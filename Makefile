@@ -1,5 +1,5 @@
 SHELL = /bin/sh
-VERSION = 2.0BRANCHE
+VERSION = 2.0rc2 
 NUMVERSION = 1.99003
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|.svn
 GROFF = groff
