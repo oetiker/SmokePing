@@ -28,7 +28,7 @@ HTML= $(addsuffix .html,$(BASE))
 POD2MAN = pod2man --release=$(VERSION) --center=SmokePing $<
 MAN2TXT = $(GROFF) -man -Tascii $< > $@
 # pod2html apparently needs to be in the target directory to get L<> links right
-POD2HTML= cd $(dir $@); top=$(shell echo $(dir $@)|sed 's,[^/]*/,../,g'); pod2html --infile=$(CURDIR)/$< --outfile=$(notdir $@) --noindex --htmlroot=. --podroot=. --podpath=$${top}doc --title=$*
+POD2HTML= cd $(dir $@); top=./$(shell echo $(dir $@)|sed -e 's,doc/,,' -e 's,[^/]*/,../,g'); pod2html --infile=$(CURDIR)/$< --outfile=$(notdir $@) --noindex --htmlroot=. --podroot=. --podpath=$${top} --title=$*
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
 MAKEPOD= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
 GENEX= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
@@ -121,7 +121,7 @@ patch:
 	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(VERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
 
 killdoc:
-	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/ISG/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod
+	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/ISG/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
 
 doc:    killdoc ref examples man html txt rename-man
 
