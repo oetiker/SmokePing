@@ -16,6 +16,7 @@ setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
 use File::Basename;
 use Smokeping::Examples;
+use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
@@ -359,8 +360,7 @@ sub init_target_tree ($$$$) {
 	    }
 	    my $pings = $probeobj->_pings($tree);
 
-	    if (not -f $name.".rrd"){
-	    	my @create = 
+	   my @create = 
 			($name.".rrd", "--step",$step,
 			      "DS:uptime:GAUGE:".(2*$step).":0:U",
 			      "DS:loss:GAUGE:".(2*$step).":0:".$pings,
@@ -369,10 +369,16 @@ sub init_target_tree ($$$$) {
 			      (map { "DS:ping${_}:GAUGE:".(2*$step).":0:180" }
 			                                                  1..$pings),
 			      (map { "RRA:".(join ":", @{$_}) } @{$cfg->{Database}{_table}} ));
+	    if (not -f $name.".rrd"){
 		do_debuglog("Calling RRDs::create(@create)");
 		RRDs::create(@create);
 		my $ERROR = RRDs::error();
 		do_log "RRDs::create ERROR: $ERROR\n" if $ERROR;
+	    } else {
+	    	shift @create; # remove the filename
+	    	my $comparison = Smokeping::RRDtools::compare($name.".rrd", \@create);
+		die("Error: RRD parameter mismatch ('$comparison'). You must delete $name.rrd or fix the configuration parameters.\n")
+			if $comparison;
 	    }
 	}
     }

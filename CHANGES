@@ -1,3 +1,4 @@
+* check at startup that existing RRD files conform to the config specifications -- niko
 * 3 pings is the official minimum now -- niko
 * graph fixes for small numbers of pings -- Chris Wilson <chris *aidworld.org>
 * fix the LDAP probe killing the CGI with perl <5.6 -- Peter Farmer <pfarmer *hashbang.org.uk>

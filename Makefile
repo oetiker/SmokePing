@@ -8,7 +8,7 @@ GROFF = groff
 
 DOCS = $(filter-out doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod,$(wildcard doc/*.pod)) doc/smokeping_examples.pod # section 7
 DOCSCONFIG := doc/smokeping_config.pod # section 5
-PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm lib/Smokeping/Examples.pm
+PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm lib/Smokeping/Examples.pm lib/Smokeping/RRDtools.pm
 PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)
 PODMATCH :=  $(wildcard lib/Smokeping/matchers/*.pm)
 
@@ -42,6 +42,8 @@ doc/Smokeping.3: lib/Smokeping.pm
 	$(POD2MAN) --section 3 > $@
 doc/Smokeping/Examples.3: lib/Smokeping/Examples.pm
 	$(POD2MAN) --section 3 > $@
+doc/Smokeping/RRDtools.3: lib/Smokeping/RRDtools.pm
+	$(POD2MAN) --section 3 > $@
 
 doc/Smokeping/probes/%.pod: lib/Smokeping/probes/%.pm
 	$(MAKEPOD) Smokeping::probes::$* > $@
@@ -63,6 +65,9 @@ doc/Smokeping.html: lib/Smokeping.pm
 	$(POD2HTML)
 doc/Smokeping/Examples.html: lib/Smokeping/Examples.pm
 	$(POD2HTML)
+doc/Smokeping/RRDtools.html: lib/Smokeping/RRDtools.pm
+	$(POD2HTML)
+
 doc/Smokeping/matchers/%.html: lib/Smokeping/matchers/%.pm
 	$(POD2HTML)
 doc/ISG/%.html: lib/ISG/%.pm
@@ -95,6 +100,7 @@ rename-man: $(MAN)
 	done
 	mv doc/ISG/ParseConfig.3 doc/ISG/ISG::ParseConfig.3
 	mv doc/Smokeping/Examples.3 doc/Smokeping/Smokeping::Examples.3
+	mv doc/Smokeping/RRDtools.3 doc/Smokeping/Smokeping::RRDtools.3
 
 ref: doc/smokeping_config.pod
 

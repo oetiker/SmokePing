@@ -101,6 +101,17 @@ The C<pings> variable now has an enforced minimum value of 3, as the
 whole design of Smokeping is based on the idea of sending several probes
 and measuring and visualizing the variation between them.
 
+=item RRD parameter checking
+
+Smokeping now checks at startup that the parameters of any existing RRD files
+match those specified in the configuration file. If there is a discrepancy,
+it will give an error message and refuse to start. 
+
+This situation is most likely to happen if you have modified the C<step>
+or C<pings> variables in your configuration file. You'll then have to
+delete the old RRD file or somehow convert it to use the new parameters.
+The C<rrdtune> command might be helpful here.
+
 =back
 
 In addition to this, some probes have had minor incompatible changes to
