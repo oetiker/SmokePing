@@ -47,7 +47,9 @@ sub pod {
 	for my $what (qw(name overview synopsis description variables authors notes bugs see_also)) {
 		my $contents = $podhash->{$what};
 		next if not defined $contents or $contents eq "";
-		$pod .= "=head1 " . uc $what . "\n\n";
+		my $headline = uc $what;
+		$headline =~ s/_/ /; # see_also => SEE ALSO
+		$pod .= "=head1 $headline\n\n";
 		$pod .= $contents;
 		chomp $pod;
 		$pod .= "\n\n";
