@@ -19,7 +19,7 @@ use Smokeping::Examples;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="1.38";
+$VERSION="1.99001";
 
 # we want opts everywhere
 my %opt;
