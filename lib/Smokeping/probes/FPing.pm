@@ -102,15 +102,15 @@ sub ping ($){
     my $errh = gensym;
     # pinging nothing is pointless
     return unless @{$self->addresses};
-    my @bytes = () ;
-    push @bytes, "-b$self->{properties}{packetsize}" if $self->{properties}{packetsize};
-    my @timeout = ();
-    push @timeout, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
+    my @params = () ;
+    push @params , "-b$self->{properties}{packetsize}" if $self->{properties}{packetsize};
+    push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
+    push @params, "-i" . int(1000 * $self->{properties}{mininterval});
+    push @params, "-p" . int(1000 * $self->{properties}{hostinterval}) if $self->{properties}{hostinterval};
     my @cmd = (
-                    $self->binary, @bytes,
+                    $self->binary,
                     '-C', $self->pings, '-q','-B1','-r1',
-		    '-i' . $self->{properties}{mindelay},
-		    @timeout,
+		    @params,
                     @{$self->addresses});
     $self->do_debug("Executing @cmd");
     my $pid = open3($inh,$outh,$errh, @cmd);
@@ -168,14 +168,25 @@ Initial target timeout. In the default mode, this is  the  amount  of  time  tha
 ping waits for a response to its first request.  Successive timeouts are multiplied by the backoff factor.
 DOC
 		},
-		mindelay => {
+		hostinterval => {
 			_re => '(\d*\.)?\d+',
-			_example => 1,
-			_default => 10,
+			_example => 1.5,
 			_doc => <<DOC,
-The fping "-i" parameter. From fping(1):
+The fping "-p" parameter, but in (possibly fractional) seconds rather than
+milliseconds, for consistency with other Smokeping probes. From fping(1):
 
-The minimum amount of time (in milliseconds) between sending a ping packet to any target.
+This parameter sets the time that fping  waits between successive packets
+to an individual target.
+DOC		
+		mininterval => {
+			_re => '(\d*\.)?\d+',
+			_example => .001,
+			_default => .01,
+			_doc => <<DOC,
+The fping "-i" parameter, but in (probably fractional) seconds rather than
+milliseconds, for consistency with other Smokeping probes. From fping(1):
+
+The minimum amount of time between sending a ping packet to any target.
 DOC
 		},
 	});

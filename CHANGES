@@ -1,3 +1,16 @@
+* new probe programming interface -- niko
+ - more strict config file checking giving helpful error messages when necessary
+ - generate probe documentation automatically from the code
+ - eliminate PROBE_CONF sections
+ - several minor incompatible probe changes; see the smokeping_upgrade document for details 
+* allow target-specific vars get defaults from Probes section -- niko
+* timeout fixes in basefork.pm -- niko
+* config file examples and smokeping_examples document -- niko
+* documentation updates and reorganizing -- niko
+* move all smokeping-specific perl modules into the Smokeping namespace -- niko
+* new commandline options '--config=X' and '--check' -- niko
+* FPing: support "-t", "-p" and "-i" fping params -- Chris Wilson <chris *aidworld.org>
+* FPing6: test against ::1 instead of localhost -- Sebastian Wiesinger <smokeping *tracker.fire-world.de>
 * fix for basefork.pm IO::Select property has_exception is very platform dependent
   by ignoring it altogether things actually work better. Especially on Solaris which
   does have propper support for has_exception as oposed to linux. --  Niko Tyni <ntyni *iki.fi>

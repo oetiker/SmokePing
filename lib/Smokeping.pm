@@ -1079,7 +1079,7 @@ sub get_parser () {
     for (readdir D) {
     	next unless s/\.pm$//;
     	next unless /^$PROBE_RE/;
-	$probelist->{$_} = "(See the separate module documentation for details about each variable.)";
+	$probelist->{$_} = "(See the L<separate module documentation|Smokeping::probes::$_> for details about each variable.)";
     }
     closedir D;
 
