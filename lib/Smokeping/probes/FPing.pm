@@ -177,7 +177,8 @@ milliseconds, for consistency with other Smokeping probes. From fping(1):
 
 This parameter sets the time that fping  waits between successive packets
 to an individual target.
-DOC		
+DOC
+		},
 		mininterval => {
 			_re => '(\d*\.)?\d+',
 			_example => .001,
