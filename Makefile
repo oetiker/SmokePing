@@ -47,6 +47,8 @@ doc/probes/%.html: doc/probes/%.pod
 	$(POD2HTML)
 doc/matchers/%.html: lib/matchers/%
 	$(POD2HTML)
+doc/smokeping.html: bin/smokeping.dist
+	$(POD2MAN)
 
 doc/%.txt: doc/%.1
 	$(GROFF) -man -Tascii $< > $@
