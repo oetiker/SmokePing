@@ -1381,7 +1381,8 @@ DOC
 			delete $grammar->{_mandatory};
 			# the parent section doesn't define a valid probe anymore
 			delete $knownprobes{$name}
-				if $knownprobes{$name} eq '_template';
+				if exists $knownprobes{$name} 
+				   and $knownprobes{$name} eq '_template';
 			# this also keeps track of the real module name for each subprobe,
 			# should we ever need it
 			$knownprobes{$subprobename} = $name;

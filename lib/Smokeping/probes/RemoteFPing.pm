@@ -82,7 +82,7 @@ sub probevars {
 	my $h = $class->SUPER::probevars;
 	$h->{rbinary} = $h->{binary};
 	delete $h->{binary};
-	delete $h->{rbinary}{sub}; # we can't check the remote program's -x bit
+	delete $h->{rbinary}{_sub}; # we can't check the remote program's -x bit
 	@{$h->{_mandatory}} = map { $_ ne 'binary' ? $_ : 'rbinary' } @{$h->{_mandatory}};
 	return $class->_makevars($h, {
 		_mandatory => [ 'binary', 'rhost' ],
