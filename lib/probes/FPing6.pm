@@ -48,5 +48,11 @@ sub probevars {
       $h->{binary}{_example} = "/usr/bin/fping6";
       return $h;
 }
+
+sub ProbeDesc($){
+    my $self = shift;
+    my $bytes = $self->{properties}{packetsize}||56;
+    return "IPv6-ICMP Echo Pings ($bytes Bytes)";
+}
   
 1;
