@@ -93,7 +93,7 @@ sub _check_mandatory($$$$)
             if (not defined $g->{$_}) {
                 $g->{$_} = {};
 
-#$self->{'err'} = "ParseConfig internal error: mandatory name $_ not found in grammar";
+#$self->{'err'} = "Config::Grammar internal error: mandatory name $_ not found in grammar";
                 #return 0;
             }
             if (not defined $c->{$_}) {
@@ -201,7 +201,7 @@ sub _next_level($$$)
     my $s = $self->_search_section($name);
     return 0 unless defined $s;
     if (not defined $self->{grammar}{$s}) {
-        $self->_make_error("ParseConfig internal error (no grammar for $s)");
+        $self->_make_error("Config::Grammar internal error (no grammar for $s)");
         return 0;
     }
     push @{$self->{grammar_stack}}, $self->{grammar};
@@ -1063,7 +1063,7 @@ documentation of the configuration file format.
 
 The B<maketmpl> method can generate a template configuration file.  If
 your grammar contains regexp matches, the template will not be all
-that helpful as ParseConfig is not smart enough to give you sensible
+that helpful as Config::Grammar is not smart enough to give you sensible
 template data based in regular expressions.
 
 =head2 Grammar Definition
