@@ -1,0 +1,372 @@
+* fix for basefork.pm IO::Select property has_exception is very platform dependent
+  by ignoring it altogether things actually work better. Especially on Solaris which
+  does have propper support for has_exception as oposed to linux. --  Niko Tyni <ntyni *iki.fi>
+  
+2005/1/30 -- 1.38
+
+* fixed error messages for environments with mixed ipv6 and ipv4 setups  -- Peter W. Osel <pwo *Infineon.COM>
+* fixed smoke coloring for 5 pings problem -- Tobi
+* fixed User-Agent example in Curl probe -- Sebastian Wiesinger <smokeping *tracker.fire-world.de>
+
+2005/1/12 -- 1.37
+
+* base class did assume that concurrent probes were off by default
+  -- Niko Tyni <ntyni *iki.fi>
+
+2005/1/7 -- 1.36 (1.35 was an internal release)
+
+* concurrent probes are default now, together with
+  a 'random' offset to make sure not all smokepings hit the net
+  at the same time -- Tobi
+* fixes for loggin -- Niko Tyni <ntyni *iki.fi>
+ - warn if no logging method is active while daemonizing.
+ - turn debugging on before loading the config file.
+ - make do_debuglog a no-op if $use_debuglog isn't set
+ - add debug info to FPing* probes
+ - print the RRD create and update strings when debugging
+* Allow probe- and target-specific number of pings  -- Niko Tyni <ntyni *iki.fi>
+* RemoteFPing probe revisited and fixed. Note this probe allowed
+  PROBE_CONF config where this was technically not possible. Now these settings
+  are done in the ***Probes*** section ... you have to fix your 
+  config files -- Niko Tyni <ntyni *iki.fi>
+* fixed many typos and some seemingly numeric comparisons -- Niko Tyni <ntyni *iki.fi>
+* new feature 'concurrentprobes' allow to run multiple probes in paralell and at different step
+  width. -- Niko Tyni <ntyni *iki.fi>
+* allow to define multiple instances of a sigle probe -- Niko Tyni <ntyni *iki.fi>
+* fix --filter again ... pathprefix was still in there -- tobi
+
+2004/11/29 -- 1.34 (1.32 + 1.33 were internal only releases)
+
+* added SNPP support as suggested by jdelisle -- tobi
+* added ipv6 support to EchoPing probe -- Niko Tyni <ntyni *iki.fi>
+* fix for Radius probe -- Niko Tyni <ntyni *iki.fi>
+* added new alert plugins called matchers -- tobi
+* created matcher::avgratio sponsored by virtela.net -- tobi
+* make --filter option actually work -- tobi
+* removed maxmedian magic regexp ... -- tobi
+* added new alert type matcher -- tobi
+* fixed pod errors -- Niko Tyni <ntyni *iki.fi>
+* allow to mix programs and email addresses in alerts --tobi
+* allow to define recipient per alert --tobi
+
+2004/08/04 -- 1.31
+
+* added anotherdns and anotherssh probes -- Christoph.Heine *HaDiKo.DE
+* modify FPing probes to skip ICPM errors in the output -- Tobi
+* modify RemoteFPing probe to work with normal fping that outputs
+  via stderr. -- Tobi
+* allow timeout to be specified in base::forks based probes -- Tobi
+* Added ssh probe -- Christian Recktenwald <smokeping-contact *citecs.de>
+
+2004/05/12 -- 1.30
+
+* fix nodata_color syntax --tobi
+
+* when inserting unknown values into sorted rtt list, do this on the outside
+  ... U:U:1:2:3:U:U and not in the middle. This will make the graphs more
+  smokei when there is data loss. --tobi
+
+* config files with different probes should work ... fixed problem introduced in 1.29 --tobi
+
+2004/05/08 -- 1.29
+* while running, make all die and warn things go to the log file if there is one --tobi
+* added rawlog option for logging actual gatherd data --tobi (for virtela)  
+* added alertee option to send a copy of any alert generated to additional 'per branche' people --tobi
+* cgi should not complain about non existing hosts ... the daemon does that already --tobi
+* actually allow empty alerts -- tobi
+
+* added nodata_color property to specify background color for graph when
+  when no data is available --  David Hull <hull *dslextreme.com>
+
+2004/03/14 -- 1.28
+* do not repeat last rounds rtts in basefork if probe gets killed on timeout -- Niko Tyni <ntyni *iki.fi>
+
+2004/03/09 -- 1.27
+* allow . in labels -- Tobi
+* fix mkdir with missing permissions -- Xander Jansen <Xander.Jansen *surfnet.nl>
+* make echoping probes complain when they do not get a 0 return value -- Tobi
+* make manu and title = host if not set -- tobi
+* forbid . in section names .. bad things will happen when used. -- tobi
+* patches for the Radius and LDAP probes --  Niko Tyni <ntyni *cc.helsinki.fi>
+* prevent requests to non existing pages -- tobi
+
+2004/02/16 -- 1.26
+* contributed radius and ldap probes --  Niko Tyni <ntyni *cc.helsinki.fi>
+* added new 'offset' parameter to config file which allows to shift startup
+  time of smokeping polling -- Tobi (for Virtela)
+* new option --static-pages to generate a static website (mrtg like) -- Santeri Paavolainen <santtu *iki.fi>
+* added support for multiple alert recipients --  Dmitry Melekhov <dm *belkam.com>
+* fix for telnetIOSping.pm to consider packet size -- Paul Wulff <paul.wulff *ap.marconi.com>
+* added --logfile option and generally enhanced logging ... 
+  smokeping will not die and log instead. -- Tobi
+
+2004/01/04 -- 1.25
+* enhaced Alert patterns: S for matching at startup
+  *X* pattern for timeshift matches. See docs. -- Tobi
+* Added timeout option the EchoPingHttp -- Tobi
+* fixed RemoteFPing probe -- Keith Patton
+
+2003/10/05 -- 1.24
+* The new --filter option allows you to run the smokeping deamon on a big config file,
+  but have the config file filtered and only measure the entries that pass
+  the filter. This allows to use rsync to consolidate measurements from
+  different hosts at a central location for presentation. -- Tobi
+* new lookup option for DNS probe -- "Poetzel, Christopher J." <cpoetzel *anl.gov>
+* store iaxhight info in img cache -- Curtis Doty <Curtis *GreenKey.net>
+* new probes: ICMP echo response times - CiscoRTTMonEchoICMP.pm,
+  DNS query response times - CiscoRTTMonDNS.pm,
+  TCP connect times - CiscoRTTMonTcpConnect.pm  -- joerg.kummer at roche.com
+
+2003/07/15 -- 1.23
+* added missing ; in DNS.pm
+
+2003/07/11 -- 1.22
+
+* fix stderr redirection:  David Hull <hull *dslextreme.com>
+* new DNS.pm based on basefork by Igor Petrovski <pigor *myrealbox.com> and  Carl Elkins <carl *celkins.org.uk>
+
+2003/06/17 -- 1.21
+
+* keep order of targets in config file when presenting on the web -- Tobi
+* fix mailsending with a b <x *y> type addresses -- Aaron Schrab <aaron *schrab.com>
+* made alert feature more robust -- Tobi
+* telnetiosping probe John A. Jackson <johnj *infoave.net>
+* add iosint configurable to IOSPing.pm --  Mars Wei <MarsWei *ncic.com.tw>
+* added RemoteFPing Probe -- Luis F Balbinot <hades *inf.ufrgs.br>
+
+2003/04/12 -- 1.20
+
+* replaced host foo with 127.0.0.1 in Echo*.pm probes -- John Sellens <jsellens *generalconcepts.com>
+* curl probe -- Gerald Combs <gerald [AT] ethereal.com>
+* DNS.pm should not use external binaries besided dig -- Tobi
+
+2003/02/19 -- 1.19
+
+* dns probe -- Andre Stolze <stolze *uni-muenster.de>
+* fixed label formatting error -- Tobi
+
+2002/12/05 -- 1.18
+
+* allow sub millisecond patterns -- Tobi
+
+* report a full link in smokeping alerts
+  suggested by "Nipper, Arnold" <arnold *nipper.de>
+
+2002/10/19 -- 1.17
+* Change the absolute max possible rtt to 180 seconds when creating new rrd files
+
+2002/10/13 -- 1.16
+
+* add Hostname as a 5th argument for external alert scripts --Tobi
+
+* when runnning fping -i must be > 10 ... (whatever 10 is) -- Tobi
+
+* fix graphing in logarithmic presentation. Handle fast pings better -- Paul J Murphy <Paul *murph.org>
+
+* added IOSPing.pm probe -- Paul J Murphy <Paul *murph.org>
+
+2002/09/27 -- 1.15
+
+* uptime color configuration was not working -- Alan Chen <alan *digikata.com>
+
+* allow to call an external script upon matching an alert pattern -- Tobi
+
+* unifie mail sending tools -- Tobi
+
+* made loss for 0.x sized values work -- rodrigo.cunha *corp.vodafone.pt
+
+* send syslog events through unix domain socket on bsd and linux systems -- Ed Ravin <eravin *panix.com>
+
+
+2002/09/10 -- 1.14
+
+* fixed docs ... remove alert_email property from docs --tobi
+
+* fixed Data output for email alerts -- tobi
+
+
+2002/09/08 -- 1.13
+
+* Added all new Alerts function. Smokeping can now match
+  alert patterns against the loss and rtt values gatherd
+  and send email when a pattern matches. -- Tobi
+
+* Display AVG loss in % -- Tobi
+
+* Add help functions back in -- Tobi
+
+* make graphs with large ping times graph properly. 
+    -- Jack Cummings <jack *mudshark.org>
+ 
+* make FPing.pm handle dead hosts more gracefully
+  '-B1','-i'. int($self->{pingfactor}/1000),'-r1' --Tobi
+
+2002/05/29 -- 1.12
+* make probes announce themselves at startup
+   -- Niko Tyni <ntyni *cc.helsinki.fi>
+
+* really ... log full loss if no pings get through ... -- Tobi
+* allow FPing probe to take packetsize option -- Tobi
+
+2002/05/08 -- 1.11
+* If no pings get trough, log a full loss and not unknown loss -- tobi
+* have a timeout to prevent hanging echoping processes 
+  -- Niko Tyni <ntyni *cc.helsinki.fi>
+* allow logging via syslog 
+  -- Niko Tyni <ntyni *cc.helsinki.fi>
+
+2002/05/06 -- 1.10
+
+* added avg loss to graphs -- tobi
+
+2002/04/29 -- 1.9
+
+* added Fping6 by Elmar Hoffmann <elho *elho.net>
+* added description about installing EchoPing, Fping and sock6 to
+  install notes
+* do not test for FPing binary when running as a cgi
+
+2002/04/24 -- 1.8
+
+* make sure smokeping.cgi manages to show its errors on the web.
+
+2002/04/12 -- 1.7
+
+* complain if fping is not seuid root -- tobi
+
+* kill one div zero bug -- Jan Ludewig <chaot *isch.de>
+
+2002/03/27 -- 1.6
+
+* fixed bug in monitoring function where targets that
+  had subtargets on the same level were ignored ... -- tobi
+
+* in basefork.pm test if IO::Select knows has_error() but not
+  has_exception() -- Jan Ludewig <chaot *isch.de>
+
+* improve handling of PID file, cases where it could not be read or written
+  wer not handlie gracefully -- Jan Ludewig <chaot *isch.de>
+
+* remove --help and --man option they never worked ...
+
+2002/03/10 -- 1.5
+
+* missed one module in the distribution ...
+
+2002/03/09 -- 1.4
+
+* make sure FPing does not hand if no targets are defined.
+
+* new mandatory config option piddir to specify where the pid file
+  should be -- Jose Carlos Garcia Sogo <jsogo *debian.org>
+  **** INCOMPATIBLE CHANGE ****
+
+* EchoPing probes contributed by Niko Tyni <ntyni *cc.helsinki.fi>
+  there is a webpage on http://www.helsinki.fi/~ntyni/smokeping/
+
+2002/03/01 -- 1.3
+
+* fixed messed up links in distribution archive ...
+
+2002/03/01 -- 1.2
+
+* improve error messages in probe setup
+
+* be smarter about detecting fping reporting unit. -- Kai <spdev *vega.fur.com>
+
+2002/02/12 -- 1.1
+
+* make detailed view colors work even if number of pings is not even
+
++INCOMPATIBLE CHANGE+ modified the definition of smokelogo and rrdlogo in the
+    webtemplate file. he tags now provide the image tage and the anchor
+    around. Please modify your template accordingly
+
+* Toby Weingartner provided some patches to clean up error messages
+
+* removed default sites from config file to protect the innocent.
+
+* detect probe loading failiours
+
+2002/02/09 -- 1.0
+
+* made basepage links stand out ...
+
+2002/01/31 -- 0.99.18
+* Fixed loss color config handling and documentation
+
+2002/01/28 -- 0.99.17
+* Get description of Ping from Probe
+* Fixed quote parsing in config parser
+
+2002/01/27 -- 0.99.16
+* fixed unison scaling ... I was picking the wrong value as median.
+* do not refuse to start if a host is missing from DNS ... just complain
+
+2002/01/27 -- 0.99.15
+* now the color works you have to use rrggbb not #rrggbb
+* added scrftime configurable to format time in lower
+  righthand corner of the graph
+
+
+2002/01/27 -- 0.99.14
+* guess [0-f] does not work it should be [0-9a-f]
+
+2002/01/26 -- 0.99.13
+* switched back to normal scaling for overview graphs
+* added average and latest median rtt numbers to graph
+* added more color settings to graph
+* allow configuration of loss and uptime colors (not tested)
+
+2002/01/23 -- 0.99.12
+* Use -alt-y-scaling for better grid in overview graphs
+* Added max_rtt to overview graphs
+
+2002/01/22 -- 0.99.11
+
+* files which must be modified are now named *.dist (thanks paul)
+* added maxrtt configurable
+* introduced new colors for link uptime using INF
+* added thin black line 'connecting the 'measurements'
+
+2002/01/20 -- 0.99.10
+
+* Added cache file for graph.max values ... this will improve unison scaling
+  in lazy mode
+* changed drawing of madian to AREA and STACK to take into account that this
+  is not anything contious we are looking at but samples ...
+
+
+2002/01/17 -- 0.99.9
+
+* allow --nodaemon as well 
+* added new configurables lograrithic and unison_tolerance
+  this should help smokeping deal better with spikes
+
+2002/01/03 -- 0.99.8
+* Change colors for LOSS display ... make small losses simpler to see
+* Sort Graphs in Overview
+* --nodemon option
+* Allow cgi urls with https://
+
+2001/11/17 -- 0.99.7
+
+* Make DYNAMIC work with hosts who do not support snmp
+* do not print anything from FPing.pm if used from CGI
+
+2001/11/03 -- 0.99.6
+
+* updated the default basepage.html to include automatic reload and cache expiery ... -- Me
+* smokeping.cgi adds header information to the webpage with expiery and charset -- Me
+* split the pod docs off the smokeping and smokeping.cgi scripts -- Me
+* created a special version of fping where configure works ... added it to the
+  download area of smokeping. -- Me
+* spell fixes for Smokepin.pm (smokeping_config.pod) -- S. William Schulz <ss *ssLinux.com>
+
+2001/11/01 -- 0.99.5
+
+* Deal with nan as well as NaN -- Me
+* Deal with DYNAMIC hosts who do not allow for SNMP -- Me
+* mkdir needs a mode (0755) -- S. William Schulz <ss *ssLinux.com>
+* Determine is fping reports in miliseconds or in 0.1 miliseconds -- Me
+* Wait for 3 seconds when restarting ... 

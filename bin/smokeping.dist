@@ -1,0 +1,148 @@
+#!/usr/sepp/bin/perl-5.8.0 -w
+# -*-perl-*-
+
+use lib qw(/usr/pack/rrdtool-1.0.47-to/lib);
+use lib qw(/home/oetiker/data/projects/AADJ-smokeping/dist/lib);
+
+use Smokeping 1.38;
+
+Smokeping::main("etc/config.dist");
+
+=head1 NAME
+
+smokeping - Commandline tool for SmokePing
+
+=head1 SYNOPSIS
+
+B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
+
+ Options:
+
+ --man        Show the manpage
+
+ --help       Help :-)
+
+ --email      Send SmokePing Agents to all Targets marked DYNAMIC
+
+ --makepod    Create POD documentation on Config file
+
+ --version    Show SmokePing Version
+
+ --debug      Run Only once and do not Fork
+
+ --debug-daemon	Start the daemon with debugging enabled
+
+ --restart    Restart SmokePing
+
+ --nodaemon    Do no daemonize the process (no fork)
+
+ --filter=x   Only measure entries which pass the filter x
+
+ --logfile    Append warnings to this logfile
+
+ --static[=x] Generates a static website in directory x.  If x is left out,
+              pagedir from the config is used.
+
+ --nosleep    For debugging you may want to run SmokePing without sleep interval
+
+=head1 DESCRIPTION
+
+The B<smokeping> tool is the commandline part of the SmokePing system. Its
+main function is to run as a daemon and send Pings to all the Targets you
+have specified in the Config file. When you call B<smokeping> without
+arguments it will start as a daemon and do its work.
+
+If called with an argument, then further functions can be activated, as seen
+in the Synopsis above. The B<--email> function is explained in the
+documentation on the config file.
+
+The B<--filter> option allows you to run the daemon on a big config file,
+but have the config file filtered and only measure the entries that pass the
+filter. This is useful for remote measurement. Run Smokeping with two
+exclusive filters in two locations and rsync the rrds back to the webserver
+host where you run the cgi. Filters act on the section names in the config
+file. Multiple section names are concatenated with B</> like path names:
+
+ *** targets ***
+ + A
+ ....
+ + B
+ ...
+ ++ C
+
+This gives
+
+ /A
+
+and 
+
+ /B, /B/C
+
+If I want to monitor /A my filter would look like this:
+
+ --filter=/A
+
+Filters follow regular expression syntax. The are always anchored at the tip of the string.
+by adding a B<!> to the front of the filter string you negate it. Matching entries will be excluded from monitoring.
+Multiple B<--filter> arguments can be used to assemble complex filters:
+
+  --filter=/A --filter=/B
+
+would include all the targets 
+
+  --filter=/A --filter=/B --filter=!/B/C
+
+would include all but /B/C.
+
+The B<--makepod> does get used internally to produce the documentation on
+the SmokePing configuration file.
+
+Please refer to the installation document for detailed setup instructions.
+
+=head1 SETUP
+
+When installing SmokePing, this file has to be adjusted to fit your
+local system. Three paths have to be entered.
+
+One pointing to your B<rrdtool> installation
+
+ use lib qw(/usr/pack/rrdtool-1.0.33-to/lib/perl);
+
+One pointing to the place where you have installed the SmokePing libraries
+
+ use lib qw(/home/oetiker/public_html/smokeping/lib);
+
+The third path is the argument to the Smokeping::main command. It points to
+the SmokePing configuration file.
+
+ use Smokeping;
+ Smokeping::main("/home/oetiker/.smokeping/config");
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 by Tobias Oetiker. All right reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA.
+
+=head1 AUTHOR
+
+Tobias Oetiker E<lt>tobi@oetiker.chE<gt>
+
+=cut

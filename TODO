@@ -1,0 +1,11 @@
+* UPTIME
+  define update via snmp pointer per device
+
+* ATTENTION
+  allow to define a thereshold rule by looking at
+  two average medians and take action when threshold triped
+
+* ALIASES
+  allow to have atarget which points to a different target
+  only targets with host are considered
+

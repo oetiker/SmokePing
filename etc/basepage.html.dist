@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"> 
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Refresh" CONTENT="<##step##>">
+<TITLE>SmokePing Latency Page for <##title##></TITLE>
+<STYLE type="text/css">
+<!--
+
+.menu { color: black;
+        font-size: 10px;
+        font-family: Arial, Helvetica, Sans-Serif;
+       }
+
+.menuitem
+       { color: black;
+         font-size: 10px;
+         font-family: Arial, Helvetica, Sans-Serif;
+       }
+       
+.menuopen
+       { color: black;
+         font-size: 10px;
+         font-family: Arial, Helvetica, Sans-Serif;
+       }
+
+.menuactive
+       { color: black;
+         font-size: 10px;
+         font-family: Arial, Helvetica, Sans-Serif;
+       }
+       
+.menuactive {
+        color: black;
+        background: #aaaaff;
+       }
+
+.menulink {
+	color: black;
+	}
+	
+.menu  A:Hover       {
+        text-decoration: none;
+        color: #000000;
+        background: silver;
+        }
+
+
+-->
+</STYLE>
+
+</HEAD>
+<BODY bgcolor="white">
+<TABLE border="0" cellpadding="10" cellspacing="0">
+<TR>
+  <TD align="left" width="130" bgcolor="#cfcfcf" valign="top">
+  <P></P>
+  <P><B>Select&nbsp;Target:</B>&nbsp;&nbsp;</P>
+  <P><##menu##></P>
+  <br>
+  <br>
+  <br>
+  <hr>
+  <br>
+  <p><small>Maintained by:<br/><A href="mailto:<##contact##>"><##owner##></A></small></p>
+  <p><small>Created using <##author##>'s <##smokeping##></small></p>
+  <P><##smokelogo##></P>
+  <P></P>
+  <P><##rrdlogo##></P>
+</TD>
+   <TD></TD>
+   <TD valign="top">
+      <H1><##title##></H1>
+        <P><##remark##></P>
+        <P><##overview##></P>
+        <P><##body##></P>
+   </TD>
+</TR>
+<tr><td width="130" bgcolor="#cfcfcf">
+</td><td></td><td></td></tr>
+</TABLE>
+</BODY>
+</HTML>

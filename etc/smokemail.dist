@@ -1,0 +1,65 @@
+From: <##FROM##>
+To:   <##TO##>
+Subject: SmokePing Agent
+  
+Hi,
+  
+Please execute the attache Perl Script on your computer. It will register
+your IP with SmokePing. You have to rerun this script at least everytime
+your IP changes. You can run the script as often as you want.
+
+The script is written in Perl. If you don't have Perl available on your
+system, you must have a Windows Box. You can easily fix this prolem by
+downloading ActivePerl from www.activestate.com
+
+As soon as you have run the SmokePing Agent, the SmokePing server will
+start monitoring your host. Check out:
+<##URL##>?target=<##PATH##>
+  
+Cheers
+<##OWNER##>
+
+------------8<------------------------
+#!/usr/bin/perl -w
+
+my $url    = '<##URL##>';
+my $path   = '<##PATH##>';
+my $secret = '<##SECRET##>';
+
+use strict;
+use IO::Socket;
+
+my $post="target=${path}&secret=${secret}";
+my $clen=length $post;
+
+$url =~ m|http://([^/]+)(/.+)|;
+my $host = $1;
+my $script = $2;
+
+my $remote = IO::Socket::INET->new( Proto => "tcp",
+                                   PeerAddr  => $host,
+                                   PeerPort  => "http(80)",
+                                   );
+exit 0 unless $remote;
+$remote->autoflush(1);
+
+print $remote <<"REQUEST";
+POST $script HTTP/1.0\r
+User-Agent: smokeping-agent/1.0\r
+Host: ${host}:80\r
+Pragma: no-cache\r
+Content-Length: ${clen}\r
+Content-Type: application/x-www-form-urlencoded\r
+\r
+${post}\r
+REQUEST
+
+my $head = 1;
+while (<$remote>) {
+    /^\s*$/ && do {$head=0;next};
+    print unless $head;
+}
+
+close $remote;
+exit;
+------------8<------------------------

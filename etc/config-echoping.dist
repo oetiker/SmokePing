@@ -1,0 +1,82 @@
+# only the relevant sections are included, see smokeping distribution
+# for the rest of them
+
+*** Probes ***
+
+# these expect to find echoping in /usr/bin
+# if not, you'll have to specify the location separately for each probe
+# + EchoPing  # uses TCP or UDP echo (port 7)
+# + EchoPingDiscard  # uses TCP or UDP discard (port 9)
+# + EchoPingChargen # uses TCP chargen (port 19)
++ EchoPingSmtp # SMTP (25/tcp) for mail servers
++ EchoPingHttps # HTTPS (443/tcp) for web servers
++ EchoPingHttp # HTTP (80/tcp) for web servers and caches
++ EchoPingIcp # ICP (3130/udp) for caches
+
+*** Targets ***
+
+# default probe
+probe = FPing
+
+menu = Top
+title = Network Latency Grapher
+remark = Welcome to the SmokePing website of xxx Company. \
+         Here you will learn all abou the latency of our network.
+
++ MyServers
+
+menu = My Servers
+title = My Servers 
+
+++ www-server
+menu = www-server
+title = Web Server (www-server) / ICMP
+# probe = FPing propagated from top
+host = www-server.abc
+
++++ http
+menu = http
+title = Web Server (www-server) / HTTP
+probe = EchoPingHttp
+host = www-server.abc 
+# default url is /
+
++++ https
+menu = https
+title = Web Server (www-server) / HTTPS
+probe = EchoPingHttps
+host = www-server.abc
+
+++ cache
+menu = www-cache
+title = Web Cache (www-cache) / ICMP
+host = www-cache.abc
+
++++ http
+menu = http
+title = www-cache / HTTP
+host = www-cache.abc
+probe = EchoPingHttp
+++++ PROBE_CONF
+port = 8080 # use the squid port
+url = http://www.microsoft.com/
+
++++ icp
+menu = icp
+title = www-cache / ICP
+host = www-cache.abc
+probe = EchoPingIcp
+++++ PROBE_CONF
+url = http://www.microsoft.com/
+
+++ mail
+menu = mail-server
+title = Mail Server (mail-server) / ICMP
+host = mail-server.abc
+
++++ smtp
+menu = mail-server / SMTP
+title = Mail Server (mail-server) / SMTP
+host = mail-server.abc
+probe = EchoPingSmtp
+

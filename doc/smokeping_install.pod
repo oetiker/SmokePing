@@ -1,0 +1,177 @@
+=head1 NAME
+
+smokeping_install - How to install SmokePing
+
+=head1 OVERVIEW
+
+This document explains how to setup SmokePing at your site.
+
+=head1 DESCRIPTION
+
+=head2 Prerequisites
+
+SmokePing does not stand alone. It relies on various other tools and
+services being present. Apart from a Unix OS and a working Perl installation
+you need the following things. The list contains the names of the tools
+together with the version of the tool which I am using, and a link for
+downloading the tool.
+
+=over
+
+=item RRDtool 1.0.x
+
+http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/pub/rrdtool-1.0.33.tar.gz
+
+Just follow the installation instructions. We need this package todo all the
+logging and graphing in SmokePing.
+
+=item FPing 2.4b2
+
+http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/fping-2.4b2_to.tar.gz 
+
+This is a special version of fping which actually builds. I have not
+modified the code in any way, I just fixed the autoconf setup. The original
+can be found on http://www.fping.com/download/fping-2.4b2.tar.gz
+
+Note that fping must be installed setuid root. It seems that older versions
+of fping report round trip times in 0.1 milliseconds instead of 1 milliseconds
+as advertised ... SmokePing tries to figure this out. It tells
+you when it starts ... let me know it it gets it wrong.
+
+=item FPing 2.4b2 IPV6 (Optional)
+
+http://unfix.org/projects/ipv6/fping-2.4b2_to-ipv6.tar.gz
+
+You need this if you want to use the FPing6 probe
+
+=item Socket6 0.11-1 (Optional)
+
+http://www.cpan.org/modules/by-module/Socket6/
+
+Optionally installing the Socket6 module for perl enables
+smokeping to check hostnames that only resolve to an IPv6
+address. If you probe such hosts using ie. the FPing6 probe
+and get warnings that those hosts don't resolve to an IP
+address, you need to install it.
+
+=item EchoPing  (Optional)
+
+http://echoping.sourceforge.net/
+
+You need this to run the EchoPing probes
+
+=item Webserver 
+
+http://httpd.apache.org/
+
+Well I wont get much into this. The important thing is, to have a webserver
+which allows you to run CGI scripts. If you are using Apache I strongly
+recommend using the F<suexec> system for running CGI scripts. Often it is
+sufficient to change the F<suexec> binary to setuid root and restart Apache.
+Using F<suexec> allow to run cgi scripts under proper user accounts.
+
+=item Perl 5.6.1
+
+http://www.perl.com
+
+I guess you will get away with older versions of perl. I am using 5.6.1 here
+and it works fine.
+
+=item SpeedyCGI 
+
+http://daemoninc.com/speedycgi/
+
+SpeedyCGI speeds up CGIs written in perl dramatically by making them memory
+resident and handing new request to the script which is already running.
+SmokePing has been optimized for use with SpeedyCGI. Note that you do NOT
+need mod_speedy, just the plain and simple speedy executable, this is the
+beauty of this tool it works without touching your apache ...  Otherwise
+you could as well be using FastCGI or mod_perl.
+
+=back
+
+=head2 Installation
+
+Once the tools listed above are in place, you can start setting up SmokePing
+itself. Once the SmokePing tools are unpacked, they are more of less ready
+to use. At least to the extent, that it is not necessary to B<install> them.
+You may want to rename the directory to a name which does not contain the
+version number of SmokePing, or at least make a symlink, so that you can use
+a persistent name when referring to SmokePing files.
+
+In the distribution you find a number of files named F<*.dist> they have to
+be edited and renamed to F<*>. Below you find a short explanation for each
+of the files you have to edit:
+
+
+=over
+
+=item F<bin/smokeping>
+
+Make sure all the required libraries are available and the first line of the
+script points to your copy of perl. Adjust the B<use lib> lines to point to
+your B<RRDtool> installation and to the B<Smokeping/lib> directory and edit
+the path of the config file to be in sync with reality.
+
+=item F<htdocs/smokeping.cgi>
+
+Edit the F<smokeping.cgi> analog to the F<smokeping> script above. Make sure
+the first line of the script is pointing to your freshly installed copy of
+Speedy CGI. Store the script in a directory of your weberver where CGIs get
+executed. You also have to edit the B<use lib> line similar to what you did
+to F<smokeping>
+
+=item F<etc/config>
+
+Create your SmokePing configuration file. The easiest is to copy the
+F<etc/config> file and work from there. Please refer to
+L<smokeping_config> for details.
+
+=item F<etc/basepage.html>
+
+Edit the html template to your likings. Please do not remove the link to the
+SmokePing counter and my name from the template.
+
+=item F<etc/smokemail>
+
+If you are going to use the B<DYNAMIC> IP support, customize the contents of this file.
+
+=back
+
+Now you are ready to start smokeping:
+
+ ./bin/smokeping
+
+Once the system works, you may want to put a SmokePing startup script into
+your F</etc/init.d> tree. Check out L<smokeping> for further information.
+
+When you can now also open the smokeping.cgi webpage to look at your data.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 by Tobias Oetiker. All right reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA.
+
+=head1 AUTHOR
+
+Tobias Oetiker E<lt>tobi@oetiker.chE<gt>
+
+=cut
