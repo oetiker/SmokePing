@@ -148,6 +148,8 @@ quotes are not needed anymore around the User-Agent string (the C<agent>
 parameter).  Smokeping will complain if it notices quotes around the
 string.
 
+Any extra arguments for C<curl> can now be specified in the C<extraargs> variable.
+
 =item L<EchoPingHttp|Smokeping::probes::EchoPingHttp>
 
 The default timeout of this probe has been raised to 10 seconds.

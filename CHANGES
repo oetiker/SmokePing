@@ -1,3 +1,5 @@
+* Curl now has a new "extraargs" option for any extra arguments, like "--header"
+  -- niko, requested by Warrick FitzGerald <lists.smokeping.wfitzgerald *crtman.com>
 * change ISG::ParseConfig references to its new name, Config::Grammar -- niko
 * don't create any RRD files if running as a CGI -- niko
 * Curl timeouts work better now -- niko, reported by Chris Wilson <chris *aidworld.org>
