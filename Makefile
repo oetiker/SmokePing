@@ -85,7 +85,7 @@ patch:
 	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(VERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
 
 killdoc:
-	-rm doc/*.1 doc/*.txt doc/*.html doc/probes/* doc/matchers/* doc/ISG/*
+	-rm doc/*.1 doc/*.txt doc/*.html doc/probes/* doc/matchers/* doc/ISG/* doc/examples/*
 
 doc:    killdoc ref man html txt examples
 
