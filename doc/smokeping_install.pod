@@ -20,33 +20,54 @@ downloading the tool.
 
 =item RRDtool 1.0.x
 
-http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/pub/rrdtool-1.0.33.tar.gz
+L<http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/>
 
 Just follow the installation instructions. We need this package todo all the
 logging and graphing in SmokePing.
 
-=item FPing 2.4b2
+=item FPing 
 
-http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/fping-2.4b2_to.tar.gz 
+L<http://www.fping.com/>
 
-This is a special version of fping which actually builds. I have not
-modified the code in any way, I just fixed the autoconf setup. The original
-can be found on http://www.fping.com/download/fping-2.4b2.tar.gz
+You should grab the newest version, 2.4b2_to-ipv6, as it has IPv6 support
+and actually builds, unlike the older ones.
 
 Note that fping must be installed setuid root. It seems that older versions
 of fping report round trip times in 0.1 milliseconds instead of 1 milliseconds
 as advertised ... SmokePing tries to figure this out. It tells
 you when it starts ... let me know it it gets it wrong.
 
-=item FPing 2.4b2 IPV6 (Optional)
+=item EchoPing  (Optional)
 
-http://unfix.org/projects/ipv6/fping-2.4b2_to-ipv6.tar.gz
+L<http://echoping.sourceforge.net/>
 
-You need this if you want to use the FPing6 probe
+You need this to run the EchoPing probes
 
-=item Socket6 0.11-1 (Optional)
+=item Curl (Optional)
 
-http://www.cpan.org/modules/by-module/Socket6/
+L<http://curl.haxx.se/>
+
+You need this for the Curl probe.
+
+=item dig (Optional)
+
+L<http://http://www.isc.org/sw/bind/>
+
+You need this for the DNS probe.
+
+=item SSH (Optional)
+
+L<http://www.openssh.org/>
+
+You need this for the SSH probe.
+
+=item Various Perl modules (Optional)
+
+You can get these from L<http://www.cpan.org/>.
+
+=over
+
+=item Socket6 0.11-1
 
 Optionally installing the Socket6 module for perl enables
 smokeping to check hostnames that only resolve to an IPv6
@@ -54,15 +75,27 @@ address. If you probe such hosts using ie. the FPing6 probe
 and get warnings that those hosts don't resolve to an IP
 address, you need to install it.
 
-=item EchoPing  (Optional)
+=item Net::Telnet 
 
-http://echoping.sourceforge.net/
+You need this for the telnetIOSPing probe.
 
-You need this to run the EchoPing probes
+=item Net::DNS
+
+You need this for the AnotherDNS probe.
+
+=item Net::LDAP
+
+You need this for the LDAP probe.
+
+=item Authen::Radius
+
+You need this for the Radius probe.
+
+=back
 
 =item Webserver 
 
-http://httpd.apache.org/
+L<http://httpd.apache.org/>
 
 Well I wont get much into this. The important thing is, to have a webserver
 which allows you to run CGI scripts. If you are using Apache I strongly
@@ -72,14 +105,14 @@ Using F<suexec> allow to run cgi scripts under proper user accounts.
 
 =item Perl 5.6.1
 
-http://www.perl.com
+L<http://www.perl.com>
 
 I guess you will get away with older versions of perl. I am using 5.6.1 here
 and it works fine.
 
 =item SpeedyCGI 
 
-http://daemoninc.com/speedycgi/
+L<http://daemoninc.com/speedycgi/>
 
 SpeedyCGI speeds up CGIs written in perl dramatically by making them memory
 resident and handing new request to the script which is already running.

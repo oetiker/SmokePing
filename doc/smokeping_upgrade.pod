@@ -83,17 +83,17 @@ their configuration.
 
 =over
 
-=item RemoteFPing
+=item L<RemoteFPing|Smokeping::probes::RemoteFPing>
 
 The C<rbinary> variable is now mandatory. This is a side effect from a bigger change:
 the probe is now derived from the FPing probe and supports all the variables
 FPing does.
 
-=item FPing6
+=item L<FPing6|Smokeping::probes::FPing6>
 
 This probe is also now derived from FPing and supports all the variables FPing does.
 
-=item Curl
+=item L<Curl|Smokeping::probes::Curl>
 
 The URL that will be used is now specified with the variable C<urlformat> instead
 of C<url>. The new variable can (and usually should) include a placeholder
@@ -104,12 +104,12 @@ The change was made to fix the confusing situation where the C<host> variable
 was required for each actual target, but it didn't actually have any effect
 (as the server to be probed came from the C<url> variable.)
 
-=item EchoPingIcp
+=item L<EchoPingIcp|Smokeping::probes::EchoPingIcp>
 
 The C<url> variable is now mandatory, as the old default "/" didn't make
 sense because it's relative rather than absolute.
 
-=item LDAP
+=item L<LDAP|Smokeping::probes::LDAP>
 
 The C<filter> variable is now mandatory, as Net::LDAP bails out without it.
 
@@ -118,24 +118,24 @@ were changed accordingly (it's now the minimum time between two queries
 rather than the time slept between the end of one and the start of the
 another.)
 
-=item Radius
+=item L<Radius|Smokeping::probes::Radius>
 
 The C<sleeptime> variable was changed to C<mininterval> and its semantics
 were changed accordingly. See the LDAP explanation above.
 
-=item AnotherDNS
+=item L<AnotherDNS|Smokeping::probes::AnotherDNS>
 
 The C<sleeptime> variable was changed to C<mininterval> and its semantics
 were changed accordingly. See the LDAP explanation above. Additionally,
 the time is now specified in seconds rather than microseconds.
 
-=item AnotherSSH
+=item L<AnotherSSH|Smokeping::probes::AnotherSSH>
 
 The C<sleeptime> variable was changed to C<mininterval> and its semantics
 were changed accordingly. See the LDAP explanation above. Additionally,
 the time is now specified in seconds rather than microseconds.
 
-=item telnetIOSPing
+=item L<telnetIOSPing|Smokeping::probes::telnetIOSPing>
 
 The C<target> variable was removed. The target should now be specified
 in the C<host> variable, like it is with all the other probes.
@@ -146,7 +146,7 @@ in the C<host> variable, like it is with all the other probes.
 
 =over
 
-=item The RemoteFPing probe
+=item The L<RemoteFPing|Smokeping::probes::RemoteFPing> probe
 
 The configuration of this probe was moved from the Targets section to the
 Probes section, as all the variables are really probe-specific. The moved
@@ -196,4 +196,4 @@ Niko Tyni <ntyni@iki.fi>
 
 =head1 SEE ALSO
 
-The other Smokeping documents, especially smokeping_config.
+The other Smokeping documents, especially L<smokeping_config>.

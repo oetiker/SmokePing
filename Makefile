@@ -6,7 +6,7 @@ GROFF = groff
 .SUFFIXES:
 .SUFFIXES: .pm .pod .txt .html .man .1 .3 .5 .7
 
-DOCS = $(filter-out smokeping_config,$(wildcard doc/*.pod)) # section 7
+DOCS = $(filter-out smokeping_config,$(wildcard doc/*.pod)) doc/smokeping_examples.pod # section 7
 DOCSCONFIG := doc/smokeping_config.pod # section 5
 PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm lib/Smokeping/Examples.pm
 PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)
@@ -16,7 +16,7 @@ DOCSBASE = $(subst .pod,,$(DOCS))
 MODBASE = $(subst .pm,,$(subst lib/,doc/,$(PM))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODPROBE))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODMATCH)))
-PROGBASE = doc/smokeping
+PROGBASE = doc/smokeping doc/smokeping.cgi
 DOCSCONFIGBASE = doc/smokeping_config
 
 BASE = $(DOCSBASE) $(MODBASE) $(PROGBASE) $(DOCSCONFIGBASE)
@@ -27,7 +27,8 @@ HTML= $(addsuffix .html,$(BASE))
 
 POD2MAN = pod2man --release=$(VERSION) --center=SmokePing $<
 MAN2TXT = $(GROFF) -man -Tascii $< > $@
-POD2HTML= cd doc ; pod2html --infile=../$< --outfile=../$@ --noindex --htmlroot=. --podroot=. --podpath=.:../bin --title=$*
+# pod2html apparently needs to be in the target directory to get L<> links right
+POD2HTML= cd $(dir $@); top=$(shell echo $(dir $@)|sed 's,[^/]*/,../,g'); pod2html --infile=$(CURDIR)/$< --outfile=$(notdir $@) --noindex --htmlroot=. --podroot=. --podpath=$${top}doc:$${top}bin --title=$*
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
 MAKEPOD= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
 GENEX= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
@@ -36,26 +37,39 @@ doc/%.7: doc/%.pod
 	$(POD2MAN) --section 7 > $@
 doc/%.5: doc/%.pod
 	$(POD2MAN) --section 5 > $@
-doc/%.3: lib/%.pm
+
+doc/Smokeping.3: lib/Smokeping.pm
 	$(POD2MAN) --section 3 > $@
-doc/Smokeping/%.pod: lib/Smokeping/%.pm
+doc/Smokeping/Examples.3: lib/Smokeping/Examples.pm
+	$(POD2MAN) --section 3 > $@
+
+doc/Smokeping/probes/%.pod: lib/Smokeping/probes/%.pm
 	$(MAKEPOD) Smokeping::probes::$* > $@
-doc/Smokeping/%.3: doc/Smokeping/%.pod
+
+doc/Smokeping/probes/%.3: doc/Smokeping/probes/%.pod
 	$(POD2MAN) --section 3 > $@
-doc/ISG/%.3: lib/Smokeping/ISG/%
+doc/Smokeping/matchers/%.3: lib/Smokeping/matchers/%.pm
+	$(POD2MAN) --section 3 > $@
+doc/ISG/%.3: lib/ISG/%.pm
 	$(POD2MAN) --section 3 > $@
 doc/smokeping.1: bin/smokeping.dist
+	$(POD2MAN) --section 1 > $@
+doc/smokeping.cgi.1: htdocs/smokeping.cgi.dist
 	$(POD2MAN) --section 1 > $@
 
 doc/%.html: doc/%.pod
 	$(POD2HTML)
-doc/%.html: lib/%.pm
+doc/Smokeping.html: lib/Smokeping.pm
 	$(POD2HTML)
-doc/Smokeping/%.html: doc/Smokeping/%.pod
+doc/Smokeping/Examples.html: lib/Smokeping/Examples.pm
 	$(POD2HTML)
-doc/ISG/%.html: lib/Smokeping/ISG/%
+doc/Smokeping/matchers/%.html: lib/Smokeping/matchers/%.pm
+	$(POD2HTML)
+doc/ISG/%.html: lib/ISG/%.pm
 	$(POD2HTML)
 doc/smokeping.html: bin/smokeping.dist
+	$(POD2HTML)
+doc/smokeping.cgi.html: htdocs/smokeping.cgi.dist
 	$(POD2HTML)
 
 doc/%.txt: doc/%.1

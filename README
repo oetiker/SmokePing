@@ -37,10 +37,12 @@ install. The following important documentation files are
 included with SmokePing:
 
 
- * doc/smokeping_install.txt -- How to Setup and Install 
- * doc/smokeping_config.txt  -- Description of the Config File
- * doc/smokeping.txt         -- About the SmokePing Daemon   
- * doc/smokeping.cgi.txt     -- About the CGI Module
+ * doc/smokeping_install.txt  -- How to Setup and Install 
+ * doc/smokeping_upgrade.txt  -- Notes on upgrading
+ * doc/smokeping_config.txt   -- Description of the Config File
+ * doc/smokeping_examples.txt -- Examples of the Config File
+ * doc/smokeping.txt          -- About the SmokePing Daemon   
+ * doc/smokeping.cgi.txt      -- About the CGI Module
 
 In the doc directory you can find even more information
 and the above documents in MAN, POD, TXT and HTML format.

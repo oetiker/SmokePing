@@ -9,7 +9,7 @@ Smokeping::Examples - A module for generating the smokeping_examples document
 
 =head1 OVERVIEW
 
-This module generates the smokeping_examples document and the example
+This module generates L<smokeping_examples> and the example
 configuration files distributed with Smokeping. It is supposed to be
 invoked from the smokeping distribution top directory, as it will need
 the C<etc/config.dist> template configuration file and will create files
@@ -23,7 +23,7 @@ created example configuration files.
 
 =head1 BUGS
 
-This module uses more or less internal functions from C<Smokeping.pm>. It's a 
+This module uses more or less internal functions from L<Smokeping.pm|Smokeping>. It's a 
 separate module only because the latter is much too big already.
 
 It should be possible to include POD markup in the configuration explanations
@@ -97,11 +97,12 @@ All the examples can be found in the C<examples> directory in the
 Smokeping documentation. Note that the DNS names in the examples are
 non-functional.
 
-Details of the syntax and all the variables are found in the
-smokeping_config reference document and in the documentation of the
+Details of the syntax and all the variables are found in 
+L<smokeping_config> and in the documentation of the
 corresponding probe, if applicable.
 
-This manual is automatically generated from the Smokeping source code.
+This manual is automatically generated from the Smokeping source code,
+specifically the L<Smokeping::Examples|Smokeping::Examples> module.
 
 ${e}head1 DESCRIPTION
 
@@ -150,7 +151,7 @@ Niko Tyni <ntyni\@iki.fi>
 
 ${e}head1 SEE ALSO
 
-The other Smokeping documents, especially smokeping_config.
+The other Smokeping documents, especially L<smokeping_config>.
 DOC
 }
 

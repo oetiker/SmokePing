@@ -17,7 +17,7 @@ source of this document are most appreciated.
 
 The first thing you should decide is which base class you should
 use for your probe. For most (if not all) uses it's a choice between
-C<Smokeping::probes::base> and C<Smokeping::probes::basefork>. The former is intended for probes
+L<Smokeping::probes::base|Smokeping::probes::base> and L<Smokeping::probes::basefork|Smokeping::probes::basefork>. The former is intended for probes
 that can measure their targets all in one go, while the latter is for
 probing them one at a time, possibly in several concurrent subprocesses.
 
@@ -27,7 +27,7 @@ you should too. This document will thus concentrate on the latter case.
 
 =head1 SKELETON FILE
 
-The C<Smokeping::probes::skel> module is a non-functional probe that is intended
+The L<Smokeping::probes::skel|Smokeping::probes::skel> module is a non-functional probe that is intended
 to make a good basis for a new probe module. Copy the file, 
 C<lib/probes/skel.pm>, to a new name and just fill out the blanks :)
 Note that real probe modules must have at least one capital letter
@@ -36,7 +36,7 @@ in their name.
 =head1 PROBE DOCUMENTATION
 
 The probe documentation is generated from the source code with the
-C<smokeping> arguments C<--man> or C<--makepod>. The embedded
+L<smokeping|smokeping> arguments C<--man> or C<--makepod>. The embedded
 POD documentation should point to this real documentation, so
 that curious users of the C<perldoc> command see what's going on.
 All the current probes do this.
@@ -61,7 +61,7 @@ by the web frontend.
 All Smokeping probes must define their variables by implementing a
 C<probevars> method for probe-specific variables and a C<targetvars>
 method for target-specific variables. If you don't know the difference
-between these yet, see the L<smokeping_examples> document.
+between these yet, see L<smokeping_examples>.
 
 (The probes that are derived from C<Smokeping::probes::base> don't support
 target-specific variables, so they only use the C<probevars> method.)
@@ -86,9 +86,9 @@ convenience method called C<_makevars> that does this, and the common idiom is
  }
 
 The variables are declared in a syntax that comes from the module used
-for parsing the configuration file, C<ISG::ParseConfig>. Each variable
+for parsing the configuration file, L<ISG::ParseConfig>. Each variable
 should be a hash that uses the "special variable keys" documented in
-the C<ISG::ParseConfig> manual. See the C<Smokeping::probes::skel> and the other
+the C<ISG::ParseConfig> manual. See C<Smokeping::probes::skel> and the other
 probes for examples. 
 
 For reference, here are the keys the hash should have. Much of this
@@ -178,7 +178,7 @@ That's it, you're done!
 
 If you would like to provide a documented example configuration for your
 probe (in addition to the automatically generated SYNOPSYS section in
-the probe manual), you can do so by adding it to the Smokeping::Examples
+the probe manual), you can do so by adding it to the L<Smokeping::Examples|Smokeping::Examples>
 module.  Look for the 'examples' subroutine and add your example there.
 
 Future versions of Smokeping might provide a way to embed examples in
@@ -250,4 +250,4 @@ This document makes writing new probes look much harder than it really is.
 
 =head1 SEE ALSO
 
-The other Smokeping documents, especially smokeping_config.
+The other Smokeping documents, especially L<smokeping_config>.

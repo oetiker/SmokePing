@@ -2862,7 +2862,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
 
 =head1 AUTHOR
 
-Tobias Oetiker E<lt>tobi\@oetiker.chE<gt>
+Tobias Oetiker E<lt>tobi@oetiker.chE<gt>
 
 Niko Tyni E<lt>ntyni@iki.fiE<gt>
 
