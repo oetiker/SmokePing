@@ -194,12 +194,12 @@ sub genpod {
 	my $text = "";
 	$text .= "=over\n\n";
 	$text .= "=item Probe configuration\n\n";
-	$text .= "*** Probes ***\n";
+	$text .= " *** Probes ***\n";
 	$text .= join("\n", map { " $_" } split(/\n/, $h->{probes}));
 	$text .= "\n\n=item Probe explanation\n\n";
 	$text .= $h->{probedoc} || "No probedoc found !";
 	$text .= "\n\n=item Target configuration\n\n";
-	$text .= "*** Targets ***\n";
+	$text .= " *** Targets ***\n";
 	$text .= join("\n", map { " $_" } split(/\n/, $h->{targets}));
 	$text .= "\n\n=item Target explanation\n\n";
 	$text .= $h->{targetdoc} || "No targetdoc found !";
@@ -223,11 +223,11 @@ sub writecfg {
 DOC
 	print F $template->{common};
 	print F "# (The actual example starts here.)\n";
-	print F "\n *** Probes ***\n\n";
+	print F "\n*** Probes ***\n\n";
 	print F join("\n", map { "# $_" } split(/\n/, $h->{probedoc} || 'No probedoc found!'));
 	print F "\n\n";
 	print F $h->{probes};
-	print F "\n *** Targets ***\n\n";
+	print F "\n*** Targets ***\n\n";
 	print F join("\n", map { "# $_" } split(/\n/, $h->{targetdoc} || 'No targetdoc found'));
 	print F "\n\n";
 	print F $h->{targets};
