@@ -4,7 +4,7 @@ package Smokeping::RRDtools;
 
 Smokeping::RRDtools - Tools for RRD file handling
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
  use Smokeping::RRDtools;
  use RRDs;

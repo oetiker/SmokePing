@@ -46,7 +46,7 @@ manpage. The supported section names are
 C<name>, C<overview>, C<description>, C<authors>, C<notes>, C<bugs>, and
 C<see_also>. If you don't need a particular section, just leave it out.
 
-The special sections C<synopsys> and C<variables> are automatically
+The special sections C<synopsis> and C<variables> are automatically
 generated from the description of your variables. See below.
 
 Note that if you use 'here documents' ('<<') that have POD markup inside,
@@ -114,7 +114,7 @@ Description of the variable.
 
 =item _example
 
-An example value. This will be used in the SYNOPSYS section in the
+An example value. This will be used in the SYNOPSIS section in the
 probe manual.
 
 =back
@@ -185,7 +185,7 @@ That's it, you're done!
 =head1 EXAMPLE CONFIGURATIONS
 
 If you would like to provide a documented example configuration for your
-probe (in addition to the automatically generated SYNOPSYS section in
+probe (in addition to the automatically generated SYNOPSIS section in
 the probe manual), you can do so by adding it to the L<Smokeping::Examples|Smokeping::Examples>
 module.  Look for the 'examples' subroutine and add your example there.
 

@@ -42,9 +42,9 @@ sub pod {
 	my $class = shift;
 	my $pod = "";
 	my $podhash = $class->pod_hash;
-	$podhash->{synopsys} = $class->pod_synopsys;
+	$podhash->{synopsis} = $class->pod_synopsis;
 	$podhash->{variables} = $class->pod_variables;
-	for my $what (qw(name overview synopsys description variables authors notes bugs see_also)) {
+	for my $what (qw(name overview synopsis description variables authors notes bugs see_also)) {
 		my $contents = $podhash->{$what};
 		next if not defined $contents or $contents eq "";
 		$pod .= "=head1 " . uc $what . "\n\n";
@@ -316,7 +316,7 @@ sub _makevars {
 	return $to;
 }
 
-sub pod_synopsys {
+sub pod_synopsis {
 	my $class = shift;
 	my $classname = ref $class||$class;
 	$classname =~ s/^Smokeping::probes:://;
@@ -329,8 +329,8 @@ sub pod_synopsys {
  +$classname
 
 DOC
-	$pod .= $class->_pod_synopsys($probevars);
-	my $targetpod = $class->_pod_synopsys($targetvars);
+	$pod .= $class->_pod_synopsis($probevars);
+	my $targetpod = $class->_pod_synopsis($targetvars);
         $pod .= "\n # The following variables can be overridden in each target section\n$targetpod"
 		if defined $targetpod and $targetpod ne "";
         $pod .= <<DOC;
@@ -353,8 +353,8 @@ DOC
 	return $pod;
 }
 
-# synopsys for one hash ref
-sub _pod_synopsys {
+# synopsis for one hash ref
+sub _pod_synopsis {
 	my $class = shift;
 	my $vars = shift;
 	my %mandatory;
