@@ -67,10 +67,15 @@ sub targetvars {
 		agent => {
 			_doc => <<DOC,
 The "-A" curl(1) option.  This is a full HTTP User-Agent header including
-the words "User-Agent:".  It should be enclosed in quotes if it contains
-shell metacharacters.
+the words "User-Agent:". Note that it does not need any quotes around it.
 DOC
-			_example => '"User-Agent: Lynx/2.8.4rel.1 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.6c"',
+			_example => 'User-Agent: Lynx/2.8.4rel.1 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.6c',
+			_sub => sub {
+				my $val = shift;
+				return "The Curl 'agent' string does not need any quotes around it anymore."
+					if $val =~ /^["']/ or $val =~ /["']$/;
+				return undef;
+			},
 		},
 		timeout => {
 			_doc => qq{The "-m" curl(1) option.  Maximum timeout in seconds.},
@@ -170,11 +175,10 @@ sub proto_args {
 	my $target = shift;
 	# XXX - It would be neat if curl had a "time_transfer".  For now,
 	# we take the total time minus the DNS lookup time.
-	my @args = ("-o /dev/null", "-w 'Time: %{time_total} DNS time: %{time_namelookup}\\n'");
+	my @args = ("-o", "/dev/null", "-w", "Time: %{time_total} DNS time: %{time_namelookup}\\n");
 	my $ssl2 = $target->{vars}{ssl2};
 	push (@args, "-2") if defined($ssl2);
 	return(@args);
-
 }
 
 sub make_commandline {
@@ -197,21 +201,20 @@ sub pingone {
 
 	my @cmd = $self->make_commandline($t);
 
-	my $cmd = join(" ", @cmd);
-
-	$self->do_debug("executing cmd $cmd");
+	$self->do_debug("executing command list " . join(",", map { qq('$_') } @cmd));
 
 	my @times;
 	my $count = $self->pings($t);
 
 	for (my $i = 0 ; $i < $count; $i++) {
-		open(P, "$cmd 2>&1 |") or croak("fork: $!");
+		open(P, "-|", @cmd) or croak("fork: $!");
 
-		# what should we do with error messages?
+		my $val;
+
 		while (<P>) {
-			/^Time: (\d+\.\d+) DNS time: (\d+\.\d+)/ and push @times, $1 - $2;
+			/^Time: (\d+\.\d+) DNS time: (\d+\.\d+)/ and $val = $1 - $2;
 		}
-		close P;
+		close P and defined $val and push @times, $val;
 	}
 	
 	# carp("Got @times") if $self->debug;

@@ -140,7 +140,13 @@ The change was made to fix the confusing situation where the C<host> variable
 was required for each actual target, but it didn't actually have any effect
 (as the server to be probed came from the C<url> variable.)
 
+Timeouts are now recognized properly by looking at the curl exit code.
 The default timeout of this probe has been raised to 10 seconds.
+
+The command line is now executed without an intervening /bin/sh, and so
+quotes are not needed anymore around the User-Agent string (the C<agent>
+parameter).  Smokeping will complain if it notices quotes around the
+string.
 
 =item L<EchoPingHttp|Smokeping::probes::EchoPingHttp>
 
