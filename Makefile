@@ -8,14 +8,14 @@ GROFF = groff
 
 DOCS = $(filter-out smokeping_config,$(wildcard doc/*.pod)) # section 7
 DOCSCONFIG := doc/smokeping_config.pod # section 5
-PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm 
+PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm lib/Smokeping/Examples.pm
 PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)
 PODMATCH :=  $(wildcard lib/Smokeping/matchers/*.pm)
 
 DOCSBASE = $(subst .pod,,$(DOCS))
 MODBASE = $(subst .pm,,$(subst lib/,doc/,$(PM))) \
-	$(subst .pm,,$(subst lib/Smokeping/probes,doc/probes,$(PODPROBE))) \
-	$(subst .pm,,$(subst lib/Smokeping/matchers,doc/matchers,$(PODMATCH)))
+	$(subst .pm,,$(subst lib/,doc/,$(PODPROBE))) \
+	$(subst .pm,,$(subst lib/,doc/,$(PODMATCH)))
 PROGBASE = doc/smokeping
 DOCSCONFIGBASE = doc/smokeping_config
 
@@ -27,7 +27,7 @@ HTML= $(addsuffix .html,$(BASE))
 
 POD2MAN = pod2man --release=$(VERSION) --center=SmokePing $<
 MAN2TXT = $(GROFF) -man -Tascii $< > $@
-POD2HTML= cd doc ; pod2html --infile=../$< --outfile=../$@ --noindex --htmlroot=. --podroot=. --podpath=. --title=$*
+POD2HTML= cd doc ; pod2html --infile=../$< --outfile=../$@ --noindex --htmlroot=. --podroot=. --podpath=.:../bin --title=$*
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
 MAKEPOD= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
 GENEX= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
@@ -38,11 +38,9 @@ doc/%.5: doc/%.pod
 	$(POD2MAN) --section 5 > $@
 doc/%.3: lib/%.pm
 	$(POD2MAN) --section 3 > $@
-doc/probes/%.pod: lib/Smokeping/probes/%.pm
+doc/Smokeping/%.pod: lib/Smokeping/%.pm
 	$(MAKEPOD) Smokeping::probes::$* > $@
-doc/probes/%.3: doc/probes/%.pod
-	$(POD2MAN) --section 3 > $@
-doc/matchers/%.3: lib/Smokeping/matchers/%.pm
+doc/Smokeping/%.3: doc/Smokeping/%.pod
 	$(POD2MAN) --section 3 > $@
 doc/ISG/%.3: lib/Smokeping/ISG/%
 	$(POD2MAN) --section 3 > $@
@@ -53,9 +51,7 @@ doc/%.html: doc/%.pod
 	$(POD2HTML)
 doc/%.html: lib/%.pm
 	$(POD2HTML)
-doc/probes/%.html: doc/probes/%.pod
-	$(POD2HTML)
-doc/matchers/%.html: lib/Smokeping/matchers/%.pm
+doc/Smokeping/%.html: doc/Smokeping/%.pod
 	$(POD2HTML)
 doc/ISG/%.html: lib/Smokeping/ISG/%
 	$(POD2HTML)
@@ -79,11 +75,12 @@ txt: $(TXT)
 
 rename-man: $(MAN)
 	for j in probes matchers; do \
-	  for i in doc/$$j/*.3; do \
+	  for i in doc/Smokeping/$$j/*.3; do \
 	    mv $$i `echo $$i | sed s,$$j/,$$j/Smokeping::$$j::,`; \
 	  done; \
 	done
 	mv doc/ISG/ParseConfig.3 doc/ISG/ISG::ParseConfig.3
+	mv doc/Smokeping/Examples.3 doc/Smokeping/Smokeping::Examples.3
 
 ref: doc/smokeping_config.pod
 
@@ -102,7 +99,7 @@ patch:
 	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(VERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
 
 killdoc:
-	-rm doc/*.[1357] doc/*.txt doc/*.html doc/probes/* doc/matchers/* doc/ISG/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod
+	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/ISG/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod
 
 doc:    killdoc ref examples man html txt rename-man
 
