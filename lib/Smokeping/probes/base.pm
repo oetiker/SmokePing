@@ -279,6 +279,12 @@ DOC
 		},
 		pings => {
 			_re => '\d+',
+           		_sub => sub {
+                		my $val = shift;
+                		return "ERROR: The pings value must be at least 3."
+                        		if $val < 3;
+                		return undef;
+           		},
 			_example => 20,
 			_doc => <<DOC,
 How many pings should be sent to each target, if different from the global

@@ -686,7 +686,7 @@ sub get_detail ($$$$){
         close HG;
     }
 
-    my $smoke = $pings - 3 > 0
+    my $smoke = $pings >= 3
          ? smokecol $pings : 
 	   [ 'COMMENT:(Not enough pings to draw any smoke.)\s', 'COMMENT:\s' ]; 
 	   # one \s doesn't seem to be enough
@@ -1622,7 +1622,8 @@ by changing the entries in the cfg file.
 DOC
 	 
 	 step   => 
-	 { %$INTEGER_SUB,
+	 { 
+	  %$INTEGER_SUB,
 	   _doc => <<DOC,
 Duration of the base operation interval of SmokePing in seconds.
 SmokePing will venture out every B<step> seconds to ping your target hosts.
@@ -1634,9 +1635,15 @@ DOC
 	 },
 	 pings  => 
 	 {
-	  %$INTEGER_SUB,
+	   _re => '\d+',
+	   _sub => sub {
+	 	my $val = shift;
+		return "ERROR: The pings value must be at least 3."
+			if $val < 3;
+		return undef;
+	   },
 	  _doc => <<DOC,
-How many pings should be sent to each target. Suggested: 20 pings.
+How many pings should be sent to each target. Suggested: 20 pings. Minimum value: 3 pings.
 This can be overridden by each probe. Some probes (those derived from
 basefork.pm, ie. most except the FPing variants) will even let this
 be overridden target-specifically. Note that the number of pings in

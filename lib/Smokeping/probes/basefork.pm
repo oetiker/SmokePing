@@ -125,6 +125,12 @@ sub targetvars {
 	return $class->_makevars($class->SUPER::targetvars, {
 		pings => {
 			_re => '\d+', 
+			_sub => sub {
+				my $val = shift;
+				return "ERROR: The pings value must be at least 3."
+					if $val < 3;
+				return undef;
+			},
 			_example => 5,
 			_doc => <<DOC,
 How many pings should be sent to each target, if different from the global
