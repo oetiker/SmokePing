@@ -27,6 +27,9 @@ DOC
 Measures HTTP roundtrip times (web servers and caches) for SmokePing.
 DOC
 		notes => <<DOC,
+You should consider setting a lower value for the C<pings> variable than the
+default 20, as repetitive URL fetching may be quite heavy on the server.
+
 The I<fill>, I<size> and I<udp> EchoPing variables are not valid for EchoPingHttp.
 DOC
 		authors => <<'DOC',

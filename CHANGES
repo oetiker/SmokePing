@@ -1,3 +1,4 @@
+* 3 pings is the official minimum now -- niko
 * graph fixes for small numbers of pings -- Chris Wilson <chris *aidworld.org>
 * fix the LDAP probe killing the CGI with perl <5.6 -- Peter Farmer <pfarmer *hashbang.org.uk>
 * make the LDAP probe work withouth IO::Socket::SSL -- niko

@@ -95,6 +95,12 @@ The matcher modules have been renamed to start with a capital letter,
 to differentiate the actual modules from the base classes. You have to
 capitalize the matcher name in the pattern definition accordingly.
 
+=item Minimum number of pings
+
+The C<pings> variable now has an enforced minimum value of 3, as the
+whole design of Smokeping is based on the idea of sending several probes
+and measuring and visualizing the variation between them.
+
 =back
 
 In addition to this, some probes have had minor incompatible changes to

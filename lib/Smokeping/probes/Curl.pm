@@ -30,6 +30,9 @@ sub pod_hash {
  Niko Tyni <ntyni@iki.fi>
 DOC
 	notes => <<DOC,
+You should consider setting a lower value for the C<pings> variable than the
+default 20, as repetitive URL fetching may be quite heavy on the server.
+
 The URL to be tested used to be specified by the variable 'url' in earlier
 versions of Smokeping, and the 'host' setting did not influence it in any
 way. The variable name has now been changed to 'urlformat', and it can
