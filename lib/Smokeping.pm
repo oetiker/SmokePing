@@ -144,29 +144,33 @@ sub sendmail ($$$){
     my $to = shift;
     $to = $1 if $to =~ /<(.*?)>/;
     my $body = shift;
-    if ($cfg->{General}{mailhost}){
-	my $smtp = Net::SMTP->new($cfg->{General}{mailhost});
-	$smtp->mail($from);
-	$smtp->to(split(/\s*,\s*/, $to));
-	$smtp->data();
-	$smtp->datasend($body);
-	$smtp->dataend();
-	$smtp->quit;
+    if ($cfg->{General}{mailhost} and  
+        my $smtp = Net::SMTP->new($cfg->{General}{mailhost})){
+        $smtp->mail($from);
+        $smtp->to(split(/\s*,\s*/, $to));
+        $smtp->data();
+        $smtp->datasend($body);
+        $smtp->dataend();
+        $smtp->quit;
     } elsif ($cfg->{General}{sendmail} or -x "/usr/lib/sendmail"){
-	open (M, "|-") || exec (($cfg->{General}{sendmail} || "/usr/lib/sendmail"),"-f",$from,$to);
-	print M $body;
-	close M;
+        open (M, "|-") || exec (($cfg->{General}{sendmail} || "/usr/lib/sendmail"),"-f",$from,$to);
+        print M $body;
+        close M;
+    } else {
+        warn "ERROR: not sending mail to $to, as all methodes failed\n";
     }
 }
 
 sub sendsnpp ($$){
    my $to = shift;
    my $msg = shift;
-   if ($cfg->{General}{snpphost}){
-        my $snpp = Net::SNPP->new($cfg->{General}{snpphost}, Timeout => 60);
+   if ($cfg->{General}{snpphost} and
+        my $snpp = Net::SNPP->new($cfg->{General}{snpphost}, Timeout => 60)){
         $snpp->send( Pager => $to,
                      Message => $msg) || do_debuglog("ERROR - ". $snpp->message);
         $snpp->quit;
+    } else {
+        warn "ERROR: not sending page to $to, as all SNPP setup faild\n";
     }
 }
 
