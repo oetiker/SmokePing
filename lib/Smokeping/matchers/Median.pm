@@ -1,8 +1,8 @@
-package Smokeping::matchers::median;
+package Smokeping::matchers::Median;
 
 =head1 NAME
 
-Smokeping::matchers::median - Find persistant change in latency
+Smokeping::matchers::Median - Find persistant changes in latency
 
 =head1 OVERVIEW
 
@@ -18,7 +18,7 @@ give a match.
 Call the matcher with the following sequence:
 
  type = matcher
- pattern =  median(old=>x,new=>y,diff=>z)
+ pattern =  Median(old=>x,new=>y,diff=>z)
 
 This will create a matcher which consumes x+y latency-datapoints, builds the
 two medians and the matches if the difference between the median latency is
@@ -64,7 +64,7 @@ sub Length($)
 }
 
 sub Desc ($) {
-    croak "Finde changes in median latency";
+    croak "Find changes in median latency";
 }    
 
 sub Test($$)

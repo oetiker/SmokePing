@@ -34,14 +34,14 @@ my $DEFAULTPRIORITY = 'info'; # default syslog priority
 
 my $logging = 0; # keeps track of whether we have a logging method enabled
 
-sub find_probedir {
-	# find the directory where the probe modules are located
+sub find_libdir {
+	# find the directory where the probe and matcher modules are located
 	# by looking for 'Smokeping/probes/FPing.pm' in @INC
 	# 
 	# yes, this is ugly. Suggestions welcome.
 	for (@INC) {
 		-f "$_/Smokeping/probes/FPing.pm" or next;
-		return "$_/Smokeping/probes";
+		return $_;
 	}
 	return undef;
 }
@@ -184,6 +184,8 @@ sub init_alerts ($){
 		or die "ERROR: Alert $al pattern entry '$_' is invalid\n";
 	    my $matcher = $1;
 	    my $arg = $2;
+	    die "ERROR: matcher $matcher: all matchers start with a capital letter since version 2.0\n"
+	    	unless $matcher =~ /^[A-Z]/;
 	    eval 'require Smokeping::matchers::'.$matcher;
 	    die "Matcher '$matcher' could not be loaded: $@\n" if $@;
 	    my $hand;
@@ -1068,12 +1070,17 @@ sub get_parser () {
 
     my $KEY_RE = '[-_0-9a-zA-Z]+';
     my $KEYD_RE = '[-_0-9a-zA-Z.]+';
-    my $PROBE_RE = '[a-z]*[A-Z][a-zA-Z]+';
+    my $PROBE_RE = '[A-Z][a-zA-Z]+';
     my %knownprobes; # the probes encountered so far
 
     # get a list of available probes for _dyndoc sections
-    my $probedir = find_probedir();
+    my $libdir = find_libdir();
+    my $probedir = $libdir . "/Smokeping/probes";
+    my $matcherdir = $libdir . "/Smokeping/matchers";
+
     my $probelist;
+    my @matcherlist;
+
     die("Can't find probe module directory") unless defined $probedir;
     opendir(D, $probedir) or die("opendir $probedir: $!");
     for (readdir D) {
@@ -1082,6 +1089,14 @@ sub get_parser () {
 	$probelist->{$_} = "(See the L<separate module documentation|Smokeping::probes::$_> for details about each variable.)";
     }
     closedir D;
+
+    die("Can't find matcher module directory") unless defined $matcherdir;
+    opendir(D, $matcherdir) or die("opendir $matcherdir: $!");
+    for (sort readdir D) {
+    	next unless /[A-Z]/;
+    	next unless s/\.pm$//;
+	push @matcherlist, $_;
+    }
 
     # The target-specific vars of each probe
     # We need to store them to relay information from Probes section to Target section
@@ -2064,9 +2079,19 @@ DOC
 		          },
 		  
 		  type => {
-		     _doc => 'Currently the pattern types B<rtt> and B<loss> and B<matcher> are known',
+		     _doc => <<DOC,
+Currently the pattern types B<rtt> and B<loss> and B<matcher> are known. 
+
+Matchers are plugin modules that extend the alert conditions.  Known
+matchers are @{[join (", ", map { "L<$_|Smokeping::matchers::$_>" }
+@matcherlist)]}.
+
+See the documentation of the corresponding matcher module
+(eg. L<Smokeping::matchers::$matcherlist[0]>) for instructions on
+configuring it.
+DOC
 		     _re => '(rtt|loss|matcher)',
-                     _re_error => 'Use loss or rtt'
+                     _re_error => 'Use loss, rtt or matcher'
 			  },
    	 	  pattern => {
  		     _doc => "a comma separated list of comparison operators and numbers. rtt patterns are in milliseconds, loss patterns are in percents",
@@ -2564,7 +2589,7 @@ sub main (;$) {
 	}
     	daemonize_me $cfg->{General}{piddir}."/smokeping.pid";
     }
-    do_log "Launched successfully";
+    do_log "Smokeping version $VERSION successfully launched.";
 
     my $myprobe;
     my $forkprobes = $cfg->{General}{concurrentprobes} || 'yes';
@@ -2593,7 +2618,7 @@ sub main (;$) {
 		$probepids{$pid} = $myprobe;
 	}
 	# parent
-	do_log("All probe processes started succesfully.");
+	do_log("All probe processes started successfully.");
 	my $exiting = 0;
 	for my $sig (qw(INT TERM)) {
 		$SIG{$sig} = sub {
@@ -2608,7 +2633,7 @@ sub main (;$) {
 				}
 				sleep 1;
 			}
-			do_log("All child processes succesfully terminated, exiting.");
+			do_log("All child processes successfully terminated, exiting.");
 			exit 0;
 		}
 	};

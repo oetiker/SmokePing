@@ -1,21 +1,21 @@
-package Smokeping::matchers::avgratio;
+package Smokeping::matchers::Avgratio;
 
 =head1 NAME
 
-Smokeping::matchers::avgratio - detect changes in average median latency
+Smokeping::matchers::Avgratio - detect changes in average median latency
 
 =head1 OVERVIEW
  
-The avgratio matcher establishes a historic average median latency over
+The Avgratio matcher establishes a historic average median latency over
 several measurement rounds. It compares this average, against a second
-average latency value again build over several rounds of measurment.
+average latency value again build over several rounds of measurement.
 
 =head1 DESCRIPTION
 
 Call the matcher with the following sequence:
 
  type = matcher
- pattern =  avgratio(historic=>a,current=>b,comparator=>o,percentage=>p)
+ pattern =  Avgratio(historic=>a,current=>b,comparator=>o,percentage=>p)
 
 =over
 
@@ -41,15 +41,15 @@ Right hand side of the comparison.
 
 =head1 EXAMPLE
 
-Take build the average median latency over 10 samples, use this to divid the
+Take build the average median latency over 10 samples, use this to divide the
 current average latency built over 2 samples and check if it is bigger than
 150%.
 
- avgratio(historic=>10,current=>2,comparator=>'>',percentage=>150);
+ Avgratio(historic=>10,current=>2,comparator=>'>',percentage=>150);
 
  avg(current)/avg(historic) > 150/100
 
-This means the matcher will activate when the current latency average if
+This means the matcher will activate when the current latency average is
 more than 1.5 times the historic latency average established over the last
 10 rounds of measurement.
 
@@ -59,7 +59,7 @@ Copyright (c) 2004 by OETIKER+PARTNER AG. All rights reserved.
 
 =head1 SPONSORSHIP
 
-The development of this matcher has been sponsored by Virtela Communications www.virtela.net.
+The development of this matcher has been sponsored by Virtela Communications, L<http://www.virtela.net/>.
 
 =head1 LICENSE
 

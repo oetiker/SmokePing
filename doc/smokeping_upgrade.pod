@@ -76,6 +76,12 @@ This is not an incompatible change, but it is mentioned here nevertheless.
 Target-specific variables can now be specified in the Probes section as well,
 and the values given become defaults for all the targets.
 
+=item Matchers
+
+The matcher modules have been renamed to start with a capital letter,
+to differentiate the actual modules from the base classes. You have to
+capitalize the matcher name in the pattern definition accordingly.
+
 =back
 
 In addition to this, some probes have had minor incompatible changes to
@@ -135,7 +141,10 @@ The C<sleeptime> variable was changed to C<mininterval> and its semantics
 were changed accordingly. See the LDAP explanation above. Additionally,
 the time is now specified in seconds rather than microseconds.
 
-=item L<telnetIOSPing|Smokeping::probes::telnetIOSPing>
+=item L<TelnetIOSPing|Smokeping::probes::TelnetIOSPing>
+
+The name of this probe was changed: it now starts with a capital letter
+like all the others do.
 
 The C<target> variable was removed. The target should now be specified
 in the C<host> variable, like it is with all the other probes.

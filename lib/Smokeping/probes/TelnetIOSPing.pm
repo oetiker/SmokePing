@@ -1,14 +1,14 @@
-package Smokeping::probes::telnetIOSPing;
+package Smokeping::probes::TelnetIOSPing;
 
 =head1 301 Moved Permanently
 
 This is a Smokeping probe module. Please use the command 
 
-C<smokeping -man Smokeping::probes::telnetIOSPing>
+C<smokeping -man Smokeping::probes::TelnetIOSPing>
 
 to view the documentation or the command
 
-C<smokeping -makepod Smokeping::probes::telnetIOSPing>
+C<smokeping -makepod Smokeping::probes::TelnetIOSPing>
 
 to generate the POD document.
 
@@ -24,7 +24,7 @@ my $e = "=";
 sub pod_hash {
 	return {
 		name => <<DOC,
-Smokeping::probes::telnetIOSPing - Cisco IOS Probe for SmokePing
+Smokeping::probes::TelnetIOSPing - Cisco IOS Probe for SmokePing
 DOC
 		description => <<DOC,
 Integrates Cisco IOS as a probe into smokeping.  Uses the telnet protocol 

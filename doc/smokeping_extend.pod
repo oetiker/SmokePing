@@ -30,8 +30,7 @@ you should too. This document will thus concentrate on the latter case.
 The L<Smokeping::probes::skel|Smokeping::probes::skel> module is a non-functional probe that is intended
 to make a good basis for a new probe module. Copy the file, 
 C<lib/probes/skel.pm>, to a new name and just fill out the blanks :)
-Note that real probe modules must have at least one capital letter
-in their name.
+Note that the names of real probe modules must start with a capital letter.
 
 =head1 PROBE DOCUMENTATION
 
@@ -49,6 +48,15 @@ C<see_also>. If you don't need a particular section, just leave it out.
 
 The special sections C<synopsys> and C<variables> are automatically
 generated from the description of your variables. See below.
+
+Note that if you use 'here documents' ('<<') that have POD markup inside,
+you should escape the markup so that it doesn't show up in the embedded
+POD documentation. Most probes do it like this:
+
+ my $e = "=";
+ my $doc = <<DOC;
+ ${e}head1 SECTION TITLE
+ DOC
 
 =head1 PROBE DESCRIPTION
 

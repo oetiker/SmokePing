@@ -7,8 +7,11 @@ Smokeping::matchers::base - Base Class for implementing SmokePing Matchers
 =head1 OVERVIEW
  
 This is the base class for writing SmokePing matchers. Every matcher must
-inherit from the base class and provide it's own methods for the 'buisness'
+inherit from the base class and provide it's own methods for the 'business'
 logic.
+
+Note that the actual matchers must have at least one capital letter in their
+name, to differentiate them from the base class(es).
 
 =head1 DESCRIPTION
 
@@ -29,7 +32,7 @@ The new method expects hash elements as an argument
 eg new({x=>'\d+',y=>'\d+'},x=>1,y=>2). The first part is
 a syntax rule for the arguments it should expect and the second part
 are the arguments itself. The first part will be supplied
-by the child class as it calls the partent method.
+by the child class as it calls the parent method.
 
 =cut
 
@@ -41,7 +44,7 @@ sub new(@)
     my $self = { param => { @_ } };
     foreach my $key (keys %{$self->{param}}){
 	my $regex = $rules->{$key};
-	croak "key '$key' is not known byt this matcher" unless defined $rules->{$key};	
+	croak "key '$key' is not known by this matcher" unless defined $rules->{$key};	
 	croak "key '$key' contains invalid data: '$self->{param}{$key}'" unless $self->{param}{$key} =~ m/^$regex$/;
     }    
     bless $self, $class;
@@ -77,7 +80,7 @@ sub Desc ($) {
 =head2 Test
 
 Run the matcher and return true or false. The Test method is called
-with a hash of two arrays giving it access to both rtt and loss values
+with a hash of two arrays giving it access to both rtt and loss values.
 
   my $data=shift;
   my @rtt = @{$data->{rtt}};

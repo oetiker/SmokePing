@@ -1,3 +1,4 @@
+* matchers start with a capital letter now -- niko
 * new probe programming interface -- niko
  - more strict config file checking giving helpful error messages when necessary
  - generate probe documentation automatically from the code

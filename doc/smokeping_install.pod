@@ -77,7 +77,7 @@ address, you need to install it.
 
 =item Net::Telnet 
 
-You need this for the telnetIOSPing probe.
+You need this for the TelnetIOSPing probe.
 
 =item Net::DNS
 
