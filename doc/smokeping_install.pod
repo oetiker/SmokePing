@@ -87,6 +87,10 @@ You need this for the AnotherDNS probe.
 
 You need this for the LDAP probe.
 
+=item IO::Socket::SSL
+
+You need this if you want the LDAP probe to be able to use the 'starttls' command.
+
 =item Authen::Radius
 
 You need this for the Radius probe.

@@ -19,7 +19,15 @@ use Smokeping::probes::passwordchecker;
 use Net::LDAP;
 use Time::HiRes qw(gettimeofday sleep);
 use base qw(Smokeping::probes::passwordchecker);
-use IO::Socket::SSL;
+
+# don't bail out if IO::Socket::SSL 
+# can't be loaded, just warn
+# about it when doing starttls
+
+my $havessl = 0;
+
+eval "use IO::Socket::SSL;";
+$havessl = 1 unless $@;
 
 my $DEFAULTINTERVAL = 1;
 
@@ -42,7 +50,9 @@ be specified by the variables `port' and `version'.
 
 The probe can issue the starttls command to convert the connection
 into encrypted mode, if so instructed by the `start_tls' variable.
-It can also optionally do an authenticated LDAP bind, if the `binddn'
+This requires the 'IO::Socket::SSL' perl module to be installed.
+
+The probe can also optionally do an authenticated LDAP bind, if the `binddn'
 variable is present. The password to be used can be specified by the
 target-specific variable `password' or in an external file.
 The location of this file is given in the probe-specific variable
@@ -95,6 +105,12 @@ sub targetvars {
 		},
 		start_tls => {
 			_doc => "If true, encrypt the connection with the starttls command. Disabled by default.",
+			_sub => sub { 
+				my $val = shift; 
+				return "ERROR: start_tls defined but IO::Socket::SSL couldn't be loaded"
+					if $val and not $havessl;
+				return undef;
+			},
 			_example => "1",
 		},
 		timeout => {

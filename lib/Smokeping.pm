@@ -687,7 +687,9 @@ sub get_detail ($$$$){
     }
 
     my $smoke = $pings - 3 > 0
-         ? smokecol $pings : [ 'COMMENT:"Not enough data collected to draw graph"'  ];
+         ? smokecol $pings : 
+	   [ 'COMMENT:(Not enough pings to draw any smoke.)\s', 'COMMENT:\s' ]; 
+	   # one \s doesn't seem to be enough
     my @upargs;
     my @upsmoke;
     my @median;
@@ -727,6 +729,7 @@ sub get_detail ($$$$){
         my $last = -1;
         my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
 	foreach my $loss (sort {$a <=> $b} keys %lc){
+	    next if $loss >= $pings;
             my $lvar = $loss; $lvar =~ s/\./d/g ;
 	    push @median, 
 	    (
@@ -2240,7 +2243,7 @@ sub daemonize_me ($) {
         open STDERR, '>/dev/null' or die "ERROR: Redirecting STDERR to /dev/null: $!";
 	# send warnings and die messages to log
         $SIG{__WARN__} = sub { do_log ((shift)."\n") };
-        $SIG{__DIE__} = sub { do_log ((shift)."\n"); exit 1 };	
+        $SIG{__DIE__} = sub { do_log ((shift)."\n"); };	
     }
 }
 
@@ -2322,7 +2325,7 @@ sub load_cfg ($) {
     my $cfmod = (stat $cfgfile)[9] || die "ERROR: calling stat on $cfgfile: $!\n";
     # when running under speedy this will prevent reloading on every run
     # if cfgfile has been modified we will still run.
-    if (not defined $cfg or $cfg->{__last} < $cfmod ){
+    if (not defined $cfg or not defined $probes or $cfg->{__last} < $cfmod ){
         $cfg = undef;
         my $parser = get_parser;
 	$cfg = get_config $parser, $cfgfile;       
@@ -2406,12 +2409,6 @@ POD
 }
 sub cgi ($) {
     $cgimode = 'yes';
-    # make sure error are shown in appropriate manner even when running from speedy
-    # and thus not getting BEGIN re-executed.
-    if ($ENV{SERVER_SOFTWARE}) {
-        $SIG{__WARN__} = sub { print "Content-Type: text/plain\n\n".(shift)."\n"; };
-        $SIG{__DIE__} = sub { print "Content-Type: text/plain\n\n".(shift)."\n"; exit 1 }
-    };
     umask 022;
     load_cfg shift;
     my $q=new CGI;
@@ -2419,11 +2416,6 @@ sub cgi ($) {
                      -expires=>'+'.($cfg->{Database}{step}).'s',
                      -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
                      );
-    if ($ENV{SERVER_SOFTWARE}) {
-        $SIG{__WARN__} = sub { print "<pre>".(shift)."</pre>"; };
-        $SIG{__DIE__} = sub { print "<pre>".(shift)."</pre>"; exit 1 }
-    };
-    initialize_cgilog();
     if ($q->param(-name=>'secret') && $q->param(-name=>'target') ) {
 	update_dynaddr $cfg,$q;
     } else {

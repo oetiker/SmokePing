@@ -16,16 +16,6 @@ to generate the POD document.
 
 use strict;
 
-# And now, an extra ugly hack
-# Reason: Net::DNS does an eval("use Win32:Registry") to
-# find out if it is running on Windows. This triggers the signal
-# handler in the cgi mode. 
-
-my $tmp = $SIG{__DIE__};
-$SIG{__DIE__} = sub { };
-eval("use Net::DNS;");
-$SIG{__DIE__} = $tmp;
-
 use base qw(Smokeping::probes::basefork);
 use IPC::Open3;
 use Symbol;
@@ -33,6 +23,7 @@ use Carp;
 use Time::HiRes qw(sleep ualarm gettimeofday tv_interval);
 use IO::Socket;
 use IO::Select;
+use Net::DNS;
 
 sub pod_hash {
 	return {

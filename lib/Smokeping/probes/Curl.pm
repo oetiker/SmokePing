@@ -72,8 +72,8 @@ DOC
 		timeout => {
 			_doc => qq{The "-m" curl(1) option.  Maximum timeout in seconds.},
 			_re => '\d+',
-			_example => 10,
-			_default => 5,
+			_example => 20,
+			_default => 10,
 		},
 		interface => {
 			_doc => <<DOC,
@@ -144,7 +144,7 @@ sub test_usage {
 }
 
 sub ProbeDesc($) {
-	return "HTTP, HTTPS, and FTP URLs using curl(1)";
+	return "URLs using curl(1)";
 }
 
 # other than host, count and protocol-specific args come from here

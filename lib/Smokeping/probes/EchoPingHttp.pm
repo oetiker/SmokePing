@@ -110,6 +110,8 @@ sub targetvars {
 	delete $h->{udp};
 	delete $h->{fill};
 	delete $h->{size};
+	$h->{timeout}{default} = 10;
+	$h->{timeout}{example} = 20;
 	return $class->_makevars($h, {
 		url => {
 			_doc => <<DOC,

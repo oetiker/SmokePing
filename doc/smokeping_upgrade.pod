@@ -76,6 +76,19 @@ This is not an incompatible change, but it is mentioned here nevertheless.
 Target-specific variables can now be specified in the Probes section as well,
 and the values given become defaults for all the targets.
 
+=item Timeouts
+
+The C<timeout> variable in the Probes section is now the maximum time
+expected for B<one> ping to take. Previously it was the maximum time
+allowed for all the pings to one target.  This is an incompatible change,
+but the code now works in the way it was documented to work even in 1.38.
+
+Those probes offering a target-specific C<timeout> variable will get a
+default for it from the Probes section, as noted in the previous item.
+This should ensure that probes that enforce the ping timeout themselves
+(most do) will not get killed due to timeout before they have a chance
+to do it.
+
 =item Matchers
 
 The matcher modules have been renamed to start with a capital letter,
@@ -109,6 +122,16 @@ The new variable is mandatory.
 The change was made to fix the confusing situation where the C<host> variable
 was required for each actual target, but it didn't actually have any effect
 (as the server to be probed came from the C<url> variable.)
+
+The default timeout of this probe has been raised to 10 seconds.
+
+=item L<EchoPingHttp|Smokeping::probes::EchoPingHttp>
+
+The default timeout of this probe has been raised to 10 seconds.
+
+=item L<EchoPingHttps|Smokeping::probes::EchoPingHttps>
+
+The default timeout of this probe has been raised to 10 seconds.
 
 =item L<EchoPingIcp|Smokeping::probes::EchoPingIcp>
 
