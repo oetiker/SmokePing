@@ -102,10 +102,10 @@ would include all the targets
 
 would include all but /B/C.
 
-The B<--makepod> does get used internally to produce the documentation on
-the SmokePing configuration file.
+The B<--makepod> does get used internally to produce the 
+L<documentation on the SmokePing configuration file|smokeping_config>.
 
-Please refer to the installation document for detailed setup instructions.
+Please refer to L<the installation document|smokeping_install> for detailed setup instructions.
 
 =head1 SETUP
 

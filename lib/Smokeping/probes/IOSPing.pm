@@ -66,7 +66,7 @@ DOC
 	authors => <<'DOC',
 Paul J Murphy <paul@murph.org>
 
-based on Smokeping::probes::FPing by
+based on L<Smokeping::probes::FPing|Smokeping::probes::FPing> by
 
 Tobias Oetiker <tobi@oetiker.ch>
 DOC

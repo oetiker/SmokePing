@@ -80,7 +80,7 @@ The need for storing cleartext passwords can be considered a bug in itself.
 DOC
 
 		see_also => <<DOC,
-Smokeping::probes::basefork(3pm), Smokeping::probes::Radius(3pm), Smokeping::probes::LDAP(3pm)
+L<Smokeping::probes::basefork>, L<Smokeping::probes::Radius>, L<Smokeping::probes::LDAP>
 DOC
 	}
 }

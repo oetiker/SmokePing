@@ -29,7 +29,7 @@ sub pod_hash {
 Smokeping::probes::base - Base Class for implementing SmokePing Probes
 DOC
 	overview => <<DOC,
-For the time being, please use the Smokeping::probes::FPing for
+For the time being, please use the L<Smokeping::probes::FPing|Smokeping::probes::FPing> for
 inspiration when implementing your own probes.
 DOC
 	authors => <<'DOC',

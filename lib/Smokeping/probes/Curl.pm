@@ -35,7 +35,7 @@ versions of Smokeping, and the 'host' setting did not influence it in any
 way. The variable name has now been changed to 'urlformat', and it can
 (and in most cases should) contain a placeholder for the 'host' variable.
 DOC
-	see_also => "curl(1), Smokeping::probes::Curl(3pm) etc., http://curl.haxx.se/",
+	see_also => "curl(1), L<http://curl.haxx.se/>",
     }
 }
 

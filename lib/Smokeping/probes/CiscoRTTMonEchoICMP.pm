@@ -62,12 +62,12 @@ DOC
 The probe sends unnecessary pings, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all pings in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*2+3 seconds (2 secs is the ping timeout value hardcoded into this probe). 
 DOC
 		see_also => <<DOC,
-http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
+L<http://people.ee.ethz.ch/~oetiker/webtools/smokeping/>
 
-http://www.switch.ch/misc/leinen/snmp/perl/
+L<http://www.switch.ch/misc/leinen/snmp/perl/>
 
-The best source for background info on SAA is Cisco's documentation on http://www.cisco.com and the CISCO-RTTMON-MIB documentation, which is available at: 
-ftp://ftp.cisco.com/pub/mibs/v2/CISCO-RTTMON-MIB.my 
+The best source for background info on SAA is Cisco's documentation on L<http://www.cisco.com> and the CISCO-RTTMON-MIB documentation, which is available at:
+L<ftp://ftp.cisco.com/pub/mibs/v2/CISCO-RTTMON-MIB.my>
 DOC
 		authors => <<DOC,
 Joerg.Kummer at Roche.com 

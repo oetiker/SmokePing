@@ -33,7 +33,7 @@ DOC
 Niko Tyni <ntyni@iki.fi>
 DOC
 		see_also => <<DOC,
-EchoPing(3pm)
+L<Smokeping::probes::EchoPing>
 DOC
 	}
 }

@@ -34,7 +34,7 @@ DOC
  Niko Tyni <ntyni@iki.fi>,
 DOC
 		see_also => <<DOC
-The L<smokeping_extend> document
+L<smokeping_extend>
 DOC
 	};
 }

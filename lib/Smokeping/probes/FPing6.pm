@@ -33,7 +33,7 @@ Tobias Oetiker <tobi@oetiker.ch>
 Niko Tyni <ntyni@iki.fi>
 DOC
              see_also => <<DOC
-Smokeping::probes::FPing
+L<Smokeping::probes::FPing>
 DOC
       }
 }

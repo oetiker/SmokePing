@@ -25,7 +25,7 @@ sub pod_hash {
 Smokeping::probes::basevars - Another Base Class for implementing SmokePing Probes
 DOC
 	overview => <<DOC,
-Like Smokeping::probes::base, but supports host-specific variables for the probe.
+Like L<Smokeping::probes::base|Smokeping::probes::base>, but supports host-specific variables for the probe.
 DOC
 	description => <<DOC,
 Provides the method `targets' that returns a list of hashes.
@@ -59,7 +59,7 @@ Uses `Smokeping::probes::base' internals too much to be a derived class, but
 I didn't want to touch the base class directly.
 DOC
 	see_also => <<DOC,
-Smokeping::probes::base(3pm), Smokeping::probes::EchoPing(3pm)
+L<Smokeping::probes::base>, L<Smokeping::probes::EchoPing>
 DOC
     }
 }

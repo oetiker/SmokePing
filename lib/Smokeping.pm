@@ -2831,7 +2831,7 @@ Smokeping.pm - SmokePing Perl Module
 =head1 OVERVIEW
 
 Almost all SmokePing functionality sits in this Module.
-The programs B<smokeping> and B<smokeping.cgi> are merely
+The programs L<smokeping|smokeping> and L<smokeping.cgi|smokeping.cgi> are merely
 figure heads allowing to hardcode some pathnames.
 
 If you feel like documenting what is happening within this library you are

@@ -74,7 +74,7 @@ DOC
 Niko Tyni <ntyni@iki.fi>
 DOC
 	see_also => <<DOC,
-Smokeping::probes::basevars(3pm), Smokeping::probes::EchoPing(3pm)
+L<Smokeping::probes::basevars>, L<Smokeping::probes::EchoPing>
 DOC
     }
 }

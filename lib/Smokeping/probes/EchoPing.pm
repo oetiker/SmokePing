@@ -44,7 +44,7 @@ DOC
 Niko Tyni <ntyni@iki.fi>
 DOC
 		see_also => <<DOC,
-echoping(1), Smokeping::probes::EchoPingHttp(3pm) etc., http://echoping.sourceforge.net/
+echoping(1), L<Smokeping::probes::EchoPingHttp> etc., L<http://echoping.sourceforge.net/>
 DOC
 	}
 }

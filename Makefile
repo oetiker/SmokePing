@@ -6,7 +6,7 @@ GROFF = groff
 .SUFFIXES:
 .SUFFIXES: .pm .pod .txt .html .man .1 .3 .5 .7
 
-DOCS = $(filter-out smokeping_config,$(wildcard doc/*.pod)) doc/smokeping_examples.pod # section 7
+DOCS = $(filter-out doc/smokeping_config.pod,$(wildcard doc/*.pod)) doc/smokeping_examples.pod # section 7
 DOCSCONFIG := doc/smokeping_config.pod # section 5
 PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm lib/Smokeping/Examples.pm
 PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)

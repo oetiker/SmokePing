@@ -26,7 +26,7 @@ DOC
 Niko Tyni <ntyni@iki.fi>
 DOC
 		see_also => <<DOC,
-Smokeping::probes::EchoPing(3pm)
+L<Smokeping::probes::EchoPing>
 DOC
 	}
 }
