@@ -51,7 +51,7 @@ You need this for the Curl probe.
 
 =item dig (Optional)
 
-L<http://http://www.isc.org/sw/bind/>
+L<http://www.isc.org/sw/bind/>
 
 You need this for the DNS probe.
 

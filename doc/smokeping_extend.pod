@@ -86,9 +86,9 @@ convenience method called C<_makevars> that does this, and the common idiom is
  }
 
 The variables are declared in a syntax that comes from the module used
-for parsing the configuration file, L<ISG::ParseConfig>. Each variable
+for parsing the configuration file, C<ISG::ParseConfig>. Each variable
 should be a hash that uses the "special variable keys" documented in
-the C<ISG::ParseConfig> manual. See C<Smokeping::probes::skel> and the other
+L<ISG::ParseConfig>. See C<Smokeping::probes::skel> and the other
 probes for examples. 
 
 For reference, here are the keys the hash should have. Much of this

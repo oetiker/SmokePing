@@ -513,7 +513,7 @@ menu = myhost2
 title = FTP latency for myhost2
 host = myhost2.example
 DOC
-	targetsdoc => <<DOC,
+	targetdoc => <<DOC,
 The target tree is divided into an HTTP branch and an FTP one.
 The servers "myhost1.example" and "myhost2.example" are probed
 in both. The third server, "myhost3.example", only has an HTTP
