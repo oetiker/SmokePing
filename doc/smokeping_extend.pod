@@ -10,8 +10,8 @@ and its probe modules. If it seems too complicated to understand, look
 at the existing modules for examples.
 
 Comments and proposed changes or additions are welcome.  Please send
-them to the smokeping-users mailing list. Patches against this file
-are most appreciated.
+them to the smokeping-users mailing list. Patches against the POD
+source of this document are most appreciated.
 
 =head1 CHOOSING A BASE CLASS
 
@@ -173,6 +173,18 @@ You should return a sorted array of the latency times measured. If a ping
 fails, don't put anything in the array.
 
 That's it, you're done!
+
+=head1 EXAMPLE CONFIGURATIONS
+
+If you would like to provide a documented example configuration for your
+probe (in addition to the automatically generated SYNOPSYS section in
+the probe manual), you can do so by adding it to the Smokeping::Examples
+module.  Look for the 'examples' subroutine and add your example there.
+
+Future versions of Smokeping might provide a way to embed examples in
+the probe modules too. The author's motivation for implementing this
+would be greatly increased by even a single demand for it, so please
+speak up if you think you'd use it.
 
 =head1 TIMEOUT HANDLING
 

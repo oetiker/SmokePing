@@ -29,6 +29,10 @@ separate module only because the latter is much too big already.
 It should be possible to include POD markup in the configuration explanations
 and have this module filter them away for the config files.
 
+It might be nice for the probe module authors to be able to provide an
+example configuration as part of the probe module instead of having to
+modify Smokeping::Examples too.
+
 =head1 COPYRIGHT
 
 Copyright 2005 by Niko Tyni.

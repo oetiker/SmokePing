@@ -14,7 +14,7 @@ a description of the problems, preferably with notes on how to fix
 them, to the C<smokeping-users> mailing list, so they can be added to
 this document.  The same applies to any problems you find with current
 versions that are not documented here, of course. Patch submissions
-against this file are most appreciated.
+against the POD source of this file are most appreciated.
 
 If a version is not listed, there are no known problems in upgrading
 to it from the previous release.
