@@ -6,7 +6,7 @@ package ISG::ParseConfig;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = 1.9;
+$VERSION = 2.0;
 
 sub new($$)
 {
@@ -1490,8 +1490,8 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 =head1 AUTHOR
 
-S<David Schweikert E<lt>dws@ee.ethz.chE<gt>>
-S<Tobias Oetiker E<lt>oetiker@ee.ethz.chE<gt>>
+David Schweikert E<lt>dws@ee.ethz.chE<gt>,
+Tobias Oetiker E<lt>oetiker@ee.ethz.chE<gt>
 
 =head1 HISTORY
 
