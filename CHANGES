@@ -1,3 +1,4 @@
+* don't create any RRD files if running as a CGI -- niko
 * Curl timeouts work better now -- niko, reported by Chris Wilson <chris *aidworld.org>
 * Curl User-Agent string doesn't need quotes anymore -- niko
 * check at startup that existing RRD files conform to the config specifications -- niko

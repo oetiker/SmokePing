@@ -370,10 +370,12 @@ sub init_target_tree ($$$$) {
 			                                                  1..$pings),
 			      (map { "RRA:".(join ":", @{$_}) } @{$cfg->{Database}{_table}} ));
 	    if (not -f $name.".rrd"){
-		do_debuglog("Calling RRDs::create(@create)");
-		RRDs::create(@create);
-		my $ERROR = RRDs::error();
-		do_log "RRDs::create ERROR: $ERROR\n" if $ERROR;
+	    	unless ($cgimode) {
+			do_debuglog("Calling RRDs::create(@create)");
+			RRDs::create(@create);
+			my $ERROR = RRDs::error();
+			do_log "RRDs::create ERROR: $ERROR\n" if $ERROR;
+		}
 	    } else {
 	    	shift @create; # remove the filename
 	    	my $comparison = Smokeping::RRDtools::compare($name.".rrd", \@create);
