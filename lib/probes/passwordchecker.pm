@@ -1,15 +1,37 @@
 package probes::passwordchecker;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
+This is a Smokeping probe module. Please use the command 
+
+C<smokeping -man probes::passwordchecker>
+
+to view the documentation or the command
+
+C<smokeping -makepod probes::passwordchecker>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+use probes::basefork;
+use base qw(probes::basefork);
+use Carp;
+
+my $e = "=";
+sub pod_hash {
+	return {
+		name => <<DOC,
 probes::passwordchecker - A Base Class for implementing SmokePing Probes
-
-=head1 OVERVIEW
-
+DOC
+		overview => <<DOC,
 Like probes::basefork, but supports a probe-specific configuration file
 for storing passwords and a method for accessing them.
+DOC
 
-=head1 SYNOPSYS
+		description => <<DOC,
+${e}head2 synopsys with more detail
 
 SmokePing main configuration file:
 
@@ -26,7 +48,7 @@ The specified password file:
 
  host2:sue:notasecreteither
 
-=head1 DESCRIPTION
+${e}head2 Actual description
 
 In implementing authentication probes, it might not be desirable to store
 the necessary cleartext passwords in the SmokePing main configuration
@@ -41,35 +63,45 @@ in the probe-specific variable `passwordfile'. The passwords can later
 be accessed and modified by the B<password> method, that needs the corresponding
 host and username as arguments.
 
-=head1 PASSWORD FILE FORMAT
+${e}head2 Password file format
 
 The password file format is simply one line for each triplet of host,
 username and password, separated from each other by colons (:).
 
 Comment lines, starting with the `#' sign, are ignored, as well as
 empty lines.
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
 
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 BUGS
-
+		bugs => <<DOC,
 The need for storing cleartext passwords can be considered a bug in itself.
+DOC
 
-=head1 SEE ALSO
-
+		see_also => <<DOC,
 probes::basefork(3pm), probes::Radius(3pm), probes::LDAP(3pm)
-
-=cut
-
-use strict;
-use probes::basefork;
-use base qw(probes::basefork);
-use Carp;
+DOC
+	}
+}
 
 sub ProbeDesc {
 	return "probe that can fork, knows about passwords and doesn't override the ProbeDesc method";
+}
+
+sub probevars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::probevars, {
+		passwordfile => {
+			_doc => "Location of the file containing usernames and passwords.",
+			_example => '/some/place/secret',
+			_sub => sub {
+				my $val = shift;
+				-r $val or return "ERROR: password file $val is not readable.";
+				return undef;
+			},
+		},
+	});
 }
 
 sub new {

@@ -1,78 +1,16 @@
 package probes::basevars;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::basevars - Another Base Class for implementing SmokePing Probes
+This is a Smokeping probe module. Please use the command 
 
-=head1 OVERVIEW
+C<smokeping -man probes::basevars>
 
-Like probes::base, but supports host-specific variables for the probe.
+to view the documentation or the command
 
-=head1 SYNOPSIS
+C<smokeping -makepod probes::basevars>
 
- *** Targets ***
-
- menu = Top
- title = Top Page
-
- + branch_1
- menu = First menu
- title = First title
- host = host1
- ++ PROBE_CONF
- # vars for host host1
- var1 = foo
- var2 = bar
- 
- ++ branch_1_2
- menu = Second menu
- title = Second title
- host = host2
- +++ PROBE_CONF
- # vars for host host2
- # var1 and var2 are propagated from above, override var2
- var2 = fii
-
- + branch_2
- # var1 and var2 are undefined here
-
-=head1 DESCRIPTION
-
-Provides the method `targets' that returns a list of hashes.
-The hashes contain the entries:
-
-=over
-
-=item addr
-
-The address of the target.
-
-=item vars 
-
-A hash containing variables defined in the corresponding
-`PROBE_CONF' config section.
-
-=item tree 
-
-The unique index that `probe::base' uses for targets.
-
-There's also the method 'vars' that returns the abovementioned
-hash corresponding to the 'tree' index parameter.
-
-=back
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 BUGS
-
-Uses `probes::base' internals too much to be a derived class, but 
-I didn't want to touch the base class directly.
-
-=head1 SEE ALSO
-
-probes::base(3pm), probes::EchoPing(3pm)
+to generate the POD document.
 
 =cut
 
@@ -80,13 +18,59 @@ use strict;
 use probes::base;
 use base qw(probes::base);
 
+my $e = "=";
+sub pod_hash {
+    return {
+    	name => <<DOC,
+probes::basevars - Another Base Class for implementing SmokePing Probes
+DOC
+	overview => <<DOC,
+Like probes::base, but supports host-specific variables for the probe.
+DOC
+	description => <<DOC,
+Provides the method `targets' that returns a list of hashes.
+The hashes contain the entries:
+
+${e}over
+
+${e}item addr
+
+The address of the target.
+
+${e}item vars 
+
+A hash containing variables defined in the corresponding
+config section.
+
+${e}item tree 
+
+The unique index that `probe::base' uses for targets.
+
+There's also the method 'vars' that returns the abovementioned
+hash corresponding to the 'tree' index parameter.
+
+${e}back
+DOC
+	authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+	bugs => <<DOC,
+Uses `probes::base' internals too much to be a derived class, but 
+I didn't want to touch the base class directly.
+DOC
+	see_also => <<DOC,
+probes::base(3pm), probes::EchoPing(3pm)
+DOC
+    }
+}
+
 sub add($$)
 {
     my $self = shift;
     my $tree = shift;
     
     $self->{targets}{$tree} = shift;
-    $self->{PROBE_CONF}{$tree} = $tree->{PROBE_CONF};
+    $self->{vars}{$tree} = { %{$self->{properties}}, %$tree };
 }
 
 sub targets {
@@ -100,8 +84,7 @@ sub targets {
 	for (@$addr) {
 		@{$copy{$_}} = @{$self->{addrlookup}{$_}} unless exists $copy{$_};
 		my $tree = pop @{$copy{$_}};
-		push @targets, { addr => $_, vars => $self->{PROBE_CONF}{$tree},
-				 tree => $tree };
+		push @targets, { addr => $_, vars => $self->{vars}{$tree}, tree => $tree };
 	}
 	return \@targets;
 }
@@ -109,7 +92,7 @@ sub targets {
 sub vars {
 	my $self = shift;
 	my $tree = shift;
-	return $self->{PROBE_CONF}{$tree};
+	return $self->{vars}{$tree};
 }
 
 sub ProbeDesc {

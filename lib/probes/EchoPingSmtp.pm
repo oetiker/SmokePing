@@ -1,44 +1,42 @@
 package probes::EchoPingSmtp;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::EchoPingSmtp - an echoping(1) probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 OVERVIEW
+C<smokeping -man probes::EchoPingSmtp>
 
-Measures SMTP roundtrip times (mail servers) for SmokePing.
+to view the documentation or the command
 
-=head1 SYNOPSYS
+C<smokeping -makepod probes::EchoPingSmtp>
 
- *** Probes ***
- + EchoPingSmtp
-
- binary = /usr/bin/echoping # mandatory
-
- *** Targets ***
- probe = EchoPingSmtp
-
-=head1 DESCRIPTION
-
-Supported probe-specific variables: those specified in EchoPing(3pm) 
-documentation.
-
-Supported target-specific variables: those specified in 
-EchoPing(3pm) documentation except I<fill>, I<size> and I<udp>.
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 SEE ALSO
-
-EchoPing(3pm)
+to generate the POD document.
 
 =cut
 
 use strict;
 use base qw(probes::EchoPing);
 use Carp;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::EchoPingSmtp - an echoping(1) probe for SmokePing
+DOC
+		overview => <<DOC,
+Measures SMTP roundtrip times (mail servers) for SmokePing.
+DOC
+		notes => <<DOC,
+The I<fill>, I<size> and I<udp> EchoPing variables are not valid.
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+		see_also => <<DOC,
+EchoPing(3pm)
+DOC
+	}
+}
 
 sub _init {
 	my $self = shift;
@@ -63,6 +61,15 @@ sub test_usage {
 
 sub ProbeDesc($) {
         return "SMTP pings using echoping(1)";
+}
+
+sub targetvars {
+	my $class = shift;
+	my $h = $class->SUPER::targetvars;
+	delete $h->{udp};
+	delete $h->{fill};
+	delete $h->{size};
+	return $h;
 }
 
 1;

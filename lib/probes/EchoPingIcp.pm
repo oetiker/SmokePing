@@ -1,62 +1,43 @@
 package probes::EchoPingIcp;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::EchoPingIcp - an echoping(1) probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 OVERVIEW
+C<smokeping -man probes::EchoPingIcp>
 
-Measures ICP (Internet Cache Protocol, spoken by web caches)
-roundtrip times for SmokePing.
+to view the documentation or the command
 
-=head1 SYNOPSYS
+C<smokeping -makepod probes::EchoPingIcp>
 
- *** Probes ***
- + EchoPingIcp
-
- binary = /usr/bin/echoping # mandatory
- 
- *** Targets ***
-
- probe = EchoPingHttp
-
- + PROBE_CONF
- # this can be overridden in the targets' PROBE_CONF sections
- url = / 
-
-
-=head1 DESCRIPTION
-
-Supported probe-specific variables: those specified in EchoPing(3pm) 
-documentation.
-
-Supported target-specific variables:
-
-=over
-
-=item those specified in EchoPing(3pm) documentation 
-
-except I<fill>, I<size> and I<udp>.
-
-=item url
-
-The URL to be requested from the web cache. 
-
-=back
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 SEE ALSO
-
-EchoPing(3pm), EchoPingHttp(3pm)
+to generate the POD document.
 
 =cut
 
 use strict;
 use base qw(probes::EchoPing);
 use Carp;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::EchoPingIcp - an echoping(1) probe for SmokePing
+DOC
+		overview => <<DOC,
+Measures ICP (Internet Cache Protocol, spoken by web caches)
+roundtrip times for SmokePing.
+DOC
+		notes => <<DOC,
+The I<fill>, I<size> and I<udp> EchoPing variables are not valid.
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+		see_also => <<DOC,
+EchoPing(3pm), EchoPingHttp(3pm)
+DOC
+	}
+}
 
 sub _init {
 	my $self = shift;
@@ -70,8 +51,6 @@ sub proto_args {
 	my $self = shift;
 	my $target = shift;
 	my $url = $target->{vars}{url};
-	$url = $self->{properties}{url} unless defined $url;
-	$url = "/" unless defined $url;
 
 	my @args = ("-i", $url);
 
@@ -82,13 +61,28 @@ sub test_usage {
 	my $self = shift;
 	my $bin = $self->{properties}{binary};
 	croak("Your echoping binary doesn't support ICP")
-		if `$bin -i/ 127.0.0.1 2>&1` =~ /not compiled|usage/i;
+		if `$bin -t1 -i/ 127.0.0.1 2>&1` =~ /not compiled|usage/i;
 	$self->SUPER::test_usage;
 	return;
 }
 
 sub ProbeDesc($) {
         return "ICP pings using echoping(1)";
+}
+
+sub targetvars {
+	my $class = shift;
+	my $h = $class->SUPER::targetvars;
+	delete $h->{udp};
+	delete $h->{fill};
+	delete $h->{size};
+	return $class->_makevars($h, {
+		_mandatory => [ 'url' ],
+		url => {
+			_doc => "The URL to be requested from the web cache.",
+			_example => 'http://www.example.org/',
+		},
+	});
 }
 
 1;

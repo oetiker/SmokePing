@@ -1,70 +1,16 @@
 package probes::DNS;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::DNS - Name Service Probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 SYNOPSIS
+C<smokeping -man probes::DNS>
 
- *** Probes ***
- + DNS
- binary = /usr/bin/dig
+to view the documentation or the command
 
- *** Targets *** 
- probe = DNS
- forks = 10
+C<smokeping -makepod probes::DNS>
 
- + First
- menu = First
- title = First Target
- # .... 
-
- ++ PROBE_CONF
- lookup=www.mozilla.org
-
-=head1 DESCRIPTION
-
-Integrates dig as a probe into smokeping. The variable B<binary> must
-point to your copy of the dig program. If it is not installed on
-your system yet, you should install bind-utils >= 9.0.0.
-
-The Probe asks the given host n-times for it's name. Where n is
-the amount specified in the config File.
-
-Supported probe-specific variables:
-
-=over
-
-=item binary
-
-The location of your dig binary.
-
-=item forks
-
-The number of concurrent processes to be run. See probes::basefork(3pm)
-for details.
-
-=back
-
-Supported target-level probe variables:
-
-=over
-
-=item lookup
-
-Name of the host to look up in the dns.
-
-=back
-
-
-=head1 AUTHOR
-
-Igor Petrovski E<lt>pigor@myrealbox.comE<gt>,
-Carl Elkins E<lt>carl@celkins.org.ukE<gt>,
-Andre Stolze E<lt>stolze@uni-muenster.deE<gt>,
-Niko Tyni E<lt>ntyni@iki.fiE<gt>,
-Chris Poetzel<lt>cpoetzel@anl.gov<gt>
-
+to generate the POD document.
 
 =cut
 
@@ -73,6 +19,29 @@ use base qw(probes::basefork);
 use IPC::Open3;
 use Symbol;
 use Carp;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::DNS - Name Service Probe for SmokePing
+DOC
+		description => <<DOC,
+Integrates dig as a probe into smokeping. The variable B<binary> must
+point to your copy of the dig program. If it is not installed on
+your system yet, you should install bind-utils >= 9.0.0.
+
+The Probe asks the given host n-times for it's name. Where n is
+the amount specified in the config File.
+DOC
+		authors => <<'DOC',
+ Igor Petrovski <pigor@myrealbox.com>,
+ Carl Elkins <carl@celkins.org.uk>,
+ Andre Stolze <stolze@uni-muenster.de>,
+ Niko Tyni <ntyni@iki.fi>,
+ Chris Poetzel<cpoetzel@anl.gov>
+DOC
+	};
+}
 
 my $dig_re=qr/query time:\s+([0-9.]+)\smsec.*/i;
 
@@ -85,11 +54,6 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        croak "ERROR: DNS 'binary' not defined in FPing probe definition"
-            unless defined $self->{properties}{binary};
-
-        croak "ERROR: DNS 'binary' does not point to an executable"
-            unless -f $self->{properties}{binary} and -x $self->{properties}{binary};
         my $call = "$self->{properties}{binary} localhost";
         my $return = `$call 2>&1`;
         if ($return =~ m/$dig_re/s){
@@ -101,6 +65,32 @@ sub new($$$)
     };
 
     return $self;
+}
+
+sub probevars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::probevars, {
+		_mandatory => [ 'binary' ],
+		binary => { 
+			_doc => "The location of your dig binary.",
+			_example => '/usr/bin/dig',
+			_sub => sub { 
+				my $val = shift;
+        			return "ERROR: DNS 'binary' does not point to an executable"
+            				unless -f $val and -x _;
+				return undef;
+			},
+		},
+	});
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		lookup => { _doc => "Name of the host to look up in the dns.",
+			    _example => "www.example.org",
+		},
+	});
 }
 
 sub ProbeDesc($){
@@ -120,7 +110,6 @@ sub pingone ($){
     my $lookuphost = $target->{vars}{lookup};
     $lookuphost = $target->{addr} unless defined $lookuphost;
 
-    #my $host = $target->{addr};
     my $query = "$self->{properties}{binary} \@$host $lookuphost";
     my @times;
 

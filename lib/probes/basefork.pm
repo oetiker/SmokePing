@@ -1,50 +1,41 @@
 package probes::basefork;
 
+=head1 301 Moved Permanently
+
+This is a Smokeping probe module. Please use the command 
+
+C<smokeping -man probes::basefork>
+
+to view the documentation or the command
+
+C<smokeping -makepod probes::basefork>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+use base qw(probes::basevars);
+use Symbol;
+use Carp;
+use IO::Select;
+use POSIX; # for ceil() and floor()
+use Config; # for signal names
+
 my $DEFAULTFORKS = 5;
 
-=head1 NAME
-
+sub pod_hash {
+    return {
+    	name => <<DOC,
 probes::basefork - Yet Another Base Class for implementing SmokePing Probes
-
-=head1 OVERVIEW
-
+DOC
+	overview => <<DOC,
 Like probes::basevars, but supports the probe-specific property `forks'
 to determine how many processes should be run concurrently. The
 targets are pinged one at a time, and the number of pings sent can vary
 between targets.
-
-=head1 SYNOPSYS
-
- *** Probes ***
-
- + MyForkingProbe
- # run this many concurrent processes
- forks = 10 
- # how long does a single 'ping' take
- timeout = 10
- # how many pings to send
- pings = 10
-
- + MyOtherForkingProbe
- # we don't want any concurrent processes at all for some reason.
- forks = 1 
-
- *** Targets ***
-
- menu = First
- title = First
- host = firsthost
- probe = MyForkingProbe
-
- menu = Second
- title = Second
- host = secondhost
- probe = MyForkingProbe
- +PROBE_CONF
- pings = 20
-
-=head1 DESCRIPTION
-
+DOC
+	description => <<DOC,
 Not all pinger programs support testing multiple hosts in a single go like
 fping(1). If the measurement takes long enough, there may be not enough time 
 perform all the tests in the time available. For example, if the test takes
@@ -60,7 +51,7 @@ the target that is to be measured. The contents of the hash are
 described in I<probes::basevars>(3pm).
 
 The number of concurrent processes is determined by the probe-specific 
-variable `forks' and is 5 by default. If there are more 
+variable `forks' and is $DEFAULTFORKS by default. If there are more 
 targets than this value, another round of forks is done after the first 
 processes are finished. This continues until all the targets have been
 tested.
@@ -69,37 +60,24 @@ The timeout in which each child has to finish is set to 5 seconds
 multiplied by the maximum number of 'pings' of the targets. You can set
 the base timeout differently if you want to, using the timeout property
 of the probe in the master config file (this again will be multiplied
-by the maximum number of pings). The probe itself can also override the
-default by providing a TimeOut method which returns an integer.
+by the maximum number of pings). The probe itself can also provide
+another default value if desired by modifying the _default value of
+the timeout variable.
 
 If the child isn't finished when the timeout occurs, it 
 will be killed along with any processes it has started.
 
-The number of pings sent can be specified in the probe-specific variable
-'pings', and it can be overridden by each target in the 'PROBE_CONF'
-section.
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 BUGS
-
-The timeout code has only been tested on Linux.
-
-=head1 SEE ALSO
-
+The number of pings sent can be specified in the target-specific variable
+'pings'.
+DOC
+	authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+	see_also => <<DOC,
 probes::basevars(3pm), probes::EchoPing(3pm)
-
-=cut
-
-use strict;
-use base qw(probes::basevars);
-use Symbol;
-use Carp;
-use IO::Select;
-use POSIX; # for ceil() and floor()
-use Config; # for signal names
+DOC
+    }
+}
 
 my %signo;
 my @signame;
@@ -122,9 +100,41 @@ sub pingone {
 	croak "pingone: this must be overridden by the subclass";
 }
 
-sub TimeOut {
-	# probes which require more time may want to provide their own implementation.
-	return 5;
+sub probevars {
+	my $class = shift;
+	my $h = $class->SUPER::probevars;
+	delete $h->{pings};
+	return $class->_makevars($h, {
+		forks => { 
+			_re => '\d+', 
+			_example => 5,
+			_doc => "Run this many concurrent processes at maximum",
+			_default => $DEFAULTFORKS,
+		},
+		timeout => {
+			_re => '\d+', 
+			_example => 15,
+			_default => 5,
+			_doc => "How long a single 'ping' takes at maximum",
+		},
+	});
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		pings => {
+			_re => '\d+', 
+			_example => 5,
+			_doc => <<DOC,
+How many pings should be sent to each target, if different from the global
+value specified in the Database section. Note that the number of pings in
+the RRD files is fixed when they are originally generated, and if you
+change this parameter afterwards, you'll have to delete the old RRD
+files or somehow convert them.
+DOC
+		},
+	});
 }
 
 sub ping {
@@ -133,20 +143,25 @@ sub ping {
 	my @targets = @{$self->targets};
 	return unless @targets;
 
-	my $forks = $self->{properties}{forks} || $DEFAULTFORKS;
+	my $forks = $self->{properties}{forks};
 
-	my $timeout = $self->{properties}{timeout};
-	unless (defined $timeout and $timeout > 0) {
-		my $maxpings = 0;
-		for (@targets) {
-			my $p = $self->pings($_);
-			$maxpings = $p if $p > $maxpings;
-		}
-		$timeout = $maxpings * $self->TimeOut();
+	my $maxpings = 0;
+	my $maxtimeout = $self->{properties}{timeout};
+	for (@targets) {
+		my $p = $self->pings($_);
+		$maxpings = $p if $p > $maxpings;
+		# some probes have a target-specific timeout variable
+		# dig out the maximum timeout
+		my $t = $_->{vars}{timeout};
+		$maxtimeout = $t if $t > $maxtimeout;
 	}
 
+	# we add 1 so that the probes doing their own timeout handling
+	# have time to do it even in the worst case
+	my $timeout = $maxpings * $maxtimeout + 1;
+
         $self->{rtts}={};
-	$self->do_debug("forks $forks, timeout per target $timeout");
+	$self->do_debug("forks $forks, timeout for each target $timeout");
 
 	while (@targets) {
 		my %targetlookup;
@@ -237,6 +252,15 @@ sub pings {
 
 sub ProbeDesc {
 	return "Probe that can fork and doesn't override the ProbeDesc method";
+}
+
+sub pod_variables {
+	my $class = shift;
+	my $pod = $class->SUPER::pod_variables;
+	my $targetvars = $class->targetvars;
+	$pod .= "Supported target-specific variables:\n\n";
+	$pod .= $class->_pod_variables($targetvars);
+	return $pod;
 }
 
 1;

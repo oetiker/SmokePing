@@ -1,134 +1,54 @@
 package probes::EchoPing;
 
-my $DEFAULTBIN = "/usr/bin/echoping";
+=head1 301 Moved Permanently
 
-=head1 NAME
+This is a Smokeping probe module. Please use the command 
 
-probes::EchoPing - an echoping(1) probe for SmokePing
+C<smokeping -man probes::EchoPing>
 
-=head1 OVERVIEW
+to view the documentation or the command
 
-Measures TCP or UDP echo (port 7) roundtrip times for SmokePing. Can also be 
-used as a base class for other echoping(1) probes.
+C<smokeping -makepod probes::EchoPing>
 
-=head1 SYNOPSYS
-
- *** Probes ***
- + EchoPing
-
- binary = /usr/bin/echoping # default value
-
- *** Targets ***
-
- probe = EchoPing
- forks = 10
-
- menu = Top
- title = Top Menu
- remark = Top Menu Remark
-
- + PROBE_CONF
-
- # none of these are mandatory
- timeout = 1
- waittime = 1
- udp = no
- size = 510
- tos = 0xa0
- priority = 6
- 
- + First
- menu = First
- title = First Target
- host = router.example.com
-
- # PROBE_CONF can be overridden here
- ++ PROBE_CONF
- size = 300
-
-=head1 DESCRIPTION
-
-Supported probe-specific variables:
-
-=over
-
-=item binary
-
-The location of your echoping binary.
-
-=item forks
-
-The number of concurrent processes to be run. See probes::basefork(3pm) 
-for details.
-
-=back
-
-Supported target-level probe variables 
-(see echoping(1) for details of the options):
-
-=over
-
-=item timeout
-
-The "-t" echoping(1) option. 
-
-=item waittime
-
-The "-w" echoping(1) option. 
-
-=item size
-
-The "-s" echoping(1) option. 
-
-=item udp
-
-The "-u" echoping(1) option. Values other than '0' and 'no' enable UDP.
-
-=item fill
-
-The "-f" echoping(1) option. 
-
-=item priority
-
-The "-p" echoping(1) option.
-
-=item tos
-
-The "-P" echoping(1) option.
-
-=item ipversion
-
-The IP protocol used. Possible values are "4" and "6". 
-Passed to echoping(1) as the "-4" or "-6" options.
-
-=item extraopts
-
-Any extra options specified here will be passed unmodified to echoping(1).
-
-=back
-
-=head1 BUGS
-
-Should we test the availability of the service at startup? After that it's
-too late to complain.
-
-The location of the echoping binary should probably be a global variable
-instead of a probe-specific one. As things are, every EchoPing -derived probe 
-has to declare it if the default (/usr/bin/echoping) isn't correct.
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 SEE ALSO
-
-echoping(1), probes::EchoPingHttp(3pm) etc., http://echoping.sourceforge.net/
+to generate the POD document.
 
 =cut
 
 use strict;
 use base qw(probes::basefork);
 use Carp;
+
+my $DEFAULTBIN = "/usr/bin/echoping";
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::EchoPing - an echoping(1) probe for SmokePing
+DOC
+		overview => <<DOC,
+Measures TCP or UDP echo (port 7) roundtrip times for SmokePing. Can also be 
+used as a base class for other echoping(1) probes.
+DOC
+		description => <<DOC,
+See echoping(1) for details of the options below.
+DOC
+		bugs => <<DOC,
+Should we test the availability of the service at startup? After that it's
+too late to complain.
+
+The location of the echoping binary should probably be a global variable
+instead of a probe-specific one. As things are, every EchoPing -derived probe 
+has to declare it if the default ($DEFAULTBIN) isn't correct.
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+		see_also => <<DOC,
+echoping(1), probes::EchoPingHttp(3pm) etc., http://echoping.sourceforge.net/
+DOC
+	}
+}
+
 #
 # derived class will mess with this through the 'features' method below
 my $featurehash = {
@@ -153,12 +73,6 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 
 	$self->_init if $self->can('_init');
-
-	unless (defined $self->{properties}{binary}) {
-		$self->{properties}{binary} = $DEFAULTBIN;
-	}
-	croak "ERROR: EchoPing 'binary' $self->{properties}{binary} does not point to an executable"
-		unless -f $self->{properties}{binary} and -x $self->{properties}{binary};
 
 	$self->test_usage;
 
@@ -207,11 +121,9 @@ sub make_args {
 
 	for (keys %arghash) {
 		my $val = $target->{vars}{$_};
-		$val = $self->{properties}{$_} unless defined $val;
 		push @args, ($arghash{$_}, $val) if defined $val;
 	}
 	push @args, $self->ipversion_arg($target);
-	push @args, $self->{properties}{extraopts} if exists $self->{properties}{extraopts};
 	push @args, $target->{vars}{extraopts} if exists $target->{vars}{extraopts};
 
 	return @args;
@@ -240,7 +152,6 @@ sub udp_arg {
 	my @args;
 
 	my $udp = $target->{vars}{udp};
-	$udp = $self->{properties}{udp} unless defined $udp;
 	push @args, "-u" if (defined $udp and $udp ne "no" and $udp ne "0");
 
 	return @args;
@@ -250,7 +161,6 @@ sub ipversion_arg {
 	my $self = shift;
 	my $target = shift;
 	my $vers = $target->{vars}{ipversion};
-	$vers = $self->{properties}{ipversion} unless defined $vers;
 	if (defined $vers and $vers =~ /^([46])$/) {
 		return ("-" . $1);
 	} else {
@@ -295,9 +205,78 @@ sub pingone {
 		/^Elapsed time: (\d+\.\d+) seconds/ and push @times, $1;
 	}
 	close P;
-	carp "WARNING: $cmd was not happy: $echoret\n" if $?;
+	$self->do_log("WARNING: $cmd was not happy: $echoret") if $?;
 	# carp("Got @times") if $self->debug;
 	return sort { $a <=> $b } @times;
+}
+
+sub probevars {
+	my $class = shift;
+	my $h = $class->SUPER::probevars;
+	delete $h->{timeout};
+	return $class->_makevars($h, {
+		binary => {
+			_doc => "The location of your echoping binary.",
+			_default => $DEFAULTBIN,
+			_sub => sub {
+				my $val = shift;
+				-x $val or return "ERROR: binary '$val' is not executable";
+				return undef;
+			},
+		},
+	});
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		timeout => {
+			_doc => 'The "-t" echoping(1) option.',
+			_example => 1,
+			_default => 5,
+			_re => '(\d*\.)?\d+',
+		},
+		waittime => {
+			_doc => 'The "-w" echoping(1) option.',
+			_example => 1,
+			_re => '\d+',
+		},
+		size => {
+			_doc => 'The "-s" echoping(1) option.',
+			_example => 510,
+			_re => '\d+',
+		},
+		udp => {
+			_doc => q{The "-u" echoping(1) option. Values other than '0' and 'no' enable UDP.},
+			_example => 'no',
+		},
+		fill => {
+			_doc => 'The "-f" echoping(1) option.',
+			_example => 'A',
+			_re => '.',
+		},
+		priority => {
+			_doc => 'The "-p" echoping(1) option.',
+			_example => 6,
+			_re => '\d+',
+		},
+		tos => {
+			_doc => 'The "-P" echoping(1) option.',
+			_example => '0xa0',
+		},
+		ipversion => {
+			_doc => <<DOC,
+The IP protocol used. Possible values are "4" and "6". 
+Passed to echoping(1) as the "-4" or "-6" options.
+DOC
+			_example => 4,
+			_re => '[46]'
+		},
+		extraopts => {
+			_doc => 'Any extra options specified here will be passed unmodified to echoping(1).',
+			_example => '-some-letter-the-author-did-not-think-of',
+		},
+	});
 }
 
 1;

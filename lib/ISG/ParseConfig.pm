@@ -75,6 +75,7 @@ sub _deepcopy {
                 /^HASH$/ and return { map { $_ => $what->{$_} eq $what ? 
                                             $what->{$_} : _deepcopy($what->{$_}) } keys %$what };
                 /^CODE$/ and return $what; # we don't need to copy the subs
+                /^Regexp$/ and return $what; # neither Regexp objects
         }
         die "Cannot _deepcopy reference type @{[ref $what]}";
 }
@@ -674,6 +675,14 @@ sub _genpod($$$){
 		    " I<(mandatory setting)>" : ""; 
 	    push @{$doc}, "=item B<$var>".$mandatory;
 	    push @{$doc}, $tree->{$var}{_doc} if $tree->{$var}{_doc} ;
+	    my $inherited = $tree->{_inherited} and 
+		grep {$_ eq $var} @{$tree->{_inherited}};
+	    push @{$doc}, "This variable I<inherits> its value from the parent section if nothing is specified here."
+	        if $inherited;
+	    push @{$doc}, "This variable I<dynamically> modifies the grammar based on its value."
+	    	if $tree->{$var}{_dyn};
+	    push @{$doc}, "Default value: $var = $tree->{$var}{_default}"
+		    if ($tree->{$var}{_default});
 	    push @{$doc}, "Example: $var = $tree->{$var}{_example}"
 		    if ($tree->{$var}{_example})
 	}
@@ -718,8 +727,15 @@ sub _genpod($$$){
 			"=head2 *** $section ***$mandatory";
 		push @{$doc}, ($tree->{$section}{_doc})
 		    if $tree->{$section}{_doc};
-		_genpod ($tree->{$section},$level+1,$doc)
-		    unless $tree eq $tree->{$section};
+		push @{$doc}, "The grammar of this section is I<dynamically> modified based on its name."
+		    if $tree->{$section}{_dyn};
+		if ($tree eq $tree->{$section} or 
+			($tree->{_recursive} and 
+			 grep {$_ eq $section} @{$tree->{_recursive}})) {
+			 push @{$doc}, "This section is I<recursive>: it can contain subsection(s) with the same syntax.";
+		} else {
+			_genpod ($tree->{$section},$level+1,$doc)
+		}
 
 
 	}

@@ -1,67 +1,39 @@
 package probes::telnetIOSPing;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
+This is a Smokeping probe module. Please use the command 
+
+C<smokeping -man probes::telnetIOSPing>
+
+to view the documentation or the command
+
+C<smokeping -makepod probes::telnetIOSPing>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+
+use base qw(probes::basefork);
+use Net::Telnet ();
+use Carp;
+
+my $e = "=";
+sub pod_hash {
+	return {
+		name => <<DOC,
 probes::telnetIOSPing - Cisco IOS Probe for SmokePing
-
-=head1 SYNOPSIS
-
- *** Probes ***
- + telnetIOSPing
- packetsize = 56
- forks = 1
-
- ++ PROBE_CONF
- iospass = password
- iosuser = user
- target = 192.168.1.1
- source = 192.168.2.1
- psource = 192.168.2.129
-
-=head1 DESCRIPTION
-
+DOC
+		description => <<DOC,
 Integrates Cisco IOS as a probe into smokeping.  Uses the telnet protocol 
-to run a ping from an IOS device (source) to another device (target).
+to run a ping from an IOS device (source) to another device (host).
 This probe basically uses the "extended ping" of the Cisco IOS.  You have
 the option to specify which interface the ping is sourced from as well.
-
-=head1 OPTIONS
-
-The iosuser, iospass, source, and target options are mandatory.
-
-The (optional) packetsize option lets you configure the packetsize for
-the pings sent.  The default size is 56.
-
-The (optional) forks options lets you configure the number of
-simultaneous remote pings to be run.  NB Some IOS devices have a
-maximum of 5 VTYs available, so be careful not to hit a limit.
-
-The source option specifies the IOS device to which we telnet.  This
-is an IP address of an IOS Device that you/your server:
-	1)  Have the ability to telnet to
-	2)  Have a valid username and password for
-
-The target option specifies the device you wish to ping from your IOS
-Device.
-
-The (optional) psource option specifies an alternate IP address or
-Interface from which you wish to source your pings from.  Routers
-can have many many IP addresses, and interfaces.  When you ping from a
-router you have the ability to choose which interface and/or which IP
-address the ping is sourced from.  Specifying an IP/interface does not 
-necessarily specify the interface from which the ping will leave, but
-will specify which address the packet(s) appear to come from.  If this
-option is left out the IOS Device will source the packet automatically
-based on routing and/or metrics.  If this doesn't make sense to you
-then just leave it out.
-
-The iosuser option allows you to specify a username that has ping
-capability on the IOS Device.
-
-The iospass option allows you to specify the password for the username
-specified with the option iosuser.
-
-=head1 IOS CONFIGURATION
+DOC
+		notes => <<DOC,
+${e}head2 IOS configuration
 
 The IOS device should have a username/password configured, as well as
 the ability to connect to the VTY(s).
@@ -75,14 +47,15 @@ eg:
      transport input telnet
     !
 
-=head1 NOTES
+Some IOS devices have a maximum of 5 VTYs available, so be careful not
+to hit a limit with the 'forks' variable.
 
-=head2 Requirements
+${e}head2 Requirements
 
 This module requires the Net::Telnet module for perl.  This is usually
 included on most newer OSs which include perl.
 
-=head2 Debugging
+${e}head2 Debugging
 
 There is some VERY rudimentary debugging code built into this module (it's
 based on the debugging code written into Net::Telnet).  It will log
@@ -91,7 +64,7 @@ These files will be written out into your current working directory (CWD).
 You can change the names of these files to something with more meaning to
 you.
 
-=head2 Password authentication
+${e}head2 Password authentication
 
 You should be advised that the authentication method of telnet uses
 clear text transmissions...meaning that without proper network security
@@ -104,7 +77,7 @@ Having said this, don't be too scared of telnet.  Remember, the
 original IOSPing module used RSH, which is even more scary to use from
 a security perspective.
 
-=head2 Ping packet size
+${e}head2 Ping packet size
 
 The FPing manpage has the following to say on the topic of ping packet
 size:
@@ -116,9 +89,8 @@ header (normally 20 bytes) and ICMP header (8 bytes), so the minimum
 total size is 40 bytes.  Default is 56, as in ping. Maximum is the
 theoretical maximum IP datagram size (64K), though most systems limit
 this to a smaller, system-dependent number.
-
-=head1 AUTHOR
-
+DOC
+		authors => <<'DOC',
 John A Jackson <geonjay@infoave.net>
 
 based HEAVILY on probes::IOSPing by
@@ -128,14 +100,9 @@ Paul J Murphy <paul@murph.org>
 based on probes::FPing by
 
 Tobias Oetiker <tobi@oetiker.ch>
-
-=cut
-
-use strict;
-
-use base qw(probes::basefork);
-use Net::Telnet ();
-use Carp;
+DOC
+	}
+}
 
 sub new($$$)
 {
@@ -145,10 +112,6 @@ sub new($$$)
 
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
-        croak "ERROR: IOSPing packetsize must be between 12 and 64000"
-           if $self->{properties}{packetsize} and 
-              ( $self->{properties}{packetsize} < 12 or $self->{properties}{packetsize} > 64000 ); 
-
 	$self->{pingfactor} = 1000; # Gives us a good-guess default
 	print "### assuming you are using an IOS reporting in miliseconds\n";
     };
@@ -158,7 +121,7 @@ sub new($$$)
 
 sub ProbeDesc($){
     my $self = shift;
-    my $bytes = $self->{properties}{packetsize} || 56;
+    my $bytes = $self->{properties}{packetsize};
     return "InfoAve Cisco IOS - ICMP Echo Pings ($bytes Bytes)";
 }
 
@@ -166,13 +129,13 @@ sub pingone ($$){
     my $self = shift;
     my $target = shift;
     my $source = $target->{vars}{source};
-    my $dest = $target->{vars}{target};
+    my $dest = $target->{vars}{host};
     my $psource = $target->{vars}{psource} || "";
     my $port = 23;
     my @output = ();
     my $login = $target->{vars}{iosuser};
     my $pssword = $target->{vars}{iospass};
-    my $bytes = $self->{properties}{packetsize} || 56;
+    my $bytes = $self->{properties}{packetsize};
     my $pings = $self->pings($target);
 
     # do NOT call superclass ... the ping method MUST be overwriten
@@ -250,6 +213,71 @@ sub pingone ($$){
     @times = map {sprintf "%.10e", $_ / $self->{pingfactor}} sort {$a <=> $b} @times;
 #    close(OUTF);
     return @times;
+}
+
+sub probevars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::probevars, {
+		packetsize => {
+			_doc => <<DOC,
+The (optional) packetsize option lets you configure the packetsize for
+the pings sent.
+DOC
+			_default => 56,
+			_re => '\d+',
+			_sub => sub {
+				my $val = shift;
+				return "ERROR: packetsize must be between 12 and 64000"
+					unless $val >= 12 and $val <= 64000;
+				return undef;
+			},
+		},
+	});
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		_mandatory => [ 'iosuser', 'iospass', 'source' ],
+		source => {
+			_doc => <<DOC,
+The source option specifies the IOS device to which we telnet.  This
+is an IP address of an IOS Device that you/your server:
+	1)  Have the ability to telnet to
+	2)  Have a valid username and password for
+DOC
+			_example => "192.168.2.1",
+		},
+		psource => {
+			_doc => <<DOC,
+The (optional) psource option specifies an alternate IP address or
+Interface from which you wish to source your pings from.  Routers
+can have many many IP addresses, and interfaces.  When you ping from a
+router you have the ability to choose which interface and/or which IP
+address the ping is sourced from.  Specifying an IP/interface does not 
+necessarily specify the interface from which the ping will leave, but
+will specify which address the packet(s) appear to come from.  If this
+option is left out the IOS Device will source the packet automatically
+based on routing and/or metrics.  If this doesn't make sense to you
+then just leave it out.
+DOC
+			_example => "192.168.2.129",
+		},
+		iosuser => {
+			_doc => <<DOC,
+The iosuser option allows you to specify a username that has ping
+capability on the IOS Device.
+DOC
+			_example => 'user',
+		},
+		iospass => {
+			_doc => <<DOC,
+The iospass option allows you to specify the password for the username
+specified with the option iosuser.
+DOC
+			_example => 'password',
+		},
+	});
 }
 
 1;

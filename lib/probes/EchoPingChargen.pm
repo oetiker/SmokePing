@@ -1,44 +1,42 @@
 package probes::EchoPingChargen;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::EchoPingChargen - an echoping(1) probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 OVERVIEW
+C<smokeping -man probes::EchoPingChargen>
 
-Measures TCP chargen (port 19) roundtrip times for SmokePing.
+to view the documentation or the command
 
-=head1 SYNOPSYS
+C<smokeping -makepod probes::EchoPingChargen>
 
- *** Probes ***
- + EchoPingChargen
-
- binary = /usr/bin/echoping
-
- *** Targets ***
-
- probe = EchoPingChargen
-
-=head1 DESCRIPTION
-
-Supported probe- and target-specific variables: see probes::EchoPing(3pm)
-
-Note: the I<udp> variable is not supported.
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 SEE ALSO
-
-probes::EchoPing(3pm)
+to generate the POD document.
 
 =cut
-
 
 use strict;
 use base qw(probes::EchoPing);
 use Carp;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::EchoPingChargen - an echoping(1) probe for SmokePing
+DOC
+		overview => <<DOC,
+Measures TCP chargen (port 19) roundtrip times for SmokePing.
+DOC
+		notes => <<DOC,
+The I<udp> variable is not supported.
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+		see_also => <<DOC,
+probes::EchoPing(3pm)
+DOC
+	}
+}
 
 sub proto_args {
 	return ("-c");
@@ -55,6 +53,13 @@ sub test_usage {
 
 sub ProbeDesc($) {
         return "TCP Chargen pings using echoping(1)";
+}
+
+sub targetvars {
+	my $class = shift;
+	my $h = $class->SUPER::targetvars;
+	delete $h->{udp};
+	return $h;
 }
 
 1;

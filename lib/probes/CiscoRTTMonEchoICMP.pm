@@ -1,49 +1,39 @@
 package probes::CiscoRTTMonEchoICMP;
 
-# please use
-# 	pod2man CiscoRTTMonEchoICMP.pm | nroff -man | more
-# to view the manpage of this document
-#
+=head1 301 Moved Permanently
 
+This is a Smokeping probe module. Please use the command 
 
-=head1 NAME
+C<smokeping -man probes::CiscoRTTMonEchoICMP>
 
+to view the documentation or the command
+
+C<smokeping -makepod probes::CiscoRTTMonEchoICMP>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+use base qw(probes::basefork);
+use Symbol;
+use Carp;
+use BER;
+use SNMP_Session;
+use SNMP_util "0.97";
+use ciscoRttMonMIB "0.2";
+
+sub pod_hash {
+	my $e = "=";
+	return {
+		name => <<DOC,
 probes::CiscoRTTMonEchoICMP - Probe for SmokePing
-
-=head1 SYNOPSIS
-
- *** Probes ***
- + CiscoRTTMonEchoICMP
- + forks=50
-
- *** Targets ***
- + MyRouter-PingVictim
- menu = MyRouter->PingVictim
- title = RTTMon ping from MyRouter to PingVictim
- host = PingVictim.foobar.com.au
- ++ PROBE_CONF 
- ioshost = RTTcommunity@Myrouter.foobar.com.au
- iosint = 10.33.22.11
- packetsize = 1024
- tos = 160
-
-=head1 DESCRIPTION
-
+DOC
+		description => <<DOC,
 A probe for smokeping, which uses the ciscoRttMon MIB functionality ("Service Assurance Agent", "SAA") of Cisco IOS to measure ICMP echo ("ping") roundtrip times between a Cisco router and any IP address. 
-
-=head1 PARAMETERS
-
-The (mandatory) host parameter specifies the IP host, which will be pinged by the router. This can be a DNS name, the smokeping host can resolve or a dotted-quad IP address.
-
-The (mandatory) ioshost parameter specifies the Cisco router, which will execute the pings, as well as the SNMP community string on the router.
-
-The (optional) packetsize parameter lets you configure the packetsize for the pings sent. The minimum is 8, the maximum 16392. Use the same number as with fping, if you want the same packet sizes being used on the network. Please note that the packesize must be specified under PROBE_CONF, all other definitions will be ignored. Default is 56 bytes. 
-
-The (optional) iosint parameter is the source address for the pings sent. This should be one of the active (!) IP addresses of the router to get results. IOS looks up the target host address in the forwarding table and then uses the interface(s) listed there to send the ping packets. By default IOS uses the (primary) IP address on the sending interface as source address for a ping. The RTTMon MIB versions before IOS 12.0(3)T didn't support this parameter.
-
-The (optional) tos parameter specifies the value of the ToS byte in the IP header of the pings. Multiply DSCP values times 4 and Precedence values times 32 to calculate the ToS values to configure, e.g. ToS 160 corresponds to a DSCP value 40 and a Precedence value of 5. The RTTMon MIB versions before IOS 12.0(3)T didn't support this parameter.
-
-=head1 IOS VERSIONS
+DOC
+		notes => <<DOC,
+${e}head2 IOS VERSIONS
 
 It is highly recommended to use this probe with routers running IOS 12.0(3)T or higher and to test it on less critical routers first. I managed to crash a router with 12.0(9) quite consistently ( in IOS lingo 12.0(9) is older code than 12.0(3)T ). I did not observe crashes on higher IOS releases, but messages on the router like the one below, when multiple processes concurrently accessed the same router (this case was IOS 12.1(12b) ):
 
@@ -52,9 +42,9 @@ Aug 20 07:30:14: %RTT-3-SemaphoreBadUnlock: %RTR: Attempt to unlock semaphore by
 Aug 20 07:35:15: %RTT-3-SemaphoreInUse: %RTR: Could not obtain a lock for RTR. Process 80
 
 
-=head1 INSTALLATION
+${e}head2 INSTALLATION
 
-To install this probe copy ciscoRttMonMIB.pm files to ($SMOKEPINGINSTALLDIR)/lib and CiscoRTTMonEchoICMP.pm to ($SMOKEPINGINSTALLDIR)/lib/probes. V0.97 or higher of Simon Leinen's SNMP_Session.pm is required.
+To install this probe copy ciscoRttMonMIB.pm files to (\$SMOKEPINGINSTALLDIR)/lib and CiscoRTTMonEchoICMP.pm to (\$SMOKEPINGINSTALLDIR)/lib/probes. V0.97 or higher of Simon Leinen's SNMP_Session.pm is required.
 
 The router(s) must be configured to allow read/write SNMP access. Sufficient is:
 
@@ -67,35 +57,23 @@ If you want to be a bit more restrictive with SNMP write access to the router, t
 	snmp-server community RTTCommunity view RttMon RW 2
 
 The above configuration grants SNMP read-write only to 10.37.3.5 (the smokeping host) and only to the ciscoRttMon MIB tree. The probe does not need access to SNMP variables outside the RttMon tree.
-
-=head1 BUGS
-
+DOC
+		bugs => <<DOC,
 The probe sends unnecessary pings, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all pings in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*2+3 seconds (2 secs is the ping timeout value hardcoded into this probe). 
-
-=head1 SEE ALSO
-
+DOC
+		see_also => <<DOC,
 http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
+
 http://www.switch.ch/misc/leinen/snmp/perl/
 
 The best source for background info on SAA is Cisco's documentation on http://www.cisco.com and the CISCO-RTTMON-MIB documentation, which is available at: 
 ftp://ftp.cisco.com/pub/mibs/v2/CISCO-RTTMON-MIB.my 
-
-
-
-=head1 AUTHOR
-
+DOC
+		authors => <<DOC,
 Joerg.Kummer at Roche.com 
-
-=cut
-
-use strict;
-use base qw(probes::basefork);
-use Symbol;
-use Carp;
-use BER;
-use SNMP_Session;
-use SNMP_util "0.97";
-use ciscoRttMonMIB "0.2";
+DOC
+	}
+}
 
 my $pingtimeout =2;
 
@@ -114,7 +92,7 @@ sub new($$$)
 
 sub ProbeDesc($){
     my $self = shift;
-    my $bytes = $self->{properties}{packetsize} || 56;
+    my $bytes = $self->{properties}{packetsize};
     return "CiscoRTTMonEchoICMP ($bytes Bytes)";
 }
 
@@ -122,12 +100,9 @@ sub pingone ($$) {
     my $self = shift;
     my $target = shift;
 
-    croak ("please define 'ioshost' under the PROBE_CONF section of your target\n")
-       unless defined $target->{vars}{ioshost} ;
-    
     my $pings = $self->pings($target) || 20;
-    my $tos   = $target->{vars}{tos} || 0;
-    my $bytes = $target->{vars}{packetsize} || 56;
+    my $tos   = $target->{vars}{tos};
+    my $bytes = $target->{properties}{packetsize}; 
 
     # use the proces ID as as row number to make this poll distinct on the router; 
     my $row=$$;
@@ -283,6 +258,64 @@ sub DestroyData ($$) {
 	&snmpset($host, "rttMonCtrlAdminStatus.$row",           'integer',      2);
 	#delete any old config
 	&snmpset($host, "rttMonCtrlAdminStatus.$row",           'integer',      6);
+}
+
+sub probevars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::probevars, {
+		packetsize => {
+			_doc => <<DOC,
+The packetsize parameter lets you configure the packetsize for the pings
+sent. The minimum is 8, the maximum 16392. Use the same number as with
+fping, if you want the same packet sizes being used on the network.
+DOC
+			_default => 56, 
+			_re => '\d+',
+			_sub => sub {
+				my $val = shift;
+				return "ERROR: packetsize must be between 8 and 16392"
+					unless $val >= 8 and $val <= 16392;
+				return undef;
+			},
+		},
+	});
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		_mandatory => [ 'ioshost' ],
+		ioshost => {
+			_example => 'RTTcommunity@Myrouter.foobar.com.au',
+			_doc => <<DOC,
+The (mandatory) ioshost parameter specifies the Cisco router, which will
+execute the pings, as well as the SNMP community string on the router.
+DOC
+		},
+		iosint => {
+			_example => '10.33.22.11',
+			_doc => <<DOC,
+The (optional) iosint parameter is the source address for the pings
+sent. This should be one of the active (!) IP addresses of the router to
+get results. IOS looks up the target host address in the forwarding table
+and then uses the interface(s) listed there to send the ping packets. By
+default IOS uses the (primary) IP address on the sending interface as
+source address for a ping. The RTTMon MIB versions before IOS 12.0(3)T
+didn't support this parameter.
+DOC
+		},
+		tos => {
+			_example => 160,
+			_default => 0,
+			_doc => <<DOC,
+The (optional) tos parameter specifies the value of the ToS byte in
+the IP header of the pings. Multiply DSCP values times 4 and Precedence
+values times 32 to calculate the ToS values to configure, e.g. ToS 160
+corresponds to a DSCP value 40 and a Precedence value of 5. The RTTMon
+MIB versions before IOS 12.0(3)T didn't support this parameter.
+DOC
+		},
+	});
 }
 
 1;

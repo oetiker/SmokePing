@@ -1,41 +1,37 @@
 package probes::LDAP;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
+This is a Smokeping probe module. Please use the command 
+
+C<smokeping -man probes::LDAP>
+
+to view the documentation or the command
+
+C<smokeping -makepod probes::LDAP>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+use probes::passwordchecker;
+use Net::LDAP;
+use Time::HiRes qw(gettimeofday sleep);
+use base qw(probes::passwordchecker);
+use IO::Socket::SSL;
+
+my $DEFAULTINTERVAL = 1;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
 probes::LDAP - a LDAP probe for SmokePing
-
-=head1 OVERVIEW
-
-Measures LDAP search latency for SmkoePing
-
-=head1 SYNOPSYS
-
- *** Probes ***
- + LDAP
-
- passwordfile = /usr/share/smokeping/etc/password # optional
- sleeptime = 0.5 # optional, 1 second by default
-
- *** Targets ***
-
- probe = LDAP
-
- + PROBE_CONF
- port = 389 # optional
- version = 3 # optional
- start_tls = 1 # disabled by default
- timeout = 60 # optional
- 
- base = dc=foo,dc=bar # optional
- filter = uid=testuser # the actual search
- attrs = uid,someotherattr
- 
- # if binddn isn't present, the LDAP bind is unauthenticated
- binddn = uid=testuser,dc=foo,dc=bar  
- password = mypass # if not present in <passwordfile>
-  
-=head1 DESCRIPTION
-
+DOC
+		overview => <<DOC,
+Measures LDAP search latency for SmokePing
+DOC
+		description => <<DOC,
 This probe measures LDAP query latency for SmokePing.
 The query is specified by the target-specific variable `filter' and,
 optionally, by the target-specific variable `base'. The attributes 
@@ -54,34 +50,86 @@ The location of this file is given in the probe-specific variable
 of this file (summary: colon-separated triplets of the form
 `<host>:<bind-dn>:<password>')
 
-The probe tries to be nice to the server and sleeps for the probe-specific
-variable `sleeptime' (one second by default) between each authentication
-request.
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 BUGS
-
+The probe tries to be nice to the server and does not send authentication
+requests more frequently than once every X seconds, where X is the value
+of the target-specific "min_interval" variable ($DEFAULTINTERVAL by default).
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+		bugs => <<DOC,
 There should be a way of specifying TLS options, such as the certificates
 involved etc.
 
 The probe has an ugly way of working around the fact that the 
 IO::Socket::SSL class complains if start_tls() is done more than once
 in the same program. But It Works For Me (tm).
-
-=cut
-
-use strict;
-use probes::passwordchecker;
-use Net::LDAP;
-use Time::HiRes qw(gettimeofday sleep);
-use base qw(probes::passwordchecker);
-use IO::Socket::SSL;
+DOC
+	}
+}
 
 sub ProbeDesc {
 	return "LDAP queries";
+}
+
+sub probevars {
+	my $class = shift;
+	my $h = $class->SUPER::probevars;
+	delete $h->{timeout};
+	return $h;
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		_mandatory => [ 'filter' ],
+		port => {
+			_re => '\d+',
+			_doc => "TCP port of the LDAP server",
+			_example => 389,
+		},
+		version => {
+			_re => '\d+',
+			_doc => "The LDAP version to be used.",
+			_example => 3,
+		},
+		start_tls => {
+			_doc => "If true, encrypt the connection with the starttls command. Disabled by default.",
+			_example => "1",
+		},
+		timeout => {
+			_doc => "LDAP query timeout in seconds.",
+			_re => '\d+',
+			_example => 10,
+			_default => 5,
+		},
+		base => {
+			_doc => "The base to be used in the LDAP query",
+			_example => "dc=foo,dc=bar",
+		},
+		filter => {
+			_doc => "The actual search to be made",
+			_example => "uid=testuser",
+		},
+		attrs => {
+			_doc => "The attributes queried.",
+			_example => "uid,someotherattr",
+		},
+		binddn => {
+			_doc => "If present, authenticate the LDAP bind with this DN.",
+			_example => "uid=testuser,dc=foo,dc=bar",
+		},
+		password => {
+			_doc => "The password to be used, if not present in <passwordfile>.",
+			_example => "mypass",
+		},
+                mininterval => {
+                        _default => $DEFAULTINTERVAL,
+                        _doc => "The minimum interval between each query sent, in (possibly fractional) second
+s.",
+                        _re => '(\d*\.)?\d+',
+                },
+	});
 }
 
 sub new {
@@ -89,21 +137,8 @@ sub new {
         my $class = ref($proto) || $proto;
         my $self = $class->SUPER::new(@_);
 
-	my $sleeptime = $self->{properties}{sleeptime};
-        $sleeptime = 1 unless defined $sleeptime;
-        $self->sleeptime($sleeptime);
-
 	return $self;
 }
-
-sub sleeptime {
-        my $self = shift;
-        my $newval = shift;
-        
-        $self->{sleeptime} = $newval if defined $newval;
-        return $self->{sleeptime};
-}
-
 
 sub pingone {
 	my $self = shift;
@@ -114,11 +149,21 @@ sub pingone {
 	my $version = $vars->{version} || 3;
 	my $port = $vars->{port};
 
+	my $mininterval = $vars->{mininterval};
+
 	my $binddn = $vars->{binddn};
 
 	my $timeout = $vars->{timeout};
 
-	my $password = $vars->{password} || $self->password($host, $binddn) if defined $binddn;
+	my $password;
+	if (defined $binddn) {
+		$password = $self->password($host, $binddn);
+		if (defined $vars->{password} and
+		    $vars->{password} ne ($self->{properties}{password}||"")) {
+			$password = $vars->{password};
+		}
+		$password ||= $self->{properties}{password};
+	}
 
 	my $start_tls = $vars->{start_tls};
 
@@ -128,14 +173,20 @@ sub pingone {
 
 	my $attrs = $vars->{attrs};
 
-	my @attrs = split(/,/, $attrs);
+	my @attrs = split(/,/, $attrs||"");
+	my $attrsref = @attrs ? \@attrs : undef;
 
 	my @times;
 	
+	my $start;
 	for (1..$self->pings($target)) {
+		if (defined $start) {
+			my $elapsed = gettimeofday() - $start;
+			my $timeleft = $mininterval - $elapsed;
+			sleep $timeleft if $timeleft > 0;
+		}
 		local $IO::Socket::SSL::SSL_Context_obj; # ugly but necessary
-		sleep $self->sleeptime unless $_ == 1; # be nice
-		my $start = gettimeofday();
+		$start = gettimeofday();
 		my $ldap = new Net::LDAP($host, port => $port, version => $version, timeout => $timeout) 
 			or do {
 				$self->do_log("connection error on $host: $!");
@@ -163,7 +214,7 @@ sub pingone {
 			$ldap->unbind;
 			next;
 		};
-		$mesg = $ldap->search(base => $base, filter => $filter, attrs => [ @attrs ]);
+		$mesg = $ldap->search(base => $base, filter => $filter, attrs => $attrsref);
 		$mesg->code and do {
 			$self->do_log("filter error on $host: " . $mesg->error);
 			$ldap->unbind;

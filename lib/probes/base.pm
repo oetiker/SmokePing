@@ -1,17 +1,16 @@
 package probes::base;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::base - Base Class for implementing SmokePing Probes
+This is a Smokeping probe module. Please use the command 
 
-=head1 OVERVIEW
- 
-For the time being, please use the probes::FPing for
-inspiration when implementing your own probes.
+C<smokeping -man probes::base>
 
-=head1 AUTHOR
+to view the documentation or the command
 
-Tobias Oetiker <tobi@oetiker.ch>
+C<smokeping -makepod probes::base>
+
+to generate the POD document.
 
 =cut
 
@@ -23,6 +22,39 @@ use Smokeping;
 $VERSION = 1.0;
 
 use strict;
+
+sub pod_hash {
+    return {
+    	name => <<DOC,
+probes::base - Base Class for implementing SmokePing Probes
+DOC
+	overview => <<DOC,
+For the time being, please use the probes::FPing for
+inspiration when implementing your own probes.
+DOC
+	authors => <<'DOC',
+Tobias Oetiker <tobi@oetiker.ch>
+DOC
+    };
+}
+
+sub pod {
+	my $class = shift;
+	my $pod = "";
+	my $podhash = $class->pod_hash;
+	$podhash->{synopsys} = $class->pod_synopsys;
+	$podhash->{variables} = $class->pod_variables;
+	for my $what (qw(name overview synopsys description variables authors notes bugs see_also)) {
+		my $contents = $podhash->{$what};
+		next if not defined $contents or $contents eq "";
+		$pod .= "=head1 " . uc $what . "\n\n";
+		$pod .= $contents;
+		chomp $pod;
+		$pod .= "\n\n";
+	}
+	$pod .= "=cut";
+	return $pod;
+}
 
 sub new($$)
 {
@@ -214,4 +246,155 @@ sub target_count {
 	return scalar keys %{$self->{targets}};
 }
 
+sub probevars {
+	return {
+		step => {
+			_re => '\d+',
+			_example => 300,
+			_doc => <<DOC,
+Duration of the base interval that this probe should use, if different
+from the one specified in the 'Database' section. Note that the step in
+the RRD files is fixed when they are originally generated, and if you
+change the step parameter afterwards, you'll have to delete the old RRD
+files or somehow convert them. (This variable is only applicable if
+the variable 'concurrentprobes' is set in the 'General' section.)
+DOC
+		},
+		offset => {
+			_re => '(\d+%|random)',
+			_re_error =>
+			  "Use offset either in % of operation interval or 'random'",
+			_example => '50%',
+			_doc => <<DOC,
+If you run many probes concurrently you may want to prevent them from
+hitting your network all at the same time. Using the probe-specific
+offset parameter you can change the point in time when each probe will
+be run. Offset is specified in % of total interval, or alternatively as
+'random', and the offset from the 'General' section is used if nothing
+is specified here. Note that this does NOT influence the rrds itself,
+it is just a matter of when data acqusition is initiated.
+(This variable is only applicable if the variable 'concurrentprobes' is set
+in the 'General' section.)
+DOC
+		},
+		pings => {
+			_re => '\d+',
+			_example => 20,
+			_doc => <<DOC,
+How many pings should be sent to each target, if different from the global
+value specified in the Database section. Note that the number of pings in
+the RRD files is fixed when they are originally generated, and if you
+change this parameter afterwards, you'll have to delete the old RRD
+files or somehow convert them.
+DOC
+		},
+		_mandatory => [],
+	};
+}
+
+sub targetvars {
+	return {_mandatory => []};
+}
+
+# a helper method that combines two var hash references
+# and joins their '_mandatory' lists.
+sub _makevars {
+	my ($class, $from, $to) = @_;
+	for (keys %$from) {
+		if ($_ eq '_mandatory') {
+			push @{$to->{_mandatory}}, @{$from->{$_}};
+			next;
+		}
+		$to->{$_} = $from->{$_};
+	}
+	return $to;
+}
+
+sub pod_synopsys {
+	my $class = shift;
+	my $classname = ref $class||$class;
+	$classname =~ s/^probes:://;
+
+	my $probevars = $class->probevars;
+	my $targetvars = $class->targetvars;
+	my $pod = <<DOC;
+ *** Probes ***
+
+ +$classname
+
+DOC
+	$pod .= $class->_pod_synopsys($probevars);
+	my $targetpod = $class->_pod_synopsys($targetvars);
+        $pod .= "\n # The following variables can be overridden in each target section\n$targetpod"
+		if defined $targetpod and $targetpod ne "";
+        $pod .= <<DOC;
+
+ # [...]
+
+ *** Targets ***
+
+ probe = $classname # if this should be the default probe
+
+ # [...]
+
+ + mytarget
+ # probe = $classname # if the default probe is something else
+ host = my.host
+DOC
+        $pod .= $targetpod
+		if defined $targetpod and $targetpod ne "";
+
+	return $pod;
+}
+
+# synopsys for one hash ref
+sub _pod_synopsys {
+	my $class = shift;
+	my $vars = shift;
+	my %mandatory;
+	$mandatory{$_} = 1 for (@{$vars->{_mandatory}});
+	my $pod = "";
+	for (sort keys %$vars) {
+		next if /^_mandatory$/;
+		my $val = $vars->{$_}{_example};
+		$val = $vars->{$_}{_default}
+			if exists $vars->{$_}{_default}
+			and not defined $val;
+		$pod .= " $_ = $val";
+		$pod .= " # mandatory" if $mandatory{$_};
+		$pod .= "\n";
+	}
+	return $pod;
+}
+
+sub pod_variables {
+	my $class = shift;
+	my $probevars = $class->probevars;
+	my $pod = "Supported probe-specific variables:\n\n";
+	$pod .= $class->_pod_variables($probevars);
+	return $pod;
+}
+
+sub _pod_variables {
+	my $class = shift;
+	my $vars = shift;
+	my $pod = "=over\n\n";
+	my %mandatory;
+	$mandatory{$_} = 1 for (@{$vars->{_mandatory}});
+	for (sort keys %$vars) {
+		next if /^_mandatory$/;
+		$pod .= "=item $_\n\n";
+		$pod .= $vars->{$_}{_doc};
+		chomp $pod;
+		$pod .= "\n\n";
+		$pod .= "Example value: " . $vars->{$_}{_example} . "\n\n"
+			if exists $vars->{$_}{_example};
+		$pod .= "Default value: " . $vars->{$_}{_default} . "\n\n"
+			if exists $vars->{$_}{_default};
+		$pod .= "This setting is mandatory.\n\n"
+			if $mandatory{$_};
+	}
+	$pod .= "=back\n\n";
+	return $pod;
+}
 1;

@@ -1,36 +1,16 @@
 package probes::FPing;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::FPing - FPing Probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 SYNOPSIS
+C<smokeping -man probes::FPing>
 
- *** Probes ***
- + FPing
- binary = /usr/sepp/bin/fping
- packetsize = 1024
+to view the documentation or the command
 
-=head1 DESCRIPTION
+C<smokeping -makepod probes::FPing>
 
-Integrates FPing as a probe into smokeping. The variable B<binary> must
-point to your copy of the FPing program. If it is not installed on
-your system yet, you can get it from http://www.fping.com/.
-
-The (optional) packetsize option lets you configure the packetsize for the pings sent.
-The FPing manpage has the following to say on this topic:
-
-Number of bytes of ping data to send.  The minimum size (normally 12) allows
-room for the data that fping needs to do its work (sequence number,
-timestamp).  The reported received data size includes the IP header
-(normally 20 bytes) and ICMP header (8 bytes), so the minimum total size is
-40 bytes.  Default is 56, as in ping. Maximum is the theoretical maximum IP
-datagram size (64K), though most systems limit this to a smaller,
-system-dependent number.
-
-=head1 AUTHOR
-
-Tobias Oetiker <tobi@oetiker.ch>
+to generate the POD document.
 
 =cut
 
@@ -40,6 +20,34 @@ use IPC::Open3;
 use Symbol;
 use Carp;
 
+sub pod_hash {
+      return {
+              name => <<DOC,
+probes::FPing - FPing Probe for SmokePing
+DOC
+              description => <<DOC,
+Integrates FPing as a probe into smokeping. The variable B<binary> must 
+point to your copy of the FPing program.  If it is not installed on 
+your system yet, you can get it from http://www.fping.com/.
+  
+The (optional) B<packetsize> option lets you configure the packetsize for the pings sent.
+
+The FPing manpage has the following to say on this topic:
+
+Number of bytes of ping data to send.  The minimum size (normally 12) allows
+room for the data that fping needs to do its work (sequence number,
+timestamp).  The reported received data size includes the IP header
+(normally 20 bytes) and ICMP header (8 bytes), so the minimum total size is
+40 bytes.  Default is 56, as in ping. Maximum is the theoretical maximum IP
+datagram size (64K), though most systems limit this to a smaller,
+system-dependent number.
+DOC
+		authors => <<'DOC',
+Tobias Oetiker <tobi@oetiker.ch>
+DOC
+	}
+}
+
 sub new($$$)
 {
     my $proto = shift;
@@ -48,17 +56,11 @@ sub new($$$)
 
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
-        croak "ERROR: FPing packetsize must be between 12 and 64000"
-           if $self->{properties}{packetsize} and 
-              ( $self->{properties}{packetsize} < 12 or $self->{properties}{packetsize} > 64000 ); 
-
-        croak "ERROR: FPing 'binary' not defined in FPing probe definition"
-            unless defined $self->{properties}{binary};
-
-        croak "ERROR: FPing 'binary' does not point to an executable"
-            unless -f $self->{properties}{binary} and -x $self->{properties}{binary};
-    
-        my $return = `$self->{properties}{binary} -C 1 localhost 2>&1`;
+    	my $binary = join(" ", $self->binary);
+	my $testhost = $self->testhost;
+        my $return = `$binary -C 1 $testhost 2>&1`;
+        croak "ERROR: fping ('$binary -C 1 $testhost') could not be run: $return"
+            if $return =~ m/not found/;
         croak "ERROR: FPing must be installed setuid root or it will not work\n" 
             if $return =~ m/only.+root/;
 
@@ -76,8 +78,19 @@ sub new($$$)
 
 sub ProbeDesc($){
     my $self = shift;
-    my $bytes = $self->{properties}{packetsize} || 56;
+    my $bytes = $self->{properties}{packetsize}||56;
     return "ICMP Echo Pings ($bytes Bytes)";
+}
+
+# derived class (ie. RemoteFPing) can override this
+sub binary {
+	my $self = shift;
+	return $self->{properties}{binary};
+}
+
+# derived class (ie. FPing6) can override this
+sub testhost {
+	return "localhost";
 }
 
 sub ping ($){
@@ -91,9 +104,13 @@ sub ping ($){
     return unless @{$self->addresses};
     my @bytes = () ;
     push @bytes, "-b$self->{properties}{packetsize}" if $self->{properties}{packetsize};
+    my @timeout = ();
+    push @timeout, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     my @cmd = (
-                    $self->{properties}{binary}, @bytes,
-                    '-C', $self->pings, '-q','-B1','-i10','-r1',
+                    $self->binary, @bytes,
+                    '-C', $self->pings, '-q','-B1','-r1',
+		    '-i' . $self->{properties}{mindelay},
+		    @timeout,
                     @{$self->addresses});
     $self->do_debug("Executing @cmd");
     my $pid = open3($inh,$outh,$errh, @cmd);
@@ -112,6 +129,56 @@ sub ping ($){
     close $inh;
     close $outh;
     close $errh;
+}
+
+sub probevars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::probevars, {
+		_mandatory => [ 'binary' ],
+		binary => {
+			_sub => sub {
+				my ($val) = @_;
+        			return "ERROR: FPing 'binary' does not point to an executable"
+            				unless -f $val and -x _;
+				return undef;
+			},
+			_doc => "The location of your fping binary.",
+			_example => '/usr/bin/fping',
+		},
+		packetsize => {
+			_re => '\d+',
+			_example => 5000,
+			_sub => sub {
+				my ($val) = @_;
+        			return "ERROR: FPing packetsize must be between 12 and 64000"
+              				if ( $val < 12 or $val > 64000 ); 
+				return undef;
+			},
+			_doc => "The ping packet size (in the range of 12-64000 bytes).",
+
+		},
+		timeout => {
+			_re => '(\d*\.)?\d+',
+			_example => 1.5,
+			_doc => <<DOC,
+The fping "-t" parameter, but in (possibly fractional) seconds rather than
+milliseconds, for consistency with other Smokeping probes. From fping(1):
+
+Initial target timeout. In the default mode, this is  the  amount  of  time  that
+ping waits for a response to its first request.  Successive timeouts are multiplied by the backoff factor.
+DOC
+		},
+		mindelay => {
+			_re => '(\d*\.)?\d+',
+			_example => 1,
+			_default => 10,
+			_doc => <<DOC,
+The fping "-i" parameter. From fping(1):
+
+The minimum amount of time (in milliseconds) between sending a ping packet to any target.
+DOC
+		},
+	});
 }
 
 1;

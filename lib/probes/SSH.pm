@@ -1,59 +1,16 @@
 package probes::SSH;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::SSH - Secure Shell Probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 SYNOPSIS
+C<smokeping -man probes::SSH>
 
- *** Probes ***
- + SSH
- binary = /usr/bin/ssh-keyscan
+to view the documentation or the command
 
- *** Targets *** 
- probe = SSH
- forks = 10
+C<smokeping -makepod probes::SSH>
 
- + First
- menu = First
- title = First Target
- # .... 
-
-=head1 DESCRIPTION
-
-Integrates ssh-keyscan as a probe into smokeping. The variable B<binary> must
-point to your copy of the ssh-keyscan program. If it is not installed on
-your system yet, you should install openssh >= 3.8p1
-
-The Probe asks the given host n-times for it's public key. Where n is
-the amount specified in the config File.
-
-Supported probe-specific variables:
-
-=over
-
-=item binary
-
-The location of your ssh-keyscan binary.
-
-=item forks
-
-The number of concurrent processes to be run. See probes::basefork(3pm)
-for details.
-
-=back
-
-Supported target-level probe variables:
-
-=over
-
-=back
-
-
-=head1 AUTHOR
-
-Christian Recktenwald<lt>smokeping-contact@citecs.de<gt>
-
+to generate the POD document.
 
 =cut
 
@@ -63,6 +20,25 @@ use IPC::Open3;
 use Symbol;
 use Carp;
 use POSIX;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::SSH - Secure Shell Probe for SmokePing
+DOC
+		description => <<DOC,
+Integrates ssh-keyscan as a probe into smokeping. The variable B<binary> must
+point to your copy of the ssh-keyscan program. If it is not installed on
+your system yet, you should install openssh >= 3.8p1
+
+The Probe asks the given host n-times for it's public key. Where n is
+the amount specified in the config File.
+DOC
+		authors => <<'DOC',
+Christian Recktenwald <smokeping-contact@citecs.de>
+DOC
+	}
+}
 
 my $ssh_re=qr/^# \S+ SSH-/i;
 
@@ -75,11 +51,6 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        croak "ERROR: SSH 'binary' not defined in SSH probe definition"
-            unless defined $self->{properties}{binary};
-
-        croak "ERROR: SSH 'binary' does not point to an executable"
-            unless -f $self->{properties}{binary} and -x $self->{properties}{binary};
         my $call = "$self->{properties}{binary} -t rsa localhost";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
@@ -132,6 +103,22 @@ sub pingone ($){
 
 #    $self->do_debug("time=@times\n");
     return @times;
+}
+
+sub probevars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::probevars, {
+		_mandatory => [ 'binary' ],
+		binary => {
+			_doc => "The location of your ssh-keyscan binary.",
+			_example => '/usr/bin/ssh-keyscan',
+			_sub => sub {
+				my $val = shift;
+				-x $val or return "ERROR: binary '$val' is not executable";
+				return undef;
+			},
+		},
+	})
 }
 
 1;

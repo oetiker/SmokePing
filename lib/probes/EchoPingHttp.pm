@@ -1,85 +1,42 @@
 package probes::EchoPingHttp;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::EchoPingHttp - an echoping(1) probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 OVERVIEW
+C<smokeping -man probes::EchoPingHttp>
 
-Measures HTTP roundtrip times (web servers and caches) for SmokePing.
+to view the documentation or the command
 
-=head1 SYNOPSYS
+C<smokeping -makepod probes::EchoPingHttp>
 
- *** Probes ***
- + EchoPingHttp
-
- binary = /usr/bin/echoping # mandatory
- 
-
- *** Targets ***
-
- probe = EchoPingHttp
-
- + PROBE_CONF
- url = / 
- ignore_cache = yes
- revalidate_data = no
- port = 80 # default value anyway
- timeout = 50 # default is 10s
-
-=head1 DESCRIPTION
-
-Supported probe-specific variables: those specified in EchoPing(3pm) 
-documentation.
-
-Supported target-specific variables:
-
-=over
-
-=item those specified in EchoPing(3pm) documentation 
-
-except I<fill>, I<size> and I<udp>.
-
-=item url
-
-The URL to be requested from the web server or cache. Can be either relative
-(/...) for web servers or absolute (http://...) for caches.
-
-=item port
-
-The TCP port to use. The default is 80.
-
-=item ignore_cache
-
-The echoping(1) "-A" option: force the proxy to ignore the cache.
-Enabled if the value is anything other than 'no' or '0'.
-
-=item revalidate_data
-
-The echoping(1) "-a" option: force the proxy to revalidate data with original 
-server. Enabled if the value is anything other than 'no' or '0'.
-
-=item timeout
-
-The echoping(1) "-t" option: Number  of  seconds  to  wait a reply before giving up. For TCP,
-this is the maximum number of seconds for the  whole  connection
-(setup and data exchange).
-
-=back
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 SEE ALSO
-
-EchoPing(3pm), EchoPingHttps(3pm)
+to generate the POD document.
 
 =cut
 
 use strict;
 use base qw(probes::EchoPing);
 use Carp;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::EchoPingHttp - an echoping(1) probe for SmokePing
+DOC
+		overview => <<DOC,
+Measures HTTP roundtrip times (web servers and caches) for SmokePing.
+DOC
+		notes => <<DOC,
+The I<fill>, I<size> and I<udp> EchoPing variables are not valid for EchoPingHttp.
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+		see_also => <<DOC,
+EchoPing(3pm), EchoPingHttps(3pm)
+DOC
+	}
+}
 
 sub _init {
 	my $self = shift;
@@ -96,7 +53,6 @@ sub make_host {
 
 	my $host = $self->SUPER::make_host($target);
 	my $port = $target->{vars}{port};
-	$port = $self->{properties}{port} unless defined $port;
 
 	$host .= ":$port" if defined $port;
 	return $host;
@@ -106,21 +62,11 @@ sub proto_args {
 	my $self = shift;
 	my $target = shift;
 	my $url = $target->{vars}{url};
-	$url = $self->{properties}{url} unless defined $url;
-	$url = "/" unless defined $url;
 
 	my @args = ("-h", $url);
 
-	# -t : timeout
-	my $timeout = $target->{vars}{timeout};
-	$timeout = $self->{properties}{timeout} 
-		unless defined $timeout;
-	push @args, "-t $timeout" if $timeout;
-
 	# -A : ignore cache
 	my $ignore = $target->{vars}{ignore_cache};
-	$ignore = $self->{properties}{ignore_cache} 
-		unless defined $ignore;
 	$ignore = 1 
 		if (defined $ignore and $ignore ne "no" 
 			and $ignore ne "0");
@@ -128,8 +74,6 @@ sub proto_args {
 
 	# -a : force cache to revalidate the data
 	my $revalidate = $target->{vars}{revalidate_data};
-	$revalidate = $self->{properties}{revalidate_data} 
-		unless defined $revalidate;
 	$revalidate= 1 if (defined $revalidate and $revalidate ne "no" 
 		and $revalidate ne "0");
 	push @args, "-a" if $revalidate and not exists $self->{_disabled}{a};
@@ -160,5 +104,40 @@ sub ProbeDesc($) {
         return "HTTP pings using echoping(1)";
 }
 
+sub targetvars {
+	my $class = shift;
+	my $h = $class->SUPER::targetvars;
+	delete $h->{udp};
+	delete $h->{fill};
+	delete $h->{size};
+	return $class->_makevars($h, {
+		url => {
+			_doc => <<DOC,
+The URL to be requested from the web server or cache. Can be either relative
+(/...) for web servers or absolute (http://...) for caches.
+DOC
+			_default => '/',
+		},
+		port => {
+			_doc => 'The TCP port to use.',
+			_example => 80,
+			_re => '\d+',
+		},
+		ignore_cache => {
+			_doc => <<DOC,
+The echoping(1) "-A" option: force the proxy to ignore the cache.
+Enabled if the value is anything other than 'no' or '0'.
+DOC
+			_example => 'yes',
+		},
+		revalidate_data => {
+			_doc => <<DOC,
+The echoping(1) "-a" option: force the proxy to revalidate data with original 
+server. Enabled if the value is anything other than 'no' or '0'.
+DOC
+			_example => 'no',
+		},
+	});
+}
 
 1;

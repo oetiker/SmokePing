@@ -1,53 +1,51 @@
 package probes::CiscoRTTMonDNS;
 
-# please use
-# 	pod2man CiscoRTTMonDNS.pm | nroff -man | more
-# to view the manpage of this document
-#
+=head1 301 Moved Permanently
 
+This is a Smokeping probe module. Please use the command 
 
-=head1 NAME
+C<smokeping -man probes::CiscoRTTMonDNS>
 
+to view the documentation or the command
+
+C<smokeping -makepod probes::CiscoRTTMonDNS>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+use base qw(probes::basefork);
+use Symbol;
+use Carp;
+use BER;
+use SNMP_Session;
+use SNMP_util "0.97";
+use ciscoRttMonMIB "0.2";
+
+my $e = "=";
+sub pod_hash {
+	return {
+		name => <<DOC,
 probes::CiscoRTTMonDNS.pm - Probe for SmokePing
+DOC,
+		description => <<DOC,
+A probe for smokeping, which uses the ciscoRttMon MIB functionality ("Service Assurance Agent", "SAA") of Cisco IOS to time ( recursive, type A) DNS queries to a DNS server.
 
-=head1 SYNOPSIS
+DOC
 
- *** Probes ***
- + CiscoRTTMonDNS
- + forks=50
+		notes => <<DOC,
+${e}head2 host parameter
 
- *** Targets ***
- + MyRouter-DNSserver
- menu = MyRouter->DNSserver
- title = RTTMon DNS lookup of www.foobar.com.au on DNSserver
- host = DNSserver.foobar.com.au
- probe=CiscoRTTMonDNS
- ++ PROBE_CONF 
- ioshost = RTTcommunity@Myrouter.foobar.com.au
- name=www.foobar.com.au
- iosint = 10.33.22.11
+The host parameter specifies the DNS server, which the router will use.
 
-=head1 DESCRIPTION
-
-A probe for smokeping, which uses the ciscoRttMon MIB functionality ("Service Assurance Agent", "SAA") of Cisco IOS to time ( recursive, type A) DNS queries to a DNS server. 
-
-=head1 PARAMETERS
-
-The (mandatory) host parameter specifies the DNS server, which the router will use. This can be a DNS name, the smokeping host can resolve or a dotted-quad IP address.
-
-The (mandatory) ioshost parameter specifies the Cisco router, which will send the DNS requests, as well as the SNMP community string on the router.
-
-The (mandatory) name parameter is the DNS name to resolve.
-
-The (optional) iosint parameter is the source address for the DNS packets. This should be one of the active (!) IP addresses of the router to get results. IOS looks up the target host address in the forwarding table and then uses the interface(s) listed there to send the DNS packets. By default IOS uses the (primary) IP address on the sending interface as source address for packets originated by the router.
-
-=head1 IOS VERSIONS
+${e}head2 IOS VERSIONS
 
 This probe only works with IOS 12.0(3)T or higher.  It is recommended to test it on less critical routers first. 
 
-=head1 INSTALLATION
+${e}head2 INSTALLATION
 
-To install this probe copy ciscoRttMonMIB.pm to ($SMOKEPINGINSTALLDIR)/lib and CiscoRTTMonDNS.pm to ($SMOKEPINGINSTALLDIR)/lib/probes. 
+To install this probe copy ciscoRttMonMIB.pm to (\$SMOKEPINGINSTALLDIR)/lib and CiscoRTTMonDNS.pm to (\$SMOKEPINGINSTALLDIR)/lib/probes.
 
 The router(s) must be configured to allow read/write SNMP access. Sufficient is:
 
@@ -60,35 +58,24 @@ If you want to be a bit more restrictive with SNMP write access to the router, t
 	snmp-server community RTTCommunity view RttMon RW 2
 
 The above configuration grants SNMP read-write only to 10.37.3.5 (the smokeping host) and only to the ciscoRttMon MIB tree. The probe does not need access to SNMP variables outside the RttMon tree.
-
-=head1 BUGS
-
+DOC
+		bugs => <<DOC,
 The probe does unnecessary DNS queries, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all queries in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*2+3 seconds (2 secs is the timeout value hardcoded into this probe). 
-
-=head1 SEE ALSO
-
+DOC
+		see_also => <<DOC,
 http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
+
 http://www.switch.ch/misc/leinen/snmp/perl/
 
 The best source for background info on SAA is Cisco's documentation on http://www.cisco.com and the CISCO-RTTMON-MIB documentation, which is available at: 
+
 ftp://ftp.cisco.com/pub/mibs/v2/CISCO-RTTMON-MIB.my 
-
-
-
-=head1 AUTHOR
-
+DOC
+		authors => <<DOC,
 Joerg.Kummer at Roche.com 
-
-=cut
-
-use strict;
-use base qw(probes::basefork);
-use Symbol;
-use Carp;
-use BER;
-use SNMP_Session;
-use SNMP_util "0.97";
-use ciscoRttMonMIB "0.2";
+DOC
+	}
+}
 
 my $pingtimeout =2;
 
@@ -107,7 +94,6 @@ sub new($$$)
 
 sub ProbeDesc($){
     my $self = shift;
-    my $bytes = $self->{properties}{packetsize} || 56;
     return "CiscoRTTMonDNS.pm";
 }
 
@@ -115,11 +101,6 @@ sub pingone ($$) {
     my $self = shift;
     my $target = shift;
 
-    croak ("please define 'ioshost' under the PROBE_CONF section of your target\n")
-       unless defined $target->{vars}{ioshost} ;
-
-    croak ("please define 'name' under the PROBE_CONF section of your target\n")
-       unless defined $target->{vars}{name} ;
     my $name = $target->{vars}{name};
     
     my $pings = $self->pings($target) || 20;
@@ -279,5 +260,35 @@ sub DestroyData ($$) {
 	&snmpset($host, "rttMonCtrlAdminStatus.$row",           'integer',      6);
 }
 
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		_mandatory => [ 'ioshost', 'name' ],
+		ioshost => {
+			_doc => <<DOC,
+The (mandatory) ioshost parameter specifies the Cisco router, which will send the DNS requests, 
+as well as the SNMP community string on the router.
+DOC
+			_example => 'RTTcommunity@Myrouter.foobar.com.au',
+		},
+		name => {
+			_doc => "The (mandatory) name parameter is the DNS name to resolve.",
+			_example => 'www.foobar.com.au',
+		},
+		iosint => {
+			_doc => <<DOC,
+The (optional) iosint parameter is the source address for the DNS packets.
+This should be one of the active (!) IP addresses of the router to get
+results. IOS looks up the target host address in the forwarding table
+and then uses the interface(s) listed there to send the DNS packets. By
+default IOS uses the (primary) IP address on the sending interface as
+source address for packets originated by the router.
+DOC
+			_example => '10.33.22.11',
+		},
+	});
+}
+
+=head1 
 1;
 

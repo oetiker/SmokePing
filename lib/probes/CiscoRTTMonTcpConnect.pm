@@ -1,56 +1,45 @@
 package probes::CiscoRTTMonTcpConnect;
 
-# please use
-# 	pod2man CiscoRTTMonTcpConnect.pm | nroff -man | more
-# to view the manpage of this document
-#
+=head1 301 Moved Permanently
 
+This is a Smokeping probe module. Please use the command 
 
-=head1 NAME
+C<smokeping -man probes::CiscoRTTMonTcpConnect>
 
+to view the documentation or the command
+
+C<smokeping -makepod probes::CiscoRTTMonTcpConnect>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+use base qw(probes::basefork);
+use Symbol;
+use Carp;
+use BER;
+use SNMP_Session;
+use SNMP_util "0.97";
+use ciscoRttMonMIB "0.2";
+
+sub pod_hash {
+	my $e = "=";
+	return {
+		name => <<DOC,
 probes::CiscoRTTMonTcpConnect - Probe for SmokePing
-
-=head1 SYNOPSIS
-
- *** Probes ***
- + CiscoRTTMonTcpConnect
- + forks=50
-
- *** Targets ***
- + MyRouter-TCPVictim
- menu = MyRouter->TCPVictim
- title = RTTMon TCP connect from MyRouter to TCPVictim
- host = TCPVictim.foobar.com.au
- probe=CiscoRTTMonTcpConnect
- ++ PROBE_CONF 
- ioshost = RTTcommunity@Myrouter.foobar.com.au
- iosint = 10.33.22.11
- tos = 160
- port = 23
-
-=head1 DESCRIPTION
-
+DOC
+		description => <<DOC,
 A probe for smokeping, which uses the ciscoRttMon MIB functionality ("Service Assurance Agent", "SAA") of Cisco IOS to measure TCP connect times between a Cisco router and a TCP server. The measured value is the time is the time to establish a TCP session, i.e. the time between the initial "SYN" TCP packet of the router and the "SYN ACK" packet of the host. The router terminates the TCP session immediately after the reception of "SYN ACK" with a "FIN" packet.
-
-=head1 PARAMETERS
-
-The (mandatory) host parameter specifies the IP host, which the router will connect to. This can be a DNS name, the smokeping host can resolve or a dotted-quad IP address.
-
-The (mandatory) ioshost parameter specifies the Cisco router, which will establish the TCP connections as well as the SNMP community string on the router.
-
-The (optional) port parameter lets you configure the destination TCP port on the host. The default is the http port 80. 
-
-The (optional) iosint parameter is the source address for the TCP connections. This should be one of the active (!) IP addresses of the router to get results. IOS looks up the target host address in the forwarding table and then uses the interface(s) listed there to send the TCP packets. By default IOS uses the (primary) IP address on the sending interface as source address for a connection. 
-
-The (optional) tos parameter specifies the value of the ToS byte in the IP header of the packets from the router. Multiply DSCP values times 4 and Precedence values times 32 to calculate the ToS values to configure, e.g. ToS 160 corresponds to a DSCP value 40 and a Precedence value of 5. Please note that this will not influence the ToS value in the packets sent by the the host. 
-
-=head1 IOS VERSIONS
+DOC
+		notes => <<DOC,
+${e}head2 IOS VERSIONS
 
 This probe only works with Cisco IOS 12.0(3)T or higher. It is recommended to test it on less critical routers first. 
 
-=head1 INSTALLATION
+${e}head2 INSTALLATION
 
-To install this probe copy ciscoRttMonMIB.pm to ($SMOKEPINGINSTALLDIR)/lib and CiscoRTTMonTcpConnect.pm to ($SMOKEPINGINSTALLDIR)/lib/probes. V0.97 or higher of Simon Leinen's SNMP_Session.pm is required.
+To install this probe copy ciscoRttMonMIB.pm to (\$SMOKEPINGINSTALLDIR)/lib and CiscoRTTMonTcpConnect.pm to (\$SMOKEPINGINSTALLDIR)/lib/probes. V0.97 or higher of Simon Leinen's SNMP_Session.pm is required.
 
 The router(s) must be configured to allow read/write SNMP access. Sufficient is:
 
@@ -63,35 +52,23 @@ If you want to be a bit more restrictive with SNMP write access to the router, t
 	snmp-server community RTTCommunity view RttMon RW 2
 
 The above configuration grants SNMP read-write only to 10.37.3.5 (the smokeping host) and only to the ciscoRttMon MIB tree. The probe does not need access to SNMP variables outside the RttMon tree.
-
-=head1 BUGS
-
+DOC
+		bugs => <<DOC,
 The probe establishes unnecessary connections, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all connections in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*2+3 seconds (2 secs is the timeout value hardcoded into this probe). 
-
-=head1 SEE ALSO
-
+DOC
+		see_also => <<DOC,
 http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
+
 http://www.switch.ch/misc/leinen/snmp/perl/
 
 The best source for background info on SAA is Cisco's documentation on http://www.cisco.com and the CISCO-RTTMON-MIB documentation, which is available at: 
 ftp://ftp.cisco.com/pub/mibs/v2/CISCO-RTTMON-MIB.my 
-
-
-
-=head1 AUTHOR
-
+DOC
+		authors => <<DOC,
 Joerg.Kummer at Roche.com 
-
-=cut
-
-use strict;
-use base qw(probes::basefork);
-use Symbol;
-use Carp;
-use BER;
-use SNMP_Session;
-use SNMP_util "0.97";
-use ciscoRttMonMIB "0.2";
+DOC
+	}
+}
 
 my $pingtimeout =2;
 
@@ -110,20 +87,16 @@ sub new($$$)
 
 sub ProbeDesc($){
     my $self = shift;
-    my $bytes = $self->{properties}{packetsize} || 56;
-    return "CiscoRTTMonTcpConnect ($bytes Bytes)";
+    return "CiscoRTTMonTcpConnect";
 }
 
 sub pingone ($$) { 
     my $self = shift;
     my $target = shift;
 
-    croak ("please define 'ioshost' under the PROBE_CONF section of your target\n")
-       unless defined $target->{vars}{ioshost} ;
-    
     my $pings = $self->pings($target) || 20;
-    my $tos   = $target->{vars}{tos} || 0;
-    my $port = $target->{vars}{port} || 80;
+    my $tos   = $target->{vars}{tos};
+    my $port = $target->{vars}{port};
 
     # use the proces ID as as row number to make this poll distinct on the router; 
     my $row=$$;
@@ -279,6 +252,53 @@ sub DestroyData ($$) {
 	&snmpset($host, "rttMonCtrlAdminStatus.$row",           'integer',      2);
 	#delete any old config
 	&snmpset($host, "rttMonCtrlAdminStatus.$row",           'integer',      6);
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		_mandatory => [ 'ioshost' ],
+		ioshost => {
+			_example => 'RTTcommunity@Myrouter.foobar.com.au',
+			_doc => <<DOC,
+The (mandatory) ioshost parameter specifies the Cisco router, which will
+establish the TCP connections as well as the SNMP community string on
+the router.
+DOC
+		},
+		port => {
+			_default => 80,
+			_re => '\d+',
+			_doc => <<DOC,
+The (optional) port parameter lets you configure the destination TCP
+port on the host. The default is the http port 80.
+DOC
+		},
+		iosint => {
+			_example => '10.33.22.11',
+			_doc => <<DOC,
+The (optional) iosint parameter is the source address for the TCP
+connections. This should be one of the active (!) IP addresses of the
+router to get results. IOS looks up the target host address in the
+forwarding table and then uses the interface(s) listed there to send
+the TCP packets. By default IOS uses the (primary) IP address on the
+sending interface as source address for a connection.
+DOC
+		},
+		tos => {
+			_default => 0,
+			_example => 160,
+			_re => '\d+',
+			_doc => <<DOC,
+The (optional) tos parameter specifies the value of the ToS byte in the
+IP header of the packets from the router. Multiply DSCP values times 4
+and Precedence values times 32 to calculate the ToS values to configure,
+e.g. ToS 160 corresponds to a DSCP value 40 and a Precedence value of
+5. Please note that this will not influence the ToS value in the packets
+sent by the the host.
+DOC
+		},
+	});
 }
 
 1;

@@ -1,48 +1,43 @@
 package probes::EchoPingHttps;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::EchoPingHttps - an echoping(1) probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 OVERVIEW
+C<smokeping -man probes::EchoPingHttps>
 
-Measures HTTPS (HTTP over SSL) roundtrip times (web servers and caches) for
-SmokePing.
+to view the documentation or the command
 
-=head1 SYNOPSYS
+C<smokeping -makepod probes::EchoPingHttps>
 
- *** Probes ***
- + EchoPingHttps
-
- binary = /usr/bin/echoping # mandatory
-
- *** Targets ***
-
- probe = EchoPingHttps
-
- + PROBE_CONF
- url = / 
- ignore-cache = yes
- force-revalidate = no
- port = 443 # default value anyway
-
-=head1 DESCRIPTION
-
-As EchoPingHttp(3pm), but SSL-enabled.
-
-=head1 AUTHOR
-
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 SEE ALSO
-
-EchoPingHttp(3pm)
+to generate the POD document.
 
 =cut
 
 use strict;
 use base qw(probes::EchoPingHttp);
 use Carp;
+
+sub pod_hash {
+	return {
+		name => <<DOC,
+probes::EchoPingHttps - an echoping(1) probe for SmokePing
+DOC
+		overview => <<DOC,
+Measures HTTPS (HTTP over SSL) roundtrip times (web servers and caches) for
+SmokePing.
+DOC
+		description => <<DOC,
+As EchoPingHttp(3pm), but SSL-enabled.
+DOC
+		authors => <<'DOC',
+Niko Tyni <ntyni@iki.fi>
+DOC
+		see_also => <<DOC,
+EchoPingHttp(3pm)
+DOC
+	}
+}
 
 sub proto_args {
 	my $self = shift;

@@ -1,62 +1,38 @@
 package probes::IOSPing;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
+This is a Smokeping probe module. Please use the command 
+
+C<smokeping -man probes::IOSPing>
+
+to view the documentation or the command
+
+C<smokeping -makepod probes::IOSPing>
+
+to generate the POD document.
+
+=cut
+
+use strict;
+use base qw(probes::basefork);
+use IPC::Open2;
+use Symbol;
+use Carp;
+
+my $e = "=";
+
+sub pod_hash {
+	return {
+		name => <<DOC,
 probes::IOSPing - Cisco IOS Probe for SmokePing
-
-=head1 SYNOPSIS
-
- *** Probes ***
- + IOSPing
- binary = /usr/bin/remsh
- packetsize = 1024
- forks = 1
-
- ++ PROBE_CONF
- ioshost = router
- iosuser = user
- iosint = source_address
-
-=head1 DESCRIPTION
-
+DOC
+		description => <<DOC,
 Integrates Cisco IOS as a probe into smokeping.  Uses the rsh / remsh
 protocol to run a ping from an IOS device.
-
-=head1 OPTIONS
-
-The binary and ioshost options are mandatory.
-
-The binary option specifies the path of the binary to be used to
-connect to the IOS device.  Commonly used binaries are /usr/bin/rsh
-and /usr/bin/remsh, although any script or binary should work if can
-be called as 
-
-    /path/to/binary [ -l user ] router ping
-
-to produce the IOS ping dialog on stdin & stdout.
-
-The (optional) packetsize option lets you configure the packetsize for
-the pings sent.
-
-The (optional) forks options lets you configure the number of
-simultaneous remote pings to be run.  NB Some IOS devices have a
-maximum of 5 VTYs available, so be careful not to hit a limit.
-
-The ioshost option specifies the IOS device which should be used for
-the ping.
-
-The (optional) iosuser option allows you to specify the remote
-username the IOS device.  If this option is omitted, the username
-defaults to the default user used by the remsh command (usually the
-user running the remsh command, ie the user running SmokePing).
-
-The (optional) iosint option allows you to specify the source address
-or interface in the IOS device. The value should be an IP address or
-an interface name such as "Ethernet 1/0". If this option is omitted,
-the IOS device will pick the IP address of the outbound interface to
-use.
-
-=head1 IOS CONFIGURATION
+DOC
+	notes => <<DOC,
+=head2 IOS Configuration
 
 The IOS device must have rsh enabled and an appropriate trust defined,
 eg:
@@ -66,14 +42,15 @@ eg:
     ip rcmd remote-host smoke 192.168.1.2 smoke enable
     !
 
-=head1 NOTES
+Some IOS devices have a maximum of 5 VTYs available, so be careful not to 
+hit a limit with the 'forks' variable.
 
-=head2 Password authentication
+${e}head2 Password authentication
 
 It is not possible to use password authentication with rsh or remsh
 due to fundamental limitations of the protocol.
 
-=head2 Ping packet size
+${e}head2 Ping packet size
 
 The FPing manpage has the following to say on the topic of ping packet
 size:
@@ -85,22 +62,16 @@ header (normally 20 bytes) and ICMP header (8 bytes), so the minimum
 total size is 40 bytes.  Default is 56, as in ping. Maximum is the
 theoretical maximum IP datagram size (64K), though most systems limit
 this to a smaller, system-dependent number.
-
-=head1 AUTHOR
-
+DOC
+	authors => <<'DOC',
 Paul J Murphy <paul@murph.org>
 
 based on probes::FPing by
 
 Tobias Oetiker <tobi@oetiker.ch>
-
-=cut
-
-use strict;
-use base qw(probes::basefork);
-use IPC::Open2;
-use Symbol;
-use Carp;
+DOC
+	}
+}
 
 sub new($$$)
 {
@@ -110,16 +81,6 @@ sub new($$$)
 
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
-        croak "ERROR: IOSPing packetsize must be between 12 and 64000"
-           if $self->{properties}{packetsize} and 
-              ( $self->{properties}{packetsize} < 12 or $self->{properties}{packetsize} > 64000 ); 
-
-        croak "ERROR: IOSPing 'binary' not defined in IOSPing probe definition"
-            unless defined $self->{properties}{binary};
-
-        croak "ERROR: IOSPing 'binary' does not point to an executable"
-            unless -f $self->{properties}{binary} and -x $self->{properties}{binary};
-
 	$self->{pingfactor} = 1000; # Gives us a good-guess default
 	print "### assuming you are using an IOS reporting in miliseconds\n";
     };
@@ -129,23 +90,20 @@ sub new($$$)
 
 sub ProbeDesc($){
     my $self = shift;
-    my $bytes = $self->{properties}{packetsize} || 56;
+    my $bytes = $self->{properties}{packetsize};
     return "Cisco IOS - ICMP Echo Pings ($bytes Bytes)";
 }
 
 sub pingone ($$){
     my $self = shift;
     my $target = shift;
-    my $bytes = $self->{properties}{packetsize} || 56;
+    my $bytes = $self->{properties}{packetsize};
     # do NOT call superclass ... the ping method MUST be overwriten
     my %upd;
     my $inh = gensym;
     my $outh = gensym;
     my @args = ();
     my $pings = $self->pings($target);
-
-    croak "ERROR: IOSPing 'ioshost' not defined"
-	unless defined $target->{vars}{ioshost};
 
     push(@args,$self->{properties}{binary});
     push(@args,'-l',$target->{vars}{iosuser})
@@ -227,6 +185,78 @@ sub pingone ($$){
     close $outh;
 
     return @times;
+}
+
+sub probevars {
+	my $class = shift;
+        return $class->_makevars($class->SUPER::probevars, {
+		_mandatory => ['binary'],
+		binary => {
+			_doc => <<DOC,
+The binary option specifies the path of the binary to be used to
+connect to the IOS device.  Commonly used binaries are /usr/bin/rsh
+and /usr/bin/remsh, although any script or binary should work if can
+be called as 
+
+    /path/to/binary [ -l user ] router ping
+
+to produce the IOS ping dialog on stdin & stdout.
+DOC
+			_example => '/usr/bin/rsh',
+			_sub => sub {
+				my $val = shift;
+				-x $val or return "ERROR: binary '$val' is not executable";
+				return undef;
+			},
+		},
+		packetsize => {
+			_doc => <<DOC,
+The (optional) packetsize option lets you configure the packetsize for
+the pings sent.
+DOC
+			_default => 56,
+			_re => '\d+',
+			_sub => sub {
+				my $val = shift;
+				return "ERROR: packetsize must be between 12 and 64000"
+					unless $val >= 12 and $val <= 64000;
+				return undef;
+			},
+		},
+	});
+}
+
+sub targetvars {
+	my $class = shift;
+        return $class->_makevars($class->SUPER::targetvars, {
+		_mandatory => [ 'ioshost' ],
+		ioshost => {
+			_doc => <<DOC,
+The ioshost option specifies the IOS device which should be used for
+the ping.
+DOC
+			_example => 'my.cisco.router',
+		},
+		iosuser => {
+			_doc => <<DOC,
+The (optional) iosuser option allows you to specify the remote
+username the IOS device.  If this option is omitted, the username
+defaults to the default user used by the remsh command (usually the
+user running the remsh command, ie the user running SmokePing).
+DOC
+			_example => 'admin',
+		},
+		iosint => {
+			_doc => <<DOC,
+The (optional) iosint option allows you to specify the source address
+or interface in the IOS device. The value should be an IP address or
+an interface name such as "Ethernet 1/0". If this option is omitted,
+the IOS device will pick the IP address of the outbound interface to
+use.
+DOC
+			_example => 'Ethernet 1/0',
+		},
+	});
 }
 
 1;

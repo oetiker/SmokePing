@@ -1,0 +1,199 @@
+=head1 NAME
+
+smokeping_upgrade - Notes on upgrading Smokeping
+
+=head1 OVERVIEW
+
+This document tries to list incompatible or otherwise user-visible changes
+in Smokeping versions, with instructions on how to fix any possible
+problems. It also sporadically mentions new features and the like.
+
+The document currently starts with changes from 1.34 to 1.37. If you
+run into problems with upgrading from earlier versions, please send
+a description of the problems, preferably with notes on how to fix
+them, to the C<smokeping-users> mailing list, so they can be added to
+this document.  The same applies to any problems you find with current
+versions that are not documented here, of course. Patch submissions
+against this file are most appreciated.
+
+If a version is not listed, there are no known problems in upgrading
+to it from the previous release.
+
+An official list of changes with each release can be found in the CHANGES
+file in the Smokeping distribution. This document tries to complement
+that with upgrading instructions etc.
+
+=head1 1.38 to 2.0
+
+The biggest change with the 2.0 release is that the configuration file
+is now parsed much more strictly. This should result in (hopefully
+understandable) error messages making the configuration less of the
+trial-and-error variety than it used to be. It also automates the
+generation of the configuration documentation from the source code,
+so the docs are now more accurate.
+
+The configuration syntax has stayed mostly the same, except for the
+issues below.
+
+=over
+
+=item PROBE_CONF
+
+The PROBE_CONF subsections have been deprecated. All the target-specific
+variables are now configured in the same section as the target is. Just
+deleting the
+
+++ PROBE_CONF
+
+lines should fix this (for any number of '+', obviously.)
+
+The existence of a PROBE_CONF section makes smokeping exit with an error
+message at parse time.
+
+Note for distributors: these lines could easily be removed automatically
+during upgrade.
+
+=item Variable order
+
+The C<probe> variable must now be set before any variables that depend on
+the selected probe. This is because setting C<probe> modifies the grammar
+of the rest of the section dynamically at parse time.
+
+Additionally, C<probe> must now precede C<host>, for reasons that have
+to do with the current implementation of mandatory variable checking.
+
+Both of these errors are recognized at parse time and produce error messages
+accordingly.
+
+Note for distributors: the C<smokeping> command now has a new '--check'
+option that can be used to verify the syntax of the configuration
+file. It might be a good idea to do this on upgrade and give the user
+an explanatory note if the verification fails.
+
+=item Target-specific variables in the Probes section
+
+This is not an incompatible change, but it is mentioned here nevertheless.
+Target-specific variables can now be specified in the Probes section as well,
+and the values given become defaults for all the targets.
+
+=back
+
+In addition to this, some probes have had minor incompatible changes to
+their configuration.
+
+=over
+
+=item RemoteFPing
+
+The C<rbinary> variable is now mandatory. This is a side effect from a bigger change:
+the probe is now derived from the FPing probe and supports all the variables
+FPing does.
+
+=item FPing6
+
+This probe is also now derived from FPing and supports all the variables FPing does.
+
+=item Curl
+
+The URL that will be used is now specified with the variable C<urlformat> instead
+of C<url>. The new variable can (and usually should) include a placeholder
+for the C<host> variable of each target as C<%host%>, eg. C<urlformat = http://%host%/>.
+The new variable is mandatory. 
+
+The change was made to fix the confusing situation where the C<host> variable
+was required for each actual target, but it didn't actually have any effect
+(as the server to be probed came from the C<url> variable.)
+
+=item EchoPingIcp
+
+The C<url> variable is now mandatory, as the old default "/" didn't make
+sense because it's relative rather than absolute.
+
+=item LDAP
+
+The C<filter> variable is now mandatory, as Net::LDAP bails out without it.
+
+The C<sleeptime> variable was changed to C<mininterval> and its semantics
+were changed accordingly (it's now the minimum time between two queries
+rather than the time slept between the end of one and the start of the
+another.)
+
+=item Radius
+
+The C<sleeptime> variable was changed to C<mininterval> and its semantics
+were changed accordingly. See the LDAP explanation above.
+
+=item AnotherDNS
+
+The C<sleeptime> variable was changed to C<mininterval> and its semantics
+were changed accordingly. See the LDAP explanation above. Additionally,
+the time is now specified in seconds rather than microseconds.
+
+=item AnotherSSH
+
+The C<sleeptime> variable was changed to C<mininterval> and its semantics
+were changed accordingly. See the LDAP explanation above. Additionally,
+the time is now specified in seconds rather than microseconds.
+
+=item telnetIOSPing
+
+The C<target> variable was removed. The target should now be specified
+in the C<host> variable, like it is with all the other probes.
+
+=back
+
+=head1 1.34 to 1.37
+
+=over
+
+=item The RemoteFPing probe
+
+The configuration of this probe was moved from the Targets section to the
+Probes section, as all the variables are really probe-specific. The moved
+variables were C<rhost>, C<rbinary> and C<rhost>.
+
+=item Logging changes
+
+The C<smokeping> daemon now warns at startup if syslog support is not turned on
+in the config file. This is because many diagnostic messages will otherwise
+get lost.
+
+=item Concurrent probes
+
+Each probe now runs in its own process, instead of them all running
+sequentially in one process. This makes it possible to specify different
+step lengths for different probes. You can get the old behaviour back
+by setting 'concurrentprobes = no'.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2005 by Niko Tyni.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA.
+
+=head1 AUTHOR
+
+Niko Tyni <ntyni@iki.fi>
+
+=head1 SEE ALSO
+
+The other Smokeping documents, especially smokeping_config.

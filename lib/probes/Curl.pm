@@ -1,105 +1,102 @@
 package probes::Curl;
 
-my $DEFAULTBIN = "/usr/bin/curl";
+=head1 301 Moved Permanently
 
-=head1 NAME
+This is a Smokeping probe module. Please use the command 
 
-probes::Curl - a curl(1) probe for SmokePing
+C<smokeping -man probes::Curl>
 
-=head1 OVERVIEW
+to view the documentation or the command
 
-Fetches an HTTP or HTTPS URL using curl(1).
+C<smokeping -makepod probes::Curl>
 
-=head1 SYNOPSYS
-
- *** Probes ***
- + Curl
-
- binary = /usr/bin/curl # default value
-
- *** Targets ***
-
- probe = Curl
- forks = 10
-
- menu = Top
- title = Top Menu
- remark = Top Menu Remark
-
- + PROBE_CONF
-
- + First
- menu = First
- title = First Target
- host = some.host
-
- # PROBE_CONF can be overridden here
- ++ PROBE_CONF
- agent = "User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.2.1) Gecko/20021130"
- url = https://some.host/some/where
-
-=head1 DESCRIPTION
-
-Supported probe-specific variables:
-
-=over
-
-=item binary
-
-The location of your curl binary.
-
-=item forks
-
-The number of concurrent processes to be run. See probes::basefork(3pm)
-for details.
-
-=item url
-
-The URL to fetch.  Can be any one that curl supports.
-
-=back
-
-Supported target-level probe variables 
-(see curl(1) for details of the options):
-
-=over
-
-=item agent
-
-The "-A" curl(1) option.  This is a full HTTP User-Agent header including
-the words "User-Agent:".  It should be enclosed in quotes if it contains
-shell metacharacters
-
-=item ssl2
-
-The "-2" curl(1) option.  Force SSL2.
-
-=item timeout
-
-The "-m" curl(1) option.  Maximum timeout in seconds.
-
-=item interface
-
-The "--interface" curl(1) option.  Bind to a specific interface, IP address or
-host name.
-
-=back
-
-=head1 AUTHORS
-
-Gerald Combs E<lt>gerald [AT] ethereal.comE<gt>
-Niko Tyni E<lt>ntyni@iki.fiE<gt>
-
-=head1 SEE ALSO
-
-curl(1), probes::Curl(3pm) etc., http://curl.haxx.se/
+to generate the POD document.
 
 =cut
 
 use strict;
 use base qw(probes::basefork);
 use Carp;
-#
+
+my $DEFAULTBIN = "/usr/bin/curl";
+
+sub pod_hash {
+    return {
+	name => "probes::Curl - a curl(1) probe for SmokePing",
+	overview => "Fetches an HTTP or HTTPS URL using curl(1).",
+	description => "(see curl(1) for details of the options below)",
+	authors => <<'DOC',
+ Gerald Combs <gerald [AT] ethereal.com>
+ Niko Tyni <ntyni@iki.fi>
+DOC
+	notes => <<DOC,
+The URL to be tested used to be specified by the variable 'url' in earlier
+versions of Smokeping, and the 'host' setting did not influence it in any
+way. The variable name has now been changed to 'urlformat', and it can
+(and in most cases should) contain a placeholder for the 'host' variable.
+DOC
+	see_also => "curl(1), probes::Curl(3pm) etc., http://curl.haxx.se/",
+    }
+}
+
+sub probevars {
+	my $class = shift;
+	my $h = $class->SUPER::probevars;
+	delete $h->{timeout};
+	return $class->_makevars($h, {
+		binary => {
+			_doc => "The location of your curl binary.",
+			_default => $DEFAULTBIN,
+			_sub => sub {
+				my $val = shift;
+				return "ERROR: Curl 'binary' $val does not point to an executable"
+					unless -f $val and -x _;
+				return undef;
+			},
+		},
+	});
+}
+
+sub targetvars {
+	my $class = shift;
+	return $class->_makevars($class->SUPER::targetvars, {
+		_mandatory => [ 'urlformat' ],
+		agent => {
+			_doc => <<DOC,
+The "-A" curl(1) option.  This is a full HTTP User-Agent header including
+the words "User-Agent:".  It should be enclosed in quotes if it contains
+shell metacharacters.
+DOC
+			_example => '"User-Agent: Lynx/2.8.4rel.1 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.6c"',
+		},
+		timeout => {
+			_doc => qq{The "-m" curl(1) option.  Maximum timeout in seconds.},
+			_re => '\d+',
+			_example => 10,
+			_default => 5,
+		},
+		interface => {
+			_doc => <<DOC,
+The "--interface" curl(1) option.  Bind to a specific interface, IP address or
+host name.
+DOC
+			_example => 'eth0',
+		},
+		ssl2 => {
+			_doc => qq{The "-2" curl(1) option.  Force SSL2.},
+			_example => 1,
+		},
+		urlformat => {
+			_doc => <<DOC,
+The template of the URL to fetch.  Can be any one that curl supports.
+Any occurrence of the string '%host%' will be replaced with the
+host to be probed.
+DOC
+			_example => "http://%host%/",
+		},
+	});
+}
+
 # derived class will mess with this through the 'features' method below
 my $featurehash = {
 	agent => "-A",
@@ -120,12 +117,6 @@ sub new {
 	my $self = $class->SUPER::new(@_);
 
 	$self->_init if $self->can('_init');
-
-	unless (defined $self->{properties}{binary}) {
-		$self->{properties}{binary} = $DEFAULTBIN;
-	}
-	croak "ERROR: Curl 'binary' $self->{properties}{binary} does not point to an executable"
-		unless -f $self->{properties}{binary} and -x $self->{properties}{binary};
 
 	$self->test_usage;
 
@@ -156,15 +147,6 @@ sub ProbeDesc($) {
 	return "HTTP, HTTPS, and FTP URLs using curl(1)";
 }
 
-# This can be overridden to tag the port number to the address
-# in derived classes (namely Curl)
-sub make_host {
-	my $self = shift;
-	my $target = shift;
-	return $target->{addr};
-}
-
-
 # other than host, count and protocol-specific args come from here
 sub make_args {
 	my $self = shift;
@@ -174,7 +156,6 @@ sub make_args {
 
 	for (keys %arghash) {
 		my $val = $target->{vars}{$_};
-		$val = $self->{properties}{$_} unless defined $val;
 		push @args, ($arghash{$_}, $val) if defined $val;
 	}
 	return @args;
@@ -199,8 +180,9 @@ sub make_commandline {
 	my $count = shift;
 
 	my @args = $self->make_args($target);
-	my $url = $target->{vars}{url};
-	$url = "" unless defined $url;
+	my $url = $target->{vars}{urlformat};
+	my $host = $target->{addr};
+	$url =~ s/%host%/$host/g;
 	push @args, $self->proto_args($target);
 	
 	return ($self->{properties}{binary}, @args, $url);

@@ -18,13 +18,17 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
 
  Options:
 
- --man        Show the manpage
+ --man[=x]    Show the manpage for the program (or for probe x, if specified)
 
  --help       Help :-)
 
  --email      Send SmokePing Agents to all Targets marked DYNAMIC
 
- --makepod    Create POD documentation on Config file
+ --config=x   Use a config file different from the default
+
+ --check      Just check the config file syntax, don't start the daemon
+
+ --makepod[=x] Create POD documentation on Config file (or for probe x, if specified)
 
  --version    Show SmokePing Version
 
@@ -44,6 +48,10 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
               pagedir from the config is used.
 
  --nosleep    For debugging you may want to run SmokePing without sleep interval
+
+ --gen-examples Generate the smokeping_examples document and example config files
+                (to be used while building inside the smokeping distribution)
+		With --check : check the syntax of the generated examples.
 
 =head1 DESCRIPTION
 

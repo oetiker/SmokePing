@@ -1,0 +1,241 @@
+=head1 NAME
+
+smokeping_extend - Notes on extending Smokeping
+
+=head1 OVERVIEW
+
+This document is intended to guide prospective authors in writing new
+Smokeping probes.  It mostly describes the interface between Smokeping
+and its probe modules. If it seems too complicated to understand, look
+at the existing modules for examples.
+
+Comments and proposed changes or additions are welcome.  Please send
+them to the smokeping-users mailing list. Patches against this file
+are most appreciated.
+
+=head1 CHOOSING A BASE CLASS
+
+The first thing you should decide is which base class you should
+use for your probe. For most (if not all) uses it's a choice between
+C<probes::base> and C<probes::basefork>. The former is intended for probes
+that can measure their targets all in one go, while the latter is for
+probing them one at a time, possibly in several concurrent subprocesses.
+
+At the moment, the only probes that use C<probes::base> are the FPing
+derivatives. All the others use C<probes::basefork>, and chances are
+you should too. This document will thus concentrate on the latter case.
+
+=head1 SKELETON FILE
+
+The C<probes::skel> module is a non-functional probe that is intended
+to make a good basis for a new probe module. Copy the file, 
+C<lib/probes/skel.pm>, to a new name and just fill out the blanks :)
+Note that real probe modules must have at least one capital letter
+in their name.
+
+=head1 PROBE DOCUMENTATION
+
+The probe documentation is generated from the source code with the
+C<smokeping> arguments C<--man> or C<--makepod>. The embedded
+POD documentation should point to this real documentation, so
+that curious users of the C<perldoc> command see what's going on.
+All the current probes do this.
+
+You should provide the method C<pod_hash> that returns a reference to
+a hash with keys corresponding to the section names you want in the
+manpage. The supported section names are
+C<name>, C<overview>, C<description>, C<authors>, C<notes>, C<bugs>, and
+C<see_also>. If you don't need a particular section, just leave it out.
+
+The special sections C<synopsys> and C<variables> are automatically
+generated from the description of your variables. See below.
+
+=head1 PROBE DESCRIPTION
+
+The probe should offer the C<ProbeDesc> method that returns a short
+description of what it does. This will be used in the graphs produced
+by the web frontend.
+
+=head1 VARIABLES
+
+All Smokeping probes must define their variables by implementing a
+C<probevars> method for probe-specific variables and a C<targetvars>
+method for target-specific variables. If you don't know the difference
+between these yet, see the L<smokeping_examples> document.
+
+(The probes that are derived from C<probes::base> don't support
+target-specific variables, so they only use the C<probevars> method.)
+
+The base classes offer these methods too to provide the variables that
+are common to all the probes (eg. the probe-specific C<step> variable
+and the target-specific C<pings> variable. If you don't want to add
+anything to the base class variables (perhaps because all your variables
+are of a target-specific nature, so you don't need new probe-specific
+variables at all), you can leave the corresponding method out and it
+will be inherited from the base class.
+
+When you do supply your own C<probevars> or C<targetvars> method, you should
+combine your variables with those coming from the superclass. There is a
+convenience method called C<_makevars> that does this, and the common idiom is
+
+ sub probevars {
+        my $class = shift;
+        return $class->_makevars($class->SUPER::probevars, {
+		# your variables go here
+	}
+ }
+
+The variables are declared in a syntax that comes from the module used
+for parsing the configuration file, C<ISG::ParseConfig>. Each variable
+should be a hash that uses the "special variable keys" documented in
+the C<ISG::ParseConfig> manual. See the C<probes::skel> and the other
+probes for examples. 
+
+For reference, here are the keys the hash should have. Much of this
+is taken straight from the C<ISG::ParseConfig> manual.
+
+=over
+
+=item Keys you B<must> provide
+
+=over
+
+=item _doc
+
+Description of the variable.
+
+=item _example
+
+An example value. This will be used in the SYNOPSYS section in the
+probe manual.
+
+=back
+
+=item Optional keys
+
+=over
+
+=item _default
+
+A default value that will be assigned to the variable if none is specified or inherited.
+
+=item _re
+
+Regular expression upon which the value will be checked.
+
+=item _re_error
+
+String containing the returned error in case the regular expression
+doesn't match (if not specified, a generic 'syntax error' message will
+be returned).
+
+=item _sub        
+
+A function pointer. It called for every value, with the value passed
+as its first argument. If the function returns a defined value it is
+assumed that the test was not successful and an error is generated with
+the returned string as content.
+
+=back
+
+=back
+
+The C<probevars> and C<targetvars> methods should return hash references
+that contain the variable names as keys and the hashes described above
+as values. In addition the C<ISG::ParseConfig> special section key
+C<_mandatory> is supported and should contain a reference to a list of
+mandatory variables. The C<_makevars> method is available of this special
+key and merges the mandatory lists in its arguments. Note that no other
+C<ISG::ParseConfig> special section keys are supported.
+
+=head1 INITIALIZATION
+
+If you must do something at probe initialization time, like check that
+the external program you're going to use behaves as you expect, you should
+do it in the C<new> method. You should probably also take care that
+you don't run the tests needlessly while in CGI mode. The usual way to 
+do this is to test for $ENV{SERVER_SOFTWARE}. See the C<probes::skel>
+module for an example.
+
+=head1 PINGING
+
+All the real action happens in the C<pingone> method (or, for
+C<probes::base>-derived probes, in the C<ping> method.) The arguments
+for C<pingone> are C<$self>, the module instance (since this is a method)
+and C<$target>, the target to be probed.
+
+You can access the probe-specific variables here via the
+C<$self-E<gt>{properties}> hash and the target-specific ones via the
+C<$target-E<gt>{vars}> hash. You get the number of pings needed for
+the target via the C<pings> method: C<my $count = $self-E<gt>pings($target)>.
+
+You should return a sorted array of the latency times measured. If a ping
+fails, don't put anything in the array.
+
+That's it, you're done!
+
+=head1 TIMEOUT HANDLING
+
+If you deal with timeouts (for example because your program offers a parameter
+for specifying the timeout for the pings), you should know a few things.
+
+First, there's timeout logic in C<probes::basefork> that kills the probe
+when the timeout is reached. By default the timeout is (# of pings *
+5 seconds) + 1 second. If you expect that your pings can take longer,
+you should modify the default value of the probe-specific variable C<timeout>.
+This would be done like this:
+
+ sub probevars {
+        my $class = shift;
+	my $h = $class->SUPER::probevars;
+	$h->{timeout}{_default} = 10; # override the superclass default
+        return $class->_makevars($h, {
+		# your variables go here
+	}
+ }
+
+If you want to provide a target-specific C<timeout> setting, you should
+delete the probe-specific variable and be sure to provide a default for
+your target-specific one. See eg. C<probes::AnotherDNS> for an example of
+how this is done. 
+
+Providing a target-specific C<timeout> will make the timeout in
+C<probes::basefork> be (# of pings * the maximum timeout of all targets)
++ 1 second. The 1 second is added so that the own timeout logic of the
+probe has time to kick in even in the worst case (ie. all pings are lost)
+before C<probes::basefork> starts killing the processes.
+
+=head1 COPYRIGHT
+
+Copyright 2005 by Niko Tyni.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA.
+
+=head1 AUTHOR
+
+Niko Tyni <ntyni@iki.fi>
+
+=head1 BUGS
+
+This document makes writing new probes look much harder than it really is.
+
+=head1 SEE ALSO
+
+The other Smokeping documents, especially smokeping_config.

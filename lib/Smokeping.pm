@@ -15,6 +15,7 @@ use Sys::Syslog qw(:DEFAULT setlogsock);
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
 use File::Basename;
+use Smokeping::Examples;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
@@ -33,6 +34,18 @@ my $DEFAULTPRIORITY = 'info'; # default syslog priority
 
 my $logging = 0; # keeps track of whether we have a logging method enabled
 
+sub find_probedir {
+	# find the directory where the probe modules are located
+	# by looking for 'probes/FPing.pm' in @INC
+	# 
+	# yes, this is ugly. Suggestions welcome.
+	for (@INC) {
+		-f "$_/probes/FPing.pm" or next;
+		return "$_/probes";
+	}
+	return undef;
+}
+		
 sub do_log(@);
 sub load_probe($$$$);
 
@@ -43,13 +56,7 @@ sub load_probes ($){
     	my @subprobes = grep { ref $cfg->{Probes}{$probe}{$_} eq 'HASH' } keys %{$cfg->{Probes}{$probe}};
     	if (@subprobes) {
 		my $modname = $probe;
-		my %properties = %{$cfg->{Probes}{$probe}};
-		delete @properties{@subprobes};
 		for my $subprobe (@subprobes) {
-			for (keys %properties) {
-				$cfg->{Probes}{$probe}{$subprobe}{$_} = $properties{$_}
-					unless exists $cfg->{Probes}{$probe}{$subprobe}{$_};
-			}
 			$prbs{$subprobe} = load_probe($modname,  $cfg->{Probes}{$probe}{$subprobe},$cfg, $subprobe);
 		}
 	} else {
@@ -65,8 +72,6 @@ sub load_probe ($$$$) {
 	my $cfg = shift;
 	my $name = shift;
 	$name = $modname unless defined $name;
-        eval 'require probes::'.$modname;
-        die "$@\n" if $@;
 	my $rv;
 	eval '$rv = probes::'.$modname.'->new( $properties,$cfg,$name);';
         die "$@\n" if $@;
@@ -305,32 +310,12 @@ sub check_filter ($$) {
       return 1;
 }
 
-sub init_target_tree ($$$$$$$$); # predeclare recursive subs
-sub init_target_tree ($$$$$$$$) {
+sub init_target_tree ($$$$); # predeclare recursive subs
+sub init_target_tree ($$$$) {
     my $cfg = shift;
     my $probes = shift;
-    my $probe = shift;
     my $tree = shift;
     my $name = shift;
-    my $PROBE_CONF = shift;
-    my $alerts = shift;
-    my $alertee = shift;
-
-    # inherit probe type from parent
-    if (not defined $tree->{probe} or $tree->{probe} eq $probe){
-	$tree->{probe} = $probe;	
-	# inherit parent values if the probe type has not changed
-	for (keys %$PROBE_CONF) {
-	    $tree->{PROBE_CONF}{$_} = $PROBE_CONF->{$_} 
-	    unless exists $tree->{PROBE_CONF}{$_};
-	}
-    };
-    
-    $tree->{alerts} = $alerts
-	if not defined $tree->{alerts} and defined $alerts;
-
-    $tree->{alertee} = $alertee
-	if not defined $tree->{alertee} and defined $alertee;
 
     if ($tree->{alerts}){
 	die "ERROR: no Alerts section\n"
@@ -349,12 +334,11 @@ sub init_target_tree ($$$$$$$$) {
     $tree->{title} ||=  $tree->{host} || "unknown";
 
     foreach my $prop (keys %{$tree}) {
-    	next if $prop eq 'PROBE_CONF';
 	if (ref $tree->{$prop} eq 'HASH'){
 	    if (not -d $name) {
 		mkdir $name, 0755 or die "ERROR: mkdir $name: $!\n";
 	    };
-	    init_target_tree $cfg, $probes, $tree->{probe}, $tree->{$prop}, "$name/$prop", $tree->{PROBE_CONF},$tree->{alerts},$tree->{alertee};
+	    init_target_tree $cfg, $probes, $tree->{$prop}, "$name/$prop";
 	}
 	if ($prop eq 'host' and check_filter($cfg,$name)) {           
 	    # print "init $name\n";
@@ -450,7 +434,6 @@ sub enable_dynamic($$$$){
         }
     }
     foreach my $prop ( keys %{$tree}) {
-    	next if $prop eq "PROBE_CONF";
 	enable_dynamic $cfg, $tree->{$prop},"$path$prop.",$email if ref $tree->{$prop} eq 'HASH';
     }
 };
@@ -467,7 +450,7 @@ sub target_menu($$$;$){
      
     my @hashes;
     foreach my $prop (sort { $tree->{$a}{_order} <=> $tree->{$b}{_order}}
-                      grep { ref $tree->{$_} eq 'HASH' and $_ ne "PROBE_CONF" }
+                      grep { ref $tree->{$_} eq 'HASH' }
                       keys %{$tree}) {
 	push @hashes, $prop;
     }
@@ -546,7 +529,7 @@ sub get_overview ($$$$){
         POSIX::strftime($cfg->{Presentation}{overview}{strftime},
                         localtime(time)) : scalar localtime(time);
     foreach my $prop (sort {$tree->{$a}{_order} <=> $tree->{$b}{_order}} 
-                      grep {  ref $tree->{$_} eq 'HASH' and $_ ne "PROBE_CONF" and defined $tree->{$_}{host}}
+                      grep {  ref $tree->{$_} eq 'HASH' and defined $tree->{$_}{host}}
                       keys %$tree) {
         my $rrd = $cfg->{General}{datadir}.$dir."/$prop.rrd";
         my $max =  $cfg->{Presentation}{overview}{max_rtt} || "100000";
@@ -909,22 +892,20 @@ sub report_probes($$) {
     }
 }
 
-sub update_rrds($$$$$$);
-sub update_rrds($$$$$$) {
+sub update_rrds($$$$$);
+sub update_rrds($$$$$) {
     my $cfg = shift;
     my $probes = shift;
-    my $probe = shift;
     my $tree = shift;
     my $name = shift;
     my $justthisprobe = shift; # if defined, update only the targets probed by this probe
 
-    $probe = $tree->{probe} if defined $tree->{probe};
+    my $probe = $tree->{probe};
     my $probeobj = $probes->{$probe};
     foreach my $prop (keys %{$tree}) {
 
-    	next if $prop eq "PROBE_CONF";
         if (ref $tree->{$prop} eq 'HASH'){
-            update_rrds $cfg, $probes, $probe, $tree->{$prop}, $name."/$prop", $justthisprobe;
+            update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe;
         } 
         next if defined $justthisprobe and $probe ne $justthisprobe;
         if ($prop eq 'host' and check_filter($cfg,$name)) {
@@ -1039,14 +1020,89 @@ ALERT
     }
 }
 
+sub _deepcopy {
+        # this handles circular references on consecutive levels,
+        # but breaks if there are any levels in between
+        my $what = shift;
+        return $what unless ref $what;
+        for (ref $what) {
+                /^ARRAY$/ and return [ map { $_ eq $what ? $_ : _deepcopy($_) } @$what ];
+                /^HASH$/ and return { map { $_ => $what->{$_} eq $what ? 
+                                            $what->{$_} : _deepcopy($what->{$_}) } keys %$what };
+                /^CODE$/ and return $what; # we don't need to copy the subs
+        }
+        die "Cannot _deepcopy reference type @{[ref $what]}";
+}
+
 sub get_parser () {
+    # The _dyn() stuff here is quite confusing, so here's a walkthrough:
+    # 1   Probe is defined in the Probes section
+    # 1.1 _dyn is called for the section to add the probe- and target-specific
+    #     vars into the grammar for this section and its subsections (subprobes)
+    # 1.2 A _dyn sub is installed for all mandatory target-specific variables so 
+    #     that they are made non-mandatory in the Targets section if they are
+    #     specified here. The %storedtargetvars hash holds this information.
+    # 1.3 If a probe section has any subsections (subprobes) defined, the main
+    #     section turns into a template that just offers default values for
+    #     the subprobes. Because of this a _dyn sub is installed for subprobe
+    #     sections that makes any mandatory variables in the main section non-mandatory.
+    # 1.4 A similar _dyn sub as in 1.2 is installed for the subprobe target-specific
+    #     variables as well.
+    # 2   Probe is selected in the Targets section top
+    # 2.1 _dyn is called for the section to add the probe- and target-specific
+    #     vars into the grammar for this section and its subsections. Any _default
+    #     values for the vars are removed, as they will be propagated from the Probes
+    #     section.
+    # 2.2 Another _dyn sub is installed for the 'probe' variable in target subsections
+    #     that behaves as 2.1
+    # 2.3 A _dyn sub is installed for the 'host' variable that makes the mandatory
+    #     variables mandatory only in those sections that have a 'host' setting.
+    # 2.4 A _sub sub is installed for the 'probe' variable in target subsections that
+    #     bombs out if 'probe' is defined after any variables that depend on the
+    #     current 'probe' setting.
+
+
     my $KEY_RE = '[-_0-9a-zA-Z]+';
     my $KEYD_RE = '[-_0-9a-zA-Z.]+';
-    my $TARGET = 
-      {
-       _sections => [ ( "PROBE_CONF", "/$KEY_RE/" ) ],
-       _vars     => [ qw (probe menu title alerts note email host remark rawlog alertee) ],
+    my $PROBE_RE = '[a-z]*[A-Z][a-zA-Z]+';
+    my %knownprobes; # the probes encountered so far
+
+    # get a list of available probes for _dyndoc sections
+    my $probedir = find_probedir();
+    my $probelist;
+    die("Can't find probe module directory") unless defined $probedir;
+    opendir(D, $probedir) or die("opendir $probedir: $!");
+    for (readdir D) {
+    	next unless s/\.pm$//;
+    	next unless /^$PROBE_RE/;
+	$probelist->{$_} = "(See the separate module documentation for details about each variable.)";
+    }
+    closedir D;
+
+    # The target-specific vars of each probe
+    # We need to store them to relay information from Probes section to Target section
+    # see 1.2 above
+    my %storedtargetvars; 
+
+    # the part of target section syntax that doesn't depend on the selected probe
+    my %TARGETCOMMON; # predeclare self-referencing structures
+    # the common variables
+    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee) ];
+    %TARGETCOMMON = 
+      (
+       _vars     => $TARGETCOMMONVARS,
+       _inherited=> [ qw (probe alerts alertee) ],
+       _sections => [ "/$KEY_RE/" ],
+       _recursive=> [ "/$KEY_RE/" ],
+       _sub => sub {
+           my $val = shift;
+	   return "PROBE_CONF sections are neither needed nor supported any longer. Please see the smokeping_upgrade document."
+	   	if $val eq 'PROBE_CONF';
+	   return undef;
+       },
+       "/$KEY_RE/" => {},
        _order    => 1,
+       _varlist  => 1,
        _doc => <<DOC,
 Each target section can contain information about a host to monitor as
 well as further target sections. Most variables have already been
@@ -1145,24 +1201,58 @@ DOC
 If you want to have alerts for this target and all targets below it go to a particular address
 on top of the address already specified in the alert, you can add it here. This can be a comma separated list of items.
 DOC
+	   probe => {
+			_sub => sub {
+				my $val = shift;
+				my $varlist = shift;
+				return "probe $val missing from the Probes section"
+					unless $knownprobes{$val};
+				my %commonvars;
+				$commonvars{$_} = 1 for @{$TARGETCOMMONVARS};
+				delete $commonvars{host};
+				# see 2.4 above
+				return "probe must be defined before the host or any probe variables"
+					if grep { not exists $commonvars{$_} } @$varlist;
+					
+				return undef;
+			},
+			_dyn => sub {
+				# this generates the new syntax whenever a new probe is selected
+				# see 2.2 above
+				my ($name, $val, $grammar) = @_;
 
-    };
+				my $targetvars = _deepcopy($storedtargetvars{$val});
+				my @mandatory = @{$targetvars->{_mandatory}};
+				delete $targetvars->{_mandatory};
+				my @targetvars = sort keys %$targetvars;
 
-    $TARGET->{ "/$KEY_RE/" } = $TARGET;
+				# the default values for targetvars are only used in the Probes section
+				delete $targetvars->{$_}{_default} for @targetvars;
 
-    my $PROBEVARS = {
-    	_vars => [ "/$KEYD_RE/" ],
-	_doc => <<DOC,
-Probe specific variables. 
-DOC
-	"/$KEYD_RE/" => { _doc => <<DOC },
-Should be found in the documentation of the
-corresponding probe. The values get propagated to those child
-nodes using the same Probe.
-DOC
-    };
+				# we replace the current grammar altogether
+				%$grammar = ( %TARGETCOMMON, %$targetvars ); 
+				$grammar->{_vars} = [ @{$grammar->{_vars}}, @targetvars ];
 
-    $TARGET->{PROBE_CONF} = $PROBEVARS;
+				# the subsections differ only in that they inherit their vars from here
+				my $g = _deepcopy($grammar);
+				$grammar->{"/$KEY_RE/"} = $g;
+				push @{$g->{_inherited}}, @targetvars;
+
+				# this makes the variables mandatory only in those sections
+				# where 'host' is defined. (We must generate this dynamically
+				# as the mandatory list isn't visible earlier.)
+				# see 2.3 above
+				
+				my $mandatorysub =  sub {
+					my ($name, $val, $grammar) = @_;
+					$grammar->{_mandatory} = [ @mandatory ];
+				};
+				$grammar->{host} = _deepcopy($grammar->{host});
+				$grammar->{host}{_dyn} = $mandatorysub;
+				$g->{host}{_dyn} = $mandatorysub;
+			},
+	   },
+    );
 
     my $INTEGER_SUB = {
         _sub => sub {
@@ -1185,73 +1275,145 @@ DOC
         }
     };
 
+    # grammar for the ***Probes*** section
     my $PROBES = {
-		                    _doc => <<DOC,
-Each module can take specific configuration information from this area. The jumble of letters above is a regular expression defining legal module names.
-DOC
-				    _vars => [ "step", "offset", "pings", "/$KEYD_RE/" ],
-				    "/$KEYD_RE/" => { _doc => 'Each module defines which
-variables it wants to accept. So this expression here just defines legal variable names.'},
-				    "step" => { %$INTEGER_SUB,
-				    		_doc => <<DOC },
-Duration of the base interval that this probe should use, if different
-from the one specified in the 'Database' section. Note that the step in 
-the RRD files is fixed when they are originally generated, and if you
-change the step parameter afterwards, you'll have to delete the old RRD
-files or somehow convert them. (This variable is only applicable if 
-the variable 'concurrentprobes' is set in the 'General' section.)
-DOC
-				    "offset" => {
-	  				_re => '(\d+%|random)',
-	  				_re_error => 
-	  				"Use offset either in % of operation interval or 'random'",
-         				_doc => <<DOC },
-If you run many probes concurrently you may want to prevent them from
-hitting your network all at the same time. Using the probe-specific
-offset parameter you can change the point in time when each probe will
-be run. Offset is specified in % of total interval, or alternatively as
-'random', and the offset from the 'General' section is used if nothing
-is specified here. Note that this does NOT influence the rrds itself,
-it is just a matter of when data acqusition is initiated. 
-(This variable is only applicable if the variable 'concurrentprobes' is set
-in the 'General' section.)
-DOC
-				    "pings" => {
-	  				%$INTEGER_SUB,
-	  				_doc => <<DOC},
-How many pings should be sent to each target, if different from the global
-value specified in the Database section.  Some probes (those derived from
-basefork.pm, ie. most except the FPing variants) will even let this be
-overridden target-specifically in the PROBE_CONF section (see the
-basefork documentation for details).  Note that the number of pings in
-the RRD files is fixed when they are originally generated, and if you
-change this parameter afterwards, you'll have to delete the old RRD
-files or somehow convert them.
-DOC
-    }; # $PROBES
+	_doc => <<DOC,
+Each module can take specific configuration information from this
+area. The jumble of letters above is a regular expression defining legal
+module names.
 
-    my $PROBESTOP = {};
-    %$PROBESTOP = %$PROBES;
-    $PROBESTOP->{_sections} = ["/$KEY_RE/"];
-    $PROBESTOP->{"/$KEY_RE/"} = $PROBES;
-    for (qw(step offset pings)) {
-    	# we need a deep copy of these
-	my %h = %{$PROBESTOP->{$_}};
-    	$PROBES->{$_} = \%h;
-    	delete $PROBES->{$_}{_doc} 
-    }
-    $PROBES->{_doc} = <<DOC;
+See the documentation of each module for details about its variables.
+DOC
+	_sections => [ "/$PROBE_RE/" ],
+
+	# this adds the probe-specific variables to the grammar
+	# see 1.1 above
+	_dyn => sub {
+		my ($re, $name, $grammar) = @_;
+
+		# load the probe module
+		my $class = "probes::$name";
+		eval "require $class";
+		die "require $class failed: $@\n" if $@;
+
+		# modify the grammar
+		my $probevars = $class->probevars;
+		my $targetvars = $class->targetvars;
+		$storedtargetvars{$name} = $targetvars;
+		
+		my @mandatory = @{$probevars->{_mandatory}};
+		my @targetvars = sort grep { $_ ne '_mandatory' } keys %$targetvars;
+		for (@targetvars) {
+			next if $_ eq '_mandatory';
+			delete $probevars->{$_};
+		}
+		my @probevars = sort grep { $_ ne '_mandatory' } keys %$probevars;
+
+		$grammar->{_vars} = [ @probevars , @targetvars ];
+		$grammar->{_mandatory} = [ @mandatory ];
+
+		# do it for probe instances in subsections too
+		my $g = $grammar->{"/$KEY_RE/"};
+		for (@probevars) {
+			$grammar->{$_} = $probevars->{$_};
+			%{$g->{$_}} = %{$probevars->{$_}};
+			# this makes the reference manual a bit less cluttered 
+			delete $g->{$_}{_doc};
+			delete $g->{$_}{_example};
+			delete $grammar->{$_}{_doc};
+			delete $grammar->{$_}{_example};
+		}
+		# make any mandatory variable specified here non-mandatory in the Targets section
+		# see 1.2 above
+		my $sub = sub {
+			my ($name, $val, $grammar) = shift;
+			$targetvars->{_mandatory} = [ grep { $_ ne $name } @{$targetvars->{_mandatory}} ];
+		};
+		for my $var (@targetvars) {
+			%{$grammar->{$var}} = %{$targetvars->{$var}};
+			%{$g->{$var}} = %{$targetvars->{$var}};
+			# this makes the reference manual a bit less cluttered 
+			delete $grammar->{$var}{_example};
+			delete $g->{$var}{_doc};
+			delete $g->{$var}{_example};
+			# (note: intentionally overwrite _doc)
+			$grammar->{$var}{_doc} = " (This variable can be overridden target-specifically in the Targets section.)";
+			$grammar->{$var}{_dyn} = $sub 
+				if grep { $_ eq $var } @{$targetvars->{_mandatory}};
+		}
+		$g->{_vars} = [ @probevars, @targetvars ];
+		$g->{_inherited} = $g->{_vars};
+		$g->{_mandatory} = [ @mandatory ];
+
+		# the special value "_template" means we don't know yet if
+		# there will be any instances of this probe
+		$knownprobes{$name} = "_template";
+
+		$g->{_dyn} = sub {
+			# if there is a subprobe, the top-level section
+			# of this probe turns into a template, and we
+			# need to delete its _mandatory list.
+			# Note that ISG::ParseConfig does mandatory checking 
+			# after the whole config tree is read, so we can fiddle 
+			# here with "_mandatory" all we want.
+			# see 1.3 above
+
+			my ($re, $subprobename, $subprobegrammar) = @_;
+			delete $grammar->{_mandatory};
+			# the parent section doesn't define a valid probe anymore
+			delete $knownprobes{$name}
+				if $knownprobes{$name} eq '_template';
+			# this also keeps track of the real module name for each subprobe,
+			# should we ever need it
+			$knownprobes{$subprobename} = $name;
+			my $subtargetvars = _deepcopy($targetvars);
+			$storedtargetvars{$subprobename} = $subtargetvars;
+			# make any mandatory variable specified here non-mandatory in the Targets section
+			# see 1.4 above
+			my $sub = sub {
+				my ($name, $val, $grammar) = shift;
+				$subtargetvars->{_mandatory} = [ grep { $_ ne $name } @{$subtargetvars->{_mandatory}} ];
+			};
+			for my $var (@targetvars) {
+				$subprobegrammar->{$var}{_dyn} = $sub 
+					if grep { $_ eq $var } @{$subtargetvars->{_mandatory}};
+			}
+		}
+	},
+	_dyndoc => $probelist, # all available probes
+	_sections => [ "/$KEY_RE/" ],
+	"/$KEY_RE/" => {
+		_doc => <<DOC,
 You can define multiple instances of the same probe with subsections. 
 These instances can have different values for their variables, so you
 can eg. have one instance of the FPing probe with packet size 1000 and
-step 30 and another instance with packet size 64 and step 300.
+step 300 and another instance with packet size 64 and step 30.
 The name of the subsection determines what the probe will be called, so
 you can write descriptive names for the probes.
 
 If there are any subsections defined, the main section for this probe
 will just provide default parameter values for the probe instances, ie.
 it will not become a probe instance itself.
+
+The example above would be written like this:
+
+ *** Probes ***
+
+ + FPing
+ # this value is common for the two subprobes
+ binary = /usr/bin/fping 
+
+ ++ FPingLarge
+ packetsize = 1000
+ step = 300
+
+ ++ FPingSmall
+ packetsize = 64
+ step = 30
+
 DOC
+	},
+    }; # $PROBES
 
     my $parser = ISG::ParseConfig->new 
       (
@@ -1454,8 +1616,7 @@ DOC
 How many pings should be sent to each target. Suggested: 20 pings.
 This can be overridden by each probe. Some probes (those derived from
 basefork.pm, ie. most except the FPing variants) will even let this
-be overridden target-specifically in the PROBE_CONF section (see the
-basefork documentation for details).  Note that the number of pings in
+be overridden target-specifically. Note that the number of pings in
 the RRD files is fixed when they are originally generated, and if you
 change this parameter afterwards, you'll have to delete the old RRD
 files or somehow convert them.
@@ -1780,9 +1941,11 @@ DOC
         }, #present
 	Probes => { _sections => [ "/$KEY_RE/" ],
 		    _doc => <<DOC,
-The Probes Section configures Probe modules. Probe modules integrate an external ping command into SmokePing. Check the documentation of the FPing module for configuration details.
+The Probes Section configures Probe modules. Probe modules integrate
+an external ping command into SmokePing. Check the documentation of each
+module for more information about it.
 DOC
-		  "/$KEY_RE/" => $PROBESTOP,
+		  "/$KEY_RE/" => $PROBES,
 	},
 	Alerts  => {
 		    _doc => <<DOC,
@@ -1916,12 +2079,54 @@ DOC
 		   _vars       => [ qw(probe menu title remark alerts) ],
 		   _mandatory  => [ qw(probe menu title) ],
                    _order => 1,
-		   _sections   => [ ( "PROBE_CONF", "/$KEY_RE/" ) ],
-		   probe => { _doc => <<DOC },
+		   _sections   => [ "/$KEY_RE/" ],
+		   _recursive  => [ "/$KEY_RE/" ],
+		   "/$KEY_RE/" => \%TARGETCOMMON, # this is just for documentation, _dyn() below replaces it
+		   probe => { 
+		   	_doc => <<DOC,
 The name of the probe module to be used for this host. The value of
 this variable gets propagated
 DOC
-		   PROBE_CONF => $PROBEVARS,
+			_sub => sub {
+				my $val = shift;
+				return "probe $val missing from the Probes section"
+					unless $knownprobes{$val};
+				return undef;
+			},
+			# create the syntax based on the selected probe.
+			# see 2.1 above
+			_dyn => sub {
+				my ($name, $val, $grammar) = @_;
+
+				my $targetvars = _deepcopy($storedtargetvars{$val});
+				my @mandatory = @{$targetvars->{_mandatory}};
+				delete $targetvars->{_mandatory};
+				my @targetvars = sort keys %$targetvars;
+				for (@targetvars) {
+					# the default values for targetvars are only used in the Probes section
+					delete $targetvars->{$_}{_default};
+					$grammar->{$_} = $targetvars->{$_};
+				}
+				push @{$grammar->{_vars}}, @targetvars;
+				my $g = { %TARGETCOMMON, %{_deepcopy($targetvars)} };
+				$grammar->{"/$KEY_RE/"} = $g;
+				$g->{_vars} = [ @{$g->{_vars}}, @targetvars ];
+				$g->{_inherited} = [ @{$g->{_inherited}}, @targetvars ];
+				# this makes the reference manual a bit less cluttered 
+				delete $grammar->{$_}{_doc} for @targetvars;
+				delete $grammar->{$_}{_example} for @targetvars;
+				delete $g->{$_}{_doc} for @targetvars;
+				delete $g->{$_}{_example} for @targetvars;
+				# make the mandatory variables mandatory only in sections
+				# with 'host' defined
+				# see 2.3 above
+				$g->{host}{_dyn} = sub {
+					my ($name, $val, $grammar) = @_;
+					$grammar->{_mandatory} = [ @mandatory ];
+				};
+			}, # _dyn
+			_dyndoc => $probelist, # all available probes
+		}, #probe
 		   menu => { _doc => <<DOC },
 Menu entry for this section. If not set this will be set to the hostname.
 DOC
@@ -1941,9 +2146,8 @@ DOC
 An optional remark on the current section. It gets displayed on the webpage.
 DOC
 
-		   "/$KEY_RE/" => $TARGET
 		  }
-            
+
       }
     );
     return $parser;
@@ -2099,7 +2303,7 @@ sub load_cfg ($) {
 	$probes = load_probes $cfg;
 	$cfg->{__probes} = $probes;
 	init_alerts $cfg if $cfg->{Alerts};
-      	init_target_tree $cfg, $probes, $cfg->{Targets}{probe}, $cfg->{Targets}, $cfg->{General}{datadir}, $cfg->{Targets}{PROBE_CONF},$cfg->{Targets}{alerts},undef; 
+      	init_target_tree $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
     }    
 }
 
@@ -2107,7 +2311,7 @@ sub load_cfg ($) {
 sub makepod ($){
     my $parser = shift;
     my $e='=';
-    print <<POD;
+    my $retval = <<POD;
 
 ${e}head1 NAME
 
@@ -2127,14 +2331,17 @@ ParseConfig module. Read all about it in L<ISG::ParseConfig>.
 The Configuration file has a tree-like structure with section headings at
 various levels. It also contains variable assignments and tables.
 
+Warning: this manual is rather long. See the smokeping_examples document
+for simple configuration examples.
+
 ${e}head1 REFERENCE
 
 The text below describes the syntax of the SmokePing configuration file.
 
 POD
 
-    print $parser->makepod;
-    print <<POD;
+    $retval .= $parser->makepod;
+    $retval .= <<POD;
 
 ${e}head1 COPYRIGHT
 
@@ -2165,8 +2372,6 @@ Tobias Oetiker E<lt>tobi\@oetiker.chE<gt>
 
 ${e}cut
 POD
-    exit 0;
-
 
 }
 sub cgi ($) {
@@ -2270,19 +2475,75 @@ sub pages ($) {
   load_cfg($config);
   makestaticpages($cfg, undef);
 }
-      
-sub main ($) {
+
+sub pod2man {
+	my $string = shift;
+	my $pid = open(P, "-|");
+	if ($pid) {
+		pod2usage(-verbose => 2, -input => \*P);
+		exit 0;
+	} else {
+		print $string;
+		exit 0;
+	}
+}
+
+sub probedoc {
+	my $class = shift;
+	my $do_man = shift;
+	eval "require $class";
+	die("Failed to load $class: $@") if $@;
+	if ($do_man) {
+		pod2man($class->pod);
+	} else {
+		print $class->pod;
+	}
+	exit 0;
+}
+
+sub verify_cfg {
+    my $cfgfile = shift;
+    get_config(get_parser, $cfgfile);
+    print "Configuration file '$cfgfile' syntax OK.\n"; 
+}
+ 
+sub main (;$) {
     $cgimode = 0;
     umask 022;
-    my $cfgfile = shift;
+    my $defaultcfg = shift;
     $opt{filter}=[];
-    GetOptions(\%opt, 'version', 'email', ,'man','help','logfile=s','static-pages:s', 'debug-daemon',
-		      'nosleep', 'makepod','debug','restart', 'filter=s', 'nodaemon|nodemon') or pod2usage(2);
+    GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
+		      'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
+		      'config=s', 'check', 'gen-examples') or pod2usage(2);
     if($opt{version})  { print "$RCS_VERSION\n"; exit(0) };
-    if($opt{man})      {  pod2usage(-verbose => 2); exit 0 };
+    if(exists $opt{man}) {
+    	if ($opt{man}) {
+		if ($opt{man} eq 'smokeping_config') {
+			pod2man(makepod(get_parser));
+		} else {
+			probedoc($opt{man}, 'do_man');
+		}
+	} else {
+		pod2usage(-verbose => 2); 
+	}
+	exit 0;
+    }
     if($opt{help})     {  pod2usage(-verbose => 1); exit 0 };
-    if($opt{makepod})  { makepod(get_parser) ; exit 0}; 
+    if(exists $opt{makepod})  { 
+    	if ($opt{makepod} and $opt{makepod} ne 'smokeping_config') {
+		probedoc($opt{makepod});
+	} else {
+    		print makepod(get_parser);
+	}
+	exit 0; 
+    }
+    if (exists $opt{'gen-examples'}) {
+	Smokeping::Examples::make($opt{check});
+	exit 0;
+    }
     initialize_debuglog if $opt{debug} or $opt{'debug-daemon'};
+    my $cfgfile = $opt{config} || $defaultcfg;
+    if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
     load_cfg $cfgfile;
     if(defined $opt{'static-pages'}) { makestaticpages $cfg, $opt{'static-pages'}; exit 0 };
     if($opt{email})    { enable_dynamic $cfg, $cfg->{Targets},"",""; exit 0 };
@@ -2422,7 +2683,7 @@ KID:
 	}
         my $now = time;
 	run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
-	update_rrds $cfg, $probes, $cfg->{Targets}{probe}, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe;
+	update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe;
 	exit 0 if $opt{debug};
         my $runtime = time - $now;
 	if ($runtime > $step) {
@@ -2598,6 +2859,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
 =head1 AUTHOR
 
 Tobias Oetiker E<lt>tobi\@oetiker.chE<gt>
+
+Niko Tyni E<lt>ntyni@iki.fiE<gt>
 
 =cut
 
