@@ -6,12 +6,16 @@ GROFF = groff
 .SUFFIXES:
 .SUFFIXES: .pm .pod .txt .html .man .1
 
-POD := $(wildcard doc/*.pod)   lib/ISG/ParseConfig.pm \
-        lib/Smokeping.pm 
+POD := $(wildcard doc/*.pod)
+PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm 
 PODPROBE :=  $(wildcard lib/probes/*.pm)
 PODMATCH :=  $(wildcard lib/matchers/*.pm)
 
-BASE = $(addprefix doc/,$(subst .pod,,$(notdir $(POD)))) $(subst .pm,,$(subst lib/probes,doc/probes,$(PODPROBE))) $(addprefix doc/matchers/,$(subst .pod,,$(notdir $(PODMATCH)))) doc/smokeping
+BASE = $(subst .pod,,$(POD)) \
+	$(subst .pm,,$(subst lib/,doc/,$(PM))) \
+	$(subst .pm,,$(subst lib/probes,doc/probes,$(PODPROBE))) \
+	$(addprefix doc/matchers/,$(subst .pm,,$(notdir $(PODMATCH)))) \
+	doc/smokeping
 MAN = $(addsuffix .1,$(BASE))
 TXT = $(addsuffix .txt,$(BASE))
 HTML= $(addsuffix .html,$(BASE))
@@ -24,7 +28,7 @@ GENEX= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokepi
 
 doc/%.1: doc/%.pod
 	$(POD2MAN)
-doc/%.1: lib/%
+doc/%.1: lib/%.pm
 	$(POD2MAN)
 doc/probes/%.pod: lib/probes/%.pm
 	$(MAKEPOD) probes::$* > $@
@@ -39,9 +43,7 @@ doc/smokeping.1: bin/smokeping.dist
 
 doc/%.html: doc/%.pod
 	$(POD2HTML)
-doc/%.html: lib/%
-	$(POD2HTML)
-doc/%.html: lib/ISG/%
+doc/%.html: lib/%.pm
 	$(POD2HTML)
 doc/probes/%.html: doc/probes/%.pod
 	$(POD2HTML)
@@ -80,9 +82,9 @@ patch:
 	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(VERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
 
 killdoc:
-	-rm doc/*.1 doc/*.txt doc/*.html
+	-rm doc/*.1 doc/*.txt doc/*.html doc/probes/* doc/matchers/* doc/ISG/*
 
-doc:    killdoc ref man html txt
+doc:    killdoc ref man html txt examples
 
 tar:	doc patch
 	-ln -s . smokeping-$(VERSION)
