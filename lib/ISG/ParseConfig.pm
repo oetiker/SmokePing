@@ -280,6 +280,11 @@ sub _next_level($$$)
     # we delete it on the way up in _prev_level()
     $self->{cfg}{_inherited} = \%inherited; 
 
+    # list of already defined variables on this level
+    if (defined $self->{grammar}{_varlist}) {
+	$self->{cfg}{_varlist} = [];
+    }
+
     # meta data for _mandatory test
     $self->{grammar}{_is_section} = 1;
     $self->{cfg}{_is_section}     = 1;
@@ -404,6 +409,11 @@ sub _set_variable($$$)
     my $gn = $self->_search_variable($key);
     defined $gn or return 0;
 
+    my $varlistref;
+    if (defined $self->{grammar}{_varlist}) {
+	$varlistref = $self->{cfg}{_varlist};
+    }
+
     if (defined $self->{grammar}{$gn}) {
         my $g = $self->{grammar}{$gn};
 
@@ -420,7 +430,7 @@ sub _set_variable($$$)
               }
         }
         if (defined $g->{_sub}){
-                my $error = &{$g->{_sub}}($value);
+                my $error = &{$g->{_sub}}($value, $varlistref);
                 if (defined $error){
                         $self->_make_error($error);
                         return 0;
@@ -432,6 +442,8 @@ sub _set_variable($$$)
         }
     }
     $self->{cfg}{$key} = $value;
+    push @{$varlistref}, $key if ref $varlistref;
+
     return 1;
 }
 
@@ -586,12 +598,16 @@ sub _parse_line($$$)
     }
 
     /^\*\*\*\s*(.*?)\s*\*\*\*$/ and do {
-        $self->_goto_level(1, $1) or return 0;
+    	my $name = $1;
+	$self->_check_section_sub($name) or return 0;
+        $self->_goto_level(1, $name) or return 0;
         return 1;
     };
     /^(\++)\s*(.*)$/ and do {
         my $level = length $1;
-        $self->_goto_level($level + 1, $2) or return 0;
+    	my $name = $2;
+	$self->_check_section_sub($name) or return 0;
+        $self->_goto_level($level + 1, $name) or return 0;
         return 1;
     };
 
@@ -617,6 +633,20 @@ sub _parse_line($$$)
     $self->_parse_table($_) or return 0;
 
     return 1;
+}
+
+sub _check_section_sub($$) {
+	my $self = shift;
+	my $name = shift;
+	my $g = $self->{grammar};
+        if (defined $g->{_sub}){
+                my $error = &{$g->{_sub}}($name);
+                if (defined $error){
+                        $self->_make_error($error);
+                        return 0;
+                }
+        }
+	return 1;
 }
 
 sub _parse_file($$)
@@ -661,30 +691,131 @@ sub _parse_file($$)
     return 1;
 }
 
+# find variables in old grammar list 'listname'
+# that aren't in the corresponding list in the new grammar 
+# and list them as a POD document, possibly with a callback
+# function 'docfunc'
+
+sub _findmissing($$$;$) {
+	my $old = shift;
+	my $new = shift;
+	my $listname = shift;
+	my $docfunc = shift;
+
+	my @doc;
+	if ($old->{$listname}) {
+		my %newlist;
+		if ($new->{$listname}) {
+			@newlist{@{$new->{$listname}}} = undef;
+		} 
+		for my $v (@{$old->{$listname}}) {
+			next if exists $newlist{$v};
+			if ($docfunc) {
+				push @doc, &$docfunc($old, $v)
+			} else {
+				push @doc, "=item $v";
+			}
+		}
+	}
+	return @doc;
+}
+
+# find variables in new grammar list 'listname'
+# that aren't in the corresponding list in the new grammar
+#
+# this is just _findmissing with the arguments swapped
+
+sub _findnew($$$;$) {
+	my $old = shift;
+	my $new = shift;
+	my $listname = shift;
+	my $docfunc = shift;
+	return _findmissing($new, $old, $listname, $docfunc);
+}
+
+# compare two lists for element equality
+
+sub _listseq($$);
+sub _listseq($$) {
+	my ($k, $l) = @_;
+	my $length = @$k;
+	return 0 unless @$l == $length;
+	for (my $i=0; $i<$length; $i++) {
+		return 0 unless $k->[$i] eq $l->[$i];
+	}
+	return 1;
+}
+
+# diff two grammar trees, documenting the differences
+
+sub _diffgrammars($$);
+sub _diffgrammars($$) {
+	my $old = shift;
+	my $new = shift;
+	my @doc;
+
+	my @vdoc;
+	@vdoc = _findmissing($old, $new, '_vars');
+	push @doc, "The following variables are not valid anymore:", "=over" , @vdoc, "=back"
+		if @vdoc;
+	@vdoc = _findnew($old, $new, '_vars', \&_describevar);
+	push @doc, "The following new variables are valid:", "=over" , @vdoc, "=back"
+		if @vdoc;
+	@vdoc = _findmissing($old, $new, '_sections');
+	push @doc, "The following subsections are not valid anymore:", "=over" , @vdoc, "=back"
+		if @vdoc;
+	@vdoc = _findnew($old, $new, '_sections', sub { 
+		my ($tree, $sec) = @_; 
+		my @tdoc; 
+		_genpod($tree->{$sec}, 0, \@tdoc);
+		return @tdoc;
+	});
+	push @doc, "The following new subsections are defined:", "=over" , @vdoc, "=back"
+		if @vdoc;
+	for (@{$old->{_sections}}) {
+		next unless exists $new->{$_};
+		@vdoc = _diffgrammars($old->{$_}, $new->{$_});
+		push @doc, "Syntax changes for subsection B<$_>", "=over", @vdoc, "=back"
+			if @vdoc;
+	}
+	return @doc;
+}
+
+# describe a variable
+
+sub _describevar {
+	my $tree = shift;
+	my $var = shift;
+	my $mandatory = ( $tree->{_mandatory} and 
+		grep {$_ eq $var} @{$tree->{_mandatory}} ) ? 
+		" I<(mandatory setting)>" : ""; 
+	my @doc;
+	push @doc, "=item B<$var>".$mandatory;
+	push @doc, $tree->{$var}{_doc} if $tree->{$var}{_doc} ;
+	my $inherited = $tree->{_inherited} and 
+		grep {$_ eq $var} @{$tree->{_inherited}};
+	push @doc, "This variable I<inherits> its value from the parent section if nothing is specified here."
+		if $inherited;
+	push @doc, "This variable I<dynamically> modifies the grammar based on its value."
+		if $tree->{$var}{_dyn};
+	push @doc, "Default value: $var = $tree->{$var}{_default}"
+		if ($tree->{$var}{_default});
+	push @doc, "Example: $var = $tree->{$var}{_example}"
+		if ($tree->{$var}{_example});
+	return @doc;
+}
+
 sub _genpod($$$);
 sub _genpod($$$){
     my $tree = shift;
     my $level = shift;
     my $doc = shift;
+    my %dyndoc;
     if ($tree->{_vars}){
 	push @{$doc}, "The following variables can be set in this section:";
 	push @{$doc}, "=over";
 	foreach my $var (@{$tree->{_vars}}){
-	    my $mandatory = ( $tree->{_mandatory} and 
-		grep {$_ eq $var} @{$tree->{_mandatory}} ) ? 
-		    " I<(mandatory setting)>" : ""; 
-	    push @{$doc}, "=item B<$var>".$mandatory;
-	    push @{$doc}, $tree->{$var}{_doc} if $tree->{$var}{_doc} ;
-	    my $inherited = $tree->{_inherited} and 
-		grep {$_ eq $var} @{$tree->{_inherited}};
-	    push @{$doc}, "This variable I<inherits> its value from the parent section if nothing is specified here."
-	        if $inherited;
-	    push @{$doc}, "This variable I<dynamically> modifies the grammar based on its value."
-	    	if $tree->{$var}{_dyn};
-	    push @{$doc}, "Default value: $var = $tree->{$var}{_default}"
-		    if ($tree->{$var}{_default});
-	    push @{$doc}, "Example: $var = $tree->{$var}{_example}"
-		    if ($tree->{$var}{_example})
+	    push @{$doc}, _describevar($tree, $var);
 	}
 	push @{$doc}, "=back";
     }
@@ -725,22 +856,60 @@ sub _genpod($$$){
 		push @{$doc}, ($level > 0) ? 
 		    "=item B<".("+" x $level)."$section>$mandatory" :
 			"=head2 *** $section ***$mandatory";
+		if ($tree eq $tree->{$section}) {
+			push @{$doc}, "This subsection has the same syntax as its parent.";
+			next;
+		}
 		push @{$doc}, ($tree->{$section}{_doc})
 		    if $tree->{$section}{_doc};
 		push @{$doc}, "The grammar of this section is I<dynamically> modified based on its name."
 		    if $tree->{$section}{_dyn};
-		if ($tree eq $tree->{$section} or 
-			($tree->{_recursive} and 
-			 grep {$_ eq $section} @{$tree->{_recursive}})) {
+		if ($tree->{_recursive} and 
+			 grep {$_ eq $section} @{$tree->{_recursive}}) {
 			 push @{$doc}, "This section is I<recursive>: it can contain subsection(s) with the same syntax.";
-		} else {
-			_genpod ($tree->{$section},$level+1,$doc)
+		} 
+		_genpod ($tree->{$section},$level+1,$doc);
+		next unless $tree->{$section}{_dyn} and $tree->{$section}{_dyndoc};
+		push @{$doc}, "Dynamical grammar changes for example instances of this section:";
+		push @{$doc}, "=over";
+		for my $name (sort keys %{$tree->{$section}{_dyndoc}}) {
+			my $newtree = _deepcopy($tree->{$section});
+			push @{$doc}, "=item B<$name>: $tree->{$section}{_dyndoc}{$name}";
+			&{$tree->{$section}{_dyn}}($section, $name, $newtree);
+			my @tdoc = _diffgrammars($tree->{$section}, $newtree);
+			if (@tdoc) {
+				push @{$doc}, @tdoc;
+			} else {
+				push @{$doc}, "No changes that can be automatically described.";
+			}
+			push @{$doc}, "(End of dynamical grammar changes for example instance C<$name>.)";
 		}
-
-
-	}
+		push @{$doc}, "=back";
+		push @{$doc}, "(End of dynamical grammar changes for example instances of section C<$section>.)";
+	    }
         push @{$doc}, "=back" if $level > 0    
     }	
+    if ($tree->{_vars}) {
+    	for my $var (@{$tree->{_vars}}) {
+		next unless $tree->{$var}{_dyn} and $tree->{$var}{_dyndoc};
+		push @{$doc}, "Dynamical grammar changes for example values of variable C<$var>:";
+		push @{$doc}, "=over";
+		for my $val (sort keys %{$tree->{$var}{_dyndoc}}) {
+			my $newtree = _deepcopy($tree);
+			push @{$doc}, "=item B<$val>: $tree->{$var}{_dyndoc}{$val}";
+			&{$tree->{$var}{_dyn}}($var, $val, $newtree);
+			my @tdoc = _diffgrammars($tree, $newtree);
+			if (@tdoc) {
+				push @{$doc}, @tdoc;
+			} else {
+				push @{$doc}, "No changes that can be automatically described.";
+			}
+			push @{$doc}, "(End of dynamical grammar changes for variable C<$var> example value C<$val>.)";
+		}
+		push @{$doc}, "=back";
+		push @{$doc}, "(End of dynamical grammar changes for example values of variable C<$var>.)";
+	}
+    }
 };
 
 sub makepod($) {
@@ -867,6 +1036,7 @@ sub parse($$)
 1
 
 __END__
+
 =head1 NAME
 
 ISG::ParseConfig - Simple config parser
@@ -965,9 +1135,28 @@ If defined, a '_order' element will be put in every hash containing the
 sections with a number that determines the order in which the sections were
 defined.
 
+=item _varlist
+
+If defined, a '_varlist' element will be put in the config hash of this
+section with a list of the variables defined in the section. This can
+be used to find out the order of the variable assignments.
+
+The '_sub' function (see below) of any variables defined in this section
+will also receive a list of those variables already defined in the
+same section. This can be used to enforce the order of the variables
+during parsing.
+
 =item _doc
 
 Describes what this section is about
+
+=item _sub
+
+A function pointer. It is called for every instance of this section,
+with the real name of the section passed as its first argument. This is
+probably only useful for the regexp sections. If the function returns
+a defined value it is assumed that the test was not successful and an
+error is generated with the returned string as content.
 
 =item _dyn
 
@@ -977,6 +1166,18 @@ three arguments: the syntax of the section name (string or regexp), the
 actual name encountered (this will be the same as the first argument for
 non-regexp sections) and a reference to the grammar tree of the section.
 This subroutine can then modify the grammar tree dynamically.
+
+=item _dyndoc
+
+A hash reference that lists interesting names for the section that
+should be documented. The keys of the hash are the names and the
+values in the hash are strings that can contain an explanation
+for the name. The _dyn() subroutine is then called for each of 
+these names and the differences of the resulting grammar and
+the original one are documented. This module can currently document
+differences in the _vars list, listing new variables and removed
+ones, and differences in the _sections list, listing the
+new and removed sections.
 
 =back
 
@@ -1000,13 +1201,18 @@ first argument. If the function returns a defined value it is assumed that
 the test was not successful and an error is generated with the returned
 string as content.
 
+If the '_varlist' key (see above) is defined in this section, the '_sub'
+function will also receive an array reference as the second argument. The
+array contains a list of those variables already defined in the same
+section. This can be used to enforce the order of the variables.
+
 =item _default
 
 A default value that will be assigned to the variable if none is specified or inherited.
 
 =item _doc
 
-Describtion of the variable.
+Description of the variable.
 
 =item _example
 
@@ -1022,6 +1228,18 @@ then modify the grammar tree dynamically.
 
 Note that no _dyn() call is made for default and inherited values of
 the variable.
+
+=item _dyndoc
+
+A hash reference that lists interesting values for the variable that
+should be documented. The keys of the hash are the values and the
+values in the hash are strings that can contain an explanation
+for the value. The _dyn() subroutine is then called for each of 
+these values and the differences of the resulting grammar and
+the original one are documented. This module can currently document
+differences in the _vars list, listing new variables and removed
+ones, and differences in the _sections list, listing the
+new and removed sections.
 
 =back
 
