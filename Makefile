@@ -1,5 +1,6 @@
 SHELL = /bin/sh
 VERSION = 2.0rc1
+NUMVERSION = 1.99001
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp
 GROFF = groff
 .PHONY: man html txt ref examples check-examples patch killdoc doc tar rename-man symlinks remove-symlinks
@@ -123,8 +124,8 @@ doc/smokeping_config.pod: lib/Smokeping.pm
 doc/smokeping_examples.pod: lib/Smokeping/Examples.pm etc/config.dist
 	$(GENEX)
 patch:
-	perl -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(VERSION)"/' lib/Smokeping.pm 
-	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(VERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
+	perl -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
+	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
 
 killdoc:
 	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/ISG/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
