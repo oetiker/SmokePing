@@ -1495,18 +1495,19 @@ S<Tobias Oetiker E<lt>oetiker@ee.ethz.chE<gt>>
 
 =head1 HISTORY
 
- 2001-05-11 ds 1.2 Initial Version for policy 0.3
- 2001-09-04 ds 1.3 Remove space before comments, more strict variable definition
- 2001-09-19 to 1.4 Added _sub error parsing and _doc self documentation
- 2001-10-20 to     Improved Rendering of _doc information
- 2002-01-09 to     Added Documentation to the _text section documentation
- 2002-01-28 to     Fixed quote parsing in tables
- 2002-03-12 ds 1.5 Implemented @define, make makepod return a string and not an array
- 2002-08-28 to     Added maketmpl methode
- 2002-10-10 ds 1.6 More verbatim _text sections
- 2004-02-09 to 1.7 Added _example propperty for pod and template generation
- 2004-08-17 to 1.8 Allow special input files like "program|"
- 2005-01-10 ds 1.9 Implemented _dyn, _default, _recursive, and _inherited (Niko Tyni) 
+ 2001-05-11 ds 1.2  Initial Version for policy 0.3
+ 2001-09-04 ds 1.3  Remove space before comments, more strict variable definition
+ 2001-09-19 to 1.4  Added _sub error parsing and _doc self documentation
+ 2001-10-20 to      Improved Rendering of _doc information
+ 2002-01-09 to      Added Documentation to the _text section documentation
+ 2002-01-28 to      Fixed quote parsing in tables
+ 2002-03-12 ds 1.5  Implemented @define, make makepod return a string and not an array
+ 2002-08-28 to      Added maketmpl methode
+ 2002-10-10 ds 1.6  More verbatim _text sections
+ 2004-02-09 to 1.7  Added _example propperty for pod and template generation
+ 2004-08-17 to 1.8  Allow special input files like "program|"
+ 2005-01-10 ds 1.9  Implemented _dyn, _default, _recursive, and _inherited (Niko Tyni) 
+ 2005-02-21 ds 2.00 Implemented _dyndoc, _varlist and _sub for sections (Niko Tyni) 
 
 =cut
 
