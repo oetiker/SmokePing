@@ -9,7 +9,7 @@ use Digest::MD5 qw(md5_base64);
 use SNMP_util;
 use SNMP_Session;
 use POSIX;
-use ISG::ParseConfig;
+use Config::Grammar;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 setlogsock('unix')
@@ -1383,7 +1383,7 @@ DOC
 			# if there is a subprobe, the top-level section
 			# of this probe turns into a template, and we
 			# need to delete its _mandatory list.
-			# Note that ISG::ParseConfig does mandatory checking 
+			# Note that Config::Grammar does mandatory checking 
 			# after the whole config tree is read, so we can fiddle 
 			# here with "_mandatory" all we want.
 			# see 1.3 above
@@ -1446,7 +1446,7 @@ DOC
 	},
     }; # $PROBES
 
-    my $parser = ISG::ParseConfig->new 
+    my $parser = Config::Grammar->new 
       (
        {
 	_sections  => [ qw(General Database Presentation Probes Alerts Targets) ],
@@ -2374,7 +2374,7 @@ The contents of this manual is generated directly from the configuration
 file parser.
 
 The Parser for the Configuration file is written using David Schweikers
-ParseConfig module. Read all about it in L<ISG::ParseConfig>.
+Config::Grammar module. Read all about it in L<Config::Grammar>.
 
 The Configuration file has a tree-like structure with section headings at
 various levels. It also contains variable assignments and tables.

@@ -9,7 +9,7 @@ GROFF = groff
 
 DOCS = $(filter-out doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod,$(wildcard doc/*.pod)) doc/smokeping_examples.pod # section 7
 DOCSCONFIG := doc/smokeping_config.pod # section 5
-PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm lib/Smokeping/Examples.pm lib/Smokeping/RRDtools.pm
+PM :=  lib/Config/Grammar.pm lib/Smokeping.pm lib/Smokeping/Examples.pm lib/Smokeping/RRDtools.pm
 PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)
 PODMATCH :=  $(wildcard lib/Smokeping/matchers/*.pm)
 
@@ -53,7 +53,7 @@ doc/Smokeping/probes/%.3: doc/Smokeping/probes/%.pod
 	$(POD2MAN) --section 3 > $@
 doc/Smokeping/matchers/%.3: lib/Smokeping/matchers/%.pm
 	$(POD2MAN) --section 3 > $@
-doc/ISG/%.3: lib/ISG/%.pm
+doc/Config/%.3: lib/Config/%.pm
 	$(POD2MAN) --section 3 > $@
 doc/smokeping.1: bin/smokeping.dist
 	$(POD2MAN) --section 1 > $@
@@ -71,7 +71,7 @@ doc/Smokeping/RRDtools.html: lib/Smokeping/RRDtools.pm
 
 doc/Smokeping/matchers/%.html: lib/Smokeping/matchers/%.pm
 	$(POD2HTML)
-doc/ISG/%.html: lib/ISG/%.pm
+doc/Config/%.html: lib/Config/%.pm
 	$(POD2HTML)
 doc/smokeping.html: bin/smokeping.dist
 	$(POD2HTML)
@@ -99,7 +99,7 @@ rename-man: $(MAN)
 	    mv $$i `echo $$i | sed s,$$j/,$$j/Smokeping::$$j::,`; \
 	  done; \
 	done
-	mv doc/ISG/ParseConfig.3 doc/ISG/ISG::ParseConfig.3
+	mv doc/Config/Grammar.3 doc/Config/Config::Grammar.3
 	mv doc/Smokeping/Examples.3 doc/Smokeping/Smokeping::Examples.3
 	mv doc/Smokeping/RRDtools.3 doc/Smokeping/Smokeping::RRDtools.3
 
@@ -128,7 +128,7 @@ patch:
 	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
 
 killdoc:
-	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/ISG/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
+	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
 
 doc:    killdoc ref examples man html txt rename-man
 

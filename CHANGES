@@ -1,3 +1,4 @@
+* change ISG::ParseConfig references to its new name, Config::Grammar -- niko
 * don't create any RRD files if running as a CGI -- niko
 * Curl timeouts work better now -- niko, reported by Chris Wilson <chris *aidworld.org>
 * Curl User-Agent string doesn't need quotes anymore -- niko

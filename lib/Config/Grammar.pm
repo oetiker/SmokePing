@@ -1,4 +1,4 @@
-package ISG::ParseConfig;
+package Config::Grammar;
 
 # TODO:
 # - _order for sections
@@ -6,7 +6,7 @@ package ISG::ParseConfig;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = 2.0;
+$VERSION = '1.01';
 
 sub new($$)
 {
@@ -1039,26 +1039,26 @@ __END__
 
 =head1 NAME
 
-ISG::ParseConfig - Simple config parser
+Config::Grammar - A grammar-based, user-friendly config parser
 
 =head1 SYNOPSIS
 
- use ISG::ParseConfig;
+ use Config::Grammar;
 
- my $parser = ISG::ParseConfig->new(\%grammar);
+ my $parser = Config::Grammar->new(\%grammar);
  my $cfg = $parser->parse('app.cfg') or die "ERROR: $parser->{err}\n";
  my $pod = $parser->makepod();
  my $ex = $parser->maketmpl('TOP','SubNode');
 
 =head1 DESCRIPTION
 
-ISG::ParseConfig is a module to parse configuration files. The
+Config::Grammar is a module to parse configuration files. The
 configuration may consist of multiple-level sections with assignments
 and tabular data. The parsed data will be returned as a hash
-containing the whole configuration. ISG::ParseConfig uses a grammar
-that is supplied upon creation of a ISG::ParseConfig object to parse
+containing the whole configuration. Config::Grammar uses a grammar
+that is supplied upon creation of a Config::Grammar object to parse
 the configuration file and return helpful error messages in case of
-syntax errors. Using the B<makepod> methode you can generate
+syntax errors. Using the B<makepod> method you can generate
 documentation of the configuration file format.
 
 The B<maketmpl> method can generate a template configuration file.  If
@@ -1321,7 +1321,7 @@ be escaped with a backslash as well.
 
 =head3 Sections
 
-ISG::ParseConfig supports hierarchical configurations through sections, whose
+Config::Grammar supports hierarchical configurations through sections, whose
 syntax is as follows:
 
 =over 15 
@@ -1358,7 +1358,7 @@ The data is interpreted as one or more columns separated by spaces.
 
 =head3 Code
 
- my $parser = ISG::ParseConfig->new({
+ my $parser = Config::Grammar->new({
    _sections => [ 'network', 'hosts' ],
    network => {
       _vars     => [ 'dns' ],
@@ -1470,44 +1470,23 @@ The data is interpreted as one or more columns separated by spaces.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000, 2001 by ETH Zurich. All rights reserved.
+Copyright (c) 2000-2005 by ETH Zurich. All rights reserved.
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-David Schweikert E<lt>dws@ee.ethz.chE<gt>,
-Tobias Oetiker E<lt>oetiker@ee.ethz.chE<gt>
+David Schweikert E<lt>dws_at_ee.ethz.chE<gt>,
+Tobias Oetiker E<lt>oetiker_at_ee.ethz.chE<gt>,
+Niko Tyni  E<lt>ntyni_at_iki.fiE<gt>
 
 =head1 HISTORY
 
- 2001-05-11 ds 1.2  Initial Version for policy 0.3
- 2001-09-04 ds 1.3  Remove space before comments, more strict variable definition
- 2001-09-19 to 1.4  Added _sub error parsing and _doc self documentation
- 2001-10-20 to      Improved Rendering of _doc information
- 2002-01-09 to      Added Documentation to the _text section documentation
- 2002-01-28 to      Fixed quote parsing in tables
- 2002-03-12 ds 1.5  Implemented @define, make makepod return a string and not an array
- 2002-08-28 to      Added maketmpl methode
- 2002-10-10 ds 1.6  More verbatim _text sections
- 2004-02-09 to 1.7  Added _example propperty for pod and template generation
- 2004-08-17 to 1.8  Allow special input files like "program|"
- 2005-01-10 ds 1.9  Implemented _dyn, _default, _recursive, and _inherited (Niko Tyni) 
- 2005-02-21 ds 2.00 Implemented _dyndoc, _varlist and _sub for sections (Niko Tyni) 
+ 2001-05-11 ds      Initial Version of ISG::ParseConfig
+ 2005-03-08 ds 1.00 Renamed from ISG::ParseConfig to Config::Grammar 
 
 =cut
 
