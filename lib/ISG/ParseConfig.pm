@@ -599,15 +599,15 @@ sub _parse_line($$$)
 
     /^\*\*\*\s*(.*?)\s*\*\*\*$/ and do {
     	my $name = $1;
-	$self->_check_section_sub($name) or return 0;
         $self->_goto_level(1, $name) or return 0;
+	$self->_check_section_sub($name) or return 0;
         return 1;
     };
     /^(\++)\s*(.*)$/ and do {
         my $level = length $1;
     	my $name = $2;
-	$self->_check_section_sub($name) or return 0;
         $self->_goto_level($level + 1, $name) or return 0;
+	$self->_check_section_sub($name) or return 0;
         return 1;
     };
 
@@ -792,8 +792,8 @@ sub _describevar {
 	my @doc;
 	push @doc, "=item B<$var>".$mandatory;
 	push @doc, $tree->{$var}{_doc} if $tree->{$var}{_doc} ;
-	my $inherited = $tree->{_inherited} and 
-		grep {$_ eq $var} @{$tree->{_inherited}};
+	my $inherited = ( $tree->{_inherited} and 
+		grep {$_ eq $var} @{$tree->{_inherited}});
 	push @doc, "This variable I<inherits> its value from the parent section if nothing is specified here."
 		if $inherited;
 	push @doc, "This variable I<dynamically> modifies the grammar based on its value."
