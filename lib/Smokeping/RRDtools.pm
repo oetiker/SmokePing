@@ -57,6 +57,10 @@ Probably.
 
 Copyright (c) 2005 by Niko Tyni.
 
+=head1 AUTHOR
+
+Niko Tyni <ntyni@iki.fi>
+
 =head1 LICENSE
 
 This program is free software; you can redistribute it
