@@ -6,7 +6,7 @@ GROFF = groff
 .SUFFIXES:
 .SUFFIXES: .pm .pod .txt .html .man .1 .3 .5 .7
 
-DOCS = $(filter-out doc/smokeping_config.pod,$(wildcard doc/*.pod)) doc/smokeping_examples.pod # section 7
+DOCS = $(filter-out doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod,$(wildcard doc/*.pod)) doc/smokeping_examples.pod # section 7
 DOCSCONFIG := doc/smokeping_config.pod # section 5
 PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm lib/Smokeping/Examples.pm
 PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)
@@ -28,7 +28,7 @@ HTML= $(addsuffix .html,$(BASE))
 POD2MAN = pod2man --release=$(VERSION) --center=SmokePing $<
 MAN2TXT = $(GROFF) -man -Tascii $< > $@
 # pod2html apparently needs to be in the target directory to get L<> links right
-POD2HTML= cd $(dir $@); top=./$(shell echo $(dir $@)|sed -e 's,doc/,,' -e 's,[^/]*/,../,g'); pod2html --infile=$(CURDIR)/$< --outfile=$(notdir $@) --noindex --htmlroot=. --podroot=. --podpath=$${top} --title=$*
+POD2HTML= cd $(dir $@); top="$(shell echo $(dir $@)|sed -e 's,doc/,,' -e 's,[^/]*/,../,g')"; top=$${top:-.}; pod2html --infile=$(CURDIR)/$< --outfile=$(notdir $@) --noindex --htmlroot=. --podroot=. --podpath=$${top} --title=$*
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
 MAKEPOD= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
 GENEX= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
