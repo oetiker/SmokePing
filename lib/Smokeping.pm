@@ -36,12 +36,12 @@ my $logging = 0; # keeps track of whether we have a logging method enabled
 
 sub find_probedir {
 	# find the directory where the probe modules are located
-	# by looking for 'probes/FPing.pm' in @INC
+	# by looking for 'Smokeping/probes/FPing.pm' in @INC
 	# 
 	# yes, this is ugly. Suggestions welcome.
 	for (@INC) {
-		-f "$_/probes/FPing.pm" or next;
-		return "$_/probes";
+		-f "$_/Smokeping/probes/FPing.pm" or next;
+		return "$_/Smokeping/probes";
 	}
 	return undef;
 }
@@ -73,7 +73,7 @@ sub load_probe ($$$$) {
 	my $name = shift;
 	$name = $modname unless defined $name;
 	my $rv;
-	eval '$rv = probes::'.$modname.'->new( $properties,$cfg,$name);';
+	eval '$rv = Smokeping::probes::'.$modname.'->new( $properties,$cfg,$name);';
         die "$@\n" if $@;
         die "Failed to load Probe $name (module $modname)\n" unless defined $rv;
 	return $rv;
@@ -184,10 +184,10 @@ sub init_alerts ($){
 		or die "ERROR: Alert $al pattern entry '$_' is invalid\n";
 	    my $matcher = $1;
 	    my $arg = $2;
-	    eval 'require matchers::'.$matcher;
+	    eval 'require Smokeping::matchers::'.$matcher;
 	    die "Matcher '$matcher' could not be loaded: $@\n" if $@;
 	    my $hand;
-	    eval "\$hand = matchers::$matcher->new($arg)";
+	    eval "\$hand = Smokeping::matchers::$matcher->new($arg)";
   	    die "ERROR: Matcher '$matcher' could not be instantiated\nwith arguments $arg:\n$@\n" if $@;
 	    $x->{length} = $hand->Length;
 	    $x->{sub} = sub { $hand->Test(shift) } ;
@@ -1296,7 +1296,7 @@ DOC
 		my ($re, $name, $grammar) = @_;
 
 		# load the probe module
-		my $class = "probes::$name";
+		my $class = "Smokeping::probes::$name";
 		eval "require $class";
 		die "require $class failed: $@\n" if $@;
 

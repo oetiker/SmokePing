@@ -8,12 +8,12 @@ GROFF = groff
 
 POD := $(wildcard doc/*.pod)
 PM :=  lib/ISG/ParseConfig.pm lib/Smokeping.pm 
-PODPROBE :=  $(wildcard lib/probes/*.pm)
-PODMATCH :=  $(wildcard lib/matchers/*.pm)
+PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)
+PODMATCH :=  $(wildcard lib/Smokeping/matchers/*.pm)
 
 BASE = $(subst .pod,,$(POD)) \
 	$(subst .pm,,$(subst lib/,doc/,$(PM))) \
-	$(subst .pm,,$(subst lib/probes,doc/probes,$(PODPROBE))) \
+	$(subst .pm,,$(subst lib/Smokeping/probes,doc/probes,$(PODPROBE))) \
 	$(addprefix doc/matchers/,$(subst .pm,,$(notdir $(PODMATCH)))) \
 	doc/smokeping
 MAN = $(addsuffix .1,$(BASE))
@@ -30,13 +30,13 @@ doc/%.1: doc/%.pod
 	$(POD2MAN)
 doc/%.1: lib/%.pm
 	$(POD2MAN)
-doc/probes/%.pod: lib/probes/%.pm
-	$(MAKEPOD) probes::$* > $@
+doc/probes/%.pod: lib/Smokeping/probes/%.pm
+	$(MAKEPOD) Smokeping::probes::$* > $@
 doc/probes/%.1: doc/probes/%.pod
 	$(POD2MAN)
-doc/matchers/%.1: lib/matchers/%
+doc/matchers/%.1: lib/Smokeping/matchers/%.pm
 	$(POD2MAN)
-doc/%.1: lib/ISG/%
+doc/ISG/%.1: lib/Smokeping/ISG/%
 	$(POD2MAN)
 doc/smokeping.1: bin/smokeping.dist
 	$(POD2MAN)
@@ -47,8 +47,11 @@ doc/%.html: lib/%.pm
 	$(POD2HTML)
 doc/probes/%.html: doc/probes/%.pod
 	$(POD2HTML)
-doc/matchers/%.html: lib/matchers/%
+doc/matchers/%.html: lib/Smokeping/matchers/%.pm
 	$(POD2HTML)
+doc/ISG/%.html: lib/Smokeping/ISG/%
+	$(POD2MAN)
+
 doc/smokeping.html: bin/smokeping.dist
 	$(POD2MAN)
 

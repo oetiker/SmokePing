@@ -17,17 +17,17 @@ source of this document are most appreciated.
 
 The first thing you should decide is which base class you should
 use for your probe. For most (if not all) uses it's a choice between
-C<probes::base> and C<probes::basefork>. The former is intended for probes
+C<Smokeping::probes::base> and C<Smokeping::probes::basefork>. The former is intended for probes
 that can measure their targets all in one go, while the latter is for
 probing them one at a time, possibly in several concurrent subprocesses.
 
-At the moment, the only probes that use C<probes::base> are the FPing
-derivatives. All the others use C<probes::basefork>, and chances are
+At the moment, the only probes that use C<Smokeping::probes::base> are the FPing
+derivatives. All the others use C<Smokeping::probes::basefork>, and chances are
 you should too. This document will thus concentrate on the latter case.
 
 =head1 SKELETON FILE
 
-The C<probes::skel> module is a non-functional probe that is intended
+The C<Smokeping::probes::skel> module is a non-functional probe that is intended
 to make a good basis for a new probe module. Copy the file, 
 C<lib/probes/skel.pm>, to a new name and just fill out the blanks :)
 Note that real probe modules must have at least one capital letter
@@ -63,7 +63,7 @@ C<probevars> method for probe-specific variables and a C<targetvars>
 method for target-specific variables. If you don't know the difference
 between these yet, see the L<smokeping_examples> document.
 
-(The probes that are derived from C<probes::base> don't support
+(The probes that are derived from C<Smokeping::probes::base> don't support
 target-specific variables, so they only use the C<probevars> method.)
 
 The base classes offer these methods too to provide the variables that
@@ -88,7 +88,7 @@ convenience method called C<_makevars> that does this, and the common idiom is
 The variables are declared in a syntax that comes from the module used
 for parsing the configuration file, C<ISG::ParseConfig>. Each variable
 should be a hash that uses the "special variable keys" documented in
-the C<ISG::ParseConfig> manual. See the C<probes::skel> and the other
+the C<ISG::ParseConfig> manual. See the C<Smokeping::probes::skel> and the other
 probes for examples. 
 
 For reference, here are the keys the hash should have. Much of this
@@ -154,13 +154,13 @@ If you must do something at probe initialization time, like check that
 the external program you're going to use behaves as you expect, you should
 do it in the C<new> method. You should probably also take care that
 you don't run the tests needlessly while in CGI mode. The usual way to 
-do this is to test for $ENV{SERVER_SOFTWARE}. See the C<probes::skel>
+do this is to test for $ENV{SERVER_SOFTWARE}. See the C<Smokeping::probes::skel>
 module for an example.
 
 =head1 PINGING
 
 All the real action happens in the C<pingone> method (or, for
-C<probes::base>-derived probes, in the C<ping> method.) The arguments
+C<Smokeping::probes::base>-derived probes, in the C<ping> method.) The arguments
 for C<pingone> are C<$self>, the module instance (since this is a method)
 and C<$target>, the target to be probed.
 
@@ -191,7 +191,7 @@ speak up if you think you'd use it.
 If you deal with timeouts (for example because your program offers a parameter
 for specifying the timeout for the pings), you should know a few things.
 
-First, there's timeout logic in C<probes::basefork> that kills the probe
+First, there's timeout logic in C<Smokeping::probes::basefork> that kills the probe
 when the timeout is reached. By default the timeout is (# of pings *
 5 seconds) + 1 second. If you expect that your pings can take longer,
 you should modify the default value of the probe-specific variable C<timeout>.
@@ -208,14 +208,14 @@ This would be done like this:
 
 If you want to provide a target-specific C<timeout> setting, you should
 delete the probe-specific variable and be sure to provide a default for
-your target-specific one. See eg. C<probes::AnotherDNS> for an example of
+your target-specific one. See eg. C<Smokeping::probes::AnotherDNS> for an example of
 how this is done. 
 
 Providing a target-specific C<timeout> will make the timeout in
-C<probes::basefork> be (# of pings * the maximum timeout of all targets)
+C<Smokeping::probes::basefork> be (# of pings * the maximum timeout of all targets)
 + 1 second. The 1 second is added so that the own timeout logic of the
 probe has time to kick in even in the worst case (ie. all pings are lost)
-before C<probes::basefork> starts killing the processes.
+before C<Smokeping::probes::basefork> starts killing the processes.
 
 =head1 COPYRIGHT
 
