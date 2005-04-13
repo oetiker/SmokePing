@@ -542,6 +542,9 @@ sub get_overview ($$$$){
     my $date = $cfg->{Presentation}{overview}{strftime} ? 
         POSIX::strftime($cfg->{Presentation}{overview}{strftime},
                         localtime(time)) : scalar localtime(time);
+    if ( $RRDs::VERSION >= 1.199908 ){
+	    $date =~ s|:|\\:|g;
+    }
     foreach my $prop (sort {$tree->{$a}{_order} <=> $tree->{$b}{_order}} 
                       grep {  ref $tree->{$_} eq 'HASH' and defined $tree->{$_}{host}}
                       keys %$tree) {
@@ -566,11 +569,10 @@ sub get_overview ($$$$){
            "CDEF:dm=median,0,$max,LIMIT",
            "CDEF:dm2=median,1.5,*,0,$max,LIMIT",
 	   "LINE1:dm2", # this is for kicking things down a bit
-	   "LINE1:dm#$medc:median RTT avg\\:    ",
-           "GPRINT:median:AVERAGE: %0.2lf %ss     ",
-           "GPRINT:median:LAST:     latest RTT\\: %0.2lf %ss     ",
-   	   "GPRINT:ploss:AVERAGE:    avg pkg loss\\: %.2lf %% ",
-	   "COMMENT:         $date\\j");
+	   "LINE1:dm#$medc:median RTT",
+           "GPRINT:median:AVERAGE:avg RTT\\: %.2lf %ss",
+   	   "GPRINT:ploss:AVERAGE:avg pkt loss\\: %.2lf %%",
+	   "COMMENT:$date\\j");
 	my $ERROR = RRDs::error();
 	$page .= "<div>";
         if (defined $ERROR) {
@@ -645,26 +647,46 @@ sub smokecol ($) {
     return \@items;
 }
 
+sub parse_datetime($){
+    my $in = shift;
+    for ($in){
+	/^\s*(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?\s*$/  && 
+	    return POSIX::mktime($6||0,$5||0,$4||0,$3,$2-1,$1-1900,0,0,-1);
+	/([ -:a-z0-9]+)/ && return $1;
+    };
+}
+	
 sub get_detail ($$$$){
+    # when drawing the detail page there are two modes for doing it
+    # a) classic with several static graphs on the page
+    # b) with one graph and below the graph one can specify the end time
+    #    and the length of the graph.
     my $cfg = shift;
     my $q = shift;
     my $tree = shift;
     my $open = shift;
+
     return "" unless $tree->{host};
+    
     my @dirs = @{$open};
     my $file = pop @dirs;
     my $dir = "";
-    die "ERROR: ".(join ".", @dirs)." has no probe defined\n" 
+
+    return "<div>ERROR: ".(join ".", @dirs)." has no probe defined</div>"
         unless $tree->{probe};
-    die "ERROR: ".(join ".", @dirs)." $tree->{probe} is not known\n"
+
+    return "<div>ERROR: ".(join ".", @dirs)." $tree->{probe} is not known</div>"
         unless $cfg->{__probes}{$tree->{probe}};
+
     my $probe = $cfg->{__probes}{$tree->{probe}};
     my $ProbeDesc = $probe->ProbeDesc();
     my $step = $probe->step();
     my $pings = $probe->_pings($tree);
-
     my $page;
 
+    my $mode = $q->param('displaymode') || 's';
+    return "<div>ERROR: unknown displaymode $mode</div>"
+      unless $mode =~ /^[sn]$/;
 
     for (@dirs) {
 	$dir .= "/$_";
@@ -674,142 +696,190 @@ sub get_detail ($$$$){
                 unless -d  $cfg->{General}{imgcache}.$dir;
 	
     }
-    my $rrd = $cfg->{General}{datadir}."/".(join "/", @dirs)."/${file}.rrd";
-    my $img = $cfg->{General}{imgcache}."/".(join "/", @dirs)."/${file}.rrd";
+    my $rrd = $cfg->{General}{datadir}."/".$dir."/${file}.rrd";
 
-    my %lasthight;
-    if (open (HG,"<${img}.maxhight")){
-        while (<HG>){
-          chomp;
-          my @l = split / /;
-          $lasthight{$l[0]} = $l[1];
-        }
-        close HG;
-    }
-    my $max = findmax $cfg, $rrd;
-    if (open (HG,">${img}.maxhight")){
-        foreach my $s (keys %{$max}){
-          print HG "$s $max->{$s}\n";        
-        }
-        close HG;
-    }
+    my $imgbase;
+    my $imghref;
+    my $max;
+    my @tasks;
+    my %lasthight;	
 
+    if ($mode eq 's'){
+	# in nave mode there is only one graph, so the height calculation
+	# is not necessary.	
+	$imgbase = $cfg->{General}{imgcache}."/".(join "/", @dirs)."/${file}";
+	$imghref = $cfg->{General}{imgurl}."/".(join "/", @dirs)."/${file}";	
+	@tasks = @{$cfg->{Presentation}{detail}{_table}};
+	if (open (HG,"<${imgbase}.maxhight")){
+	    while (<HG>){
+		chomp;
+		my @l = split / /;
+		$lasthight{$l[0]} = $l[1];
+	    }
+	    close HG;
+	}
+	$max = findmax $cfg, $rrd;
+	if (open (HG,">${imgbase}.maxhight")){
+	    foreach my $s (keys %{$max}){
+		print HG "$s $max->{$s}\n";        
+	    }
+	    close HG;
+	}
+    } else {
+	my $basedir = 
+	mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $imgbase;
+	# remove old images after one hour
+	my $pattern = "$cfg->{General}{imgcache}/__navcache/*.png";
+	for (<$pattern>){
+		unlink $_ if -A $_ > 1/24;
+	}
+	$imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
+	$imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
+	@tasks = (["Navigator Mode", parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
+
+	my ($graphret,$xs,$ys) = RRDs::graph
+	  ("dummy", 
+	   '--start', $tasks[0][1],
+	   '--end',$tasks[0][2], 
+           "DEF:maxping=${rrd}:median:AVERAGE",
+           'PRINT:maxping:MAX:%le' );
+        my $ERROR = RRDs::error();
+	do_log $ERROR if $ERROR;
+        my $val = $graphret->[0];
+        $val = 1 if $val =~ /nan/i;
+        $max = { $tasks[0][1] => $val };
+    }
+        
     my $smoke = $pings >= 3
-         ? smokecol $pings : 
-	   [ 'COMMENT:(Not enough pings to draw any smoke.)\s', 'COMMENT:\s' ]; 
-	   # one \s doesn't seem to be enough
+      ? smokecol $pings : 
+      [ 'COMMENT:(Not enough pings to draw any smoke.)\s', 'COMMENT:\s' ]; 
+    # one \s doesn't seem to be enough
     my @upargs;
     my @upsmoke;
-    my @median;
-    my $date = $cfg->{Presentation}{detail}{strftime} ? 
-        POSIX::strftime($cfg->{Presentation}{detail}{strftime},
-                        localtime(time)) : scalar localtime(time);
-
-    for (@{$cfg->{Presentation}{detail}{_table}}) {
-	my ($desc,$start) = @{$_};
-	$start = exp2seconds($start);
-    do {
-	@median = ("DEF:median=${rrd}:median:AVERAGE",
-		   "DEF:loss=${rrd}:loss:AVERAGE",
-                   "CDEF:ploss=loss,$pings,/,100,*",
-           	   "GPRINT:median:AVERAGE:Median Ping RTT (avg %.1lf %ss) ",
-                   "LINE1:median#202020"
-        	   );
+    my %lc;
+    if ( defined $cfg->{Presentation}{detail}{loss_colors}{_table} ) {
+	for (@{$cfg->{Presentation}{detail}{loss_colors}{_table}}) {
+	    my ($num,$col,$txt) = @{$_};
+	    $lc{$num} = [ $txt, "#".$col ];
+	}
+    } else {  
 	my $p = $pings;
+	%lc =  (0     => ['0',   '#26ff00'],
+		1          => ["1/$p",  '#00b8ff'],
+		2          => ["2/$p",  '#0059ff'],
+		3          => ["3/$p",  '#5e00ff'],
+		4          => ["4/$p",  '#7e00ff'],
+		int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
+		$p-1       => [($p-1)."/$p",    '#ff0000'],
+		);
+    };
 
-        my %lc;
-        my $lastup = 0;
-        if ( defined $cfg->{Presentation}{detail}{loss_colors}{_table} ) {
-              for (@{$cfg->{Presentation}{detail}{loss_colors}{_table}}) {
-                   my ($num,$col,$txt) = @{$_};
-                   $lc{$num} = [ $txt, "#".$col ];
-              }
-       } else {  
-         	%lc =  (0     => ['0',   '#26ff00'],
-		   1          => ["1/$p",  '#00b8ff'],
-		   2          => ["2/$p",  '#0059ff'],
-		   3          => ["3/$p",  '#5e00ff'],
-		   4          => ["4/$p",  '#7e00ff'],
-		   int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
-		   $p-1       => [($p-1)."/$p",    '#ff0000'],
+    my %upt;
+    if ( defined $cfg->{Presentation}{detail}{uptime_colors}{_table} ) {
+	for (@{$cfg->{Presentation}{detail}{uptime_colors}{_table}}) {
+	    my ($num,$col,$txt) = @{$_};
+	    $upt{$num} = [ $txt, "#".$col];
+	}
+    } else {  
+	%upt = ( 3600       => ['<1h', '#FFD3D3'],
+		2*3600     => ['<2h', '#FFE4C7'],
+		6*3600     => ['<6h', '#FFF9BA'],
+		12*3600    => ['<12h','#F3FFC0'],
+		24*3600    => ['<1d', '#E1FFCC'],
+		7*24*3600  => ['<1w', '#BBFFCB'],
+		30*24*3600 => ['<1m', '#BAFFF5'],
+		'1e100'    => ['>1m', '#DAECFF']
+		);
+    }                
+    
+    my $date = $cfg->{Presentation}{detail}{strftime} ? 
+      POSIX::strftime($cfg->{Presentation}{detail}{strftime},
+		      localtime(time)) : scalar localtime(time);
+    my $BS = '';
+    if ( $RRDs::VERSION >= 1.199908 ){
+        $date =~ s|:|\\:|g;
+        $ProbeDesc =~ s|:|\\:|g;
+	$BS = '\\';
+    }
+
+    for (@tasks) {
+	my ($desc,$start,$end) = @{$_};
+	$end ||= 'last';
+	$start = exp2seconds($start) if $mode eq 's';	
+
+	my $startstr = POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $start : time-$start));
+	my $endstr   = POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time));
+
+	my $last = -1;
+	my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
+	my @median = ("DEF:median=${rrd}:median:AVERAGE",
+		      "DEF:loss=${rrd}:loss:AVERAGE",
+		      "CDEF:ploss=loss,$pings,/,100,*",
+		      "GPRINT:median:AVERAGE:Median Ping RTT (%.1lf %ss avg) ",
+		      "LINE1:median#202020"
 		  );
-        };
-        my $last = -1;
-        my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
 	foreach my $loss (sort {$a <=> $b} keys %lc){
 	    next if $loss >= $pings;
-            my $lvar = $loss; $lvar =~ s/\./d/g ;
+	    my $lvar = $loss; $lvar =~ s/\./d/g ;
 	    push @median, 
-	    (
-	     "CDEF:me$lvar=loss,$last,GT,loss,$loss,LE,*,1,UNKN,IF,median,*",
-	     "CDEF:meL$lvar=me$lvar,$swidth,-",
-	     "CDEF:meH$lvar=me$lvar,0,*,$swidth,2,*,+",             
-	     "AREA:meL$lvar",
-	     "STACK:meH$lvar$lc{$loss}[1]:$lc{$loss}[0]"
-	     );
-             $last = $loss;
+	      (
+	       "CDEF:me$lvar=loss,$last,GT,loss,$loss,LE,*,1,UNKN,IF,median,*",
+	       "CDEF:meL$lvar=me$lvar,$swidth,-",
+	       "CDEF:meH$lvar=me$lvar,0,*,$swidth,2,*,+",             
+	       "AREA:meL$lvar",
+	       "STACK:meH$lvar$lc{$loss}[1]:$lc{$loss}[0]"
+	       #		   "LINE2:me$lvar$lc{$loss}[1]:$lc{$loss}[0]"
+	       );
+	    $last = $loss;
 	}
-	push @median, ( "GPRINT:ploss:AVERAGE:    avg pkg loss\\: %.2lf %%\\l" );
-#	map {print "$_<br/>"} @median;
-    };
+	push @median, ( "COMMENT:\\l",
+			"GPRINT:ploss:AVERAGE:Packet Loss\\: %.2lf %% average",
+			"GPRINT:ploss:MAX:%.2lf %% maximum",
+			"GPRINT:ploss:LAST:%.2lf %% current\\l"
+	);
+
         # if we have uptime draw a colorful background or the graph showing the uptime
         my $cdir=$cfg->{General}{datadir}."/".(join "/", @dirs)."/";
         if (-f "$cdir/${file}.adr") {
-                @upsmoke = ();
-        	@upargs = ('COMMENT:Link Up:     ',
-	        	   "DEF:uptime=${rrd}:uptime:AVERAGE",
-		           "CDEF:duptime=uptime,86400,/", 
-       		           'GPRINT:duptime:LAST: %0.1lf days  (');
-        	my %upt;
-                if ( defined $cfg->{Presentation}{detail}{uptime_colors}{_table} ) {
-                    for (@{$cfg->{Presentation}{detail}{uptime_colors}{_table}}) {
-                        my ($num,$col,$txt) = @{$_};
-                        $upt{$num} = [ $txt, "#".$col];
-                    }
-                } else {  
-                    %upt = ( 3600       => ['<1h', '#FFD3D3'],
-	        	    2*3600     => ['<2h', '#FFE4C7'],
-	        	    6*3600     => ['<6h', '#FFF9BA'],
-	        	    12*3600    => ['<12h','#F3FFC0'],
-	        	    24*3600    => ['<1d', '#E1FFCC'],
-         		    7*24*3600  => ['<1w', '#BBFFCB'],
-	        	    30*24*3600 => ['<1m', '#BAFFF5'],
-	        	    '1e100'    => ['>1m', '#DAECFF']
-	        	    );
-                }                
-	        my $lastup = 0;
-        	foreach my $uptime (sort {$a <=> $b} keys %upt){
-        	    push @upargs, 
-        	    (
-        	     "CDEF:up$uptime=uptime,$lastup,GE,uptime,$uptime,LE,*,INF,UNKN,IF",
-        	     "AREA:up$uptime$upt{$uptime}[1]:$upt{$uptime}[0]"
-        	     );
-                    push @upsmoke, 
-        	    (
-        	     "CDEF:ups$uptime=uptime,$lastup,GE,uptime,$uptime,LE,*,cp2,UNKN,IF",
-        	     "AREA:ups$uptime$upt{$uptime}[1]"
+	    @upsmoke = ();
+	    @upargs = ('COMMENT:Link Up${BS}:     ',
+		       "DEF:uptime=${rrd}:uptime:AVERAGE",
+		       "CDEF:duptime=uptime,86400,/", 
+		       'GPRINT:duptime:LAST: %0.1lf days  (');
+	    my $lastup = 0;
+	    foreach my $uptime (sort {$a <=> $b} keys %upt){
+		push @upargs, 
+		  (
+		   "CDEF:up$uptime=uptime,$lastup,GE,uptime,$uptime,LE,*,INF,UNKN,IF",
+		   "AREA:up$uptime$upt{$uptime}[1]:$upt{$uptime}[0]"
+		   );
+		push @upsmoke, 
+		  (
+		   "CDEF:ups$uptime=uptime,$lastup,GE,uptime,$uptime,LE,*,cp2,UNKN,IF",
+		   "AREA:ups$uptime$upt{$uptime}[1]"
         	     );                    
-               	    $lastup=$uptime;
-	}
-	
-	push @upargs, 'COMMENT:)\l';
-#	map {print "$_<br/>"} @upargs;
-    };
+		$lastup=$uptime;
+	    }
+	    
+	    push @upargs, 'COMMENT:)\l';
+	    #	map {print "$_<br/>"} @upargs;
+	};
         my @log = ();
         push @log, "--logarithmic" if  $cfg->{Presentation}{detail}{logarithmic} and
-	    $cfg->{Presentation}{detail}{logarithmic} eq 'yes';
-
+	  $cfg->{Presentation}{detail}{logarithmic} eq 'yes';
+	
         my @lazy =();
-        @lazy = ('--lazy') if $lasthight{$start} and $lasthight{$start} == $max->{$start};
+        @lazy = ('--lazy') if $mode eq 's' and $lasthight{$start} and $lasthight{$start} == $max->{$start};
+	$desc = "Navigator Graph" if $mode eq 'n';
 	my ($graphret,$xs,$ys) = RRDs::graph
-	  ($cfg->{General}{imgcache}.$dir."/${file}_last_${start}.png",
+	  ("${imgbase}_${end}_${start}.png",
 	   @lazy,
-	   '--start','-'.$start,
+	   '--start',( $mode eq 's' ? '-'.$start : $start),
+	   ($end ne 'last' ? ('--end',$end) : ()),
 	   '--height',$cfg->{Presentation}{detail}{height},
 	   '--width',,$cfg->{Presentation}{detail}{width},
 	   '--title',$desc,
-           '--rigid',
-           '--upper-limit', $max->{$start},
+           '--rigid','--upper-limit', $max->{$start},
 	   @log,
 	   '--lower-limit',(@log ? ($max->{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
 	   '--vertical-label',"Seconds",
@@ -824,8 +894,6 @@ sub get_detail ($$$$){
  	   @$smoke,
            @upsmoke, # draw the rest of the uptime bg color
 	   @median,
-#	   'LINE3:median#ff0000:Median RTT    in grey '.$cfg->{Database}{pings}.' pings sorted by RTT',
-#	   'LINE1:median#ff8080',
            # Gray background for times when no data was collected, so they can
            # be distinguished from network being down.
            ( $cfg->{Presentation}{detail}{nodata_color} ? (
@@ -834,14 +902,34 @@ sub get_detail ($$$$){
 		 ()),
 	   'HRULE:0#000000',
 	   'COMMENT:\s',
-           "COMMENT:Probe: $pings $ProbeDesc every $step seconds",
+           "COMMENT:Probe${BS}: $pings $ProbeDesc every $step seconds",
 	   'COMMENT:created on '.$date.'\j' );
 	
 	my $ERROR = RRDs::error();
-	$page .= "<div>".
-	  ( $ERROR ||
-	   "<IMG BORDER=\"0\" WIDTH=\"$xs\" HEIGHT=\"$ys\" ".
-	   "SRC=\"".$cfg->{General}{imgurl}.$dir."/${file}_last_${start}.png\">" )."</div>";
+	if ($mode eq 'n'){
+	    $page .= "<div>";
+	    $page .= ( $ERROR || qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">} );
+	    $page .= "</div>";
+	    $page .= $q->start_form(-method=>'GET')
+	      . "<p>Time range: "
+	      . $q->textfield(-name=>'start',-default=>$startstr)
+	      . "&nbsp;&nbsp;to&nbsp;&nbsp;".$q->textfield(-name=>'end',-default=>$endstr)
+	      . $q->hidden(-name=>'target' )
+	      . $q->hidden(-name=>'displaymode',-default=>$mode )
+	      . "&nbsp;"
+	      . $q->submit(-name=>'Generate!')
+ 	      . "</p>"
+	      . $q->end_form();
+	} else {
+	    $startstr =~ s/\s/%20/g;
+	    $endstr =~ s/\s/%20/g;
+	    $page .= "<div>";
+	    $page .= ( $ERROR || 
+		      qq{<a href="?displaymode=n;start=$startstr;end=$endstr;}."target=".$q->param('target').'">'
+		      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" );
+	    $page .= "</div>";
+
+	}
 
     }
     return $page;
@@ -925,7 +1013,8 @@ sub update_rrds($$$$$) {
         } 
 	# if we are looking down a branche where no probe propperty is set there is not sense
         # in further exploring it
-        next unless  defined $probe and defined $justthisprobe and $probe ne $justthisprobe;
+        next unless defined $probe;
+	next if defined $justthisprobe and $probe ne $justthisprobe;
         my $probeobj = $probes->{$probe};
         if ($prop eq 'host' and check_filter($cfg,$name)) {
             #print "update $name\n";
