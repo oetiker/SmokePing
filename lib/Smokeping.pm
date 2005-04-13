@@ -20,7 +20,7 @@ use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="1.99001";
+$VERSION="1.99004";
 
 # we want opts everywhere
 my %opt;
@@ -918,13 +918,15 @@ sub update_rrds($$$$$) {
     my $justthisprobe = shift; # if defined, update only the targets probed by this probe
 
     my $probe = $tree->{probe};
-    my $probeobj = $probes->{$probe};
     foreach my $prop (keys %{$tree}) {
 
         if (ref $tree->{$prop} eq 'HASH'){
             update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe;
         } 
-        next if defined $justthisprobe and $probe ne $justthisprobe;
+	# if we are looking down a branche where no probe propperty is set there is not sense
+        # in further exploring it
+        next unless  defined $probe and defined $justthisprobe and $probe ne $justthisprobe;
+        my $probeobj = $probes->{$probe};
         if ($prop eq 'host' and check_filter($cfg,$name)) {
             #print "update $name\n";
 	    my $updatestring = $probeobj->rrdupdate_string($tree);
