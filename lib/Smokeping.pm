@@ -559,9 +559,11 @@ sub get_overview ($$$$){
 	   '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
            '--title',$tree->{$prop}{title},
 	   '--height',$cfg->{Presentation}{overview}{height},
-	   '--width',,$cfg->{Presentation}{overview}{width},
+	   '--width',$cfg->{Presentation}{overview}{width},
 	   '--vertical-label',"Seconds",
 	   '--imgformat','PNG',
+	   '--alt-autoscale-max',
+	   '--alt-y-grid',
            '--lower-limit','0',
 	   "DEF:median=${rrd}:median:AVERAGE",
 	   "DEF:loss=${rrd}:loss:AVERAGE",
@@ -726,11 +728,10 @@ sub get_detail ($$$$){
 	    close HG;
 	}
     } else {
-	my $basedir = 
-	mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $imgbase;
+	mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $cfg->{General}{imgcache}."/__navcache";
 	# remove old images after one hour
 	my $pattern = "$cfg->{General}{imgcache}/__navcache/*.png";
-	for (<$pattern>){
+	for (<"$pattern">){
 		unlink $_ if -A $_ > 1/24;
 	}
 	$imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
