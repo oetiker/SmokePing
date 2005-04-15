@@ -745,10 +745,10 @@ sub get_detail ($$$$){
            "DEF:maxping=${rrd}:median:AVERAGE",
            'PRINT:maxping:MAX:%le' );
         my $ERROR = RRDs::error();
-	do_log $ERROR if $ERROR;
+        return "<div>RRDtool did not understand your input: $ERROR.</div>" if $ERROR;     
         my $val = $graphret->[0];
         $val = 1 if $val =~ /nan/i;
-        $max = { $tasks[0][1] => $val };
+        $max = { $tasks[0][1] => $val * 1.5 };
     }
         
     my $smoke = $pings >= 3
@@ -808,8 +808,8 @@ sub get_detail ($$$$){
 	$end ||= 'last';
 	$start = exp2seconds($start) if $mode eq 's';	
 
-	my $startstr = POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $start : time-$start));
-	my $endstr   = POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time));
+        my $startstr = $start =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $start : time-$start)) : $start;
+        my $endstr   = $end =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time)) : $end;
 
 	my $last = -1;
 	my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
