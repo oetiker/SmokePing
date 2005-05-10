@@ -102,6 +102,16 @@ host to be probed.
 DOC
 			_example => "http://%host%/",
 		},
+        insecure_ssl => {
+            _doc => <<DOC,
+The "-k" curl(1) option. Accept SSL connections that don't have a secure
+certificate chain to a trusted CA. Note that if you are going to monitor
+https targets, you'll probably have to either enable this option or specify
+the CA path to curl through extraargs below. For more info, see the
+curl(1) manual page.
+DOC
+            _example => 1,
+        },
 		extrare=> {
 			_doc => <<DOC,
 The regexp used to split the extraargs string into an argument list,
@@ -210,6 +220,9 @@ sub proto_args {
 	my @args = ("-o", "/dev/null", "-w", "Time: %{time_total} DNS time: %{time_namelookup}\\n");
 	my $ssl2 = $target->{vars}{ssl2};
 	push (@args, "-2") if defined($ssl2);
+    my $insecure_ssl = $target->{vars}{insecure_ssl};
+    push (@args, '-k') if defined $insecure_ssl;
+
 	return(@args);
 }
 
