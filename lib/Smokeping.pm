@@ -50,6 +50,10 @@ sub find_libdir {
 sub do_log(@);
 sub load_probe($$$$);
 
+sub dummyCGI::param {
+    return wantarray ? () : "";
+}
+
 sub load_probes ($){
     my $cfg = shift;
     my %prbs;
@@ -2451,6 +2455,7 @@ sub load_cfg ($) {
 sub makepod ($){
     my $parser = shift;
     my $e='=';
+    my $a='@';
     my $retval = <<POD;
 
 ${e}head1 NAME
@@ -2476,7 +2481,29 @@ for simple configuration examples.
 
 ${e}head1 REFERENCE
 
-The text below describes the syntax of the SmokePing configuration file.
+${e}head2 GENERAL SYNTAX
+
+The text below describes the general syntax of the SmokePing configuration file.
+It was copied from the Config::Grammar documentation.
+
+'#' denotes a comment up to the end-of-line, empty lines are allowed and space
+at the beginning and end of lines is trimmed.
+
+'\\' at the end of the line marks a continued line on the next line. A single
+space will be inserted between the concatenated lines.
+
+'${a}include filename' is used to include another file.
+
+'${a}define a some value' will replace all occurences of 'a' in the following text
+with 'some value'.
+
+Fields in tables that contain white space can be enclosed in either C<'> or C<">.
+Whitespace can also be escaped with C<\\>. Quotes inside quotes are allowed but must
+be escaped with a backslash as well.
+
+${e}head2 SPECIFIC SYNTAX
+
+The text below describes the specific syntax of the SmokePing configuration file.
 
 POD
 
