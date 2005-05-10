@@ -1,3 +1,12 @@
+* Curl now has a new 'insecure_ssl' option for those not caring about CA paths
+  -- niko, original patch by  Spitzer <mspitzer *gmail.com>
+* document '@include' and its friends in smokeping_config in addition to 
+  Config::Grammar -- niko, from Marc Haber (Debian bug #307955)
+* AnotherDNS: Double check the answer from the dns server and optionally enforce a
+  NOERROR response code -- Christoph.Heine in HaDiKo.DE
+* NEW Feature: when clicking on the graphs in detail view
+  you can select different time ranges for the graph. The creation of this
+  feature has been sponsored by BeverlyCorp.com -- tobi
 * Curl now has a new "extraargs" option for any extra arguments, like "--header"
   -- niko, requested by Warrick FitzGerald <lists.smokeping.wfitzgerald *crtman.com>
 * change ISG::ParseConfig references to its new name, Config::Grammar -- niko
@@ -23,6 +32,7 @@
 * new commandline options '--config=X' and '--check' -- niko
 * FPing: support "-t", "-p" and "-i" fping params -- niko, suggested by Chris Wilson <chris *aidworld.org>
 * FPing6: test against ::1 instead of localhost -- Sebastian Wiesinger <smokeping *tracker.fire-world.de>
+* make sure mailsetup works before using it -- tobi
 * fix for basefork.pm IO::Select property has_exception is very platform dependent
   by ignoring it altogether things actually work better. Especially on Solaris which
   does have propper support for has_exception as oposed to linux. -- niko, reported by Jim Morris <wrdnet *earthlink.net> 

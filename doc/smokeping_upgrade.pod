@@ -23,7 +23,7 @@ An official list of changes with each release can be found in the CHANGES
 file in the Smokeping distribution. This document tries to complement
 that with upgrading instructions etc.
 
-=head1 1.38 to 2.0
+=head1 1.40 to 2.0
 
 The biggest change with the 2.0 release is that the configuration file
 is now parsed much more strictly. This should result in (hopefully
@@ -198,6 +198,17 @@ The C<target> variable was removed. The target should now be specified
 in the C<host> variable, like it is with all the other probes.
 
 =back
+
+=head1 1.38 to 1.40
+
+=over
+
+=item The new navigation feature
+
+The big visible difference between 1.38 and 1.40 is the new browser navigation
+feature: when clicking on the graphs in detail view you can select
+different time ranges for the graph. The creation of this
+feature has been sponsored by BeverlyCorp.com.
 
 =head1 1.34 to 1.37
 
