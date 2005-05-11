@@ -1,5 +1,5 @@
 * Curl now has a new 'insecure_ssl' option for those not caring about CA paths
-  -- niko, original patch by  Spitzer <mspitzer *gmail.com>
+  -- niko, original patch by Marc Spitzer <mspitzer *gmail.com>
 * document '@include' and its friends in smokeping_config in addition to 
   Config::Grammar -- niko, from Marc Haber (Debian bug #307955)
 * AnotherDNS: Double check the answer from the dns server and optionally enforce a
