@@ -930,7 +930,7 @@ sub get_detail ($$$$){
 	    $endstr =~ s/\s/%20/g;
 	    $page .= "<div>";
 	    $page .= ( $ERROR || 
-		      qq{<a href="?displaymode=n;start=$startstr;end=$endstr;}."target=".$q->param('target').'">'
+		      qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
 		      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" );
 	    $page .= "</div>";
 
@@ -2132,7 +2132,7 @@ let the pattern match:
 
   >10%,*10*,>10%
 
-will fire if more than 10% of the packets have been losst twice over the
+will fire if more than 10% of the packets have been lost at least twice over the
 last 10 samples.
 
 A complete example

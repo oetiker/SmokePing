@@ -42,7 +42,7 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
 
  --filter=x   Only measure entries which pass the filter x
 
- --logfile    Append warnings to this logfile
+ --logfile=x    Append warnings to logfile x.
 
  --static[=x] Generates a static website in directory x.  If x is left out,
               pagedir from the config is used.
