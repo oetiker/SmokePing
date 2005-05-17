@@ -8,9 +8,19 @@
 * NEW Feature: when clicking on the graphs in detail view
   you can select different time ranges for the graph. The creation of this
   feature has been sponsored by BeverlyCorp.com -- tobi
+
+2005/03/10 - 2.0rc3 (tobi)
+
 * Curl now has a new "extraargs" option for any extra arguments, like "--header"
   -- niko, requested by Warrick FitzGerald <lists.smokeping.wfitzgerald *crtman.com>
 * change ISG::ParseConfig references to its new name, Config::Grammar -- niko
+
+2005/02/28 - 2.0rc2 (tobi)
+
+* SYNOPSYS is really spelled SYNOPSIS. Shame on me. -- niko
+
+2005/02/22 - 2.0rc1 (tobi)
+
 * don't create any RRD files if running as a CGI -- niko
 * Curl timeouts work better now -- niko, reported by Chris Wilson <chris *aidworld.org>
 * Curl User-Agent string doesn't need quotes anymore -- niko
