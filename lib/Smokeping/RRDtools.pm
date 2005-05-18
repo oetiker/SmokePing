@@ -97,7 +97,8 @@ sub info2create {
 	my $error = RRDs::error;
 	die("RRDs::info $file: ERROR: $error") if $error;
 	die("$file: unknown RRD version: $info->{rrd_version}")
-		unless $info->{rrd_version} eq '0001';
+		unless $info->{rrd_version} eq '0001'
+		or     $info->{rrd_version} eq '0003';
 	my $cf = $info->{"rra[0].cf"};
 	die("$file: no RRAs found?") 
 		unless defined $cf;

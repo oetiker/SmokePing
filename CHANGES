@@ -1,3 +1,6 @@
+* RRDtool 1.2.x compatibility fix ("unknown RRD version: 0003" on restart)
+  -- niko, reported by Sam Stickland <sam_ml *spacething.org>
+
 2005/05/11 - publish rc4 (tobi)
 * Curl now has a new 'insecure_ssl' option for those not caring about CA paths
   -- niko, original patch by Marc Spitzer <mspitzer *gmail.com>
