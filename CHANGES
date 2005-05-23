@@ -1,3 +1,5 @@
+* Perl 5.8.0 compatibility fix ("missing max for DS uptime")
+  -- niko, reported by Steve Wickert and Kennedy Clark <hkclark *gmail.com>
 * RRDtool 1.2.x compatibility fix ("unknown RRD version: 0003" on restart)
   -- niko, reported by Sam Stickland <sam_ml *spacething.org>
 

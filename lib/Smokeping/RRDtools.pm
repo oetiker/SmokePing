@@ -93,6 +93,7 @@ use RRDs;
 sub info2create {
 	my $file = shift;
 	my @create;
+    my $buggy_perl_version = 1 if $^V and $^V eq v5.8.0;
 	my $info = RRDs::info($file);
 	my $error = RRDs::error;
 	die("RRDs::info $file: ERROR: $error") if $error;
@@ -112,7 +113,8 @@ sub info2create {
 		my @s = ("DS", $ds);
 		for (qw(type minimal_heartbeat min max)) {
 			die("$file: missing $_ for DS $ds?")
-				unless exists $info->{"ds[$ds].$_"};
+				unless exists $info->{"ds[$ds].$_"}
+                or $buggy_perl_version;
 			my $val = $info->{"ds[$ds].$_"};
 			push @s, defined $val ? $val : "U";
 		}
@@ -122,7 +124,8 @@ sub info2create {
 		my @s = ("RRA", $info->{"rra[$i].cf"});
 		for (qw(xff pdp_per_row rows)) {
 			die("$file: missing $_ for RRA $i")
-				unless exists $info->{"rra[$i].$_"};
+				unless exists $info->{"rra[$i].$_"}
+                or $buggy_perl_version;
 			push @s, $info->{"rra[$i].$_"};
 		}
 		push @create, join(":", @s);
