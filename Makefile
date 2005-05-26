@@ -17,7 +17,7 @@ DOCSBASE = $(subst .pod,,$(DOCS))
 MODBASE = $(subst .pm,,$(subst lib/,doc/,$(PM))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODPROBE))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODMATCH)))
-PROGBASE = doc/smokeping doc/smokeping.cgi
+PROGBASE = doc/smokeping doc/smokeping.cgi doc/tSmoke
 DOCSCONFIGBASE = doc/smokeping_config
 
 BASE = $(DOCSBASE) $(MODBASE) $(PROGBASE) $(DOCSCONFIGBASE)
@@ -59,6 +59,8 @@ doc/smokeping.1: bin/smokeping.dist
 	$(POD2MAN) --section 1 > $@
 doc/smokeping.cgi.1: htdocs/smokeping.cgi.dist
 	$(POD2MAN) --section 1 > $@
+doc/tSmoke.1: bin/tSmoke.dist
+	$(POD2MAN) --section 1 > $@
 
 doc/%.html: doc/%.pod
 	$(POD2HTML)
@@ -76,6 +78,8 @@ doc/Config/%.html: lib/Config/%.pm
 doc/smokeping.html: bin/smokeping.dist
 	$(POD2HTML)
 doc/smokeping.cgi.html: htdocs/smokeping.cgi.dist
+	$(POD2HTML)
+doc/tSmoke.html: bin/tSmoke.dist
 	$(POD2HTML)
 
 doc/%.txt: doc/%.1

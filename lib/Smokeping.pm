@@ -1555,7 +1555,7 @@ DOC
 	 _vars =>
 	 [ qw(owner imgcache imgurl datadir pagedir piddir sendmail offset
               smokemail cgiurl mailhost contact netsnpp
-	      syslogfacility syslogpriority concurrentprobes changeprocessnames) ],
+	      syslogfacility syslogpriority concurrentprobes changeprocessnames tmail) ],
 	 _mandatory =>
 	 [ qw(owner imgcache imgurl datadir piddir
               smokemail cgiurl contact) ],
@@ -1714,6 +1714,13 @@ be appended to the process name as '[probe]', eg.  '/usr/bin/smokeping
 If 'concurrentprobes' is not set to 'yes', this variable has no effect.
 DOC
 	 },
+     tmail => 
+      {
+        %$FILECHECK_SUB,
+        _doc => <<DOC,
+Path to your tSmoke HTML mail template file. See the tSmoke documentation for details.
+DOC
+      }
 	},
 	Database => 
 	{ 

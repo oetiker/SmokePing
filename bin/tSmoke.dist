@@ -6,6 +6,31 @@
 # tSmoke.v 0.4 2004/03 McGinn-Combs
 #-----------------------------------------------
 #
+# Modified for Smokeping official distribution since 20050526
+# Original README follows
+#
+# tSmoke.v04.README
+# - added downtime report (--downtime)
+# - a few tweaks to the calculations to ensure it's consistent
+# 
+# tSmoke.v03.README
+# - Initial Release
+# - The script, started through cron, will cull through a config file and 
+# determine which hosts are down at a point in time (Morning report) and 
+# send out an smtp message to a mobile phone (for example).
+# 
+# - It will also cull through the same config file and, using an included html
+# file (small change to General section of the config file), send an html 
+# message which shows the availability over the past day, week, month 
+# and quarter.
+# 
+# - It can also show detail data depending on the setting of 
+# command line option "detail".
+# 
+# tSmoke.v02.README
+# - Local testing version
+#-----------------------------------------------
+#
 # 1) This program is run via CRON or the command line
 # 2) It extracts RRD information from a smokeping config file
 # 3) It pulls data from RRD files to determine if anything is offline, that is returning 0 PINGs
@@ -25,17 +50,17 @@ use strict;
 # -- Getopt::Long
 #
 # Point the lib variables to your implementation
-use lib "/usr/local/smokeping/lib";
+use lib qw(lib);
 use lib "/usr/local/rrdtool-1.0.39/lib/perl";
+
 use Smokeping;
 use Net::SMTP;
-use ISG::ParseConfig;
 use Getopt::Long;
 use Pod::Usage;
 use RRDs;
 
 # Point to your Smokeping config file
-my $cfgfile = "/usr/local/smokeping/etc/config";
+my $cfgfile = "etc/config.dist";
 
 # global variables
 my $cfg;
@@ -424,7 +449,7 @@ tSmoke - Commandline tool for sending SmokePing information
 
 =head1 SYNOPSIS
 
-B<tSmoke.pl> [ B<--testmail> | B<--morning> | B<--weekly> | B<--version> | B<--help> | B<--man>]
+B<tSmoke> [ B<--testmail> | B<--morning> | B<--weekly> | B<--version> | B<--help> | B<--man>]
 
  Options:
 
@@ -435,51 +460,53 @@ B<tSmoke.pl> [ B<--testmail> | B<--morning> | B<--weekly> | B<--version> | B<--h
  --listrrds List the RRDs used by this Smokeping
  --morning  Send a morning synopsis
  --weekly   Send a weekly status report
- --to       E-mail address to send message (i.e. '--to=xyz@company.com'
+ --to       E-mail address to send message (i.e. '--to=xyz@company.com.invalid'
  --detail   How much detail to send in weekly report (i.e. '--detail=1')
  --quiet    Do not print welcome
  
 =head1 DESCRIPTION
 
-The B<tSmoke> tool is a commandline tool which iterfaces with the SmokePing system.
+The B<tSmoke> tool is a commandline tool which interfaces with the SmokePing system.
 Its main function is to send a message indicating the current status of the systems
 being monitored by Smokeping or an HTML mail file containing the status over the past day,
 past week and past month including an overview.
 
 Typical crontab used to invoke this are
-# Quick morning alert to see what's down
-0 6 * * * /usr/local/smokeping/bin/tSmoke.pl --q --to=mobilephone@att.net --morning
-# Weekly report on the percent availability of network systems with no detail
-0 8 * * * /usr/local/smokeping/bin/tSmoke.pl --q --to=mailbox@company.com --weekly --detail=0
+
+ # Quick morning alert to see what's down
+ 0 6 * * * /usr/local/smokeping/bin/tSmoke.pl --q --to=mobilephone@att.net.invalid --morning
+ # Weekly report on the percent availability of network systems with no detail
+ 0 8 * * * /usr/local/smokeping/bin/tSmoke.pl --q --to=mailbox@company.com.invalid --weekly --detail=0
 
 =head1 SETUP
 
 When installing tSmoke, some variables must be adjusted to fit your local system.
 
 We need to use the following B<libraries>:
-# -- Smokeping
-# -- RRDTool Perl bindings
-# -- Getopt::Long
 
-# Set up your libraries
-use lib "/usr/local/smokeping/lib";
-use lib "/usr/local/rrdtool-1.0.39/lib/perl";
+=over
 
-# Add the B<use> statements
-use Smokeping;
-use Net::SMTP;
-use ISG::ParseConfig;
-use Pod::Usage;
-use RRDs;
+=item Smokeping
 
-# Point to your Smokeping B<config> file
-my $cfgfile = "/usr/local/smokeping/etc/config";
+=item RRDTool Perl bindings
 
-# Modify the config file to include a path for tmail
-tmail = /usr/local/smokeping/etc/tmail
+=item Getopt::Long
 
-# Modify the General section of get_parser in Smokeping.pm to find the tmail file
-[ qw(owner imgcache imgurl datadir piddir sendmail smokemail cgiurl mailhost contact syslogfacility syslogpriority tmail) ]
+=back
+
+Set up your libraries:
+
+ use lib "/usr/local/smokeping/lib";
+ use lib "/usr/local/rrdtool-1.0.39/lib/perl";
+
+Point to your Smokeping B<config> file
+
+ my $cfgfile = "/usr/local/smokeping/etc/config";
+
+Modify the Smokeping config file to include a path for tmail in the
+General section:
+
+ tmail = /usr/local/smokeping/etc/tmail
 
 =head1 COPYRIGHT
 
@@ -508,4 +535,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
 
 Dan McGinn-Combs E<lt>d.mcginn-combs@mindspring.comE<gt>
 
+Modified for Smokeping official distribution by Niko Tyni E<lt>ntyni@iki.fiE<gt>
+
 =cut
+
