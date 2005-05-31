@@ -397,7 +397,6 @@ sub list_rrds($$$) {
     my $print = shift;
     my $prline;
     foreach my $rrds (keys %{$tree}) {
-    	next if $rrds eq "PROBE_CONF";
         if (ref $tree->{$rrds} eq 'HASH'){
 			$prline .= list_rrds( $tree->{$rrds}, $path."/$rrds", $print );
         } 
