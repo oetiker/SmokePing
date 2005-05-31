@@ -1,3 +1,6 @@
+* Officially include the tSmoke script from the contrib download directory.
+  Notice that this needs the new 'tmail' variable to be defined in the config file.
+  -- niko
 * Perl 5.8.0 compatibility fix ("missing max for DS uptime")
   -- niko, reported by Steve Wickert and Kennedy Clark <hkclark *gmail.com>
 * RRDtool 1.2.x compatibility fix ("unknown RRD version: 0003" on restart)
