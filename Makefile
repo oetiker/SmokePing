@@ -1,6 +1,6 @@
 SHELL = /bin/sh
-VERSION = 2.0rc4
-NUMVERSION = 1.99005
+VERSION = 2.0rc5
+NUMVERSION = 1.99006
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|.svn
 GROFF = groff
 .PHONY: man html txt ref examples check-examples patch killdoc doc tar rename-man symlinks remove-symlinks
@@ -147,4 +147,4 @@ dist:   tar
 
 tag:    dist
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
-	svn copy -m "tagging version $(VERSION)" svn://svn.ee.ethz.ch/smokeping/branches/2.0 svn://svn.ee.ethz.ch/smokeping/tags/$VERSION
+	svn copy -m "tagging version $(VERSION)" svn://svn.ee.ethz.ch/smokeping/branches/2.0 svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION)
