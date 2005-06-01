@@ -129,7 +129,7 @@ doc/smokeping_examples.pod: lib/Smokeping/Examples.pm etc/config.dist
 	$(GENEX)
 patch:
 	perl -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
-	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist
+	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
 
 killdoc:
 	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod

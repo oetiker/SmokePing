@@ -32,6 +32,13 @@ trial-and-error variety than it used to be. It also automates the
 generation of the configuration documentation from the source code,
 so the docs are now more accurate.
 
+A smaller change worth mentioning is the inclusion of the tSmoke script
+(contributed by Dan McGinn-Combs) for sending summary emails on daily
+and weekly system status. Note that it needs the new 'tmail' variable
+to be defined in the config file.
+
+=head2 CONFIGURATION
+
 The configuration syntax has stayed mostly the same, except for the
 issues below.
 
