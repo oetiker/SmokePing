@@ -148,3 +148,7 @@ dist:   tar
 tag:    dist
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	svn copy -m "tagging version $(VERSION)" svn://svn.ee.ethz.ch/smokeping/branches/2.0 svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION)
+
+increment-CHANGES-version:
+	perl -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ ' CHANGES
+	
