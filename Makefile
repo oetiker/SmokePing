@@ -130,6 +130,8 @@ doc/smokeping_examples.pod: lib/Smokeping/Examples.pm etc/config.dist
 patch:
 	perl -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
 	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
+	perl -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
+	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 
 killdoc:
 	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
@@ -146,9 +148,5 @@ dist:   tar
 	cp CHANGES /home/oetiker/public_html/webtools/smokeping/pub/CHANGES
 
 tag:    dist
-	svn commit -m "prepare for the release of smokeping-$(VERSION)"
+	svn ls svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION) || \
 	svn copy -m "tagging version $(VERSION)" svn://svn.ee.ethz.ch/smokeping/branches/2.0 svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION)
-
-increment-CHANGES-version:
-	perl -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ ' CHANGES
-	
