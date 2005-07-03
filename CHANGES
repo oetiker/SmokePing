@@ -1,3 +1,6 @@
+* tune DS properties min/max/heartbeat instead of just complaing about
+  them not matching (tobi)
+
 2005/05/31 - publish rc5 (tobi)
 * Officially include the tSmoke script from the contrib download directory.
   Note that this needs the new 'tmail' variable to be defined in the config file.
