@@ -385,6 +385,7 @@ sub init_target_tree ($$$$) {
 	    	my $comparison = Smokeping::RRDtools::compare($name.".rrd", \@create);
 		die("Error: RRD parameter mismatch ('$comparison'). You must delete $name.rrd or fix the configuration parameters.\n")
 			if $comparison;
+		Smokeping::RRDtools::tuneds($name.".rrd", \@create);			
 	    }
 	}
     }
