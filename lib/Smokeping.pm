@@ -848,7 +848,7 @@ sub get_detail ($$$$){
         my $cdir=$cfg->{General}{datadir}."/".(join "/", @dirs)."/";
         if (-f "$cdir/${file}.adr") {
 	    @upsmoke = ();
-	    @upargs = ('COMMENT:Link Up${BS}:     ',
+	    @upargs = ("COMMENT:Link Up${BS}:     ",
 		       "DEF:uptime=${rrd}:uptime:AVERAGE",
 		       "CDEF:duptime=uptime,86400,/", 
 		       'GPRINT:duptime:LAST: %0.1lf days  (');
