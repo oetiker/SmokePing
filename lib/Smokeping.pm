@@ -735,9 +735,9 @@ sub get_detail ($$$$){
     } else {
 	mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $cfg->{General}{imgcache}."/__navcache";
 	# remove old images after one hour
-	my $pattern = "$cfg->{General}{imgcache}/__navcache/*.png";
-	for (<"$pattern">){
-		unlink $_ if -A $_ > 1/24;
+	my $pattern = $cfg->{General}{imgcache}."/__navcache/*.png";
+	for (glob $pattern){
+		unlink $_ if time - (stat $_)[9] > 3600;
 	}
 	$imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
 	$imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
