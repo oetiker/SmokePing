@@ -1,3 +1,5 @@
+* bugfix for CiscoRTTMonEchoICMP packetsize variable
+  -- niko, from Sam Stickland <sam_ml *spacething.org>
 * tune DS properties min/max/heartbeat instead of just complaing about
   them not matching (tobi)
 

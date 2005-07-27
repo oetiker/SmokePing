@@ -92,8 +92,7 @@ sub new($$$)
 
 sub ProbeDesc($){
     my $self = shift;
-    my $bytes = $self->{properties}{packetsize};
-    return "CiscoRTTMonEchoICMP ($bytes Bytes)";
+    return "CiscoRTTMonEchoICMP";
 }
 
 sub pingone ($$) { 
@@ -102,7 +101,7 @@ sub pingone ($$) {
 
     my $pings = $self->pings($target) || 20;
     my $tos   = $target->{vars}{tos};
-    my $bytes = $target->{properties}{packetsize}; 
+    my $bytes = $target->{vars}{packetsize}; 
 
     # use the proces ID as as row number to make this poll distinct on the router; 
     my $row=$$;
@@ -260,27 +259,6 @@ sub DestroyData ($$) {
 	&snmpset($host, "rttMonCtrlAdminStatus.$row",           'integer',      6);
 }
 
-sub probevars {
-	my $class = shift;
-	return $class->_makevars($class->SUPER::probevars, {
-		packetsize => {
-			_doc => <<DOC,
-The packetsize parameter lets you configure the packetsize for the pings
-sent. The minimum is 8, the maximum 16392. Use the same number as with
-fping, if you want the same packet sizes being used on the network.
-DOC
-			_default => 56, 
-			_re => '\d+',
-			_sub => sub {
-				my $val = shift;
-				return "ERROR: packetsize must be between 8 and 16392"
-					unless $val >= 8 and $val <= 16392;
-				return undef;
-			},
-		},
-	});
-}
-
 sub targetvars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::targetvars, {
@@ -314,6 +292,21 @@ values times 32 to calculate the ToS values to configure, e.g. ToS 160
 corresponds to a DSCP value 40 and a Precedence value of 5. The RTTMon
 MIB versions before IOS 12.0(3)T didn't support this parameter.
 DOC
+		},
+		packetsize => {
+			_doc => <<DOC,
+The packetsize parameter lets you configure the packetsize for the pings
+sent. The minimum is 8, the maximum 16392. Use the same number as with
+fping, if you want the same packet sizes being used on the network.
+DOC
+			_default => 56, 
+			_re => '\d+',
+			_sub => sub {
+				my $val = shift;
+				return "ERROR: packetsize must be between 8 and 16392"
+					unless $val >= 8 and $val <= 16392;
+				return undef;
+			},
 		},
 	});
 }
