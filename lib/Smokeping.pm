@@ -12,8 +12,15 @@ use POSIX;
 use Config::Grammar;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
+
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
+
+# make sure we do not end up with , in odd places where one would expect a '.'
+# we set the environment variable so that our 'kids' get the benefit too
+$ENV{LC_NUMERIC}='C';
+POSIX::setlocale(&POSIX::LC_NUMERIC,"");
+
 use File::Basename;
 use Smokeping::Examples;
 use Smokeping::RRDtools;
@@ -877,7 +884,8 @@ sub get_detail ($$$$){
         my @lazy =();
         @lazy = ('--lazy') if $mode eq 's' and $lasthight{$start} and $lasthight{$start} == $max->{$start};
 	$desc = "Navigator Graph" if $mode eq 'n';
-	my ($graphret,$xs,$ys) = RRDs::graph
+        my $timer_start = time();
+        my @task =
 	  ("${imgbase}_${end}_${start}.png",
 	   @lazy,
 	   '--start',( $mode eq 's' ? '-'.$start : $start),
@@ -910,11 +918,13 @@ sub get_detail ($$$$){
 	   'COMMENT:\s',
            "COMMENT:Probe${BS}: $pings $ProbeDesc every $step seconds",
 	   'COMMENT:created on '.$date.'\j' );
+
+        my ($graphret,$xs,$ys) = RRDs::graph @task;
 	
 	my $ERROR = RRDs::error();
 	if ($mode eq 'n'){
 	    $page .= "<div>";
-	    $page .= ( $ERROR || qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">} );
+	    $page .= ( $ERROR || qq|<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">| );
 	    $page .= "</div>";
 	    $page .= $q->start_form(-method=>'GET')
 	      . "<p>Time range: "
@@ -930,6 +940,9 @@ sub get_detail ($$$$){
 	    $startstr =~ s/\s/%20/g;
 	    $endstr =~ s/\s/%20/g;
 	    $page .= "<div>";
+#	    $page .= (time-$timer_start)."<br/>";
+#	    $page .= join " ",map {"'$_'"} @task;
+	    $page .= "<br/>";
 	    $page .= ( $ERROR || 
 		      qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
 		      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" );

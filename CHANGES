@@ -1,3 +1,7 @@
+* set LC_NUMERIC to C so that users who work with a locale like french that
+  would use , as a decimal separator do not trip over failing regexp-matches
+  (tobi)
+
 * bugfix for CiscoRTTMonEchoICMP packetsize variable
   -- niko, from Sam Stickland <sam_ml *spacething.org>
 * tune DS properties min/max/heartbeat instead of just complaing about
