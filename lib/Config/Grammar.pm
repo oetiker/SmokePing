@@ -587,7 +587,7 @@ sub _parse_line($$$)
         return 1;
     };
     /^\@define\s+(\S+)\s+(.*)$/ and do {
-	$self->{defines}{$1}=quotemeta $2;
+	$self->{defines}{$1}=$2;
 	return 1;
     };
 
