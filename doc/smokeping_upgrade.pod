@@ -112,10 +112,10 @@ and measuring and visualizing the variation between them.
 
 Smokeping now checks at startup that the parameters of any existing RRD files
 match those specified in the configuration file. If there is a discrepancy,
-it will give an error message and refuse to start. 
+it will try to fix the situation and refuse to start if it can't.
 
-This situation is most likely to happen if you have modified the C<step>
-or C<pings> variables in your configuration file. You'll then have to
+This situation is most likely to happen if you have modified the
+C<pings> variable in your configuration file. You'll then have to
 delete the old RRD file or somehow convert it to use the new parameters.
 The C<rrdtune> command might be helpful here.
 
