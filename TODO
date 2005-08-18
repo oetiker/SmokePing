@@ -35,3 +35,8 @@
   - almost every probe has a different way of calling system(), exec()
     or similar. This should be in an inheritable module.
   - the module should also support extra commandline arguments 
+
+* RRD 
+  configurable RRD parameters per target?
+  - suggested by Leos Bitto,
+    <http://lists.ee.ethz.ch/smokeping-users/msg01632.html>
