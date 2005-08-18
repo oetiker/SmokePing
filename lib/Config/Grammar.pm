@@ -6,7 +6,7 @@ package Config::Grammar;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub new($$)
 {
@@ -58,7 +58,7 @@ sub _quotesplit($)
             push @items, $frag;
         }
         else {
-            die "Internal parser error for '$line'\n";
+            die "Internal parser error for '$line'";
         }
     }
     return @items;
@@ -1426,18 +1426,18 @@ The data is interpreted as one or more columns separated by spaces.
 
  *** network ***
   
-   dns      = 129.132.7.87
+   dns      = 192.168.7.87
   
- + 129.132.7.64
+ + 192.168.7.64
  
    netmask  = 255.255.255.192
-   gateway  = 129.132.7.65
+   gateway  = 192.168.7.65
   
  *** hosts ***
  
-   00:50:fe:bc:65:11     129.132.7.97    plain.hades
-   00:50:fe:bc:65:12     129.132.7.98    isg.ee.hades
-   00:50:fe:bc:65:14     129.132.7.99    isg.ee.hades
+   00:50:fe:bc:65:11     192.168.7.97    plain.hades
+   00:50:fe:bc:65:12     192.168.7.98    isg.ee.hades
+   00:50:fe:bc:65:14     192.168.7.99    isg.ee.hades
 
 =head3 Result
 
@@ -1445,26 +1445,26 @@ The data is interpreted as one or more columns separated by spaces.
    'hosts' => {
                 '00:50:fe:bc:65:11' => [
                                          '00:50:fe:bc:65:11',
-                                         '129.132.7.97',
+                                         '192.168.7.97',
                                          'plain.hades'
                                        ],
                 '00:50:fe:bc:65:12' => [
                                          '00:50:fe:bc:65:12',
-                                         '129.132.7.98',
+                                         '192.168.7.98',
                                          'isg.ee.hades'
                                        ],
                 '00:50:fe:bc:65:14' => [
                                          '00:50:fe:bc:65:14',
-                                         '129.132.7.99',
+                                         '192.168.7.99',
                                          'isg.ee.hades'
                                        ]
               },
    'network' => {
-                  '129.132.7.64' => {
+                  '192.168.7.64' => {
                                       'netmask' => '255.255.255.192',
-                                      'gateway' => '129.132.7.65'
+                                      'gateway' => '192.168.7.65'
                                     },
-                  'dns' => '129.132.7.87'
+                  'dns' => '192.168.7.87'
                 }
  };
 
