@@ -44,3 +44,15 @@
 * CGI LOGGING
   replace the __WARN__ and __DIE__ handlers with CGI::Carp?
   Problems with speedy?
+
+* CGI RETURN VALUE
+  return something else than 200 OK in error situations at least
+  when updating DYNAMIC addresses
+  - suggested by Marc Haber, 
+    <http://lists.ee.ethz.ch/smokeping-users/msg01644.html>
+
+* CONFIG
+  make the .adr (and .snmp) directory configurable
+  - suggested by Marc Haber,
+    <http://lists.ee.ethz.ch/smokeping-users/msg01644.html>
+
