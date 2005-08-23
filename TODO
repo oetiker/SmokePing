@@ -40,3 +40,7 @@
   configurable RRD parameters per target?
   - suggested by Leos Bitto,
     <http://lists.ee.ethz.ch/smokeping-users/msg01632.html>
+
+* CGI LOGGING
+  replace the __WARN__ and __DIE__ handlers with CGI::Carp?
+  Problems with speedy?

@@ -2572,7 +2572,8 @@ sub cgi ($) {
                      -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
                      );
     if ($q->param(-name=>'secret') && $q->param(-name=>'target') ) {
-	update_dynaddr $cfg,$q;
+	my $ret = update_dynaddr $cfg,$q;
+	do_cgilog($ret) if defined $ret and $ret ne "";
     } else {
 	display_webpage $cfg,$q;
     }

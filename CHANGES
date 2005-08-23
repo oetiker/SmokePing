@@ -1,3 +1,5 @@
+* make errors in DYNAMIC updates appear in the web server error log
+  -- niko
 * remove a quotemeta() call in Config::Grammar to allow metacharacters
   at the right side of '@define'
   -- niko, reported by Warrick FitzGerald <lists.smokeping.wfitzgerald *crtman.com>
