@@ -100,7 +100,9 @@ txt: $(TXT)
 rename-man: $(MAN)
 	for j in probes matchers; do \
 	  for i in doc/Smokeping/$$j/*.3; do \
-	    mv $$i `echo $$i | sed s,$$j/,$$j/Smokeping::$$j::,`; \
+	    if ! echo $$i | grep -q Smokeping::$$j; then \
+	      mv $$i `echo $$i | sed s,$$j/,$$j/Smokeping::$$j::,`; \
+	    fi; \
 	  done; \
 	done
 	mv doc/Config/Grammar.3 doc/Config/Config::Grammar.3
