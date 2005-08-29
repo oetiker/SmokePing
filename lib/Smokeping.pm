@@ -2422,7 +2422,7 @@ sub daemonize_me ($) {
 	sub do_cgilog ($){
                 my $str = shift;
 		print "<p>" , $str, "</p>\n";
-		print STDERR $str,"\n"; # for the webserver log
+		warn $str, "\n"; # for the webserver log
 	}
 
 	sub do_debuglog ($){
