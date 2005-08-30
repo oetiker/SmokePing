@@ -2395,6 +2395,7 @@ sub daemonize_me ($) {
 
 	sub initialize_cgilog (){
 		$use_cgilog = 1;
+        CGI::Carp::set_progname($0 . " [client " . ($ENV{REMOTE_ADDR}||"(unknown)") . "]");
 		$logging=1;
 	}
 
@@ -2571,11 +2572,12 @@ sub cgi ($) {
                      -expires=>'+'.($cfg->{Database}{step}).'s',
                      -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
                      );
+    initialize_cgilog();
     if ($q->param(-name=>'secret') && $q->param(-name=>'target') ) {
-	my $ret = update_dynaddr $cfg,$q;
+        my $ret = update_dynaddr $cfg,$q;
 	do_cgilog($ret) if defined $ret and $ret ne "";
     } else {
-	display_webpage $cfg,$q;
+        display_webpage $cfg,$q;
     }
 }
 
