@@ -363,7 +363,7 @@ sub init_target_tree ($$$$) {
 
     foreach my $prop (keys %{$tree}) {
 	if (ref $tree->{$prop} eq 'HASH'){
-	    if (not -d $name) {
+	    if (not -d $name and not $cgimode) {
 		mkdir $name, 0755 or die "ERROR: mkdir $name: $!\n";
 	    };
 	    init_target_tree $cfg, $probes, $tree->{$prop}, "$name/$prop";

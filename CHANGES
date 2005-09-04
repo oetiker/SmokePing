@@ -1,3 +1,5 @@
+* don't create directories in "datadir" when running as a CGI
+  -- niko
 * the DYNAMIC-related files (.adr and .snmp) can now be located outside "datadir"
   by specifying the new configuration variable "dyndir" 
   -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
