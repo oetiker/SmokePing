@@ -977,7 +977,9 @@ sub display_webpage($$){
 	$tree = $tree->{$_};
     }
     gen_imgs($cfg); # create logos in imgcache
-
+    my $readversion = "?";
+    $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
+        
     print fill_template
       ($cfg->{Presentation}{template},
        {
@@ -992,7 +994,7 @@ sub display_webpage($$){
 	owner => $cfg->{General}{owner},
         contact => $cfg->{General}{contact},
         author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
-        smokeping => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$VERSION.'</A>',
+        smokeping => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
         step => $step,
         rrdlogo => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/"><img border="0" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
         smokelogo => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
@@ -2470,8 +2472,6 @@ sub daemonize_me ($) {
 # The Main Program 
 ###########################################################################
 
-my $RCS_VERSION = '$Id: Smokeping.pm,v 1.5 2004/10/21 21:10:51 oetiker Exp $';
-
 sub load_cfg ($) { 
     my $cfgfile = shift;
     my $cfmod = (stat $cfgfile)[9] || die "ERROR: calling stat on $cfgfile: $!\n";
@@ -2619,7 +2619,8 @@ sub gen_page  ($$$) {
       open PAGEFILE, ">$cfg->{General}{pagedir}/$name";
 
     my $step = $probes->{$tree->{probe}}->step();
-
+    my $readversion = "?";
+    $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
     $page = fill_template
 	($cfg->{Presentation}{template},
 	 {
@@ -2633,8 +2634,8 @@ sub gen_page  ($$$) {
 	  target_ip => ($tree->{host} || ''),
 	  owner => $cfg->{General}{owner},
 	  contact => $cfg->{General}{contact},
-	  author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A>',
-	  smokeping => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$VERSION.'</A>',
+          author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
+	  smokeping => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
 	  step => $step,
 	  rrdlogo => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/"><img border="0" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
 	  smokelogo => '<A HREF="http://people.ee.ethz.ch/~oetiker/webtools/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
@@ -2719,7 +2720,7 @@ sub main (;$) {
     GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
 		      'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
 		      'config=s', 'check', 'gen-examples') or pod2usage(2);
-    if($opt{version})  { print "$RCS_VERSION\n"; exit(0) };
+    if($opt{version})  { print "$VERSION\n"; exit(0) };
     if(exists $opt{man}) {
     	if ($opt{man}) {
 		if ($opt{man} eq 'smokeping_config') {

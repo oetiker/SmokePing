@@ -62,7 +62,7 @@ a.menulink:hover       {
    </TD>
 </TR>
 <tr>
-<td class="menubar" valign="bottom">
+<td class="menubar" valign="bottom" width="130">
   <p><small>Maintained by <br/><A href="mailto:<##contact##>"><##owner##></A></small></p>
   <p><small>Running on <##smokeping##> by <##author##></small></p>
   <P><##smokelogo##></P>

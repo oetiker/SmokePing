@@ -1,6 +1,7 @@
+* fixed version number display in basetemplate -- tobi
+
 2005/9/4 -- released version 2.0.0
 
-2005/09/04 - 2.0.0 release (tobi)
 * updated page template to match new logos and included Niko
   -- tobi
 * don't create directories in "datadir" when running as a CGI
