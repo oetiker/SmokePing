@@ -1,3 +1,55 @@
+* don't create directories in "datadir" when running as a CGI
+  -- niko
+* the DYNAMIC-related files (.adr and .snmp) can now be located outside "datadir"
+  by specifying the new configuration variable "dyndir" 
+  -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
+* return '404 not found' when DYNAMIC updates fail
+  -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
+* make errors in DYNAMIC updates appear in the web server error log
+  -- niko
+* remove a quotemeta() call in Config::Grammar to allow metacharacters
+  at the right side of '@define'
+  -- niko, reported by Warrick FitzGerald <lists.smokeping.wfitzgerald *crtman.com>
+* set LC_NUMERIC to C so that users who work with a locale like french that
+  would use , as a decimal separator do not trip over failing regexp-matches
+  (tobi)
+* bugfix for CiscoRTTMonEchoICMP packetsize variable
+  -- niko, from Sam Stickland <sam_ml *spacething.org>
+* tune DS properties min/max/heartbeat instead of just complaing about
+  them not matching (tobi)
+
+2005/05/31 - publish rc5 (tobi)
+* Officially include the tSmoke script from the contrib download directory.
+  Note that this needs the new 'tmail' variable to be defined in the config file.
+  -- niko, original script by Dan McGinn-Combs <d.mcginn-combs *mindspring.com>
+* Perl 5.8.0 compatibility fix ("missing max for DS uptime")
+  -- niko, reported by Steve Wickert and Kennedy Clark <hkclark *gmail.com>
+* RRDtool 1.2.x compatibility fix ("unknown RRD version: 0003" on restart)
+  -- niko, reported by Sam Stickland <sam_ml *spacething.org>
+
+2005/05/11 - publish rc4 (tobi)
+* Curl now has a new 'insecure_ssl' option for those not caring about CA paths
+  -- niko, original patch by Marc Spitzer <mspitzer *gmail.com>
+* document '@include' and its friends in smokeping_config in addition to 
+  Config::Grammar -- niko, from Marc Haber (Debian bug #307955)
+* AnotherDNS: Double check the answer from the dns server and optionally enforce a
+  NOERROR response code -- Christoph.Heine in HaDiKo.DE
+* NEW Feature: when clicking on the graphs in detail view
+  you can select different time ranges for the graph. The creation of this
+  feature has been sponsored by BeverlyCorp.com -- tobi
+
+2005/03/10 - 2.0rc3 (tobi)
+
+* Curl now has a new "extraargs" option for any extra arguments, like "--header"
+  -- niko, requested by Warrick FitzGerald <lists.smokeping.wfitzgerald *crtman.com>
+* change ISG::ParseConfig references to its new name, Config::Grammar -- niko
+
+2005/02/28 - 2.0rc2 (tobi)
+
+* SYNOPSYS is really spelled SYNOPSIS. Shame on me. -- niko
+
+2005/02/22 - 2.0rc1 (tobi)
+
 * don't create any RRD files if running as a CGI -- niko
 * Curl timeouts work better now -- niko, reported by Chris Wilson <chris *aidworld.org>
 * Curl User-Agent string doesn't need quotes anymore -- niko
@@ -20,6 +72,7 @@
 * new commandline options '--config=X' and '--check' -- niko
 * FPing: support "-t", "-p" and "-i" fping params -- niko, suggested by Chris Wilson <chris *aidworld.org>
 * FPing6: test against ::1 instead of localhost -- Sebastian Wiesinger <smokeping *tracker.fire-world.de>
+* make sure mailsetup works before using it -- tobi
 * fix for basefork.pm IO::Select property has_exception is very platform dependent
   by ignoring it altogether things actually work better. Especially on Solaris which
   does have propper support for has_exception as oposed to linux. -- niko, reported by Jim Morris <wrdnet *earthlink.net> 

@@ -46,7 +46,7 @@ manpage. The supported section names are
 C<name>, C<overview>, C<description>, C<authors>, C<notes>, C<bugs>, and
 C<see_also>. If you don't need a particular section, just leave it out.
 
-The special sections C<synopsys> and C<variables> are automatically
+The special sections C<synopsis> and C<variables> are automatically
 generated from the description of your variables. See below.
 
 Note that if you use 'here documents' ('<<') that have POD markup inside,
@@ -94,13 +94,13 @@ convenience method called C<_makevars> that does this, and the common idiom is
  }
 
 The variables are declared in a syntax that comes from the module used
-for parsing the configuration file, C<ISG::ParseConfig>. Each variable
+for parsing the configuration file, C<Config::Grammar>. Each variable
 should be a hash that uses the "special variable keys" documented in
-L<ISG::ParseConfig>. See C<Smokeping::probes::skel> and the other
+L<Config::Grammar>. See C<Smokeping::probes::skel> and the other
 probes for examples. 
 
 For reference, here are the keys the hash should have. Much of this
-is taken straight from the C<ISG::ParseConfig> manual.
+is taken straight from the C<Config::Grammar> manual.
 
 =over
 
@@ -114,7 +114,7 @@ Description of the variable.
 
 =item _example
 
-An example value. This will be used in the SYNOPSYS section in the
+An example value. This will be used in the SYNOPSIS section in the
 probe manual.
 
 =back
@@ -150,11 +150,11 @@ the returned string as content.
 
 The C<probevars> and C<targetvars> methods should return hash references
 that contain the variable names as keys and the hashes described above
-as values. In addition the C<ISG::ParseConfig> special section key
+as values. In addition the C<Config::Grammar> special section key
 C<_mandatory> is supported and should contain a reference to a list of
 mandatory variables. The C<_makevars> method is available of this special
 key and merges the mandatory lists in its arguments. Note that no other
-C<ISG::ParseConfig> special section keys are supported.
+C<Config::Grammar> special section keys are supported.
 
 =head1 INITIALIZATION
 
@@ -185,7 +185,7 @@ That's it, you're done!
 =head1 EXAMPLE CONFIGURATIONS
 
 If you would like to provide a documented example configuration for your
-probe (in addition to the automatically generated SYNOPSYS section in
+probe (in addition to the automatically generated SYNOPSIS section in
 the probe manual), you can do so by adding it to the L<Smokeping::Examples|Smokeping::Examples>
 module.  Look for the 'examples' subroutine and add your example there.
 

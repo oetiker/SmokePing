@@ -42,12 +42,14 @@ sub pod {
 	my $class = shift;
 	my $pod = "";
 	my $podhash = $class->pod_hash;
-	$podhash->{synopsys} = $class->pod_synopsys;
+	$podhash->{synopsis} = $class->pod_synopsis;
 	$podhash->{variables} = $class->pod_variables;
-	for my $what (qw(name overview synopsys description variables authors notes bugs see_also)) {
+	for my $what (qw(name overview synopsis description variables authors notes bugs see_also)) {
 		my $contents = $podhash->{$what};
 		next if not defined $contents or $contents eq "";
-		$pod .= "=head1 " . uc $what . "\n\n";
+		my $headline = uc $what;
+		$headline =~ s/_/ /; # see_also => SEE ALSO
+		$pod .= "=head1 $headline\n\n";
 		$pod .= $contents;
 		chomp $pod;
 		$pod .= "\n\n";
@@ -88,6 +90,23 @@ sub ProbeDesc ($) {
     return "Probe which does not overrivd the ProbeDesc methode";
 }    
 
+sub target2dynfile ($$) {
+    # the targets are stored in the $self->{targets}
+    # hash as filenames pointing to the RRD files
+    #
+    # now that we use a (optionally) different dir for the
+    # . adr files, we need to derive the .adr filename
+    # from the RRD filename with a simple substitution
+
+    my $self = shift;
+    my $target = shift; # filename with <datadir> embedded
+    my $dyndir =  $self->{cfg}{General}{dyndir};
+    return $target unless defined $dyndir; # nothing to do
+    my $datadir = $self->{cfg}{General}{datadir};
+    $target =~ s/^\Q$datadir\E/$dyndir/;
+    return $target;
+}
+
 sub rrdupdate_string($$)
 {   my $self = shift;
     my $tree = shift;
@@ -105,17 +124,18 @@ sub rrdupdate_string($$)
     my $upperloss = $loss - $lowerloss;
     @times = ((map {'U'} 1..$lowerloss),@times, (map {'U'} 1..$upperloss));
     my $age;
-    if ( -f $self->{targets}{$tree}.".adr" ) {
-      $age =  time - (stat($self->{targets}{$tree}.".adr"))[9];
+    my $dynbase = $self->target2dynfile($self->{targets}{$tree});
+    if ( -f $dynbase.".adr" ) {
+      $age =  time - (stat($dynbase.".adr"))[9];
     } else {
       $age = 'U';
     }
     if ( $entries == 0 ){
       $age = 'U';
       $loss = 'U';
-      if ( -f $self->{targets}{$tree}.".adr"
-	   and not -f $self->{targets}{$tree}.".snmp" ){
-	unlink $self->{targets}{$tree}.".adr";
+      if ( -f $dynbase.".adr"
+	   and not -f $dynbase.".snmp" ){
+	unlink $dynbase.".adr";
       }
     } ;
     return "${age}:${loss}:${median}:".(join ":", @times);
@@ -129,12 +149,13 @@ sub addresses($)
     foreach my $tree (keys %{$self->{targets}}){
         my $target = $self->{targets}{$tree};
         if ($target =~ m|/|) {
-	   if ( open D, "<$target.adr" ) {
+	   my $dynbase = $self->target2dynfile($target);
+	   if ( open D, "<$dynbase.adr" ) {
 	       my $ip;
 	       chomp($ip = <D>);
 	       close D;
 	       
-	       if ( open D, "<$target.snmp" ) {
+	       if ( open D, "<$dynbase.snmp" ) {
 		   my $snmp = <D>;
 		   chomp($snmp);
 		   if ($snmp ne Smokeping::snmpget_ident $ip) {
@@ -316,7 +337,7 @@ sub _makevars {
 	return $to;
 }
 
-sub pod_synopsys {
+sub pod_synopsis {
 	my $class = shift;
 	my $classname = ref $class||$class;
 	$classname =~ s/^Smokeping::probes:://;
@@ -329,8 +350,8 @@ sub pod_synopsys {
  +$classname
 
 DOC
-	$pod .= $class->_pod_synopsys($probevars);
-	my $targetpod = $class->_pod_synopsys($targetvars);
+	$pod .= $class->_pod_synopsis($probevars);
+	my $targetpod = $class->_pod_synopsis($targetvars);
         $pod .= "\n # The following variables can be overridden in each target section\n$targetpod"
 		if defined $targetpod and $targetpod ne "";
         $pod .= <<DOC;
@@ -353,8 +374,8 @@ DOC
 	return $pod;
 }
 
-# synopsys for one hash ref
-sub _pod_synopsys {
+# synopsis for one hash ref
+sub _pod_synopsis {
 	my $class = shift;
 	my $vars = shift;
 	my %mandatory;

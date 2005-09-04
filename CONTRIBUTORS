@@ -3,7 +3,7 @@ Contributors
 
 * Tobias Oetiker <tobi@oetiker.ch>  => Main Author
 
-* Niko Tyni <ntyni@cc.helsinki.fi>  => Many Patches
+* Niko Tyni <ntyni@iki.fi>  => Many Patches
 * Simon Leinen  <leinen@switch.ch>  => SNMP_Session.pm
-* David Schweikert <dws@ee.ethz.ch> => ISG::ParseConfig.pm
+* David Schweikert <dws@ee.ethz.ch> => Config::Grammar
 * Jack Cummings <jack@mudshark.org> => Proper graphs with pings > 10s. 

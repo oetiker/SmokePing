@@ -1,0 +1,132 @@
+MIME-Version: 1.0
+Content-Type: text/html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" >
+<html>
+<head>
+<TITLE>IT System Availability Report</TITLE>
+<STYLE TYPE ='text/css'>
+.appHeader {
+            color: #000000;
+            font-family: Arial, Sans-Serif;
+            font-size: 12px;
+            font-weight: bold;
+            padding-left: 10px;
+            padding-top: 7px;
+            border-width: 10px;
+            border-color: #FFFFFF;
+            border-style:none;
+            border-left-width: 10px;
+            border-left-color: #8CAAE6;
+            border-left-style: solid;
+            }
+.Head {
+            color: Turquoise;
+            background-color: White;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: underline;
+            }
+.SubSubHead {
+            color: RoyalBlue;
+            background-color: CornSilk;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 11px;
+            font-weight: bold;
+            }
+.SubHead {
+            color: RoyalBlue;
+            background-color: CornSilk;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: underline;
+            }
+.SubDetail {
+            color: Black;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 11px;
+            background-color: CornSilk;
+            }
+.Up99 {
+            color: DarkGreen;
+            text-align: Center;
+            background-color: CornSilk;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 11px;
+            font-weight: bold;
+            }
+.Up95 {
+            color: DarkBlue;
+            text-align: Center;
+            background-color: CornSilk;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 11px;
+            font-weight: bold;
+            }
+.Up90 {
+            color: Orange;
+            text-align: Center;
+            background-color: CornSilk;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 11px;
+            font-weight: bold;
+            }
+.UpNo {
+            color: Red;
+            text-align: Center;
+            background-color: CornSilk;
+            font-family: Verdana, Helvetica, San-Serif;
+            font-size: 11px;
+            font-weight: bold;
+            }
+.Display-Block { display:'block' }
+.Display-None { display:'none' }
+</STYLE>
+</head>
+<body onLoad=
+"Day.style.display='none';
+ Week.style.display='none';
+ Month.style.display='none';
+ Quarter.style.display='none';" >
+<table width='100%' border='0' cellspacing='0' cellpadding='0'>
+<tr><td bgcolor='#FFFFFF'>
+<img border='0' src='http://www.xxxx.com/docs/TEMPLATE/204/xxxx_logo.gif' alt='Put your logo here'></a></td><td class='Head'>XXXX IT System Availability</td></tr>
+</table>
+<P>
+<P>
+<HR width='80%'>
+<P>
+<##SUMMARY##>
+<p>
+<CENTER>
+<table width='60%' border='1' cellspacing='0' cellpadding='0'>
+<tr>
+<td bgcolor='CornSilk' onMouseOver="Quarter.style.display='block'"
+        onMouseOut="Quarter.style.display='none'">Quarterly Detail</td>
+<td bgcolor='CornSilk' onMouseOver="Month.style.display='block'"
+        onMouseOut="Month.style.display='none'">Monthly Detail</td>
+<td bgcolor='CornSilk' onMouseOver="Week.style.display='block'"
+        onMouseOut="Week.style.display='none'">Weekly Detail</td>
+<td bgcolor='CornSilk' onMouseOver="Day.style.display='block'"
+        onMouseOut="Day.style.display='none'">Daily Detail</td>
+</tr>
+</table>
+</CENTER>
+<p>
+<div id="Day">
+<##DAYDETAIL##>
+</div>
+<p>
+<div id="Week">
+<##WEEKDETAIL##>
+</div>
+<p>
+<div id="Month">
+<##MONTHDETAIL##>
+</div>
+<p>
+<div id=Quarter>
+<##QUARTERDETAIL##>
+</div>
+</html></body>

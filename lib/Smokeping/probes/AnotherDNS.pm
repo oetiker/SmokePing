@@ -69,6 +69,7 @@ sub pingone ($) {
     my $recordtype = $target->{vars}{recordtype};
     my $timeout = $target->{vars}{timeout};
     my $port = $target->{vars}{port};
+    my $require_noerror = $target->{vars}{require_noerror};
     $lookuphost = $target->{addr} unless defined $lookuphost;
 
     my $packet = Net::DNS::Packet->new( $lookuphost, $recordtype )->data;
@@ -93,9 +94,20 @@ sub pingone ($) {
         my $t1 = [gettimeofday];
         $elapsed = tv_interval( $t0, $t1 );
         if ( defined $ready ) {
-            push @times, $elapsed;
             my $buf = '';
             $ready->recv( $buf, &Net::DNS::PACKETSZ );
+	    my ($recvPacket, $err) = Net::DNS::Packet->new(\$buf);
+	    if (defined $recvPacket) {
+	    	if (not $require_noerror) {
+		    push @times, $elapsed;
+		} else {
+		    # Check the Response Code for the NOERROR.
+		    my $recvHeader = $recvPacket->header();
+		    if ($recvHeader->rcode() eq "NOERROR") {
+		         push @times, $elapsed;
+		    }
+		}
+	    }
         }
     }
     @times =
@@ -126,6 +138,10 @@ Minimum time between sending two lookup queries in (possibly fractional) seconds
 DOC
 			_default => .5,
 			_re => '(\d*\.)?\d+',
+		},
+		require_noerror => {
+			_doc => 'Only Count Answers with Response Status NOERROR.',
+			_default => 0,
 		},
 		recordtype => {
 			_doc => 'Record type to look up.',

@@ -31,7 +31,7 @@ for storing passwords and a method for accessing them.
 DOC
 
 		description => <<DOC,
-${e}head2 synopsys with more detail
+${e}head2 synopsis with more detail
 
 SmokePing main configuration file:
 

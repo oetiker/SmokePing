@@ -1,5 +1,7 @@
 * UPTIME
-  define update via snmp pointer per device
+  - define update via snmp pointer per device
+  - possibility to call an external script
+    -> generic uptime plugin?
 
 * ATTENTION
   allow to define a thereshold rule by looking at
@@ -8,4 +10,34 @@
 * ALIASES
   allow to have atarget which points to a different target
   only targets with host are considered
+
+* ALERTS
+  only send alerts when the state changes
+  - suggested by Marc Haber,
+    <http://lists.ee.ethz.ch/smokeping-users/msg01439.html>
+
+* DAEMON
+  reread config periodically or with SIGHUP so that
+  no measurement is interrupted
+  - suggested by Taisuke Yamada,
+    <http://lists.ee.ethz.ch/smokeping-users/msg01445.html>
+  - concurrent probe processes need a signal anyway,
+    they have to exit and new ones started so that
+    we don't have to compare to the old config
+
+* REMOTE EXECUTION
+  generic remote probe
+  - a possibility for basefork-derived probes to reuse the same
+    SSH connection with shell for() loops for all the pings to a given
+    target
+
+* GENERIC EXEC PROBE
+  - almost every probe has a different way of calling system(), exec()
+    or similar. This should be in an inheritable module.
+  - the module should also support extra commandline arguments 
+
+* RRD 
+  configurable RRD parameters per target?
+  - suggested by Leos Bitto,
+    <http://lists.ee.ethz.ch/smokeping-users/msg01632.html>
 

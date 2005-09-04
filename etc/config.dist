@@ -14,6 +14,7 @@ datadir  = /home/oetiker/data/projects/AADJ-smokeping/dist/var
 piddir  = /home/oetiker/data/projects/AADJ-smokeping/dist/var
 cgiurl   = http://people.ee.ethz.ch/~oetiker/smokeping/smokeping.cgi
 smokemail = /home/oetiker/data/projects/AADJ-smokeping/dist/etc/smokemail.dist
+tmail = /home/oetiker/data/projects/AADJ-smokeping/dist/etc/tmail.dist
 # specify this to get syslog logging
 syslogfacility = local0
 # each probe is now run in its own process

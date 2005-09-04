@@ -102,6 +102,48 @@ host to be probed.
 DOC
 			_example => "http://%host%/",
 		},
+        insecure_ssl => {
+            _doc => <<DOC,
+The "-k" curl(1) option. Accept SSL connections that don't have a secure
+certificate chain to a trusted CA. Note that if you are going to monitor
+https targets, you'll probably have to either enable this option or specify
+the CA path to curl through extraargs below. For more info, see the
+curl(1) manual page.
+DOC
+            _example => 1,
+        },
+		extrare=> {
+			_doc => <<DOC,
+The regexp used to split the extraargs string into an argument list,
+in the "/regexp/" notation.  This contains just the space character 
+(" ") by default, but if you need to specify any arguments containing spaces,
+you can set this variable to a different value.
+DOC
+			_default => "/ /",
+			_example => "/ /",
+			_sub => sub {
+				my $val = shift;
+				return "extrare should be specified in the /regexp/ notation"
+					unless $val =~ m,^/.*/$,;
+				return undef;
+			},
+		},
+		extraargs => {
+			_doc => <<DOC,
+Any extra arguments you might want to hand to curl(1). The arguments
+should be separated by the regexp specified in "extrare", which
+contains just the space character (" ") by default.
+
+Note that curl will be called with the resulting list of arguments
+without any shell expansion. If you need to specify any arguments
+containing spaces, you should set "extrare" to something else.
+
+As a complicated example, to explicitly set the "Host:" header in Curl
+requests, you need to set "extrare" to something else, eg. "/;/",
+and then specify C<extraargs = --header;Host: www.example.com>.
+DOC
+			_example => "-6 --head --user user:password",
+		},
 	});
 }
 
@@ -178,7 +220,20 @@ sub proto_args {
 	my @args = ("-o", "/dev/null", "-w", "Time: %{time_total} DNS time: %{time_namelookup}\\n");
 	my $ssl2 = $target->{vars}{ssl2};
 	push (@args, "-2") if defined($ssl2);
+    my $insecure_ssl = $target->{vars}{insecure_ssl};
+    push (@args, '-k') if defined $insecure_ssl;
+
 	return(@args);
+}
+
+sub extra_args {
+	my $self = shift;
+	my $target = shift;
+	my $args = $target->{vars}{extraargs};
+	return () unless defined $args;
+	my $re = $target->{vars}{extrare};
+	($re =~ m,^/(.*)/$,) and $re = qr{$1};
+	return split($re, $args);
 }
 
 sub make_commandline {
@@ -191,6 +246,7 @@ sub make_commandline {
 	my $host = $target->{addr};
 	$url =~ s/%host%/$host/g;
 	push @args, $self->proto_args($target);
+	push @args, $self->extra_args($target);
 	
 	return ($self->{properties}{binary}, @args, $url);
 }

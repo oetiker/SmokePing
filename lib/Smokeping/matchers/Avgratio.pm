@@ -5,7 +5,7 @@ package Smokeping::matchers::Avgratio;
 Smokeping::matchers::Avgratio - detect changes in average median latency
 
 =head1 OVERVIEW
- 
+
 The Avgratio matcher establishes a historic average median latency over
 several measurement rounds. It compares this average, against a second
 average latency value again build over several rounds of measurement.

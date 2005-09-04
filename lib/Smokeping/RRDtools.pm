@@ -4,7 +4,7 @@ package Smokeping::RRDtools;
 
 Smokeping::RRDtools - Tools for RRD file handling
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
  use Smokeping::RRDtools;
  use RRDs;
@@ -22,12 +22,15 @@ Smokeping::RRDtools - Tools for RRD file handling
  my $comparison = Smokeping::RRDtools::compare($file, \@create);
  print "Create arguments didn't match: $comparison\n" if $comparison;
 
+ Smokeping::RRDtools::tuneds($file, \@create);
+ 
 =head1 DESCRIPTION
 
-This module offers two functions, C<info2create> and C<compare>.
-The first can be used to recreate the arguments that an RRD file
-was created with. The second checks if an RRD file was created
-with the given arguments.
+This module offers three functions, C<info2create>, C<compare> and
+C<tuneds>. The first can be used to recreate the arguments that an RRD file
+was created with. The second checks if an RRD file was created with the
+given arguments. The thirds tunes the DS parameters according to the
+supplied create string.
 
 The function C<info2create> must be called with one argument:
 the path to the interesting RRD file. It will return an array
@@ -35,14 +38,17 @@ reference of the argument list that can be fed to C<RRDs::create>.
 Note that this list will never contain the C<start> parameter,
 but it B<will> contain the C<step> parameter.
 
-The function C<compare> must be called with two arguments: the path
-to the interesting RRD file, and a reference to an argument list that
-could be fed to C<RRDs::create>. The function will then simply compare
-the result of C<info2create> with this argument list.  It will return
-C<undef> if the arguments matched, and a string indicating the difference
-if a discrepancy was found. Note that if there is a C<start> parameter in
-the argument list, C<compare> disregards it. If C<step> isn't specified,
-C<compare> will use the C<rrdtool> default of 300 seconds.
+The function C<compare> must be called with two arguments: the path to the
+interesting RRD file, and a reference to an argument list that could be fed
+to C<RRDs::create>. The function will then simply compare the result of
+C<info2create> with this argument list.  It will return C<undef> if the
+arguments matched, and a string indicating the difference if a discrepancy
+was found. Note that if there is a C<start> parameter in the argument list,
+C<compare> disregards it. If C<step> isn't specified, C<compare> will use
+the C<rrdtool> default of 300 seconds. C<compare> ignores non-matching DS
+parameters since C<tuneds> will fix them.
+
+C<tuneds> talks on stderr about the parameters it fixes.
 
 =head1 NOTES
 
@@ -56,6 +62,10 @@ Probably.
 =head1 COPYRIGHT
 
 Copyright (c) 2005 by Niko Tyni.
+
+=head1 AUTHOR
+
+Niko Tyni <ntyni@iki.fi>
 
 =head1 LICENSE
 
@@ -89,11 +99,13 @@ use RRDs;
 sub info2create {
 	my $file = shift;
 	my @create;
+    my $buggy_perl_version = 1 if $^V and $^V eq v5.8.0;
 	my $info = RRDs::info($file);
 	my $error = RRDs::error;
 	die("RRDs::info $file: ERROR: $error") if $error;
 	die("$file: unknown RRD version: $info->{rrd_version}")
-		unless $info->{rrd_version} eq '0001';
+		unless $info->{rrd_version} eq '0001'
+		or     $info->{rrd_version} eq '0003';
 	my $cf = $info->{"rra[0].cf"};
 	die("$file: no RRAs found?") 
 		unless defined $cf;
@@ -107,7 +119,8 @@ sub info2create {
 		my @s = ("DS", $ds);
 		for (qw(type minimal_heartbeat min max)) {
 			die("$file: missing $_ for DS $ds?")
-				unless exists $info->{"ds[$ds].$_"};
+				unless exists $info->{"ds[$ds].$_"}
+                or $buggy_perl_version;
 			my $val = $info->{"ds[$ds].$_"};
 			push @s, defined $val ? $val : "U";
 		}
@@ -117,7 +130,8 @@ sub info2create {
 		my @s = ("RRA", $info->{"rra[$i].cf"});
 		for (qw(xff pdp_per_row rows)) {
 			die("$file: missing $_ for RRA $i")
-				unless exists $info->{"rra[$i].$_"};
+				unless exists $info->{"rra[$i].$_"}
+                or $buggy_perl_version;
 			push @s, $info->{"rra[$i].$_"};
 		}
 		push @create, join(":", @s);
@@ -160,10 +174,37 @@ sub compare {
 
 	while (my $arg = shift @create) {
 		my $arg2 = shift @create2;
+		my @ds = split /:/, $arg;
+		my @ds2 = split /:/, $arg2;
+		next if $ds[0] eq 'DS' and $ds[0] eq $ds2[0] and $ds[1] eq $ds2[1] and $ds[2] eq $ds2[2];
 		return "Different arguments: $file has $arg2, create string has $arg"
 			unless $arg eq $arg2;
 	}
 	return undef;
 }
 
+sub tuneds {
+        my $file = shift;
+        my $create = shift;
+        my @create2 = sort grep /^DS/, @{info2create($file)};
+	my @create = sort grep /^DS/,  @$create;
+	while (@create){
+	       my @ds = split /:/, shift @create;
+	       my @ds2 = split /:/, shift @create2;
+	       next unless $ds[1] eq $ds2[1] and $ds[2] eq $ds[2];
+	       if ($ds[3] ne $ds2[3]){
+	       		warn "## Updating $file DS:$ds[1] heartbeat $ds2[3] -> $ds[3]\n";
+	  	        RRDs::tune $file,"--hearbeat","$ds[1]:$ds[3]" unless $ds[3] eq $ds2[3];
+	       }
+	       if ($ds[4] ne $ds2[4]){
+	       		warn "## Updating $file DS:$ds[1] minimum $ds2[4] -> $ds[4]\n";
+	 	        RRDs::tune $file,"--minimum","$ds[1]:$ds[4]" unless $ds[4] eq $ds2[4];
+	       }
+	       if ($ds[5] ne $ds2[5]){
+	       		warn "## Updating $file DS:$ds[1] maximum $ds2[5] -> $ds[5]\n";
+	                RRDs::tune $file,"--maximum","$ds[1]:$ds[5]" unless $ds[5] eq $ds2[5];
+	       }
+	}
+}	
+		                        
 1;
