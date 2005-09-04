@@ -20,8 +20,6 @@ SmokePing is ...
 
  * extensible through plug-in modules
 
- * fully documented
-
  * easy to customize through a webtemplate and an extensive
    configuration file.
 
@@ -41,6 +39,13 @@ been written entirely in my spare time) please feel free to
 use:
 
   http://people.ee.ethz.ch/oetiker/wish
+
+Continute Reading
+=================
+
+* doc/smokeping_install.txt
+
+and all the rest of the documentation in the doc tree
 
 Cheers
 tobi

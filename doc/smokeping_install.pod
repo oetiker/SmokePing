@@ -18,9 +18,9 @@ downloading the tool.
 
 =over
 
-=item RRDtool 1.0.x
+=item RRDtool 1.0.x or 1.2.x
 
-L<http://people.ee.ethz.ch/~oetiker/webtools/rrdtool/>
+L<http://people.ee.ethz.ch/oetiker/webtools/rrdtool/>
 
 Just follow the installation instructions. We need this package todo all the
 logging and graphing in SmokePing.
@@ -186,7 +186,7 @@ When you can now also open the smokeping.cgi webpage to look at your data.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 by Tobias Oetiker. All right reserved.
+Copyright (c) 2001, 2005 by Tobias Oetiker. All right reserved.
 
 =head1 LICENSE
 
