@@ -41,10 +41,6 @@
   - suggested by Leos Bitto,
     <http://lists.ee.ethz.ch/smokeping-users/msg01632.html>
 
-* CGI LOGGING
-  replace the __WARN__ and __DIE__ handlers with CGI::Carp?
-  Problems with speedy?
-
 * CGI RETURN VALUE
   return something else than 200 OK in error situations at least
   when updating DYNAMIC addresses
