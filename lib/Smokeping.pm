@@ -110,6 +110,11 @@ sub lnk ($$) {
     }
 }
 
+sub dyndir ($) {
+    my $cfg = shift;
+    return $cfg->{General}{dyndir} || $cfg->{General}{datadir};
+}
+
 sub update_dynaddr ($$){
     my $cfg = shift;
     my $q = shift;
@@ -125,7 +130,12 @@ sub update_dynaddr ($$){
     return "Error: Invalid target or secret" 
       unless defined $targetptr->{host} and
       $targetptr->{host} eq "DYNAMIC/${secret}";
-    my $file = $cfg->{General}{datadir}."/".(join "/", @target);
+    my $file = dyndir($cfg);
+    for (0..$#target-1) {
+    	$file .= "/" . $target[$_];
+    	( -d $file ) || mkdir $file, 0755;
+    }
+    $file.= "/" . $target[-1];
     my $prevaddress = "?";
     my $snmp = snmpget_ident $address;
     if (-r "$file.adr" and not -z "$file.adr"){
@@ -852,7 +862,7 @@ sub get_detail ($$$$){
 	);
 
         # if we have uptime draw a colorful background or the graph showing the uptime
-        my $cdir=$cfg->{General}{datadir}."/".(join "/", @dirs)."/";
+        my $cdir=dyndir($cfg)."/".(join "/", @dirs)."/";
         if (-f "$cdir/${file}.adr") {
 	    @upsmoke = ();
 	    @upargs = ("COMMENT:Link Up${BS}:     ",
@@ -1567,7 +1577,7 @@ DOC
 General configuration values valid for the whole SmokePing setup.
 DOC
 	 _vars =>
-	 [ qw(owner imgcache imgurl datadir pagedir piddir sendmail offset
+	 [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
               smokemail cgiurl mailhost contact netsnpp
 	      syslogfacility syslogpriority concurrentprobes changeprocessnames tmail) ],
 	 _mandatory =>
@@ -1637,7 +1647,16 @@ DOC
 The directory where SmokePing can keep its rrd files.
 DOC
 	},
+	dyndir =>
+	{
+	 %$DIRCHECK_SUB,
+	 _doc => <<DOC,
+The base directory where SmokePing keeps the files related to the DYNAMIC function.
+This directory must be writeable by the WWW server.
 
+If this variable is not specified, the value of C<datadir> will be used instead.
+DOC
+	},
 	piddir  =>
 	{
 	 %$DIRCHECK_SUB,

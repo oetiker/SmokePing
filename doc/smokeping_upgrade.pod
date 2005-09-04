@@ -119,6 +119,17 @@ C<pings> variable in your configuration file. You'll then have to
 delete the old RRD file or somehow convert it to use the new parameters.
 The C<rrdtune> command might be helpful here.
 
+=item Configurable location for DYNAMIC-related files
+
+There is now a new configuration variable, C<dyndir>, that can be used
+to specify the location of the DYNAMIC-related files (.adr and .snmp).
+These files used to be kept under C<datadir> along with the RRD files,
+but since they need to be writable by the web server, it may be useful
+to separate these.
+
+If C<dyndir> is not specified, Smokeping will use the C<datadir> value
+as the default. This should ensure that no existing setups will break.
+
 =back
 
 In addition to this, some probes have had minor incompatible changes to

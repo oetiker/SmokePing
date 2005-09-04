@@ -1,5 +1,8 @@
+* the DYNAMIC-related files (.adr and .snmp) can now be located outside "datadir"
+  by specifying the new configuration variable "dyndir" 
+  -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
 * return '404 not found' when DYNAMIC updates fail
-  - niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
+  -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
 * make errors in DYNAMIC updates appear in the web server error log
   -- niko
 * remove a quotemeta() call in Config::Grammar to allow metacharacters

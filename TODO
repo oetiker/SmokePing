@@ -41,8 +41,3 @@
   - suggested by Leos Bitto,
     <http://lists.ee.ethz.ch/smokeping-users/msg01632.html>
 
-* CONFIG
-  make the .adr (and .snmp) directory configurable
-  - suggested by Marc Haber,
-    <http://lists.ee.ethz.ch/smokeping-users/msg01644.html>
-
