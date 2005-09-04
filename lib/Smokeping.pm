@@ -118,11 +118,11 @@ sub update_dynaddr ($$){
     my $address = $ENV{REMOTE_ADDR};
     my $targetptr = $cfg->{Targets};
     foreach my $step (@target){
-	return "Error: Unknown Target $step" 
+	return "Error: Unknown target $step" 
 	  unless defined $targetptr->{$step};
 	$targetptr =  $targetptr->{$step};
     };
-    return "Error: Invalid Target" 
+    return "Error: Invalid target or secret" 
       unless defined $targetptr->{host} and
       $targetptr->{host} eq "DYNAMIC/${secret}";
     my $file = $cfg->{General}{datadir}."/".(join "/", @target);
@@ -2568,15 +2568,20 @@ sub cgi ($) {
     umask 022;
     load_cfg shift;
     my $q=new CGI;
-    print $q->header(-type=>'text/html',
-                     -expires=>'+'.($cfg->{Database}{step}).'s',
-                     -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
-                     );
     initialize_cgilog();
     if ($q->param(-name=>'secret') && $q->param(-name=>'target') ) {
         my $ret = update_dynaddr $cfg,$q;
-	do_cgilog($ret) if defined $ret and $ret ne "";
+	if (defined $ret and $ret ne "") {
+		print $q->header(-status => "404 Not Found");
+		do_cgilog("Updating DYNAMIC address failed: $ret");
+	} else {
+		print $q->header; # no HTML output on success
+	}
     } else {
+        print $q->header(-type=>'text/html',
+                     -expires=>'+'.($cfg->{Database}{step}).'s',
+                     -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
+                     );
         display_webpage $cfg,$q;
     }
 }
