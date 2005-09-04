@@ -105,7 +105,7 @@ txt: $(TXT)
 rename-man: $(MAN)
 	for j in probes matchers; do \
 	  for i in doc/Smokeping/$$j/*.3; do \
-	    if ! echo $$i | grep -q Smokeping::$$j; then \
+	    if echo $$i | grep -q Smokeping::$$j; then :; else \
 	      mv $$i `echo $$i | sed s,$$j/,$$j/Smokeping::$$j::,`; \
 	    fi; \
 	  done; \
