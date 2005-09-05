@@ -228,6 +228,8 @@ feature: when clicking on the graphs in detail view you can select
 different time ranges for the graph. The creation of this
 feature has been sponsored by BeverlyCorp.com.
 
+=back
+
 =head1 1.34 to 1.37
 
 =over
