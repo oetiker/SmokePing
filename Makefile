@@ -1,6 +1,11 @@
 SHELL = /bin/sh
-VERSION = 2.0rc5
-NUMVERSION = 1.99006
+VERSION = 2.0.1
+############ A is for features
+############ B is for bugfixes
+############ V.AAABBB
+############ 2.000001
+############ 2.000002
+NUMVERSION = 2.000001
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|.svn
 GROFF = groff
 .PHONY: man html txt ref examples check-examples patch killdoc doc tar rename-man symlinks remove-symlinks
@@ -31,8 +36,8 @@ MAN2TXT = $(GROFF) -man -Tascii $< > $@
 # pod2html apparently needs to be in the target directory to get L<> links right
 POD2HTML= cd $(dir $@); top="$(shell echo $(dir $@)|sed -e 's,doc/,,' -e 's,[^/]*/,../,g' -e 's,/$$,,')"; top=$${top:-.}; pod2html --infile=$(CURDIR)/$< --noindex --htmlroot=. --podroot=. --podpath=$${top} --title=$* | $${top}/../util/fix-pod2html.pl > $(notdir $@)
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
-MAKEPOD= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
-GENEX= perl -Ilib -I/usr/pack/rrdtool-1.0.47-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
+MAKEPOD= perl -I/home/oetiker/lib/fake-perl/ -Ilib -I/usr/pack/rrdtool-1.2svn-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
+GENEX= perl -I/home/oetiker/lib/fake-perl/ -Ilib -I/usr/pack/rrdtool-1.2svn-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
 
 doc/%.7: doc/%.pod
 	$(POD2MAN) --section 7 > $@
@@ -100,7 +105,7 @@ txt: $(TXT)
 rename-man: $(MAN)
 	for j in probes matchers; do \
 	  for i in doc/Smokeping/$$j/*.3; do \
-	    if ! echo $$i | grep -q Smokeping::$$j; then \
+	    if echo $$i | grep Smokeping::$$j>/dev/null; then :; else \
 	      mv $$i `echo $$i | sed s,$$j/,$$j/Smokeping::$$j::,`; \
 	    fi; \
 	  done; \
