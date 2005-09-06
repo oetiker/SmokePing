@@ -2906,7 +2906,14 @@ KID:
 sub gen_imgs ($){
 
   my $cfg = shift;
-  if (not -r $cfg->{General}{imgcache}."/rrdtool.png"){
+  my $modulemodtime;
+  for (@INC) {
+  	( -f "$_/Smokeping.pm" ) or next;
+	$modulemodtime = (stat _)[9];
+	last;
+  }
+  if (not -r $cfg->{General}{imgcache}."/rrdtool.png" or
+      (defined $modulemodtime and $modulemodtime > (stat _)[9])){
 open W, ">".$cfg->{General}{imgcache}."/rrdtool.png" 
    or do { warn "WARNING: creating $cfg->{General}{imgcache}/rrdtool.png: $!\n"; return 0 };
 print W unpack ('u', <<'UUENC');
@@ -3001,7 +3008,8 @@ UUENC
 close W;
 }
 
-  if (not -r $cfg->{General}{imgcache}."/smokeping.png"){
+  if (not -r $cfg->{General}{imgcache}."/smokeping.png" or
+      (defined $modulemodtime and $modulemodtime > (stat _)[9])){
 open W, ">".$cfg->{General}{imgcache}."/smokeping.png" 
    or do { warn "WARNING: creating $cfg->{General}{imgcache}/smokeping.png: $!\n"; return 0};
 print W unpack ('u', <<'UUENC');
