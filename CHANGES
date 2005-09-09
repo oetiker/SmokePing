@@ -1,3 +1,8 @@
+* try to trigger an alert with the minimum number of values needed for it
+  rather than require a stack with the maximum number of possible values.
+  See http://lists.ee.ethz.ch/smokeping-users/msg01654.html for the problem.
+  -- niko, reported by Leos Bitto <smokeping *leos.cz>
+
 2005/9/9 -- released version 20050909_trunk
 
 2005/9/8 -- released version 20050908_trunk
