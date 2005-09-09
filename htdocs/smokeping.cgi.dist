@@ -49,7 +49,7 @@ One pointing to the place where you have installed the SmokePing libraries
 
  Smokeping::cgi("/home/oetiker/.smokeping/config");
 
-The third path is the argument to the Smokeping::main command. It points to
+The third path is the argument to the Smokeping::cgi command. It points to
 the SmokePing configuration file.
 
 =head1 COPYRIGHT
