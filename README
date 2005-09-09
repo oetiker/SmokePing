@@ -3,7 +3,6 @@
 \___ \| '_ ` _ \ / _ \| |/ / _ \ |_) | | '_ \ / _` |
  ___) | | | | | | (_) |   <  __/  __/| | | | | (_| |
 |____/|_| |_| |_|\___/|_|\_\___|_|   |_|_| |_|\__, |
-
                                               |___/ 
 Authors:  Tobias Oetiker <tobi of oetiker.ch>
           Niko Tyni <ntyni with iki.fi>
@@ -40,7 +39,7 @@ use:
 
   http://people.ee.ethz.ch/oetiker/wish
 
-Continute Reading
+Continue Reading
 =================
 
 * doc/smokeping_install.txt
