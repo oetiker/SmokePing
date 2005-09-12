@@ -1,3 +1,5 @@
+2005/9/13 -- released version 20050913_trunk
+
 * optionally only send alerts when the state changes ('edgetrigger')
   -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
 
