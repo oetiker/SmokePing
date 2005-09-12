@@ -16,9 +16,6 @@
   only targets with host are considered
 
 * ALERTS
-  only send alerts when the state changes
-  - suggested by Marc Haber,
-    <http://lists.ee.ethz.ch/smokeping-users/msg01439.html>
   make 'active alerts' (whatever that means, have to think
   this through) visible (eg. different colour) in the CGI menu
   - suggested by Cornel Badea <cornel *sbhost.ro>

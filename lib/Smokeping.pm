@@ -1105,15 +1105,25 @@ sub update_rrds($$$$$) {
        		        do_log "WARNING: Alert '$_' did not resolve to a Sub Ref. Skipping\n";
                         next;
                     };
-		    if ( &{$cfg->{Alerts}{$_}{sub}}($x) ){
-			# we got a match
+                    my $prevmatch = $cfg->{Alerts}{$_}{prevmatch} || 0;
+                    my $match = &{$cfg->{Alerts}{$_}{sub}}($x);
+                    my $edgetrigger = $cfg->{Alerts}{$_}{edgetrigger} eq 'yes';
+                    my $what;
+                    if ($edgetrigger and $prevmatch != $match) {
+                        $what = ($prevmatch == 0 ? "was raised" : "was cleared");
+                    }
+                    if (not $edgetrigger and $match) {
+                        $what = "is active";
+                    }
+		    if ($what) {
+			# send something
 			my $from;
                         my $line = "$name/$prop";
                         my $base = $cfg->{General}{datadir};
                         $line =~ s|^$base/||;
                         $line =~ s|/host$||;
                         $line =~ s|/|.|g;
-			do_log("Alert $_ triggered for $line");
+			do_log("Alert $_ $what for $line");
                         my $urlline = $line;
                         $urlline =  $cfg->{General}{cgiurl}."?target=".$line;
                         my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
@@ -1123,11 +1133,15 @@ sub update_rrds($$$$$) {
 			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$cfg->{Alerts}{$_}{to}){
 			     next unless $addr;
 			     if ( $addr =~ /^\|(.+)/) {
-  			         system $1,$_,$line,$loss,$rtt,$tree->{host};				     
+                                 if ($edgetrigger) {
+  			                system $1,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
+                                 } else {
+  			                system $1,$_,$line,$loss,$rtt,$tree->{host};
+                                 }
 			     } elsif ( $addr =~ /^snpp:(.+)/ ) {
 				 sendsnpp $1, <<SNPPALERT;
 $cfg->{Alerts}{$_}{comment}
-$_ on $line
+$_ $what on $line
 $loss
 $rtt
 SNPPALERT
@@ -1140,11 +1154,11 @@ SNPPALERT
 			    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
 From: $cfg->{Alerts}{from}
-Subject: [SmokeAlert] $_ on $line
+Subject: [SmokeAlert] $_ $what on $line
 
 $stamp
 
-Got a match for alert "$_" for $urlline
+Alert "$_" $what for $urlline
 
 Pattern
 -------
@@ -1166,6 +1180,7 @@ ALERT
 		    } else {
 		        do_debuglog("Alert \"$_\": no match for target $name\n");
                     }
+                    $cfg->{Alerts}{$_}{prevmatch} = $match;
 		}
 	    }
 	}
@@ -2223,13 +2238,14 @@ A complete example
 DOC
 
 	     _sections => [ '/[^\s,]+/' ],
-	     _vars => [ qw(to from) ],
+	     _vars => [ qw(to from edgetrigger) ],
 	     _mandatory => [ qw(to from)],
 	     to => { doc => <<DOC,
 Either an email address to send alerts to, or the name of a program to
 execute when an alert matches. To call a program, the first character of the
 B<to> value must be a pipe symbol "|". The program will the be called
-whenever an alert matches, using the following 5 arguments:
+whenever an alert matches, using the following 5 arguments 
+(except if B<edgetrigger> is 'yes'; see below):
 B<name-of-alert>, B<target>, B<loss-pattern>, B<rtt-pattern>, B<hostname>.
 You can also provide a comma separated list of addresses and programs.
 DOC
@@ -2240,8 +2256,23 @@ DOC
 		       _re => '.+@\S+',
 		       _re_error => 'put an email address here',
 		      },
+             edgetrigger => { doc => <<DOC,
+The alert notifications and/or the programs executed are normally triggered every
+time the alert matches. If this variable is set to 'yes', they will be triggered
+only when the alert's state is changed, ie. when it's raised and when it's cleared.
+Subsequent matches of the same alert will thus not trigger a notification.
+
+When this variable is set to 'yes', a notification program (see the B<to> variable
+documentation above) will get a sixth argument, B<raise>, which has the value 1 if the alert
+was just raised and 0 if it was cleared.
+DOC
+                       _re => '(yes|no)',
+                       _re_error =>"this must either be 'yes' or 'no'",
+                       _default => 'no',
+              },
 	     '/[^\s,]+/' => {
-		  _vars => [ qw(type pattern comment to) ],
+		  _vars => [ qw(type pattern comment to edgetrigger) ],
+                  _inherited => [ qw(edgetrigger) ],
 		  _mandatory => [ qw(type pattern comment) ],
 	          to => { doc => 'Similar to the "to" parameter on the top-level except that  it will only be used IN ADDITION to the value of the toplevel parameter. Same rules apply.',
 			_re => '(\|.+|.+@\S+|snpp:)',
