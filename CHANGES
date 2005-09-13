@@ -1,3 +1,4 @@
+* made some alert docs in smokeping_config visible --niko
 * automatically regenerate the logo images if Smokeping.pm has been updated --niko
 
 2005/9/5 -- released version 2.0.1

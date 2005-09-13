@@ -2212,7 +2212,7 @@ DOC
 	     _sections => [ '/[^\s,]+/' ],
 	     _vars => [ qw(to from) ],
 	     _mandatory => [ qw(to from)],
-	     to => { doc => <<DOC,
+	     to => { _doc => <<DOC,
 Either an email address to send alerts to, or the name of a program to
 execute when an alert matches. To call a program, the first character of the
 B<to> value must be a pipe symbol "|". The program will the be called
@@ -2223,14 +2223,14 @@ DOC
 			_re => '(\|.+|.+@\S+|snpp:)',
 			_re_error => 'put an email address or the name of a program here',
 		      },
-	     from => { doc => 'who should alerts appear to be coming from ?',
+	     from => { _doc => 'who should alerts appear to be coming from ?',
 		       _re => '.+@\S+',
 		       _re_error => 'put an email address here',
 		      },
 	     '/[^\s,]+/' => {
 		  _vars => [ qw(type pattern comment to) ],
 		  _mandatory => [ qw(type pattern comment) ],
-	          to => { doc => 'Similar to the "to" parameter on the top-level except that  it will only be used IN ADDITION to the value of the toplevel parameter. Same rules apply.',
+	          to => { _doc => 'Similar to the "to" parameter on the top-level except that  it will only be used IN ADDITION to the value of the toplevel parameter. Same rules apply.',
 			_re => '(\|.+|.+@\S+|snpp:)',
 			_re_error => 'put an email address or the name of a program here',
 		          },
