@@ -1105,7 +1105,7 @@ sub update_rrds($$$$$) {
        		        do_log "WARNING: Alert '$_' did not resolve to a Sub Ref. Skipping\n";
                         next;
                     };
-                    my $prevmatch = $cfg->{Alerts}{$_}{prevmatch} || 0;
+                    my $prevmatch = $tree->{prevmatch}{$_} || 0;
                     my $match = &{$cfg->{Alerts}{$_}{sub}}($x);
                     my $edgetrigger = $cfg->{Alerts}{$_}{edgetrigger} eq 'yes';
                     my $what;
@@ -1180,7 +1180,7 @@ ALERT
 		    } else {
 		        do_debuglog("Alert \"$_\": no match for target $name\n");
                     }
-                    $cfg->{Alerts}{$_}{prevmatch} = $match;
+                    $tree->{prevmatch}{$_} = $match;
 		}
 	    }
 	}
