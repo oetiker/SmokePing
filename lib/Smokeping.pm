@@ -2299,6 +2299,11 @@ DOC
 		     _re => '(?:([^,]+)(,[^,]+)*|\S+\(.+\s)',
  		     _re_error => 'Could not parse pattern or matcher',
 		             },
+		  edgetrigger => {
+                       _re => '(yes|no)',
+                       _re_error =>"this must either be 'yes' or 'no'",
+		  	_default => 'no',
+		  },
 		  },
         },
        Targets => {_doc        => <<DOC,
