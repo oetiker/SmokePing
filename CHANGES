@@ -1,5 +1,5 @@
-* reload the config file on HUP signal and bail out if it's broken.
-  After reloading, restart gracefully so that no measurement is
+* reload the config file on HUP signal and switch to the new one if it 
+  isn't broken. After reloading, restart gracefully so that no measurement is
   interrupted. The signal can also be triggered by 'smokeping --reload'.
   -- niko, suggested by Taisuke Yamada <tyamadajp *list.rakugaki.org>
 
