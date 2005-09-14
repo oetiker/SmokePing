@@ -20,15 +20,6 @@
   this through) visible (eg. different colour) in the CGI menu
   - suggested by Cornel Badea <cornel *sbhost.ro>
 
-* DAEMON
-  reread config periodically or with SIGHUP so that
-  no measurement is interrupted
-  - suggested by Taisuke Yamada,
-    <http://lists.ee.ethz.ch/smokeping-users/msg01445.html>
-  - concurrent probe processes need a signal anyway,
-    they have to exit and new ones started so that
-    we don't have to compare to the old config
-
 * REMOTE EXECUTION
   generic remote probe
   - a possibility for basefork-derived probes to reuse the same

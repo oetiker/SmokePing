@@ -1776,6 +1776,7 @@ be appended to the process name as '[probe]', eg.  '/usr/bin/smokeping
 [FPing]'. If you don't like this behaviour, set this variable to 'no'.
 If 'concurrentprobes' is not set to 'yes', this variable has no effect.
 DOC
+          _default => 'yes',
 	 },
      tmail => 
       {
@@ -2395,16 +2396,23 @@ sub get_config ($$){
     return $parser->parse( $cfgfile ) || die "ERROR: $parser->{err}\n";
 }
 
-sub kill_smoke ($) { 
+sub kill_smoke ($$) { 
   my $pidfile = shift;
+  my $signal = shift;
     if (defined $pidfile){ 
         if ( -f $pidfile && open PIDFILE, "<$pidfile" ) {
             <PIDFILE> =~ /(\d+)/;
             my $pid = $1;
-            kill 2, $pid if kill 0, $pid;
-            sleep 3; # let it die
-            die "ERROR: Can not stop running instance of SmokePing ($pid)\n"
-                if kill 0, $pid;    
+            if ($signal == SIGINT || $signal == SIGTERM) {
+                kill $signal, $pid if kill 0, $pid;
+                sleep 3; # let it die
+                die "ERROR: Can not stop running instance of SmokePing ($pid)\n"
+                        if kill 0, $pid;
+            } else {
+                die "ERROR: no instance of SmokePing running (pid $pid)?\n"
+                        unless kill 0, $pid;
+                kill $signal, $pid;
+            }
             close PIDFILE;
         } else {	
 	    die "ERROR: Can not read pid from $pidfile: $!\n";
@@ -2487,7 +2495,9 @@ sub daemonize_me ($) {
 	}
 
 	sub do_syslog ($){
-		syslog("$syslog_facility|$syslog_priority", shift);
+                my $str = shift;
+                $str =~ s,%,%%,g;
+		syslog("$syslog_facility|$syslog_priority", $str);
 	}
 
 	sub do_cgilog ($){
@@ -2540,7 +2550,9 @@ sub load_cfg ($) {
 	$cfg->{__probes} = $probes;
 	init_alerts $cfg if $cfg->{Alerts};
       	init_target_tree $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
-    }    
+    } else {
+        do_log("Config file unmodified, skipping reload") unless $cgimode;
+    }
 }
 
 
@@ -2762,6 +2774,40 @@ sub verify_cfg {
     print "Configuration file '$cfgfile' syntax OK.\n"; 
 }
  
+sub make_kid {
+        my $sleep_count = 0;
+        my $pid;
+	do {
+        	$pid = fork;
+		unless (defined $pid) {
+			do_log("Fatal: cannot fork: $!");
+			die "bailing out" 
+				if $sleep_count++ > 6;
+			sleep 10;
+		}
+        } until defined $pid;
+        srand();
+        return $pid;
+}
+
+sub start_probes {
+        my $pids = shift;
+        my $pid;
+        my $myprobe;
+    	for my $p (keys %$probes) {
+		if ($probes->{$p}->target_count == 0) {
+			do_log("No targets defined for probe $p, skipping.");
+			next;
+		}
+                $pid = make_kid();
+                $myprobe = $p;
+                $pids->{$pid} = $p;
+                last unless $pid;
+		do_log("Child process $pid started for probe $p.");
+	}
+        return $pid;
+}
+
 sub main (;$) {
     $cgimode = 0;
     umask 022;
@@ -2769,7 +2815,7 @@ sub main (;$) {
     $opt{filter}=[];
     GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
 		      'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
-		      'config=s', 'check', 'gen-examples') or pod2usage(2);
+		      'config=s', 'check', 'gen-examples', 'reload') or pod2usage(2);
     if($opt{version})  { print "$RCS_VERSION\n"; exit(0) };
     if(exists $opt{man}) {
     	if ($opt{man}) {
@@ -2802,7 +2848,12 @@ sub main (;$) {
     load_cfg $cfgfile;
     if(defined $opt{'static-pages'}) { makestaticpages $cfg, $opt{'static-pages'}; exit 0 };
     if($opt{email})    { enable_dynamic $cfg, $cfg->{Targets},"",""; exit 0 };
-    if($opt{restart})  { kill_smoke $cfg->{General}{piddir}."/smokeping.pid";};
+    if($opt{restart})  { kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGINT;};
+    if($opt{reload})  { 
+        kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGHUP; 
+        print "HUP signal sent to the running SmokePing process, exiting.\n";
+        exit 0;
+    };
     if($opt{logfile})      { initialize_filelog($opt{logfile}) };
     if (not keys %$probes) {
     	do_log("No probes defined, exiting.");
@@ -2817,35 +2868,22 @@ sub main (;$) {
     }
     do_log "Smokeping version $VERSION successfully launched.";
 
+RESTART:
     my $myprobe;
+    my $multiprocessmode;
     my $forkprobes = $cfg->{General}{concurrentprobes} || 'yes';
     if ($forkprobes eq "yes" and keys %$probes > 1 and not $opt{debug}) {
+        $multiprocessmode = 1;
     	my %probepids;
 	my $pid;
 	do_log("Entering multiprocess mode.");
-    	for my $p (keys %$probes) {
-		if ($probes->{$p}->target_count == 0) {
-			do_log("No targets defined for probe $p, skipping.");
-			next;
-		}
-		my $sleep_count = 0;
-		do {
-			$pid = fork;
-			unless (defined $pid) {
-				do_log("Fatal: cannot fork: $!");
-				die "bailing out" 
-					if $sleep_count++ > 6;
-				sleep 10;
-			}
-		} until defined $pid;
-		$myprobe = $p;
-		goto KID unless $pid; # child skips rest of loop
-		do_log("Child process $pid started for probe $myprobe.");
-		$probepids{$pid} = $myprobe;
-	}
+        $pid = start_probes(\%probepids);
+        $myprobe = $probepids{$pid};
+	goto KID unless $pid; # child skips rest of loop
 	# parent
 	do_log("All probe processes started successfully.");
 	my $exiting = 0;
+        my $reloading = 0;
 	for my $sig (qw(INT TERM)) {
 		$SIG{$sig} = sub {
 			do_log("Got $sig signal, terminating child processes.");
@@ -2854,7 +2892,7 @@ sub main (;$) {
 			my $now = time;
 			while(keys %probepids) { # SIGCHLD handler below removes the keys
 				if (time - $now > 2) {
-					do_log("Can't terminate all child processes, giving up.");
+					do_log("Fatal: can't terminate all child processes, giving up.");
 					exit 1;
 				}
 				sleep 1;
@@ -2868,14 +2906,64 @@ sub main (;$) {
 			my $p = $probepids{$dead};
 			$p = 'unknown' unless defined $p;
 			do_log("Child process $dead (probe $p) exited unexpectedly with status $?.")
-				unless $exiting;
+				unless $exiting or $reloading;
 			delete $probepids{$dead};
 		}
 	};
-	sleep while 1; # just wait for the signals
+        my $gothup = 0;
+        $SIG{HUP} = sub {
+                do_debuglog("Got HUP signal.");
+                $gothup = 1;
+        };
+	while (1) { # just wait for the signals
+                sleep;
+                next unless $gothup;
+                $reloading = 1;
+                $gothup = 0;
+                my $oldprobes = $probes;
+                $reloading = 0, next unless reload_cfg($cfgfile);
+                do_debuglog("Restarting probe processes " . join(",", keys %probepids) . ".");
+                kill SIGHUP, $_ for (keys %probepids);
+                my $i=0;
+                while (keys %probepids) {
+                        sleep 1;
+                        if ($i % 10 == 0) {
+                                do_log("Waiting for child processes to terminate.");
+                        }
+                        $i++;
+                        my %termsent;
+                        for (keys %probepids) {
+                                my $step = $oldprobes->{$probepids{$_}}->step;
+                                if ($i > $step) {
+                                        do_log("Child process $_ took over its step value to terminate, killing it with SIGTERM");
+                                        if (kill SIGTERM, $_ == 0 and exists $probepids{$_}) {
+                                                do_log("Fatal: Child process $_ has disappeared? This shouldn't happen. Giving up.");
+                                                exit 1;
+                                        } else {
+                                                $termsent{$_} = time;
+                                        }
+                                }
+                                for (keys %termsent) {
+                                        if (exists $probepids{$_}) {
+                                                if (time() - $termsent{$_} > 2) {
+                                                        do_log("Fatal: Child process $_ took over 2 seconds to exit on TERM signal. Giving up.");
+                                                        exit 1;
+                                                }
+                                        } else {
+                                                delete $termsent{$_};
+                                        }
+                                }
+                         }
+                }
+                $reloading = 0;
+                do_log("Child processes terminated, restarting with new configuration.");
+                $SIG{CHLD} = 'DEFAULT'; # restore
+                goto RESTART;
+        }
 	do_log("Exiting abnormally - this should not happen.");
 	exit 1; # not reached
     } else {
+        $multiprocessmode = 0;
     	if ($forkprobes ne "yes") {
 		do_log("Not entering multiprocess mode because the 'concurrentprobes' variable is not set.");
     		for my $p (keys %$probes) {
@@ -2890,21 +2978,26 @@ sub main (;$) {
 		do_log("Not entering multiprocess mode for just a single probe.");
 		$myprobe = (keys %$probes)[0]; # this way we won't ignore a probe-specific step parameter
 	}
-	for my $sig (qw(INT TERM)) {
-		$SIG{$sig} = sub {
-			do_log("Got $sig signal, terminating.");
-			exit 1;
-		}
-	}
     }
 KID:
     my $offset;
     my $step; 
+    my $gothup = 0;
+    my $changeprocessnames = $cfg->{General}{changeprocessnames} ne "no";
+    $SIG{HUP} = sub {
+        do_log("Got HUP signal, " . ($multiprocessmode ? "exiting" : "restarting") . " gracefully.");
+        $gothup = 1;
+    };
+    for my $sig (qw(INT TERM)) {
+        $SIG{$sig} = sub {
+                do_log("got $sig signal, terminating.");
+                exit 1;
+        }
+    }
     if (defined $myprobe) {
     	$offset = $probes->{$myprobe}->offset || 'random';
 	$step = $probes->{$myprobe}->step;
-	$0 .= " [$myprobe]" unless defined $cfg->{General}{changeprocessnames}
-	                    and $cfg->{General}{changeprocessnames} eq "no";
+	$0 .= " [$myprobe]" if $changeprocessnames;
     } else {
 	$offset = $cfg->{General}{offset} || 'random';
 	$step = $cfg->{Database}{step};
@@ -2935,6 +3028,7 @@ KID:
         		do_debuglog("Sleeping $sleeptime seconds.");
 		}
 		sleep $sleeptime;
+                last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
 	}
         my $now = time;
 	run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
@@ -2951,8 +3045,40 @@ KID:
         		do_log($warn);
 		}
 	}
+        last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
     }
+    $0 =~ s/ \[$myprobe\]$// if $changeprocessnames;
+    goto RESTART;
 }
+
+sub checkhup ($$) {
+        my $multiprocessmode = shift;
+        my $gothup = shift;
+        if ($gothup) {
+                if ($multiprocessmode) {
+                        do_log("Exiting due to HUP signal.");
+                        exit 0;
+                } else {
+                        do_log("Restarting due to HUP signal.");
+                        return 1;
+                }
+        }
+        return 0;
+}
+
+sub reload_cfg ($) {
+        my $cfgfile = shift;
+        my ($oldcfg, $oldprobes) = ($cfg, $probes);
+        do_log("Reloading configuration.");
+        eval { load_cfg($cfgfile) };
+        if ($@) {
+                do_log("Reloading configuration from $cfgfile failed: $@");
+                ($cfg, $probes) = ($oldcfg, $oldprobes);
+                return 0;
+        }
+        return 1;
+}
+        
 
 sub gen_imgs ($){
 
