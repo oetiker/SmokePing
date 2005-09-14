@@ -2568,7 +2568,7 @@ Config::Grammar module. Read all about it in L<Config::Grammar>.
 The Configuration file has a tree-like structure with section headings at
 various levels. It also contains variable assignments and tables.
 
-Warning: this manual is rather long. See the smokeping_examples document
+Warning: this manual is rather long. See L<smokeping_examples>
 for simple configuration examples.
 
 ${e}head1 REFERENCE
