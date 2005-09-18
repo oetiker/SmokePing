@@ -1,4 +1,8 @@
 * made some alert docs in smokeping_config visible --niko
+* try to trigger an alert with the minimum number of values needed for it
+  rather than require a stack with the maximum number of possible values.
+  See http://lists.ee.ethz.ch/smokeping-users/msg01654.html for the problem.
+  -- niko, reported by Leos Bitto <smokeping *leos.cz>
 * automatically regenerate the logo images if Smokeping.pm has been updated --niko
 
 2005/9/5 -- released version 2.0.1

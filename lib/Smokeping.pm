@@ -196,6 +196,11 @@ sub sendsnpp ($$){
     }
 }
 
+sub min ($$) {
+        my ($a, $b) = @_;
+        return $a < $b ? $a : $b;
+}
+
 sub init_alerts ($){
     my $cfg = shift;
     foreach my $al (keys %{$cfg->{Alerts}}) {
@@ -213,7 +218,8 @@ sub init_alerts ($){
 	    my $hand;
 	    eval "\$hand = Smokeping::matchers::$matcher->new($arg)";
   	    die "ERROR: Matcher '$matcher' could not be instantiated\nwith arguments $arg:\n$@\n" if $@;
-	    $x->{length} = $hand->Length;
+	    $x->{minlength} = $hand->Length;
+	    $x->{maxlength} = $x->{minlength};
 	    $x->{sub} = sub { $hand->Test(shift) } ;
 	} else {
 	    my $sub_front = <<SUB;
@@ -225,17 +231,22 @@ SUB
 	    my $sub;
 	    my $sub_back = "        return 1;\n    }\n    return 0;\n}\n";
 	    my @ops = split /\s*,\s*/, $x->{pattern};
-	    $x->{length} = scalar grep /^[!=><]/, @ops;
+	    $x->{minlength} = scalar grep /^[!=><]/, @ops;
+	    $x->{maxlength} = $x->{minlength};
 	    my $multis = scalar grep /^[*]/, @ops;
 	    my $it = "";
 	    for(1..$multis){
 		my $ind = "    " x ($_-1);
+                my $extra = "";
+                for (1..$_-1) {
+                        $extra .= "-\$i$_";
+                }
 		$sub .= <<FOR;
 $ind        my \$i$_;
-$ind        for(\$i$_=0; \$i$_<\$imax$_;\$i$_++){
+$ind        for(\$i$_=0; \$i$_ < min(\$maxlength$extra,\$imax$_); \$i$_++){
 FOR
 	    };
-	    my $i = - $x->{length};
+	    my $i = - $x->{maxlength};
 	    my $incr = 0;
 	    for (@ops) {
 		my $extra = "";
@@ -251,13 +262,13 @@ FOR
 		if ($op eq '*') {
 		    if ($value =~ /^([1-9]\d*)\*$/) {
 			$value = $1;
-			$x->{length} += $value;
-			$sub_front .= "        my \$imax$multis = $value;\n";
+                        $x->{maxlength} += $value;
+			$sub_front .= "        my \$imax$multis = min(\@\$y - $x->{minlength}, $value);\n";
 			$sub_back .=  "\n";
 			$sub .= <<FOR;
 $it        last;
 $it    }
-$it    return 0 if \$i$multis >= \$imax$multis;
+$it    return 0 if \$i$multis >= min(\$maxlength$extra,\$imax$multis);
 FOR
 			
 			$multis--;
@@ -299,7 +310,9 @@ IF
 		}
 		$i++;
 	    }
-	    $sub_front .= "$it        next if scalar \@\$y < $x->{length} ;\n";
+	    $sub_front .= "$it        my \$minlength = $x->{minlength};\n";
+	    $sub_front .= "$it        my \$maxlength = $x->{maxlength};\n";
+	    $sub_front .= "$it        next if scalar \@\$y < \$minlength ;\n";
 	    do_debuglog(<<COMP);
 ### Compiling alert detector pattern '$al'
 ### $x->{pattern}
@@ -353,8 +366,8 @@ sub init_target_tree ($$$$) {
  	foreach my $al (@{$tree->{alerts}}) {
 	    die "ERROR: alert $al ($name) is not defined\n"
 		unless defined $cfg->{Alerts}{$al};
-	    $tree->{fetchlength} = $cfg->{Alerts}{$al}{length}
-		if $tree->{fetchlength} < $cfg->{Alerts}{$al}{length};
+	    $tree->{fetchlength} = $cfg->{Alerts}{$al}{maxlength}
+		if $tree->{fetchlength} < $cfg->{Alerts}{$al}{maxlength};
 	}
     };
     # fill in menu and title if missing
@@ -1152,7 +1165,9 @@ $cfg->{Alerts}{$_}{comment}
 
 ALERT
 			}
-		    }
+		    } else {
+		        do_debuglog("Alert \"$_\": no match for target $name\n");
+                    }
 		}
 	    }
 	}
