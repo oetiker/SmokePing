@@ -1,6 +1,13 @@
+* ASSIGN BLAME - HALFWAY PING
+  - A method for pinging the host in the middle between here and host B
+    (use traceroute for figuring out which one it should be)
+    This graph combined with the graph for here-B could show in which half of the link the problem lies ... 
+    Russell Stuart <russell-debian * stuart.id.au>
+
 * TOP10
   - show a list of the top 10 (most whatever graphs)
-    gmourani@privalodc.com
+    gmourani * privalodc.com
+    < they are willing to pay for this feature - tobi >
 
 * UPTIME
   - define update via snmp pointer per device
