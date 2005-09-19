@@ -1,3 +1,7 @@
+* reload the config file on HUP signal and switch to the new one if it 
+  isn't broken. After reloading, restart gracefully so that no measurement is
+  interrupted. The signal can also be triggered by 'smokeping --reload'.
+  -- niko, suggested by Taisuke Yamada <tyamadajp *list.rakugaki.org>
 * made some alert docs in smokeping_config visible --niko
 * try to trigger an alert with the minimum number of values needed for it
   rather than require a stack with the maximum number of possible values.

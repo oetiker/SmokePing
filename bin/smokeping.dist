@@ -38,6 +38,9 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
 
  --restart    Restart SmokePing
 
+ --reload     Reload configuration in the running process without interrupting 
+              any probes
+
  --nodaemon    Do no daemonize the process (no fork)
 
  --filter=x   Only measure entries which pass the filter x
