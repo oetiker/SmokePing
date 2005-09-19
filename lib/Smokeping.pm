@@ -2259,7 +2259,7 @@ DOC
 		       _re => '.+@\S+',
 		       _re_error => 'put an email address here',
 		      },
-             edgetrigger => { doc => <<DOC,
+             edgetrigger => { _doc => <<DOC,
 The alert notifications and/or the programs executed are normally triggered every
 time the alert matches. If this variable is set to 'yes', they will be triggered
 only when the alert's state is changed, ie. when it's raised and when it's cleared.
