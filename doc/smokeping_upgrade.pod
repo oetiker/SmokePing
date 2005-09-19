@@ -23,6 +23,19 @@ An official list of changes with each release can be found in the CHANGES
 file in the Smokeping distribution. This document tries to complement
 that with upgrading instructions etc.
 
+=head1 2.0 to 2.1
+
+=head2 Edge-triggered alerts
+
+The alert notifications can now optionally be sent only when the state of 
+the alert changes. This means that only the first match of the alert
+generates a notification, subsequent matches don't. When the alert is
+cleared, ie. there's no match anymore, another notification is sent.
+
+This behaviour is enabled by the C<edgetrigger> variable in the C<Alerts>
+section. The old behaviour (which sends a notification on each match)
+is the default.
+
 =head1 1.40 to 2.0
 
 The biggest change with the 2.0 release is that the configuration file

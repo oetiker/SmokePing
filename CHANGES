@@ -3,6 +3,8 @@
   interrupted. The signal can also be triggered by 'smokeping --reload'.
   -- niko, suggested by Taisuke Yamada <tyamadajp *list.rakugaki.org>
 * made some alert docs in smokeping_config visible --niko
+* optionally only send alerts when the state changes ('edgetrigger')
+  -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
 * try to trigger an alert with the minimum number of values needed for it
   rather than require a stack with the maximum number of possible values.
   See http://lists.ee.ethz.ch/smokeping-users/msg01654.html for the problem.

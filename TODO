@@ -12,9 +12,6 @@
   only targets with host are considered
 
 * ALERTS
-  only send alerts when the state changes
-  - suggested by Marc Haber,
-    <http://lists.ee.ethz.ch/smokeping-users/msg01439.html>
 
 * REMOTE EXECUTION
   generic remote probe
