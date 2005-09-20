@@ -116,14 +116,16 @@ and it works fine.
 
 =item SpeedyCGI 
 
-L<http://daemoninc.com/speedycgi/>
+L<http://www.daemoninc.com/SpeedyCGI/>
 
 SpeedyCGI speeds up CGIs written in perl dramatically by making them memory
 resident and handing new request to the script which is already running.
 SmokePing has been optimized for use with SpeedyCGI. Note that you do NOT
 need mod_speedy, just the plain and simple speedy executable, this is the
-beauty of this tool it works without touching your apache ...  Otherwise
-you could as well be using FastCGI or mod_perl.
+beauty of this tool it works without touching your apache ...  Otherwise you
+could as well be using FastCGI or mod_perl. There is a bug in speedy with
+returning error messages to the apache error log. You can find a patch in
+the smokeping download area.
 
 =back
 
