@@ -1,3 +1,5 @@
+2005/9/20 -- released version 2.0.2
+
 * reload the config file on HUP signal and switch to the new one if it 
   isn't broken. After reloading, restart gracefully so that no measurement is
   interrupted. The signal can also be triggered by 'smokeping --reload'.
