@@ -26,6 +26,11 @@
   make 'active alerts' (whatever that means, have to think
   this through) visible (eg. different colour) in the CGI menu
   - suggested by Cornel Badea <cornel *sbhost.ro>
+  
+  Targets/alertee: syntax to remove an address from the Alerts/to list
+  (maybe 'alertee = -user@somewhere'? This breaks real addresses
+  starting with '-'...require quoting for those?)
+  - from James Bouressa, <http://lists.ee.ethz.ch/smokeping-users/msg01667.html>
 
 * REMOTE EXECUTION
   generic remote probe
