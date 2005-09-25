@@ -165,13 +165,13 @@ sub pingone {
 			if exists $vars->{nas_ip_address};
 		my $c;
 		my $start = gettimeofday();
-		$r->send_packet(ACCESS_REQUEST) and $c = $r->recv_packet;
+		$r->send_packet(&ACCESS_REQUEST) and $c = $r->recv_packet;
 		my $end = gettimeofday();
 		my $result;
 		if (defined $c) {
 			$result = $c;
-			$result = "OK" if $c == ACCESS_ACCEPT;
-			$result = "fail" if $c == ACCESS_REJECT;
+			$result = "OK" if $c == &ACCESS_ACCEPT;
+			$result = "fail" if $c == &ACCESS_REJECT;
 		} else {
 			if (defined $r->get_error) {
 				$result = "error: " . $r->strerror;
@@ -181,7 +181,7 @@ sub pingone {
 		}
 		$elapsed = $end - $start;
 		$self->do_debug("$host: radius query $_: $result, $elapsed");
-		push @times, $elapsed if (defined $c and $c == ACCESS_ACCEPT);
+		push @times, $elapsed if (defined $c and $c == &ACCESS_ACCEPT);
 	}
 	return sort { $a <=> $b } @times;
 }
