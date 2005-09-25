@@ -1475,8 +1475,7 @@ DOC
 
 		# load the probe module
 		my $class = "Smokeping::probes::$name";
-		eval "require $class";
-		die "require $class failed: $@\n" if $@;
+		Smokeping::maybe_require $class;
 
 		# modify the grammar
 		my $probevars = $class->probevars;
@@ -2756,11 +2755,50 @@ sub pod2man {
 	}
 }
 
+sub maybe_require {
+	# like eval "require $class", but tries to
+	# fake missing classes by adding them to %INC.
+	# This rocks when we're building the documentation
+	# so we don't need to have the external modules 
+	# installed.
+
+	my $class = shift;
+
+	# don't do the kludge unless we're building documentation
+	unless (exists $opt{makepod} or exists $opt{man}) {
+		eval "require $class";
+		die("require $class failed: $@") if $@;
+		return;
+	}
+
+	my %faked;
+
+	my $file = $class;
+	$file =~ s,::,/,g;
+	$file .= ".pm";
+
+	eval "require $class";
+
+	while ($@ =~ /Can't locate (\S+)\.pm/) {
+		my $missing = $1;
+		die("Can't fake missing class $missing, giving up. This shouldn't happen.") 
+			if $faked{$missing}++;
+		$INC{"$missing.pm"} = "foobar";
+		$missing =~ s,/,::,;
+
+		delete $INC{"$file"}; # so we can redo the require()
+		eval "require $class";
+		last unless $@;
+	}
+	die("require $class failed: $@") if $@;
+	my $libpath = find_libdir;
+	$INC{$file} = "$libpath/$file";
+}
+
 sub probedoc {
 	my $class = shift;
 	my $do_man = shift;
-	eval "require $class";
-	die("Failed to load $class: $@") if $@;
+	maybe_require($class);
 	if ($do_man) {
 		pod2man($class->pod);
 	} else {

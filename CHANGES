@@ -1,3 +1,6 @@
+* don't need to have all the external modules installed to build the
+  documentation -- niko
+
 2005/9/20 -- released version 2.0.2
 
 * reload the config file on HUP signal and switch to the new one if it 
