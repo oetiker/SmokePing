@@ -143,7 +143,7 @@ sub pingone ($$){
     my @args = ();
 
 
-     my $telnet = new Net::Telnet;
+     my $telnet = Net::Telnet->new();
 #               These are for debugging
 #               $telnet->errmode("TIPreturn");
 #               $telnet->input_log("TIPinlog");
