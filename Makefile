@@ -145,7 +145,7 @@ killdoc:
 
 doc:    killdoc ref examples man html txt rename-man
 
-tar:	doc patch
+tar:	patch doc
 	-ln -s . smokeping-$(VERSION)
 	find smokeping-$(VERSION)/* -type f -follow -o -type l | egrep -v '$(IGNORE)' | gtar -T - -czvf smokeping-$(VERSION).tar.gz
 	rm smokeping-$(VERSION)
