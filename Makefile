@@ -138,19 +138,20 @@ patch:
 	perl -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
 	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
 	perl -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
-	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 
 killdoc:
 	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
 
 doc:    killdoc ref examples man html txt rename-man
 
-tar:	doc patch
+# patch first so Smokeping.pm is older than smokeping_config.pod in the tarball
+tar:	patch doc
 	-ln -s . smokeping-$(VERSION)
 	find smokeping-$(VERSION)/* -type f -follow -o -type l | egrep -v '$(IGNORE)' | gtar -T - -czvf smokeping-$(VERSION).tar.gz
 	rm smokeping-$(VERSION)
 	
 dist:   tar
+	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	mv smokeping-$(VERSION).tar.gz /home/oetiker/public_html/webtools/smokeping/pub/
 	cp CHANGES /home/oetiker/public_html/webtools/smokeping/pub/CHANGES
 
