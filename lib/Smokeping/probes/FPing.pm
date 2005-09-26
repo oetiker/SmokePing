@@ -117,7 +117,8 @@ sub ping ($){
     $self->{rtts}={};
     while (<$errh>){
         chomp;
-        next unless /^\S+\s+:\s+[\d\.]/; #filter out error messages from fping
+	$self->do_debug("Got fping output: '$_'");
+        next unless /^\S+\s+:\s+[-\d\.]/; #filter out error messages from fping
         my @times = split /\s+/;
         my $ip = shift @times;
         next unless ':' eq shift @times; #drop the colon
