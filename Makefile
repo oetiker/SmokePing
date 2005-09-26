@@ -149,9 +149,11 @@ tar:	patch doc
 	-ln -s . smokeping-$(VERSION)
 	find smokeping-$(VERSION)/* -type f -follow -o -type l | egrep -v '$(IGNORE)' | gtar -T - -czvf smokeping-$(VERSION).tar.gz
 	rm smokeping-$(VERSION)
-	
-dist:   tar
+
+commit:
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
+	
+dist:   tar commit
 	mv smokeping-$(VERSION).tar.gz /home/oetiker/public_html/webtools/smokeping/pub/
 	cp CHANGES /home/oetiker/public_html/webtools/smokeping/pub/CHANGES
 
