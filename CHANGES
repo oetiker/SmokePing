@@ -1,3 +1,5 @@
+2005/9/26 -- released version 20050926_trunk
+
 * fixed FPing probe so it doesn't report 100% loss when the first ping is lost
   -- niko, reported by Matthew Swainston <njunk *exemail.com.au>
 * don't need to have all the external modules installed to build the
