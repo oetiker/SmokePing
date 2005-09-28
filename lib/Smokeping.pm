@@ -2472,7 +2472,9 @@ sub daemonize_me ($) {
 
 	sub initialize_cgilog (){
 		$use_cgilog = 1;
-        CGI::Carp::set_progname($0 . " [client " . ($ENV{REMOTE_ADDR}||"(unknown)") . "]");
+		# set_progname() is available starting with CGI.pm-2.82 / Perl 5.8.1
+		# so trap this inside 'eval'
+		eval 'CGI::Carp::set_progname($0 . " [client " . ($ENV{REMOTE_ADDR}||"(unknown)") . "]")';
 		$logging=1;
 	}
 
