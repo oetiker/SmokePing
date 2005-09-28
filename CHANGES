@@ -1,3 +1,5 @@
+2005/9/29 -- released version 20050929_trunk
+
 * make having an older version of CGI::Carp a non-fatal error and
   recommend a newer one in the docs
   -- niko, reported by Ron Bisset <Ron.Bisset *cnrinternational.com>
