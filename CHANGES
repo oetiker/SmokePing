@@ -1,3 +1,7 @@
+* make having an older version of CGI::Carp a non-fatal error and
+  recommend a newer one in the docs
+  -- niko, reported by Ron Bisset <Ron.Bisset *cnrinternational.com>
+
 2005/9/26 -- released version 2.0.3
 
 * fixed FPing probe so it doesn't report 100% loss when the first ping is lost

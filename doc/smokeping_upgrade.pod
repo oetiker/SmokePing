@@ -230,6 +230,12 @@ in the C<host> variable, like it is with all the other probes.
 
 =back
 
+=head2 CGI::Carp module version
+
+The recommended version for CGI::Carp is now at least 1.24, included in
+CGI.pm-2.82 and the Perl standard distribution starting from 5.8.1.
+See L<the smokeping_install document|smokeping_install>. 
+
 =head1 1.38 to 1.40
 
 =over
