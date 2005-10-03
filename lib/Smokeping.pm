@@ -1608,7 +1608,8 @@ DOC
 	 _vars =>
 	 [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
               smokemail cgiurl mailhost contact netsnpp
-	      syslogfacility syslogpriority concurrentprobes changeprocessnames tmail) ],
+	      syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
+	      changecgiprogramname) ],
 	 _mandatory =>
 	 [ qw(owner imgcache imgurl datadir piddir
               smokemail cgiurl contact) ],
@@ -1775,6 +1776,19 @@ be appended to the process name as '[probe]', eg.  '/usr/bin/smokeping
 [FPing]'. If you don't like this behaviour, set this variable to 'no'.
 If 'concurrentprobes' is not set to 'yes', this variable has no effect.
 DOC
+          _default => 'yes',
+	 },
+	 changecgiprogramname => {
+	  _re => '(yes|no)',
+          _re_error =>"this must either be 'yes' or 'no'",
+	  _doc => <<DOC,
+Usually the Smokeping CGI tries to log any possible errors with an extended
+program name that includes the IP address of the remote client for easier
+debugging. If this variable is set to 'no', the program name will not be 
+modified. The only reason you would want this is if you have a very old
+version of the CGI::Carp module. See 
+L<the installation document|smokeping_install> for details.
+DOC,
           _default => 'yes',
 	 },
      tmail => 
@@ -2472,10 +2486,13 @@ sub daemonize_me ($) {
 
 	sub initialize_cgilog (){
 		$use_cgilog = 1;
+		$logging=1;
+		return if $cfg->{General}{changecgiprogramname} eq 'no';
 		# set_progname() is available starting with CGI.pm-2.82 / Perl 5.8.1
 		# so trap this inside 'eval'
+		# even this apparently isn't enough for older versions that try to
+		# find out whether they are inside an eval...oh well.
 		eval 'CGI::Carp::set_progname($0 . " [client " . ($ENV{REMOTE_ADDR}||"(unknown)") . "]")';
-		$logging=1;
 	}
 
 	sub initialize_filelog ($){
