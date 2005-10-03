@@ -1788,7 +1788,7 @@ debugging. If this variable is set to 'no', the program name will not be
 modified. The only reason you would want this is if you have a very old
 version of the CGI::Carp module. See 
 L<the installation document|smokeping_install> for details.
-DOC,
+DOC
           _default => 'yes',
 	 },
      tmail => 
