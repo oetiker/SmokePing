@@ -1,3 +1,5 @@
+2005/10/4 -- released version 20051004_trunk
+
 * make it work (hopefully) with even older versions of CGI::Carp if
   'changecgiprogramname' is set to 'no' in the General section
   -- niko
