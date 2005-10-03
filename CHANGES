@@ -1,6 +1,9 @@
 * make having an older version of CGI::Carp a non-fatal error and
   recommend a newer one in the docs
   -- niko, reported by Ron Bisset <Ron.Bisset *cnrinternational.com>
+* make it work (hopefully) with even older versions of CGI::Carp if
+  'changecgiprogramname' is set to 'no' in the General section
+  -- niko
 
 2005/9/26 -- released version 2.0.3
 
