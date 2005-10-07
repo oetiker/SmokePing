@@ -1,3 +1,5 @@
+* only warn if RRA parameters other than CF are different 
+  config file and an RRD -- niko, for Javier Oviedo <joviedo *plcendesa.com>
 * make having an older version of CGI::Carp a non-fatal error and
   recommend a newer one in the docs
   -- niko, reported by Ron Bisset <Ron.Bisset *cnrinternational.com>

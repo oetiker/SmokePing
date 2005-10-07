@@ -412,9 +412,10 @@ sub init_target_tree ($$$$) {
 		}
 	    } else {
 	    	shift @create; # remove the filename
-	    	my $comparison = Smokeping::RRDtools::compare($name.".rrd", \@create);
+	    	my ($fatal, $comparison) = Smokeping::RRDtools::compare($name.".rrd", \@create);
 		die("Error: RRD parameter mismatch ('$comparison'). You must delete $name.rrd or fix the configuration parameters.\n")
-			if $comparison;
+			if $fatal;
+		warn("Warning: RRD parameter mismatch('$comparison'). Continuing anyway.\n") if $comparison and not $fatal;
 		Smokeping::RRDtools::tuneds($name.".rrd", \@create);			
 	    }
 	}

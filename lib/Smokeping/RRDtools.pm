@@ -19,7 +19,8 @@ Smokeping::RRDtools - Tools for RRD file handling
 
  # or compare them against another create list
  my @create = ('--step', 60, 'DS:ds0:GAUGE:120:0:U', 'RRA:AVERAGE:0.5:1:1008');
- my $comparison = Smokeping::RRDtools::compare($file, \@create);
+ my ($fatal, $comparison) = Smokeping::RRDtools::compare($file, \@create);
+ print "Fatal: " if $fatal;
  print "Create arguments didn't match: $comparison\n" if $comparison;
 
  Smokeping::RRDtools::tuneds($file, \@create);
@@ -41,9 +42,13 @@ but it B<will> contain the C<step> parameter.
 The function C<compare> must be called with two arguments: the path to the
 interesting RRD file, and a reference to an argument list that could be fed
 to C<RRDs::create>. The function will then simply compare the result of
-C<info2create> with this argument list.  It will return C<undef> if the
-arguments matched, and a string indicating the difference if a discrepancy
-was found. Note that if there is a C<start> parameter in the argument list,
+C<info2create> with this argument list. It will return an array of two values:
+C<(fatal, text)> where  C<fatal> is 1 if it found a fatal difference, and 0 if not.
+The C<text> will contain an error message if C<fatal == 1> and a possible warning 
+message if C<fatal == 0>. If C<fatal == 0> and C<text> is C<undef>, all the
+arguments matched.
+
+Note that if there is a C<start> parameter in the argument list,
 C<compare> disregards it. If C<step> isn't specified, C<compare> will use
 the C<rrdtool> default of 300 seconds. C<compare> ignores non-matching DS
 parameters since C<tuneds> will fix them.
@@ -160,27 +165,34 @@ sub compare {
 	} else {
 		$step2 = 300; # default value
 	}
-	return "Wrong value of step: $file has $step, create string has $step2"
+	return (1, "Wrong value of step: $file has $step, create string has $step2")
 		unless $step == $step2;
 	
 	my $dscount = grep /^DS/, @create;
 	my $dscount2 = grep /^DS/, @create2;
-	return "Different number of data sources: $file has $dscount2, create string has $dscount"
+	return (1, "Different number of data sources: $file has $dscount2, create string has $dscount")
 		unless $dscount == $dscount2;
 	my $rracount = grep /^RRA/, @create;
 	my $rracount2 = grep /^RRA/, @create2;
-	return "Different number of RRAs: $file has $rracount2, create string has $rracount"
+	return (1, "Different number of RRAs: $file has $rracount2, create string has $rracount")
 		unless $rracount == $rracount2;
 
+	my $warning;
 	while (my $arg = shift @create) {
 		my $arg2 = shift @create2;
 		my @ds = split /:/, $arg;
 		my @ds2 = split /:/, $arg2;
 		next if $ds[0] eq 'DS' and $ds[0] eq $ds2[0] and $ds[1] eq $ds2[1] and $ds[2] eq $ds2[2];
-		return "Different arguments: $file has $arg2, create string has $arg"
-			unless $arg eq $arg2;
+		if ($arg ne $arg2) {
+			if ($ds[0] eq 'RRA' and $ds[0] eq $ds2[0] and $ds[1] eq $ds2[1]) {
+				# non-fatal: CF is the same, but xff/steps/rows differ
+				$warning .= "Different RRA parameters: $file has $arg2, create string has $arg";
+			} else {
+				return (1, "Different arguments: $file has $arg2, create string has $arg");
+			}
+		}
 	}
-	return undef;
+	return (0, $warning);
 }
 
 sub tuneds {
