@@ -2552,8 +2552,9 @@ sub daemonize_me ($) {
 
 my $RCS_VERSION = '$Id: Smokeping.pm,v 1.5 2004/10/21 21:10:51 oetiker Exp $';
 
-sub load_cfg ($) { 
+sub load_cfg ($;$) { 
     my $cfgfile = shift;
+    my $noinit = shift;
     my $cfmod = (stat $cfgfile)[9] || die "ERROR: calling stat on $cfgfile: $!\n";
     # when running under speedy this will prevent reloading on every run
     # if cfgfile has been modified we will still run.
@@ -2567,6 +2568,7 @@ sub load_cfg ($) {
         $probes = undef;
 	$probes = load_probes $cfg;
 	$cfg->{__probes} = $probes;
+	return if $noinit;
 	init_alerts $cfg if $cfg->{Alerts};
       	init_target_tree $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
     } else {
@@ -2903,15 +2905,16 @@ sub main (;$) {
     initialize_debuglog if $opt{debug} or $opt{'debug-daemon'};
     my $cfgfile = $opt{config} || $defaultcfg;
     if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
-    load_cfg $cfgfile;
-    if(defined $opt{'static-pages'}) { makestaticpages $cfg, $opt{'static-pages'}; exit 0 };
-    if($opt{email})    { enable_dynamic $cfg, $cfg->{Targets},"",""; exit 0 };
-    if($opt{restart})  { kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGINT;};
     if($opt{reload})  { 
+    	load_cfg $cfgfile, 'noinit'; # we need just the piddir
         kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGHUP; 
         print "HUP signal sent to the running SmokePing process, exiting.\n";
         exit 0;
     };
+    load_cfg $cfgfile;
+    if(defined $opt{'static-pages'}) { makestaticpages $cfg, $opt{'static-pages'}; exit 0 };
+    if($opt{email})    { enable_dynamic $cfg, $cfg->{Targets},"",""; exit 0 };
+    if($opt{restart})  { kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGINT;};
     if($opt{logfile})      { initialize_filelog($opt{logfile}) };
     if (not keys %$probes) {
     	do_log("No probes defined, exiting.");
