@@ -11,7 +11,7 @@
 2005/10/8 -- released version 20051008_trunk
 
 * only warn if RRA parameters other than CF are different
-  config file and an RRD -- niko, for Javier Oviedo <joviedo *plcendesa.com>
+  in the config file and an RRD -- niko, for Javier Oviedo <joviedo *plcendesa.com>
 
 2005/10/7 -- released version 20051007_trunk
 
