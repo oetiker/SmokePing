@@ -1,3 +1,5 @@
+2005/10/13 -- released version 20051013_trunk
+
 2005/10/12 -- released version 20051012_trunk
 
 * avoid creating new RRD files as the user running 'smokeping --reload'
