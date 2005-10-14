@@ -734,7 +734,7 @@ sub get_detail ($$$$){
                 unless -d  $cfg->{General}{imgcache}.$dir;
 	
     }
-    my $rrd = $cfg->{General}{datadir}."/".$dir."/${file}.rrd";
+    my $rrd = $cfg->{General}{datadir}.$dir."/${file}.rrd";
 
     my $imgbase;
     my $imghref;
