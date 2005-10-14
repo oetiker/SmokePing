@@ -670,17 +670,17 @@ sub findmax ($$) {
 }
 
 sub smokecol ($) {
-    my $count = ( shift )- 2 ;
-    return [] unless $count > 0;
+    my $count = shift;
+    return [] unless $count > 2;
     my $half = $count/2;
     my @items;
     for (my $i=$count; $i > $half; $i--){
 	my $color = int(190/$half * ($i-$half))+50;
-	push @items, "AREA:cp".($i+2)."#".(sprintf("%02x",$color) x 3);
+	push @items, "AREA:cp".($i)."#".(sprintf("%02x",$color) x 3);
     };
-    for (my $i=int($half); $i >= 0; $i--){
-	my $color = int(190/$half * ($half - $i))+64;
-	push @items, "AREA:cp".($i+2)."#".(sprintf("%02x",$color) x 3);
+    for (my $i=int($half); $i > 0; $i--){
+	my $color = int(190/$half * ($half - $i + 1))+64;
+	push @items, "AREA:cp".($i)."#".(sprintf("%02x",$color) x 3);
     };
     return \@items;
 }
