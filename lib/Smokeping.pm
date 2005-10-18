@@ -1107,7 +1107,7 @@ sub update_rrds($$$$$) {
                         next;
                     };
                     my $prevmatch = $tree->{prevmatch}{$_} || 0;
-                    my $match = &{$cfg->{Alerts}{$_}{sub}}($x);
+                    my $match = &{$cfg->{Alerts}{$_}{sub}}($x) || 0; # Avgratio returns undef
                     my $edgetrigger = $cfg->{Alerts}{$_}{edgetrigger} eq 'yes';
                     my $what;
                     if ($edgetrigger and $prevmatch != $match) {

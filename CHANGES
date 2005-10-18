@@ -1,3 +1,6 @@
+* get rid of 'Use of uninitialized value' messages when using the Avgratio matcher
+  and 'edgetrigger' -- niko, reported by John L Hoo <jhoo *antapex.ca>
+
 2005/10/18 -- released version 20051018_trunk
 
 2005/10/17 -- released version 20051017_trunk
