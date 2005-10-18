@@ -1,3 +1,5 @@
+* get rid of 'Use of uninitialized value' messages when using the Avgratio matcher
+  and 'edgetrigger' -- niko, reported by John L Hoo <jhoo *antapex.ca>
 * include the smallest ping value in the graphs too
   -- niko, from ChunjingHan <chjhan *cstnet.cn>
 
