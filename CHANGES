@@ -1,3 +1,6 @@
+* make the Curl probe compatible with Perl 5.6
+  -- niko, reported by Ben Eisenbraun <bene *klatsch.org>
+
 2005/10/19 -- released version 20051019_trunk
 
 * get rid of 'Use of uninitialized value' messages when using the Avgratio matcher
