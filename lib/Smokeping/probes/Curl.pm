@@ -263,7 +263,7 @@ sub pingone {
 	my $count = $self->pings($t);
 
 	for (my $i = 0 ; $i < $count; $i++) {
-		open(P, "-|", @cmd) or croak("fork: $!");
+		open(P, "-|") or exec @cmd;
 
 		my $val;
 
