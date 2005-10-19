@@ -1,3 +1,5 @@
+2005/10/20 -- released version 20051020_trunk
+
 * make the Curl probe compatible with Perl 5.6
   -- niko, reported by Ben Eisenbraun <bene *klatsch.org>
 
