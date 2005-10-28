@@ -1,3 +1,6 @@
+* add the 'scope' Net::LDAP search option to the LDAP probe
+  -- niko, from Seppo Syrjänen <seppo.syrjanen *helsinki.fi>
+
 2005/10/28 -- released version 20051028_trunk
 
 2005/10/27 -- released version 20051027_trunk
