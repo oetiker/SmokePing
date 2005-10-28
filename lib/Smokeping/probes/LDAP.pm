@@ -145,6 +145,12 @@ sub targetvars {
 s.",
                         _re => '(\d*\.)?\d+',
                 },
+		scope => {
+			_doc => "The scope of the query. Can be either 'base', 'one' or 'sub'. See the Net::LDAP documentation for details.",
+			_example => "one",
+			_re => "(base|one|sub)",
+			_default => "sub",
+		},
 	});
 }
 
@@ -170,6 +176,8 @@ sub pingone {
 	my $binddn = $vars->{binddn};
 
 	my $timeout = $vars->{timeout};
+
+	my $scope = $vars->{scope};
 
 	my $password;
 	if (defined $binddn) {
@@ -203,7 +211,7 @@ sub pingone {
 		}
 		local $IO::Socket::SSL::SSL_Context_obj; # ugly but necessary
 		$start = gettimeofday();
-		my $ldap = new Net::LDAP($host, port => $port, version => $version, timeout => $timeout) 
+		my $ldap = new Net::LDAP($host, port => $port, version => $version, timeout => $timeout, scope => $scope) 
 			or do {
 				$self->do_log("connection error on $host: $!");
 				next;

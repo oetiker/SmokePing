@@ -1,3 +1,5 @@
+* add the 'scope' Net::LDAP search option to the LDAP probe
+  -- niko, from Seppo Syrjänen <seppo.syrjanen *helsinki.fi>
 * make the Curl probe compatible with Perl 5.6
   -- niko, reported by Ben Eisenbraun <bene *klatsch.org>
 * get rid of 'Use of uninitialized value' messages when using the Avgratio matcher
