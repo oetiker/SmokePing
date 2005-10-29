@@ -1,3 +1,5 @@
+2005/10/30 -- released version 20051030_trunk
+
 2005/10/29 -- released version 20051029_trunk
 
 * add the 'scope' Net::LDAP search option to the LDAP probe
