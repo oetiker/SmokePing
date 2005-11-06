@@ -219,9 +219,9 @@ sub proto_args {
 	# we take the total time minus the DNS lookup time.
 	my @args = ("-o", "/dev/null", "-w", "Time: %{time_total} DNS time: %{time_namelookup}\\n");
 	my $ssl2 = $target->{vars}{ssl2};
-	push (@args, "-2") if defined($ssl2);
-    my $insecure_ssl = $target->{vars}{insecure_ssl};
-    push (@args, '-k') if defined $insecure_ssl;
+	push (@args, "-2") if $ssl2;
+	my $insecure_ssl = $target->{vars}{insecure_ssl};
+	push (@args, '-k') if $insecure_ssl;
 
 	return(@args);
 }
