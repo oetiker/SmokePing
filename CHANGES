@@ -1,3 +1,5 @@
+* Curl.pm: don't take '0' for 'true' with the 'ssl2' or 'insecure_ssl' options
+  -- niko, reported by Michael McCarn <mmccarn *sierracorp.us>
 * add the 'scope' Net::LDAP search option to the LDAP probe
   -- niko, from Seppo Syrjänen <seppo.syrjanen *helsinki.fi>
 * make the Curl probe compatible with Perl 5.6
