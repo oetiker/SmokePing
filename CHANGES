@@ -1,3 +1,5 @@
+2005/11/8 -- released version 20051108_trunk
+
 2005/11/7 -- released version 20051107_trunk
 
 * Curl.pm: don't take '0' for 'true' with the 'ssl2' or 'insecure_ssl' options
