@@ -106,7 +106,7 @@ sub lnk ($$) {
     if ($q->isa('dummyCGI')) {
 	return $path . ".html";
     } else {
-	return ($q->script_name() || '') . "?target=" . $path;
+	return $cfg->{General}->{cgiurl} . "?target=" . $path;
     }
 }
 
@@ -999,7 +999,7 @@ sub display_webpage($$){
        {
 	menu => target_menu($cfg->{Targets},
 			    [@$open], #copy this because it gets changed
-			    ($q->script_name() || '')."?target="),
+			    $cfg->{General}->{cgiurl}."?target="),
 	title => $tree->{title},
 	remark => ($tree->{remark} || ''),
 	overview => get_overview( $cfg,$q,$tree,$open ),
