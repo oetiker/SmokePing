@@ -1,3 +1,5 @@
+* remove the FPing 'timeout' variable, since it never really did anything
+  -- niko
 * use the 'cgiurl' variable from the 'General' section for all CGI self-refering 
   links -- niko, from Christian Hammers <ch .*debian.org> (Debian bug #339019)
 * Curl.pm: don't take '0' for 'true' with the 'ssl2' or 'insecure_ssl' options
