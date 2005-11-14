@@ -104,7 +104,6 @@ sub ping ($){
     return unless @{$self->addresses};
     my @params = () ;
     push @params , "-b$self->{properties}{packetsize}" if $self->{properties}{packetsize};
-    push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     push @params, "-i" . int(1000 * $self->{properties}{mininterval});
     push @params, "-p" . int(1000 * $self->{properties}{hostinterval}) if $self->{properties}{hostinterval};
     my @cmd = (
@@ -157,17 +156,6 @@ sub probevars {
 			},
 			_doc => "The ping packet size (in the range of 12-64000 bytes).",
 
-		},
-		timeout => {
-			_re => '(\d*\.)?\d+',
-			_example => 1.5,
-			_doc => <<DOC,
-The fping "-t" parameter, but in (possibly fractional) seconds rather than
-milliseconds, for consistency with other Smokeping probes. From fping(1):
-
-Initial target timeout. In the default mode, this is  the  amount  of  time  that
-ping waits for a response to its first request.  Successive timeouts are multiplied by the backoff factor.
-DOC
 		},
 		hostinterval => {
 			_re => '(\d*\.)?\d+',
