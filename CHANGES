@@ -1,3 +1,6 @@
+* use the 'cgiurl' variable from the 'General' section for all CGI self-refering 
+  links -- niko, from Christian Hammers <ch .*debian.org> (Debian bug #339019)
+
 2005/11/14 -- released version 20051114_trunk
 
 2005/11/13 -- released version 20051113_trunk
