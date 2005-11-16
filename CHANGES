@@ -1,3 +1,5 @@
+2005/11/16 -- released version 20051116_trunk
+
 2005/11/15 -- released version 20051115_trunk
 
 * remove the FPing 'timeout' variable, since it never really did anything
