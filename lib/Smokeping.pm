@@ -2055,7 +2055,7 @@ DOC
 			   return undef;
 		       },
 		     },        
-	 height => {  _doc => 'How many pixels heigh should detail graphs be',
+	 height => {  _doc => 'How many pixels high should detail graphs be',
 		    _sub => sub {
 			  return "height must be an integer >= 10"
 			    unless $_[ 0 ] >= 10
