@@ -1,3 +1,5 @@
+* fixed spelling for height -- tobi
+
 2005/11/14 -- released version 2.0.5
 
 * remove the FPing 'timeout' variable, since it never really did anything
