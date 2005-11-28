@@ -128,6 +128,26 @@ DOC
 				return undef;
 			},
 		},
+		follow_redirects => {
+			_doc => <<DOC,
+If this variable is set to 'yes', curl will follow any HTTP redirection steps (the '-L' option).
+If set to 'no', HTTP Location: headers will not be followed. See also 'include_redirects'.
+DOC
+			_default => "no",
+			_re => "(yes|no)",
+			_example => "yes",
+		},
+
+		include_redirects => {
+			_doc => <<DOC,
+If this variable is set to 'yes', the measurement result will include the time
+spent on following any HTTP redirection steps. If set to 'no', only the last
+step is measured. See also 'follow_redirects'.
+DOC
+			_default => "no",
+			_re => "(yes|no)",
+			_example => "yes",
+		},
 		extraargs => {
 			_doc => <<DOC,
 Any extra arguments you might want to hand to curl(1). The arguments
@@ -189,7 +209,9 @@ sub test_usage {
 		}
 	}
 	map { delete $arghashref->{$_} } @unsupported;
-
+	if (`$bin -o /dev/null -w '<%{time_redirect}>\n' 127.0.0.1 2>&1` =~ /^<>/m) {
+		$self->do_log("Note: your curl doesn't support the 'time_redirect' output variable; 'include_redirects' will not function.");
+	}
 	return;
 }
 
@@ -217,11 +239,13 @@ sub proto_args {
 	my $target = shift;
 	# XXX - It would be neat if curl had a "time_transfer".  For now,
 	# we take the total time minus the DNS lookup time.
-	my @args = ("-o", "/dev/null", "-w", "Time: %{time_total} DNS time: %{time_namelookup}\\n");
+	my @args = ("-o", "/dev/null", "-w", "Time: %{time_total} DNS time: %{time_namelookup} Redirect time: %{time_redirect}\\n");
 	my $ssl2 = $target->{vars}{ssl2};
 	push (@args, "-2") if $ssl2;
 	my $insecure_ssl = $target->{vars}{insecure_ssl};
 	push (@args, '-k') if $insecure_ssl;
+	my $follow = $target->{vars}{follow_redirects};
+	push (@args, '-L') if $follow eq "yes";
 
 	return(@args);
 }
@@ -268,7 +292,14 @@ sub pingone {
 		my $val;
 
 		while (<P>) {
-			/^Time: (\d+\.\d+) DNS time: (\d+\.\d+)/ and $val = $1 - $2;
+			chomp;
+			/^Time: (\d+\.\d+) DNS time: (\d+\.\d+) Redirect time: (\d+\.\d+)?/ and do {
+				$val = $1 - $2;
+				if ($t->{vars}{include_redirects} eq "yes" and defined $3) {
+					$val += $3;
+				}
+				$self->do_debug("curl output: '$_', result: $val");
+			};
 		}
 		close P and defined $val and push @times, $val;
 	}
