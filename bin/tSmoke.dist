@@ -89,8 +89,15 @@ my $RCS_VERSION = '$id: tSmoke.v 0.4 2004/03 McGinn-Combs';
 
 sub test_mail($) {
 	my $cfg = shift;
-	print "Mail will be sent to $cfg->{Alerts}{to}\n";
-	print "Mail will be sent from $cfg->{Alerts}{from}\n";
+	my $mail = <<"EOF";
+Subject: tSmoke test
+To: $cfg->{Alerts}{to}
+
+This is a test mail with 'tSmoke --testmail'.
+EOF
+	print "Sending a test mail to $cfg->{Alerts}{to} from $cfg->{Alerts}{from}...";
+	Smokeping::sendmail($cfg->{Alerts}{from}, $cfg->{Alerts}{to}, $mail);
+	print "done.\n";
 };
 
 sub morning_update($) {
