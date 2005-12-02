@@ -239,7 +239,7 @@ sub proto_args {
 	my $target = shift;
 	# XXX - It would be neat if curl had a "time_transfer".  For now,
 	# we take the total time minus the DNS lookup time.
-	my @args = ("-o", "/dev/null", "-w", "Time: %{time_total} DNS time: %{time_namelookup} Redirect time: %{time_redirect}\\n");
+	my @args = ("-w", "Time: %{time_total} DNS time: %{time_namelookup} Redirect time: %{time_redirect}\\n");
 	my $ssl2 = $target->{vars}{ssl2};
 	push (@args, "-2") if $ssl2;
 	my $insecure_ssl = $target->{vars}{insecure_ssl};
@@ -269,10 +269,12 @@ sub make_commandline {
 	my $url = $target->{vars}{urlformat};
 	my $host = $target->{addr};
 	$url =~ s/%host%/$host/g;
+	my @urls = split(/\s+/, $url);
+	push @args, ("-o", "/dev/null") for (@urls);
 	push @args, $self->proto_args($target);
 	push @args, $self->extra_args($target);
 	
-	return ($self->{properties}{binary}, @args, $url);
+	return ($self->{properties}{binary}, @args, @urls);
 }
 
 sub pingone {
@@ -294,7 +296,7 @@ sub pingone {
 		while (<P>) {
 			chomp;
 			/^Time: (\d+\.\d+) DNS time: (\d+\.\d+) Redirect time: (\d+\.\d+)?/ and do {
-				$val = $1 - $2;
+				$val += $1 - $2;
 				if ($t->{vars}{include_redirects} eq "yes" and defined $3) {
 					$val += $3;
 				}

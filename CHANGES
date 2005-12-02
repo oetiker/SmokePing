@@ -1,3 +1,5 @@
+* Curl.pm: handle measurement of multiple URLs by adding the results together
+  -- niko, requested by <rob *dejongnet.net>
 * Curl.pm: new variables 'follow_redirects' and 'include_redirects'
   -- niko, requested by <rob *dejongnet.net>
 * fixed spelling for height -- tobi
