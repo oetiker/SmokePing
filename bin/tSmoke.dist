@@ -126,7 +126,7 @@ sub morning_update($) {
 		$target =~ s/.rrd//;
 		$TmpBody .= "$target\n" if $Loss == 0;
 	}
-	$Body = "Subject: Of $Count Hosts, $Down Down:\n";
+	$Body = "Subject: Of $Count Hosts, $Down Down\n";
 	$Body .= "To: $To\n\n";
 	$Body .= $TmpBody;
 	Smokeping::sendmail($cfg->{Alerts}{from},$To,$Body);
