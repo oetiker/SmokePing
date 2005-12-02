@@ -1,3 +1,9 @@
+* really send a test email with 'tSmoke --testmail' -- niko
+* Curl.pm: handle measurement of multiple URLs by adding the results together
+  -- niko, requested by Rob de Jong <rob *dejongnet.net>
+* Curl.pm: new variables 'follow_redirects' and 'include_redirects'
+  -- niko, requested by Rob de Jong <rob *dejongnet.net>
+
 2005/12/2 -- released version 20051202_trunk
 
 2005/12/1 -- released version 20051201_trunk

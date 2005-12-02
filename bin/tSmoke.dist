@@ -40,7 +40,7 @@
 # Many thanks to the following people for their help and guidance:
 # Jim Horwath of Agere Systems Inc. for his examples and pointers to Spreadsheet::WriteExcel
 # Frank Harper the author of SLAMon, a tool for tracking Service Level Agreements
-# Tobias Oeticker, or course, the author of Smokeping, RRDTool and MRTG
+# Tobias Oetiker, or course, the author of Smokeping, RRDTool and MRTG
 #
 use strict;
 
@@ -89,32 +89,16 @@ my $RCS_VERSION = '$id: tSmoke.v 0.4 2004/03 McGinn-Combs';
 
 sub test_mail($) {
 	my $cfg = shift;
-	print "Mail will be sent to $cfg->{Alerts}{to}\n";
-	print "Mail will be sent from $cfg->{Alerts}{from}\n";
-};
+	my $mail = <<"EOF";
+Subject: tSmoke test
+To: $cfg->{Alerts}{to}
 
-sub sendmail ($$$$){
-    my $from = shift;
-    my $to = shift;
-    my $subject = shift;
-    my $body = shift;
-    if ($cfg->{General}{mailhost}){
-	my $smtp = Net::SMTP->new($cfg->{General}{mailhost});
-	$smtp->mail($from);
-	$smtp->to($to);
-	$smtp->data();
-	$smtp->datasend("Subject: $subject\n");
-        $smtp->datasend("To: $to\n");
-	$smtp->datasend($body);
-	$smtp->dataend();
-	$smtp->quit;
-    } elsif ($cfg->{General}{sendmail} or -f "/usr/lib/sendmail"){
-	open (M, "|-") || exec (($cfg->{General}{sendmail} || "/usr/lib/sendmail"),"-f",$from,$to);
-        print M "Subject: $subject\n";
-	print M $body;
-	close M;
-    }
-}
+This is a test mail with 'tSmoke --testmail'.
+EOF
+	print "Sending a test mail to $cfg->{Alerts}{to} from $cfg->{Alerts}{from}...";
+	Smokeping::sendmail($cfg->{Alerts}{from}, $cfg->{Alerts}{to}, $mail);
+	print "done.\n";
+};
 
 sub morning_update($) {
 	# Send out a morning summary of devices that are down
@@ -142,8 +126,11 @@ sub morning_update($) {
 		$target =~ s/.rrd//;
 		$TmpBody .= "$target\n" if $Loss == 0;
 	}
-	$Body = "Of $Count Hosts, $Down Down:\n" . $TmpBody;
-	sendmail $cfg->{Alerts}{from},$To,"Of $Count Hosts, $Down Down",$Body;
+	$Body = "Subject: Of $Count Hosts, $Down Down\n";
+	$Body .= "To: $To\n\n";
+	$Body = "Of $Count Hosts, $Down Down:\n";
+	$Body .= $TmpBody;
+	Smokeping::sendmail($cfg->{Alerts}{from},$To,$Body);
 }
 
 sub weekly_update($) {
@@ -220,6 +207,8 @@ sub weekly_update($) {
 	}
 
         # Prepare the e-mail message
+	    $Body = "Subject: IT System Availability\n";
+	    $Body .= "To: $To\n\n";
 	    open tSMOKE, $cfg->{General}{tmail} or die "ERROR: can't read $cfg->{General}{tmail}\n";
 	    while (<tSMOKE>){
                 my $Summary = Summary_Sheet();
@@ -235,7 +224,7 @@ sub weekly_update($) {
 		$Body .= $_;
 	    }
 	    close tSMOKE;
-        sendmail ( $cfg->{Alerts}{from}, $To, "IT System Availability", $Body );
+        Smokeping::sendmail($cfg->{Alerts}{from}, $To, $Body);
 }
 
 sub update_stats($$$$$);

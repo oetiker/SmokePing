@@ -740,7 +740,7 @@ sub get_detail ($$$$){
     my $imghref;
     my $max;
     my @tasks;
-    my %lasthight;	
+    my %lastheight;	
 
     if ($mode eq 's'){
 	# in nave mode there is only one graph, so the height calculation
@@ -748,16 +748,16 @@ sub get_detail ($$$$){
 	$imgbase = $cfg->{General}{imgcache}."/".(join "/", @dirs)."/${file}";
 	$imghref = $cfg->{General}{imgurl}."/".(join "/", @dirs)."/${file}";	
 	@tasks = @{$cfg->{Presentation}{detail}{_table}};
-	if (open (HG,"<${imgbase}.maxhight")){
+	if (open (HG,"<${imgbase}.maxheight")){
 	    while (<HG>){
 		chomp;
 		my @l = split / /;
-		$lasthight{$l[0]} = $l[1];
+		$lastheight{$l[0]} = $l[1];
 	    }
 	    close HG;
 	}
 	$max = findmax $cfg, $rrd;
-	if (open (HG,">${imgbase}.maxhight")){
+	if (open (HG,">${imgbase}.maxheight")){
 	    foreach my $s (keys %{$max}){
 		print HG "$s $max->{$s}\n";        
 	    }
@@ -906,7 +906,7 @@ sub get_detail ($$$$){
 	  $cfg->{Presentation}{detail}{logarithmic} eq 'yes';
 	
         my @lazy =();
-        @lazy = ('--lazy') if $mode eq 's' and $lasthight{$start} and $lasthight{$start} == $max->{$start};
+        @lazy = ('--lazy') if $mode eq 's' and $lastheight{$start} and $lastheight{$start} == $max->{$start};
 	$desc = "Navigator Graph" if $mode eq 'n';
         my $timer_start = time();
         my @task =
