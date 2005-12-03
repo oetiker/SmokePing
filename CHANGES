@@ -1,3 +1,5 @@
+2005/12/3 -- released version 20051203_trunk
+
 * really send a test email with 'tSmoke --testmail' -- niko
 * Curl.pm: handle measurement of multiple URLs by adding the results together
   -- niko, requested by Rob de Jong <rob *dejongnet.net>
