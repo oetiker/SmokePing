@@ -130,6 +130,7 @@ sub targetvars {
            keytype => {
                _doc => "The type of key, used in ssh-keyscan -t <keytype>",
                _example => 'dsa',
+	       _re => '[dr]sa',
                 _default => 'rsa',
            },
        })
