@@ -54,7 +54,7 @@ sub new($$$)
         my $call = "$self->{properties}{binary} -t rsa localhost";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
-            $self->{pingfactor} = 10;
+            $self->{pingfactor} = POSIX::sysconf( &POSIX::_SC_CLK_TCK ) || 100 ;
             print "### parsing ssh-keyscan output...OK\n";
         } else {
             croak "ERROR: output of '$call' does not match $ssh_re\n";
@@ -79,25 +79,28 @@ sub pingone ($){
 
     my $host = $target->{addr};
 
-    my $query = "$self->{properties}{binary} -t rsa $host";
+    my $query = "$self->{properties}{binary} -t $self->{properties}{keytype} $host";
     my @times;
 
     # get the user and system times before and after the test
     $self->do_debug("query=$query\n");
     for (my $run = 0; $run < $self->pings; $run++) {
     	my @times1 = POSIX::times;
+        my $time = '-';  # assume it failed
 	my $pid = open3($inh,$outh,$errh, $query);
-	while (<$outh>) {
-	    if (/$ssh_re/i) {
-		last;
-	    }
-	}
+       while (<$errh>) {
+            if (/$ssh_re/i) {
+                my @times2 = POSIX::times;
+                $time = $times2[0]-$times1[0];
+                last;
+            }
+        }
 	waitpid $pid,0;
 	close $errh;
 	close $inh;
 	close $outh;
-    	my @times2 = POSIX::times;
-	push @times, $times2[0]-$times1[0];
+
+       push @times, $time;
     }
     @times = map {sprintf "%.10e", $_ / $self->{pingfactor}} sort {$a <=> $b} grep {$_ ne "-"} @times;
 
@@ -121,4 +124,14 @@ sub probevars {
 	})
 }
 
+sub targetvars {
+        my $class = shift;
+        return $class->_makevars($class->SUPER::targetvars, {
+           keytype => {
+               _doc => "The type of key, used in ssh-keyscan -t <keytype>",
+               _example => 'dsa',
+                _default => 'rsa',
+           },
+       })
+}
 1;

@@ -1,3 +1,5 @@
+* SSH.pm: new variable 'keytype' + bugfixes
+  - niko, from Igor Petrovski <pigor *mm.st>
 * fix a bug that broke target sections with the same name
   in different branches  -- niko, reported by Igor Petrovski <pigor *mm.st>
 * really send a test email with 'tSmoke --testmail' -- niko
