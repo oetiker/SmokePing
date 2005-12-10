@@ -211,10 +211,6 @@ sub _next_level($$$)
         # grammar so that any _dyn sub further below will edit
         # just this branch
 
-        # but first, we have to make this section a new branch
-        # so we don't modify the grammar of other branches
-        $self->{grammar} = _deepcopy($self->{grammar});
-
         $self->{grammar}{$name} = _deepcopy($self->{grammar}{$s});
 
         # put it at the head of the section list
