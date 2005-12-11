@@ -1266,11 +1266,11 @@ sub get_parser () {
     my %storedtargetvars; 
 
     # the part of target section syntax that doesn't depend on the selected probe
-    my %TARGETCOMMON; # predeclare self-referencing structures
+    my $TARGETCOMMON; # predeclare self-referencing structures
     # the common variables
     my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee) ];
-    %TARGETCOMMON = 
-      (
+    $TARGETCOMMON = 
+      {
        _vars     => $TARGETCOMMONVARS,
        _inherited=> [ qw (probe alerts alertee) ],
        _sections => [ "/$KEY_RE/" ],
@@ -1411,7 +1411,7 @@ DOC
 				delete $targetvars->{$_}{_default} for @targetvars;
 
 				# we replace the current grammar altogether
-				%$grammar = ( %TARGETCOMMON, %$targetvars ); 
+				%$grammar = ( %{_deepcopy($TARGETCOMMON)}, %$targetvars ); 
 				$grammar->{_vars} = [ @{$grammar->{_vars}}, @targetvars ];
 
 				# the subsections differ only in that they inherit their vars from here
@@ -1433,7 +1433,7 @@ DOC
 				$g->{host}{_dyn} = $mandatorysub;
 			},
 	   },
-    );
+    };
 
     my $INTEGER_SUB = {
         _sub => sub {
@@ -2331,7 +2331,7 @@ DOC
                    _order => 1,
 		   _sections   => [ "/$KEY_RE/" ],
 		   _recursive  => [ "/$KEY_RE/" ],
-		   "/$KEY_RE/" => \%TARGETCOMMON, # this is just for documentation, _dyn() below replaces it
+		   "/$KEY_RE/" => $TARGETCOMMON, # this is just for documentation, _dyn() below replaces it
 		   probe => { 
 		   	_doc => <<DOC,
 The name of the probe module to be used for this host. The value of
@@ -2358,7 +2358,7 @@ DOC
 					$grammar->{$_} = $targetvars->{$_};
 				}
 				push @{$grammar->{_vars}}, @targetvars;
-				my $g = { %TARGETCOMMON, %{_deepcopy($targetvars)} };
+				my $g = { %{_deepcopy($TARGETCOMMON)}, %{_deepcopy($targetvars)} };
 				$grammar->{"/$KEY_RE/"} = $g;
 				$g->{_vars} = [ @{$g->{_vars}}, @targetvars ];
 				$g->{_inherited} = [ @{$g->{_inherited}}, @targetvars ];

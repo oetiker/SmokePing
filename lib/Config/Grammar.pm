@@ -316,7 +316,7 @@ sub _prev_level($)
     # section name
     if (defined $self->{section}) {
         if ($self->{section} =~ /\//) {
-            $self->{section} =~ s/\/.*?$//;
+            $self->{section} =~ s,/[^/]*$,,;
         }
         else {
             $self->{section} = undef;
