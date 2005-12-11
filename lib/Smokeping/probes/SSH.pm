@@ -19,7 +19,7 @@ use base qw(Smokeping::probes::basefork);
 use IPC::Open3;
 use Symbol;
 use Carp;
-use POSIX;
+use Time::HiRes qw(gettimeofday tv_interval);
 
 sub pod_hash {
 	return {
@@ -31,8 +31,12 @@ Integrates ssh-keyscan as a probe into smokeping. The variable B<binary> must
 point to your copy of the ssh-keyscan program. If it is not installed on
 your system yet, you should install openssh >= 3.8p1
 
-The Probe asks the given host n-times for it's public key. Where n is
+The Probe asks the given host n-times for it's public key, where n is
 the amount specified in the config File.
+
+As part of the initialization, the probe asks localhost for it's public key
+and tries to parse the output. Make sure you have SSH running on the
+localhost as well.
 DOC
 		authors => <<'DOC',
 Christian Recktenwald <smokeping-contact@citecs.de>
@@ -51,10 +55,9 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        my $call = "$self->{properties}{binary} -t rsa localhost";
+        my $call = "$self->{properties}{binary} -t dsa,rsa,rsa1 localhost";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
-            $self->{pingfactor} = POSIX::sysconf( &POSIX::_SC_CLK_TCK ) || 100 ;
             print "### parsing ssh-keyscan output...OK\n";
         } else {
             croak "ERROR: output of '$call' does not match $ssh_re\n";
@@ -79,19 +82,18 @@ sub pingone ($){
 
     my $host = $target->{addr};
 
-    my $query = "$self->{properties}{binary} -t $self->{properties}{keytype} $host";
+    my $query = "$self->{properties}{binary} -t $target->{vars}->{keytype} $host";
     my @times;
 
     # get the user and system times before and after the test
     $self->do_debug("query=$query\n");
     for (my $run = 0; $run < $self->pings; $run++) {
-    	my @times1 = POSIX::times;
-        my $time = '-';  # assume it failed
+       my $t0 = [gettimeofday];
+
 	my $pid = open3($inh,$outh,$errh, $query);
        while (<$errh>) {
             if (/$ssh_re/i) {
-                my @times2 = POSIX::times;
-                $time = $times2[0]-$times1[0];
+                push @times, tv_interval($t0);
                 last;
             }
         }
@@ -100,9 +102,8 @@ sub pingone ($){
 	close $inh;
 	close $outh;
 
-       push @times, $time;
     }
-    @times = map {sprintf "%.10e", $_ / $self->{pingfactor}} sort {$a <=> $b} grep {$_ ne "-"} @times;
+    @times =  map {sprintf "%.10e", $_ } sort {$a <=> $b} @times;
 
 #    $self->do_debug("time=@times\n");
     return @times;
@@ -128,9 +129,8 @@ sub targetvars {
         my $class = shift;
         return $class->_makevars($class->SUPER::targetvars, {
            keytype => {
-               _doc => "The type of key, used in ssh-keyscan -t <keytype>",
+               _doc => "Type of key, used in ssh-keyscan -t <keytype>",
                _example => 'dsa',
-	       _re => '[dr]sa',
                 _default => 'rsa',
            },
        })
