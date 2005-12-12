@@ -1,3 +1,5 @@
+2005/12/12 -- released version 20051212_trunk
+
 * SSH.pm: new variable 'keytype' + bugfixes
   - niko, from Igor Petrovski <pigor *mm.st>
 * fix a bug that broke target sections with the same name
