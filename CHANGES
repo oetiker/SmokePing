@@ -1,3 +1,8 @@
+* Set an --end time for graphs so that fetch does get its its
+  undies in a twist when selecting the RRA and goes for hires
+  due to coverage -- tobi
+* CiscoRTTMonEchoICMP.pm: new variable vrf
+  - Kevin Stewart <kevins *callplus.co.nz>
 * SSH.pm: new variable 'keytype' + bugfixes
   - niko, from Igor Petrovski <pigor *mm.st>
 * fix a bug that broke target sections with the same name
