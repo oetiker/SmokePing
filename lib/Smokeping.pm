@@ -635,7 +635,8 @@ sub findmax ($$) {
 	my ($desc,$start) = @{$_};
 	$start = exp2seconds($start);
 	my ($graphret,$xs,$ys) = RRDs::graph
-	  ("dummy", '--start', -$start,
+	  ("dummy", '--start', -$start, 
+           '--end','-'.int($start / $cfg->{Presentation}{detail}{width}),
            "DEF:maxping=${rrd}:median:AVERAGE",
            'PRINT:maxping:MAX:%le' );
         my $ERROR = RRDs::error();

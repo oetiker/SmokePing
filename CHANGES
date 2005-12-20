@@ -1,3 +1,9 @@
+* Set an --end time for graphs so that fetch does get its its
+  undies in a twist when selecting the RRA and goes for hires
+  due to coverage -- tobi
+* CiscoRTTMonEchoICMP.pm: new variable vrf
+  - Kevin Stewart <kevins *callplus.co.nz>
+
 2005/12/20 -- released version 20051220_trunk
 
 2005/12/19 -- released version 20051219_trunk

@@ -108,7 +108,7 @@ sub pingone ($$) {
 
     if (defined 
         StartRttMibEcho($target->{vars}{ioshost}.":::::2", $target->{addr}, 
-        $bytes, $pings, $target->{vars}{iosint}, $tos, $row)) 
+        $bytes, $pings, $target->{vars}{iosint}, $tos, $row, $target->{vars}{vrf}))
 	{
         # wait for the series to finish
         sleep ($pings*$pingtimeout+5);
@@ -126,7 +126,7 @@ sub pingone ($$) {
 }
 
 sub StartRttMibEcho ($$$$$$){
-	my ($host, $target, $size, $pings, $sourceip, $tos, $row) = @_;
+    my ($host, $target, $size, $pings, $sourceip, $tos, $row,$vrf) = @_;
 
 	# resolve the target name and encode its IP address
 	$_=$target;
@@ -195,6 +195,10 @@ sub StartRttMibEcho ($$$$$$){
 		"rttMonScheduleAdminRttStartTime.$row",	'timeticks',	1,
 		"rttMonScheduleAdminRttLife.$row",	'integer',	$pings*$pingtimeout+3,
 		"rttMonScheduleAdminConceptRowAgeout.$row",'integer', 	60;
+
+    if(defined($vrf)){
+        push @params,"rttMonEchoAdminVrfName.$row",'octetstring',$vrf;
+    }
 
 	# with udpEcho support (>= 12.0(3)T ) the ICMP ping support was enhanced in the RTTMon SW - we are
 	# NOT using udpEcho, but echo (ICMP echo, ping)
@@ -292,6 +296,15 @@ values times 32 to calculate the ToS values to configure, e.g. ToS 160
 corresponds to a DSCP value 40 and a Precedence value of 5. The RTTMon
 MIB versions before IOS 12.0(3)T didn't support this parameter.
 DOC
+            },
+        vrf => {
+            _example => "INTERNET",
+            _doc => <<DOC,
+The the VPN name in which the RTT operation will be used. For regular RTT
+operation this field should not be configured. The agent
+will use this field to identify the VPN routing Table for
+this operation.
+DOC
 		},
 		packetsize => {
 			_doc => <<DOC,
@@ -306,8 +319,8 @@ DOC
 				return "ERROR: packetsize must be between 8 and 16392"
 					unless $val >= 8 and $val <= 16392;
 				return undef;
-			},
-		},
+            }
+        }
 	});
 }
 
