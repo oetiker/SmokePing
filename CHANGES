@@ -1,3 +1,5 @@
+* include a Date field in alert emails, since all M[ST]As don't insert it. 
+  --niko
 * Set an --end time for graphs so that fetch does get its its
   undies in a twist when selecting the RRA and goes for hires
   due to coverage -- tobi

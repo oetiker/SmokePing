@@ -1132,7 +1132,9 @@ sub update_rrds($$$$$) {
                         $urlline =  $cfg->{General}{cgiurl}."?target=".$line;
                         my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
                         my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
-                        my $stamp = scalar localtime time;
+			my $time = time;
+                        my @stamp = localtime($time);
+			my $stamp = localtime($time);
 			my @to;
 			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$cfg->{Alerts}{$_}{to}){
 			     next unless $addr;
@@ -1154,10 +1156,12 @@ SNPPALERT
 			     }
 			};
 			if (@to){
+			    my $rfc2822stamp =  strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
 			    my $to = join ",",@to;
 			    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
 From: $cfg->{Alerts}{from}
+Date: $rfc2822stamp
 Subject: [SmokeAlert] $_ $what on $line
 
 $stamp
