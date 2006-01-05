@@ -1,3 +1,6 @@
+* make buggy_perl_version test work on perl 5.8.7 too ... 
+  --tobi from Nathan Butcher <xqufa .yokohama.riken.jp>
+
 2006/1/5 -- released version 20060105_trunk
 
 2006/1/4 -- released version 20060104_trunk
