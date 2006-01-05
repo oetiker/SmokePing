@@ -1,3 +1,5 @@
+* make buggy_perl_version test work on perl 5.8.7 too ... 
+  --tobi from Nathan Butcher <xqufa .yokohama.riken.jp>
 * include a Date field in alert emails, since all M[ST]As don't insert it. 
   --niko
 * Set an --end time for graphs so that fetch does get its its
