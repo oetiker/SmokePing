@@ -1,3 +1,7 @@
+* ALERTS based on input from multiple targets
+  Wouter Prins <wouter * null0.nl>
+
+
 * ASSIGN BLAME - HALFWAY PING
   - A method for pinging the host in the middle between here and host B
     (use traceroute for figuring out which one it should be)
