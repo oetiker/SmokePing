@@ -23,6 +23,19 @@ An official list of changes with each release can be found in the CHANGES
 file in the Smokeping distribution. This document tries to complement
 that with upgrading instructions etc.
 
+=head1 2.0.5 to 2.0.6
+
+=head2 CGI self-referring links (again)
+
+The way Smokeping creates the self-referring links was changed once more.
+See the section under '2.0.4 to 2.0.5' for a description of the previous
+change.
+
+The behaviour is now customizable via the C<linkstyle> variable in the
+C<General> section of the configuration file. The default is now C<relative>,
+creating links like S<<a href="?foo=bar">>. I hope this works for everybody,
+but if it doesn't, see L<smokeping_config> for the alternatives.
+
 =head1 2.0.4 to 2.0.5
 
 =head2 L<FPing|Smokeping::probes::FPing>
@@ -32,6 +45,14 @@ It was used to give the C<fping> command the C<-t> parameter,
 but as this parameter is only effective in C<fping>'s I<default> mode,
 while Smokeping uses the I<counting> mode (C<-c>), it never actually
 did anything.
+
+=head2 CGI self-referring links
+
+The way Smokeping creates the self-referring links was changed. The old
+behaviour used the script name but not the host part, resulting in links
+like S<<a href="/path/smokeping.cgi?foo=bar">>. The new behaviour uses the
+C<cgiurl> variable: the links are always absolute like 
+S<<a href="http://some.host/path/smokeping.cgi?foo=bar">>.
 
 =head1 2.0.1 to 2.0.2
 

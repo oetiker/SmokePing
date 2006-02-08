@@ -101,12 +101,26 @@ sub snmpget_ident ($) {
     return $answer;
 }
 
+sub cgiurl {
+    my ($q, $cfg) = @_;
+    my %url_of = (
+        absolute => $cfg->{General}{cgiurl},
+        relative => q{},
+        original => $q->script_name,
+    );
+    my $linkstyle = $cfg->{General}->{linkstyle};
+    die('unknown value for $cfg->{General}->{linkstyle}: '
+                         . $linkstyle
+    ) unless exists $url_of{$linkstyle};
+    return $url_of{$linkstyle};
+}
+
 sub lnk ($$) {
     my ($q, $path) = @_;
     if ($q->isa('dummyCGI')) {
 	return $path . ".html";
     } else {
-	return $cfg->{General}->{cgiurl} . "?target=" . $path;
+	return cgiurl($q, $cfg) . "?target=" . $path;
     }
 }
 
@@ -1000,7 +1014,7 @@ sub display_webpage($$){
        {
 	menu => target_menu($cfg->{Targets},
 			    [@$open], #copy this because it gets changed
-			    $cfg->{General}->{cgiurl}."?target="),
+			    cgiurl($q, $cfg) ."?target="),
 	title => $tree->{title},
 	remark => ($tree->{remark} || ''),
 	overview => get_overview( $cfg,$q,$tree,$open ),
@@ -1617,7 +1631,7 @@ DOC
 	 [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
               smokemail cgiurl mailhost contact netsnpp
 	      syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
-	      changecgiprogramname) ],
+	      changecgiprogramname linkstyle) ],
 	 _mandatory =>
 	 [ qw(owner imgcache imgurl datadir piddir
               smokemail cgiurl contact) ],
@@ -1728,6 +1742,41 @@ Complete URL path of the SmokePing.cgi
 DOC
 	  
 	 },
+     linkstyle =>
+     {
+      _re => '(?:absolute|relative|original)',
+      _default => 'relative',
+      _re_error =>
+      'linkstyle must be one of "absolute", "relative" or "original"',
+      _doc => <<DOC,
+How the CGI self-referring links are created. The possible values are 
+
+=over
+
+=item absolute 
+
+Full hostname and path derived from the 'cgiurl' variable 
+
+S<\<a href="http://hostname/path/smokeping.cgi?foo=bar\>>
+
+=item relative 
+
+Only the parameter part is specified 
+
+S<\<a href="?foo=bar"\>>
+
+=item original 
+
+The way the links were generated before Smokeping version 2.0.4:
+no hostname, only the path 
+
+S<\<a href="/path/smokeping.cgi?foo=bar\>>
+
+=back
+
+The default is "relative", which hopefully works for everybody.
+DOC
+    },
 	 syslogfacility	=>
 	 {
 	  _re => '\w+',

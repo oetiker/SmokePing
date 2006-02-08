@@ -1,3 +1,6 @@
+* make the way CGI self-referring links are created configurable, and
+  change the default (once more) to 'linkstyle = relative' 
+  -- niko, for Dmitry Semyonov <linulin *gmail.com> (Debian bug #351783)
 * make buggy_perl_version test work on perl 5.8.7 too ... 
   --tobi from Nathan Butcher <xqufa .yokohama.riken.jp>
 * include a Date field in alert emails, since all M[ST]As don't insert it. 
