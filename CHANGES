@@ -1,3 +1,5 @@
+2006/02/08 -- released version 2.0.6
+
 * make the way CGI self-referring links are created configurable, and
   change the default (once more) to 'linkstyle = relative' 
   -- niko, for Dmitry Semyonov <linulin *gmail.com> (Debian bug #351783)
