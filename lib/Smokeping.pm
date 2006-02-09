@@ -1757,7 +1757,7 @@ How the CGI self-referring links are created. The possible values are
 
 Full hostname and path derived from the 'cgiurl' variable 
 
-S<\<a href="http://hostname/path/smokeping.cgi?foo=bar\>>
+S<\<a href="http://hostname/path/smokeping.cgi?foo=bar"\>>
 
 =item relative 
 
@@ -1770,7 +1770,7 @@ S<\<a href="?foo=bar"\>>
 The way the links were generated before Smokeping version 2.0.4:
 no hostname, only the path 
 
-S<\<a href="/path/smokeping.cgi?foo=bar\>>
+S<\<a href="/path/smokeping.cgi?foo=bar"\>>
 
 =back
 
