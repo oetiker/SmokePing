@@ -1,5 +1,5 @@
-* fixed quotes in 'linkstyle' documentation that broke the Smokeping.3 
-  manual page --niko
+* fixed POD markup escaping in 'linkstyle' documentation that broke the Smokeping
+  module documentation --niko
 
 2006/02/08 -- released version 2.0.6
 

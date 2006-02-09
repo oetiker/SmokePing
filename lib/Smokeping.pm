@@ -1751,28 +1751,28 @@ DOC
       _doc => <<DOC,
 How the CGI self-referring links are created. The possible values are 
 
-=over
+${e}over
 
-=item absolute 
+${e}item absolute 
 
 Full hostname and path derived from the 'cgiurl' variable 
 
 S<\<a href="http://hostname/path/smokeping.cgi?foo=bar"\>>
 
-=item relative 
+${e}item relative 
 
 Only the parameter part is specified 
 
 S<\<a href="?foo=bar"\>>
 
-=item original 
+${e}item original 
 
 The way the links were generated before Smokeping version 2.0.4:
 no hostname, only the path 
 
 S<\<a href="/path/smokeping.cgi?foo=bar"\>>
 
-=back
+${e}back
 
 The default is "relative", which hopefully works for everybody.
 DOC
