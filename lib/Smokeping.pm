@@ -1254,6 +1254,7 @@ sub get_parser () {
     my $KEY_RE = '[-_0-9a-zA-Z]+';
     my $KEYD_RE = '[-_0-9a-zA-Z.]+';
     my $PROBE_RE = '[A-Z][a-zA-Z]+';
+    my $e = "=";
     my %knownprobes; # the probes encountered so far
 
     # get a list of available probes for _dyndoc sections
