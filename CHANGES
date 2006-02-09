@@ -1,3 +1,5 @@
+2006/02/09 -- released version 2.0.7
+
 * fixed POD markup escaping in 'linkstyle' documentation that broke the Smokeping
   module documentation --niko
 
