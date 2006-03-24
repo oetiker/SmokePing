@@ -90,6 +90,9 @@ sub targetvars {
 		lookup => { _doc => "Name of the host to look up in the dns.",
 			    _example => "www.example.org",
 		},
+                server => { _doc => "Name of the dns server to use.",
+                            _example => "ns1.someisp.net",
+                },
 	});
 }
 
@@ -109,8 +112,9 @@ sub pingone ($){
     my $host = $target->{addr};
     my $lookuphost = $target->{vars}{lookup};
     $lookuphost = $target->{addr} unless defined $lookuphost;
+    my $dnsserver = $target->{vars}{server} || $host;
+    my $query = "$self->{properties}{binary} \@$dnsserver $lookuphost";
 
-    my $query = "$self->{properties}{binary} \@$host $lookuphost";
     my @times;
 
     $self->do_debug("query=$query\n");

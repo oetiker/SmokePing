@@ -1,3 +1,5 @@
+* let the name of the dns server be configured in DNS.pm
+  -- ark <yesv *ring.wtwf.com>
 * make buggy_perl_version test work again
   -- niko, noticed by Fran Boon <flavour *partyvibe.com>
 
