@@ -20,7 +20,7 @@ downloading the tool.
 
 =item RRDtool 1.0.x or 1.2.x
 
-L<http://people.ee.ethz.ch/oetiker/webtools/rrdtool/>
+L<http://oss.oetiker.ch/rrdtool/>
 
 Just follow the installation instructions. We need this package todo all the
 logging and graphing in SmokePing.

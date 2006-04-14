@@ -1,3 +1,7 @@
+
+* adjusted links to new home on oss.oetiker.ch
+  -- tobi
+
 * let the name of the dns server be configured in DNS.pm
   -- ark <yesv *ring.wtwf.com>
 * make buggy_perl_version test work again
