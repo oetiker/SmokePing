@@ -57,7 +57,7 @@ DOC
 The probe establishes unnecessary connections, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all connections in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*2+3 seconds (2 secs is the timeout value hardcoded into this probe). 
 DOC
 		see_also => <<DOC,
-L<http://people.ee.ethz.ch/~oetiker/webtools/smokeping/>
+L<http://oss.oetiker.ch/smokeping/>
 
 L<http://www.switch.ch/misc/leinen/snmp/perl/>
 
