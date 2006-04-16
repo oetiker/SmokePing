@@ -1,3 +1,6 @@
+ * brought back the FPing.pm 'timeout' parameter, since it does something
+   after all. - niko, requested by Peter Klausner <peter.klausner *gmail.com>
+
 2006/04/14 -- released version 2.0.8
 
 * adjusted links to new home on oss.oetiker.ch

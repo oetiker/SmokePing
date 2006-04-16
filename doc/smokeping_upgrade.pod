@@ -36,6 +36,15 @@ C<General> section of the configuration file. The default is now C<relative>,
 creating links like S<<a href="?foo=bar">>. I hope this works for everybody,
 but if it doesn't, see L<smokeping_config> for the alternatives.
 
+=head1 2.0.8 to 2.0.9
+
+=head2 L<FPing|Smokeping::probes::FPing>
+
+The 'timeout' variable removed in 2.0.5 has been brought back.
+It is used to give the C<fping> command the C<-t> parameter,
+which apparently affects the timeout of the last ping in the
+counting (C<-C>) mode used by Smokeping.
+
 =head1 2.0.4 to 2.0.5
 
 =head2 L<FPing|Smokeping::probes::FPing>
