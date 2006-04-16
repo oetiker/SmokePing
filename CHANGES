@@ -1,3 +1,6 @@
+* brought back the FPing.pm 'timeout' parameter, since it does something 
+  after all. - niko, requested by Peter Klausner <peter.klausner *gmail.com>
+
 2006/4/16 -- released version 20060416_trunk
 
 2006/4/15 -- released version 20060415_trunk
