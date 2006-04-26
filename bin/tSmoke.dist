@@ -53,7 +53,7 @@ use strict;
 use lib qw(lib);
 use lib "/usr/local/rrdtool-1.0.39/lib/perl";
 
-use Smokeping 20060426;
+use Smokeping 20060427;
 use Net::SMTP;
 use Getopt::Long;
 use Pod::Usage;
