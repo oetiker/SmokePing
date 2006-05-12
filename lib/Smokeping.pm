@@ -1153,10 +1153,11 @@ sub update_rrds($$$$$) {
 			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$cfg->{Alerts}{$_}{to}){
 			     next unless $addr;
 			     if ( $addr =~ /^\|(.+)/) {
+			     	 my $cmd = $1;
                                  if ($edgetrigger) {
-  			                system $1,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
+  			                system $cmd,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
                                  } else {
-  			                system $1,$_,$line,$loss,$rtt,$tree->{host};
+  			                system $cmd,$_,$line,$loss,$rtt,$tree->{host};
                                  }
 			     } elsif ( $addr =~ /^snpp:(.+)/ ) {
 				 sendsnpp $1, <<SNPPALERT;
