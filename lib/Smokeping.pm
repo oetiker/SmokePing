@@ -12,6 +12,7 @@ use POSIX;
 use Config::Grammar;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
+use Smokeping::Colorspace;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -802,14 +803,27 @@ sub get_detail ($$$$){
 	}
     } else {  
 	my $p = $pings;
-	%lc =  (0     => ['0',   '#26ff00'],
-		1          => ["1/$p",  '#00b8ff'],
-		2          => ["2/$p",  '#0059ff'],
-		3          => ["3/$p",  '#5e00ff'],
-		4          => ["4/$p",  '#7e00ff'],
-		int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
-		$p-1       => [($p-1)."/$p",    '#ff0000'],
-		);
+        %lc =  (0     => ['0',   '#26ff00'],
+                1          => ["1/$p",  '#00b8ff'],
+                2          => ["2/$p",  '#0059ff'],
+                3          => ["3/$p",  '#5e00ff'],
+                4          => ["4/$p",  '#7e00ff'],
+                int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
+                $p-1       => [($p-1)."/$p",    '#ff0000'],
+                );
+	my $key;
+	# determine a more 'pastel' version of the ping colours; this is 
+	# used for the optional loss background colouring
+	foreach $key (keys %lc) {
+		next if ($key == 0);
+	 	my $web = $lc{$key}[1];
+	 	my @rgb = Smokeping::Colorspace::web_to_rgb($web);
+		my @hsl = Smokeping::Colorspace::rgb_to_hsl(@rgb);
+		$hsl[2] = (1 - $hsl[2]) * (2/3) + $hsl[2];
+		@rgb = Smokeping::Colorspace::hsl_to_rgb(@hsl);
+		$web = Smokeping::Colorspace::rgb_to_web(@rgb);
+		$lc{$key}[2] = $web;
+	}
     };
 
     my %upt;
@@ -828,8 +842,8 @@ sub get_detail ($$$$){
 		30*24*3600 => ['<1m', '#BAFFF5'],
 		'1e100'    => ['>1m', '#DAECFF']
 		);
-    }                
-    
+    }
+		
     my $date = $cfg->{Presentation}{detail}{strftime} ? 
       POSIX::strftime($cfg->{Presentation}{detail}{strftime},
 		      localtime(time)) : scalar localtime(time);
@@ -851,11 +865,12 @@ sub get_detail ($$$$){
 	my $last = -1;
 	my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
 	my @median = ("DEF:median=${rrd}:median:AVERAGE",
-		      "DEF:loss=${rrd}:loss:AVERAGE",
 		      "CDEF:ploss=loss,$pings,/,100,*",
 		      "GPRINT:median:AVERAGE:Median Ping RTT (%.1lf %ss avg) ",
 		      "LINE1:median#202020"
 		  );
+	my @lossargs = ();
+	my @losssmoke = ();
 	foreach my $loss (sort {$a <=> $b} keys %lc){
 	    next if $loss >= $pings;
 	    my $lvar = $loss; $lvar =~ s/\./d/g ;
@@ -865,9 +880,21 @@ sub get_detail ($$$$){
 	       "CDEF:meL$lvar=me$lvar,$swidth,-",
 	       "CDEF:meH$lvar=me$lvar,0,*,$swidth,2,*,+",             
 	       "AREA:meL$lvar",
-	       "STACK:meH$lvar$lc{$loss}[1]:$lc{$loss}[0]"
+               "STACK:meH$lvar$lc{$loss}[1]:$lc{$loss}[0]"
 	       #		   "LINE2:me$lvar$lc{$loss}[1]:$lc{$loss}[0]"
 	       );
+	    if  ($cfg->{Presentation}{detail}{loss_background} and $cfg->{Presentation}{detail}{loss_background} eq 'yes') {
+		push @lossargs,
+	  	  (
+	   	   "CDEF:lossbg$lvar=loss,$last,GT,loss,$loss,LE,*,INF,UNKN,IF",
+	   	   "AREA:lossbg$lvar$lc{$loss}[2]",
+	       	  );
+	        push @losssmoke,
+	          (
+	           "CDEF:lossbgs$lvar=loss,$last,GT,loss,$loss,LE,*,cp2,UNKN,IF",
+	           "AREA:lossbgs$lvar$lc{$loss}[2]",
+	          );
+            }
 	    $last = $loss;
 	}
 	push @median, ( "COMMENT:\\l",
@@ -878,7 +905,8 @@ sub get_detail ($$$$){
 
         # if we have uptime draw a colorful background or the graph showing the uptime
         my $cdir=dyndir($cfg)."/".(join "/", @dirs)."/";
-        if (-f "$cdir/${file}.adr") {
+        if ((not defined $cfg->{Presentation}{detail}{loss_background} or $cfg->{Presentation}{detail}{loss_background} ne 'yes') &&
+ 		(-f "$cdir/${file}.adr")) {
 	    @upsmoke = ();
 	    @upargs = ("COMMENT:Link Up${BS}:     ",
 		       "DEF:uptime=${rrd}:uptime:AVERAGE",
@@ -929,9 +957,12 @@ sub get_detail ($$$$){
 	   '--color', 'CANVAS#ffffff',
 	   (map {"DEF:ping${_}=${rrd}:ping${_}:AVERAGE"} 1..$pings),
 	   (map {"CDEF:cp${_}=ping${_},0,$max->{$start},LIMIT"} 1..$pings),
+           ("DEF:loss=${rrd}:loss:AVERAGE"),
 	   @upargs,# draw the uptime bg color
+	   @lossargs, # draw the loss bg color
  	   @$smoke,
            @upsmoke, # draw the rest of the uptime bg color
+	   @losssmoke, # draw the rest of the loss bg color
 	   @median,
            # Gray background for times when no data was collected, so they can
            # be distinguished from network being down.
@@ -943,6 +974,9 @@ sub get_detail ($$$$){
 	   'COMMENT:\s',
            "COMMENT:Probe${BS}: $pings $ProbeDesc every $step seconds",
 	   'COMMENT:created on '.$date.'\j' );
+#	do_log ("***** begin task ***** <br />");
+#	do_log (@task);
+#	do_log ("***** end task ***** <br />");
 
         my ($graphret,$xs,$ys) = RRDs::graph @task;
 	
@@ -1988,7 +2022,7 @@ DOC
 	       },
 	 detail => 
 	 { 
-	  _vars => [ qw(width height logarithmic unison_tolerance max_rtt strftime nodata_color) ],
+	  _vars => [ qw(width height loss_background logarithmic unison_tolerance max_rtt strftime nodata_color) ],
           _sections => [ qw(loss_colors uptime_colors) ],
 	  _mandatory => [ qw(width height) ],
 	  _table     => { _columns => 2,
@@ -2036,6 +2070,11 @@ DOC
                 _re_error =>  "color must be defined with in rrggbb syntax",
 		_doc => "Paint the graph background in a special color when there is no data for this period because smokeping has not been running (#rrggbb)",
 			},
+         loss_background      => { _doc => 'should the graphs be shown with a background showing loss data for emphasis (yes/no)',
+                       _re  => '(yes|no)',
+                       _re_error =>"this must either be 'yes' or 'no'",
+		       _doc => "If this option is enabled, uptime data is no longer displayed in the graph background.",
+		                     },
          logarithmic      => { _doc => 'should the graphs be shown in a logarithmic scale (yes/no)',
                        _re  => '(yes|no)',
                        _re_error =>"this must either be 'yes' or 'no'",
