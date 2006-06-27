@@ -1,4 +1,5 @@
 * new feature to color the graph background in sync with the loss -- grahame.bo
+* new probe JunOS Telnet ping -- Shan Ali Khan shanali *singtel.com
 
 2006/6/27 -- released version 20060627_trunk
 
