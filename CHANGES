@@ -1,3 +1,6 @@
+* fix loss_color description -- tobi
+* fix loss_background implementation to still color mainline
+
 2006/7/7 -- released version 20060707_trunk
 
 2006/7/6 -- released version 20060706_trunk

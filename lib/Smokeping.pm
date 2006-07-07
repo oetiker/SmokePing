@@ -796,6 +796,7 @@ sub get_detail ($$$$){
     my @upargs;
     my @upsmoke;
     my %lc;
+    my %lcback;
     if ( defined $cfg->{Presentation}{detail}{loss_colors}{_table} ) {
 	for (@{$cfg->{Presentation}{detail}{loss_colors}{_table}}) {
 	    my ($num,$col,$txt) = @{$_};
@@ -811,20 +812,19 @@ sub get_detail ($$$$){
                 int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
                 $p-1       => [($p-1)."/$p",    '#ff0000'],
                 );
-	my $key;
-	# determine a more 'pastel' version of the ping colours; this is 
-	# used for the optional loss background colouring
-	foreach $key (keys %lc) {
-		next if ($key == 0);
-	 	my $web = $lc{$key}[1];
-	 	my @rgb = Smokeping::Colorspace::web_to_rgb($web);
-		my @hsl = Smokeping::Colorspace::rgb_to_hsl(@rgb);
-		$hsl[2] = (1 - $hsl[2]) * (2/3) + $hsl[2];
-		@rgb = Smokeping::Colorspace::hsl_to_rgb(@hsl);
-		$web = Smokeping::Colorspace::rgb_to_web(@rgb);
-		$lc{$key}[2] = $web;
-	}
     };
+    # determine a more 'pastel' version of the ping colours; this is 
+    # used for the optional loss background colouring
+    foreach my $key (keys %lc) {
+	next if ($key == 0);
+ 	my $web = $lc{$key}[1];
+ 	my @rgb = Smokeping::Colorspace::web_to_rgb($web);
+	my @hsl = Smokeping::Colorspace::rgb_to_hsl(@rgb);
+	$hsl[2] = (1 - $hsl[2]) * (2/3) + $hsl[2];
+	@rgb = Smokeping::Colorspace::hsl_to_rgb(@hsl);
+        $web = Smokeping::Colorspace::rgb_to_web(@rgb);
+	$lcback{$key} = $web;
+    }
 
     my %upt;
     if ( defined $cfg->{Presentation}{detail}{uptime_colors}{_table} ) {
@@ -833,7 +833,7 @@ sub get_detail ($$$$){
 	    $upt{$num} = [ $txt, "#".$col];
 	}
     } else {  
-	%upt = ( 3600       => ['<1h', '#FFD3D3'],
+	%upt = (3600       => ['<1h', '#FFD3D3'],
 		2*3600     => ['<2h', '#FFE4C7'],
 		6*3600     => ['<6h', '#FFF9BA'],
 		12*3600    => ['<12h','#F3FFC0'],
@@ -887,12 +887,12 @@ sub get_detail ($$$$){
 		push @lossargs,
 	  	  (
 	   	   "CDEF:lossbg$lvar=loss,$last,GT,loss,$loss,LE,*,INF,UNKN,IF",
-	   	   "AREA:lossbg$lvar$lc{$loss}[2]",
+	   	   "AREA:lossbg$lvar$lcback{$loss}",
 	       	  );
 	        push @losssmoke,
 	          (
 	           "CDEF:lossbgs$lvar=loss,$last,GT,loss,$loss,LE,*,cp2,UNKN,IF",
-	           "AREA:lossbgs$lvar$lc{$loss}[2]",
+	           "AREA:lossbgs$lvar$lcback{$loss}",
 	          );
             }
 	    $last = $loss;
@@ -2115,13 +2115,13 @@ Example:
  Loss Color   Legend
  1    00ff00    "<1"
  3    0000ff    "<3"
- 100  ff0000    ">=3"
+ 1000 ff0000    ">=3"
 
 DOC
 			  0 => 
 			  {
 			   _doc => <<DOC,
-Activate when the lossrate (in percent) is larger of equal to this number
+Activate when the number of losst pings is larger or equal to this number
 DOC
 			   _re       => '\d+.?\d*',
 			   _re_error =>
