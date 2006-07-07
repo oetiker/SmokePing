@@ -2133,13 +2133,13 @@ Example:
  Loss Color   Legend
  1    00ff00    "<1"
  3    0000ff    "<3"
- 100  ff0000    ">=3"
+ 1000 ff0000    ">=3"
 
 DOC
 			  0 => 
 			  {
 			   _doc => <<DOC,
-Activate when the lossrate (in percent) is larger of equal to this number
+Activate when the number of losst pings is larger or equal to this number                       
 DOC
 			   _re       => '\d+.?\d*',
 			   _re_error =>
