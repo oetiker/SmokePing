@@ -1,5 +1,6 @@
+* AnotherDNS.pm: added option 'require_answers' for testing
+  recursive DNS servers. -- niko
 * fixed loss_color documentation (this is not in percent) -- tobi
-
 * brought back the FPing.pm 'timeout' parameter, since it does something
    after all. -- niko, requested by Peter Klausner <peter.klausner *gmail.com>
 * fix running an external program on edge-triggered alerts.
