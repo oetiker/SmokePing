@@ -98,11 +98,12 @@ sub pingone ($) {
             $ready->recv( $buf, &Net::DNS::PACKETSZ );
 	    my ($recvPacket, $err) = Net::DNS::Packet->new(\$buf);
 	    if (defined $recvPacket) {
+		my $recvHeader = $recvPacket->header();
+		next if $recvHeader->ancount() < $target->{vars}{require_answers};
 	    	if (not $require_noerror) {
 		    push @times, $elapsed;
 		} else {
 		    # Check the Response Code for the NOERROR.
-		    my $recvHeader = $recvPacket->header();
 		    if ($recvHeader->rcode() eq "NOERROR") {
 		         push @times, $elapsed;
 		    }
@@ -141,6 +142,10 @@ DOC
 		},
 		require_noerror => {
 			_doc => 'Only Count Answers with Response Status NOERROR.',
+			_default => 0,
+		},
+		require_answers => {
+			_doc => 'Only Count Answers with answer count >= this value.',
 			_default => 0,
 		},
 		recordtype => {

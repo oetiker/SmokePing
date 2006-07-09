@@ -1,3 +1,6 @@
+* AnotherDNS.pm: added option 'require_answers' for testing
+  recursive DNS servers. -- niko
+
 2006/7/9 -- released version 20060709_trunk
 
 2006/7/8 -- released version 20060708_trunk
