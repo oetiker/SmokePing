@@ -1,3 +1,5 @@
+2006/7/10 -- released version 20060710_trunk
+
 * AnotherDNS.pm: added option 'require_answers' for testing
   recursive DNS servers. -- niko
 * fix running an external program on edge-triggered alerts.
