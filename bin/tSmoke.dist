@@ -128,7 +128,7 @@ sub morning_update($) {
 	}
 	$Body = "Subject: Of $Count Hosts, $Down Down\n";
 	$Body .= "To: $To\n\n";
-	$Body = "Of $Count Hosts, $Down Down:\n";
+	$Body .= "Of $Count Hosts, $Down Down:\n";
 	$Body .= $TmpBody;
 	Smokeping::sendmail($cfg->{Alerts}{from},$To,$Body);
 }
