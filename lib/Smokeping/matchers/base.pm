@@ -80,7 +80,7 @@ sub Desc ($) {
 =head2 Test
 
 Run the matcher and return true or false. The Test method is called
-with a hash of two arrays giving it access to both rtt and loss values.
+with a hash containing two arrays giving it access to both rtt and loss values.
 
   my $data=shift;
   my @rtt = @{$data->{rtt}};
@@ -93,6 +93,11 @@ The arrays are ordered from old to new.
 There may be more than the expected number of elements in this array. Address them with
 $x[-1] to $x[-max].
 
+There's also a key called 'prevmatch' in the hash. It contains the
+value returned by the previous call of the 'Test' method. This allows
+for somewhat more intelligent alerting due to state awareness.
+
+  my $prevmatch = $data->{prevmatch};
 
 =cut
 
