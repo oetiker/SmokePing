@@ -1142,6 +1142,12 @@ sub update_rrds($$$$$) {
                         next;
                     };
                     my $prevmatch = $tree->{prevmatch}{$_} || 0;
+
+		    # add the current state of an edge triggered alert to the
+		    # data passed into a matcher, which allows for somewhat 
+		    # more intelligent alerting due to state awareness.
+		    $x->{prevmatch} = $prevmatch;
+
                     my $match = &{$cfg->{Alerts}{$_}{sub}}($x) || 0; # Avgratio returns undef
                     my $edgetrigger = $cfg->{Alerts}{$_}{edgetrigger} eq 'yes';
                     my $what;

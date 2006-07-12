@@ -1,3 +1,5 @@
+* pass 'prevmatch' to alert matcher plugins.
+  -- niko, from Dylan Vanderhoof <DylanV *semaphore.com>
 * fix subject in tSmoke 'morning' emails.  --niko, 
    from Jean-Philippe Luiggi <Jean-Philippe.Luiggi *revolutionlinux.com>
 
