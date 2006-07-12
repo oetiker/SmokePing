@@ -1,3 +1,5 @@
+* fix subject in tSmoke 'morning' emails.  --niko, 
+   from Jean-Philippe Luiggi <Jean-Philippe.Luiggi *revolutionlinux.com>
 * AnotherDNS.pm: added option 'require_answers' for testing
   recursive DNS servers. -- niko
 * fixed loss_color documentation (this is not in percent) -- tobi
