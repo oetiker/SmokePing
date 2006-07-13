@@ -1,3 +1,5 @@
+2006/7/14 -- released version 20060714_trunk
+
 2006/7/13 -- released version 20060713_trunk
 
 * pass 'prevmatch' to alert matcher plugins.
