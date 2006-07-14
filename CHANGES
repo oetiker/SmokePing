@@ -1,3 +1,5 @@
+2006/7/15 -- released version 20060715_trunk
+
 * added matchers CheckLatency and CheckLoss -- tobi, from Dylan Vanderhoof DylanV semaphore.com
 * added TacacsPlus probe -- tobi, from Gary.Mikula * nasd.com
 
