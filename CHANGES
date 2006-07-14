@@ -1,4 +1,5 @@
-* added TacacsPlus probe -- tobi, Gary.Mikula nasd.com
+* added matchers CheckLatency and CheckLoss -- tobi, from Dylan Vanderhoof DylanV semaphore.com
+* added TacacsPlus probe -- tobi, from Gary.Mikula * nasd.com
 
 2006/7/14 -- released version 20060714_trunk
 
