@@ -1,11 +1,11 @@
 SHELL = /bin/sh
-VERSION = 20060728_trunk
+VERSION = 20060729_trunk
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
 ############ 2.000001
 ############ 2.000002
-NUMVERSION = 20060728
+NUMVERSION = 20060729
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|.svn
 GROFF = groff
 .PHONY: man html txt ref examples check-examples patch killdoc doc tar rename-man symlinks remove-symlinks
