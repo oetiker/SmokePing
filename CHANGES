@@ -1,3 +1,5 @@
+* Allow several Mailservers to be specified in Mailhost
+* Reduce timeout for Net::SMTP to 5 seconds.
 2006/8/15 -- released version 20060815_trunk
 
 2006/8/14 -- released version 20060814_trunk

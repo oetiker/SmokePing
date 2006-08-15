@@ -168,7 +168,7 @@ sub sendmail ($$$){
     $to = $1 if $to =~ /<(.*?)>/;
     my $body = shift;
     if ($cfg->{General}{mailhost} and  
-        my $smtp = Net::SMTP->new($cfg->{General}{mailhost})){
+        my $smtp = Net::SMTP->new([split /\s*,\s*/, $cfg->{General}{mailhost}],Timeout=>5) ){
         $smtp->mail($from);
         $smtp->to(split(/\s*,\s*/, $to));
         $smtp->data();
@@ -1688,8 +1688,11 @@ DOC
 	 mailhost  => 
 	 {
 	  _doc => <<DOC,
-Instead of using sendmail, you can specify the name of an smtp server 
-and use perl's Net::SMTP module to send mail to DYNAMIC host owners (see below).
+
+Instead of using sendmail, you can specify the name of an smtp server and
+use perl's Net::SMTP module to send mail to DYNAMIC host owners (see below).
+Several comma separated mailhosts can be specified. SmokePing will try using
+the next one after not getting an answer for 5 seconds.
 DOC
           _sub => sub { require Net::SMTP ||return "ERROR: loading Net::SMTP"; return undef; }
 	 },
