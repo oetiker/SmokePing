@@ -2988,6 +2988,7 @@ sub main (;$) {
     $opt{filter}=[];
     GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
 		      'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
+		      'config=s', 'check', 'gen-examples', 'reload') or pod2usage(2);
     if($opt{version})  { print "$VERSION\n"; exit(0) };
     if(exists $opt{man}) {
     	if ($opt{man}) {
