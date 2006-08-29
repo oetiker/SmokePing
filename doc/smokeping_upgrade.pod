@@ -32,15 +32,6 @@ It is used to give the C<fping> command the C<-t> parameter,
 which apparently affects the timeout of the last ping in the
 counting (C<-C>) mode used by Smokeping.
 
-=head2 CGI self-referring links
-
-The way Smokeping creates the self-referring links was changed. The old
-behaviour used the script name but not the host part, resulting in links
-like S<<a href="/path/smokeping.cgi?foo=bar">>. The new behaviour uses the
-C<cgiurl> variable: the links are always absolute like 
-S<<a href="http://some.host/path/smokeping.cgi?foo=bar">>.
-
-
 =head1 2.0.5 to 2.0.6
 
 =head2 CGI self-referring links (again)
@@ -63,6 +54,14 @@ It was used to give the C<fping> command the C<-t> parameter,
 but as this parameter is only effective in C<fping>'s I<default> mode,
 while Smokeping uses the I<counting> mode (C<-c>), it never actually
 did anything.
+
+=head2 CGI self-referring links
+
+The way Smokeping creates the self-referring links was changed. The old
+behaviour used the script name but not the host part, resulting in links
+like S<<a href="/path/smokeping.cgi?foo=bar">>. The new behaviour uses the
+C<cgiurl> variable: the links are always absolute like 
+S<<a href="http://some.host/path/smokeping.cgi?foo=bar">>.
 
 =head1 2.0.1 to 2.0.2
 
