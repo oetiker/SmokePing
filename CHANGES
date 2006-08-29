@@ -1,816 +1,127 @@
-2006/8/29 -- released version 20060829_trunk
+* maintaining trunk and branch is not realy sensible the way smokeping evolves. 
+  I have merged everything back to trunk -- tobi
+* Allow several Mailservers to be specified in Mailhost -- tobi
+* Reduce timeout for Net::SMTP to 5 seconds. -- tobi
+* new feature to color the graph background in sync with the loss -- grahame.bo
+* new probe JunOS Telnet ping -- Shan Ali Khan shanali *singtel.com
 
-2006/8/28 -- released version 20060828_trunk
-
-2006/8/26 -- released version 20060826_trunk
-
-2006/8/25 -- released version 20060825_trunk
-
-2006/8/24 -- released version 20060824_trunk
-
-2006/8/23 -- released version 20060823_trunk
-
-2006/8/22 -- released version 20060822_trunk
-
-2006/8/21 -- released version 20060821_trunk
-
-2006/8/20 -- released version 20060820_trunk
-
-2006/8/19 -- released version 20060819_trunk
-
-2006/8/18 -- released version 20060818_trunk
-
-2006/8/17 -- released version 20060817_trunk
-
-2006/8/16 -- released version 20060816_trunk
-
-* Allow several Mailservers to be specified in Mailhost
-* Reduce timeout for Net::SMTP to 5 seconds.
-2006/8/15 -- released version 20060815_trunk
-
-2006/8/14 -- released version 20060814_trunk
-
-2006/8/13 -- released version 20060813_trunk
-
-2006/8/12 -- released version 20060812_trunk
-
-2006/8/11 -- released version 20060811_trunk
-
-2006/8/10 -- released version 20060810_trunk
-
-2006/8/9 -- released version 20060809_trunk
-
-2006/8/8 -- released version 20060808_trunk
-
-2006/8/7 -- released version 20060807_trunk
-
-2006/8/6 -- released version 20060806_trunk
-
-2006/8/5 -- released version 20060805_trunk
-
-2006/8/4 -- released version 20060804_trunk
-
-2006/8/3 -- released version 20060803_trunk
-
-2006/8/2 -- released version 20060802_trunk
-
-2006/8/1 -- released version 20060801_trunk
-
-2006/7/31 -- released version 20060731_trunk
-
-2006/7/30 -- released version 20060730_trunk
-
-2006/7/29 -- released version 20060729_trunk
-
-2006/7/28 -- released version 20060728_trunk
-
-2006/7/27 -- released version 20060727_trunk
-
-2006/7/26 -- released version 20060726_trunk
-
-2006/7/25 -- released version 20060725_trunk
-
-2006/7/24 -- released version 20060724_trunk
-
-2006/7/23 -- released version 20060723_trunk
-
-2006/7/22 -- released version 20060722_trunk
-
-2006/7/21 -- released version 20060721_trunk
-
-2006/7/20 -- released version 20060720_trunk
-
-2006/7/19 -- released version 20060719_trunk
-
-2006/7/18 -- released version 20060718_trunk
-
-2006/7/17 -- released version 20060717_trunk
-
-2006/7/16 -- released version 20060716_trunk
-
-2006/7/15 -- released version 20060715_trunk
+2006/07/14 -- released version 2.0.9
 
 * added matchers CheckLatency and CheckLoss -- tobi, from Dylan Vanderhoof DylanV semaphore.com
 * added TacacsPlus probe -- tobi, from Gary.Mikula * nasd.com
-
-2006/7/14 -- released version 20060714_trunk
-
-2006/7/13 -- released version 20060713_trunk
-
 * pass 'prevmatch' to alert matcher plugins.
   -- niko, from Dylan Vanderhoof <DylanV *semaphore.com>
 * fix subject in tSmoke 'morning' emails.  --niko, 
    from Jean-Philippe Luiggi <Jean-Philippe.Luiggi *revolutionlinux.com>
-
-2006/7/12 -- released version 20060712_trunk
-
-2006/7/11 -- released version 20060711_trunk
-
-2006/7/10 -- released version 20060710_trunk
-
 * AnotherDNS.pm: added option 'require_answers' for testing
   recursive DNS servers. -- niko
+* fixed loss_color documentation (this is not in percent) -- tobi
+* brought back the FPing.pm 'timeout' parameter, since it does something
+   after all. -- niko, requested by Peter Klausner <peter.klausner *gmail.com>
 * fix running an external program on edge-triggered alerts.
   -- niko, from Peter Klausner <peter.klausner *gmail.com>
 
-2006/7/9 -- released version 20060709_trunk
-
-2006/7/8 -- released version 20060708_trunk
-
-* fix loss_color description -- tobi
-* fix loss_background implementation to still color mainline
-
-2006/7/7 -- released version 20060707_trunk
-
-2006/7/6 -- released version 20060706_trunk
-
-2006/7/5 -- released version 20060705_trunk
-
-2006/7/4 -- released version 20060704_trunk
-
-* new feature to color the graph background in sync with the loss -- grahame.bo
-* new probe JunOS Telnet ping -- Shan Ali Khan shanali *singtel.com
-
-2006/6/27 -- released version 20060627_trunk
-
-2006/6/26 -- released version 20060626_trunk
-
-2006/6/25 -- released version 20060625_trunk
-
-2006/6/24 -- released version 20060624_trunk
-
-2006/6/23 -- released version 20060623_trunk
-
-2006/6/22 -- released version 20060622_trunk
-
-2006/6/21 -- released version 20060621_trunk
-
-2006/6/20 -- released version 20060620_trunk
-
-2006/6/19 -- released version 20060619_trunk
-
-2006/6/18 -- released version 20060618_trunk
-
-2006/6/17 -- released version 20060617_trunk
-
-2006/6/16 -- released version 20060616_trunk
-
-2006/6/15 -- released version 20060615_trunk
-
-2006/6/14 -- released version 20060614_trunk
-
-2006/6/13 -- released version 20060613_trunk
-
-2006/6/12 -- released version 20060612_trunk
-
-2006/6/11 -- released version 20060611_trunk
-
-2006/6/10 -- released version 20060610_trunk
-
-2006/6/9 -- released version 20060609_trunk
-
-2006/6/8 -- released version 20060608_trunk
-
-2006/6/7 -- released version 20060607_trunk
-
-2006/6/6 -- released version 20060606_trunk
-
-2006/6/5 -- released version 20060605_trunk
-
-2006/6/4 -- released version 20060604_trunk
-
-2006/6/3 -- released version 20060603_trunk
-
-2006/6/2 -- released version 20060602_trunk
-
-2006/6/1 -- released version 20060601_trunk
-
-2006/5/31 -- released version 20060531_trunk
-
-2006/5/30 -- released version 20060530_trunk
-
-2006/5/29 -- released version 20060529_trunk
-
-2006/5/28 -- released version 20060528_trunk
-
-2006/5/27 -- released version 20060527_trunk
-
-2006/5/26 -- released version 20060526_trunk
-
-2006/5/25 -- released version 20060525_trunk
-
-2006/5/24 -- released version 20060524_trunk
-
-2006/5/23 -- released version 20060523_trunk
-
-2006/5/22 -- released version 20060522_trunk
-
-2006/5/21 -- released version 20060521_trunk
-
-2006/5/20 -- released version 20060520_trunk
-
-2006/5/19 -- released version 20060519_trunk
-
-2006/5/18 -- released version 20060518_trunk
-
-2006/5/17 -- released version 20060517_trunk
-
-2006/5/16 -- released version 20060516_trunk
-
-2006/5/15 -- released version 20060515_trunk
-
-2006/5/14 -- released version 20060514_trunk
-
-2006/5/13 -- released version 20060513_trunk
-
-2006/5/12 -- released version 20060512_trunk
-
-2006/5/11 -- released version 20060511_trunk
-
-2006/5/10 -- released version 20060510_trunk
-
-2006/5/9 -- released version 20060509_trunk
-
-2006/5/8 -- released version 20060508_trunk
-
-2006/5/7 -- released version 20060507_trunk
-
-2006/5/6 -- released version 20060506_trunk
-
-2006/5/5 -- released version 20060505_trunk
-
-2006/5/4 -- released version 20060504_trunk
-
-2006/5/3 -- released version 20060503_trunk
-
-2006/5/2 -- released version 20060502_trunk
-
-2006/5/1 -- released version 20060501_trunk
-
-2006/4/30 -- released version 20060430_trunk
-
-2006/4/29 -- released version 20060429_trunk
-
-2006/4/28 -- released version 20060428_trunk
-
-2006/4/27 -- released version 20060427_trunk
-
-2006/4/26 -- released version 20060426_trunk
-
-2006/4/25 -- released version 20060425_trunk
-
-2006/4/24 -- released version 20060424_trunk
-
-2006/4/23 -- released version 20060423_trunk
-
-2006/4/22 -- released version 20060422_trunk
-
-2006/4/21 -- released version 20060421_trunk
-
-2006/4/20 -- released version 20060420_trunk
-
-2006/4/19 -- released version 20060419_trunk
-
-2006/4/18 -- released version 20060418_trunk
-
-2006/4/17 -- released version 20060417_trunk
-
-* brought back the FPing.pm 'timeout' parameter, since it does something 
-  after all. - niko, requested by Peter Klausner <peter.klausner *gmail.com>
-
-2006/4/16 -- released version 20060416_trunk
-
-2006/4/15 -- released version 20060415_trunk
+2006/04/14 -- released version 2.0.8
 
 * adjusted links to new home on oss.oetiker.ch
   -- tobi
 
-2006/4/14 -- released version 20060414_trunk
-
-2006/4/13 -- released version 20060413_trunk
-
-2006/4/12 -- released version 20060412_trunk
-
-2006/4/11 -- released version 20060411_trunk
-
-2006/4/10 -- released version 20060410_trunk
-
-2006/4/9 -- released version 20060409_trunk
-
-2006/4/8 -- released version 20060408_trunk
-
-2006/4/7 -- released version 20060407_trunk
-
-2006/4/6 -- released version 20060406_trunk
-
-2006/4/5 -- released version 20060405_trunk
-
-2006/4/4 -- released version 20060404_trunk
-
-2006/4/3 -- released version 20060403_trunk
-
-2006/4/2 -- released version 20060402_trunk
-
-2006/4/1 -- released version 20060401_trunk
-
-2006/3/31 -- released version 20060331_trunk
-
-2006/3/30 -- released version 20060330_trunk
-
-2006/3/29 -- released version 20060329_trunk
-
-2006/3/28 -- released version 20060328_trunk
-
-2006/3/27 -- released version 20060327_trunk
-
-2006/3/26 -- released version 20060326_trunk
-
-2006/3/25 -- released version 20060325_trunk
-
 * let the name of the dns server be configured in DNS.pm
   -- ark <yesv *ring.wtwf.com>
+* make buggy_perl_version test work again
+  -- niko, noticed by Fran Boon <flavour *partyvibe.com>
 
-2006/3/24 -- released version 20060324_trunk
+2006/02/09 -- released version 2.0.7
 
-2006/3/23 -- released version 20060323_trunk
+* fixed POD markup escaping in 'linkstyle' documentation that broke the Smokeping
+  module documentation --niko
 
-2006/3/22 -- released version 20060322_trunk
+2006/02/08 -- released version 2.0.6
 
-2006/3/21 -- released version 20060321_trunk
-
-2006/3/20 -- released version 20060320_trunk
-
-2006/3/19 -- released version 20060319_trunk
-
-2006/3/18 -- released version 20060318_trunk
-
-2006/3/17 -- released version 20060317_trunk
-
-2006/3/16 -- released version 20060316_trunk
-
-2006/3/15 -- released version 20060315_trunk
-
-2006/3/14 -- released version 20060314_trunk
-
-2006/3/13 -- released version 20060313_trunk
-
-2006/3/12 -- released version 20060312_trunk
-
-2006/3/11 -- released version 20060311_trunk
-
-2006/3/10 -- released version 20060310_trunk
-
-2006/3/9 -- released version 20060309_trunk
-
-2006/3/8 -- released version 20060308_trunk
-
-2006/3/7 -- released version 20060307_trunk
-
-2006/3/6 -- released version 20060306_trunk
-
-2006/3/5 -- released version 20060305_trunk
-
-2006/3/4 -- released version 20060304_trunk
-
-2006/3/3 -- released version 20060303_trunk
-
-2006/3/2 -- released version 20060302_trunk
-
-2006/3/1 -- released version 20060301_trunk
-
-2006/2/28 -- released version 20060228_trunk
-
-2006/2/27 -- released version 20060227_trunk
-
-2006/2/26 -- released version 20060226_trunk
-
-2006/2/25 -- released version 20060225_trunk
-
-2006/2/24 -- released version 20060224_trunk
-
-2006/2/23 -- released version 20060223_trunk
-
-2006/2/22 -- released version 20060222_trunk
-
-2006/2/21 -- released version 20060221_trunk
-
-2006/2/20 -- released version 20060220_trunk
-
-2006/2/19 -- released version 20060219_trunk
-
-2006/2/18 -- released version 20060218_trunk
-
-2006/2/17 -- released version 20060217_trunk
-
-2006/2/16 -- released version 20060216_trunk
-
-2006/2/15 -- released version 20060215_trunk
-
-2006/2/14 -- released version 20060214_trunk
-
-2006/2/13 -- released version 20060213_trunk
-
-2006/2/12 -- released version 20060212_trunk
-
-2006/2/11 -- released version 20060211_trunk
-
-2006/2/10 -- released version 20060210_trunk
-
-2006/2/9 -- released version 20060209_trunk
-
-2006/2/8 -- released version 20060208_trunk
-
-2006/2/7 -- released version 20060207_trunk
-
-2006/2/6 -- released version 20060206_trunk
-
-2006/2/5 -- released version 20060205_trunk
-
-2006/2/4 -- released version 20060204_trunk
-
-2006/2/3 -- released version 20060203_trunk
-
-2006/2/2 -- released version 20060202_trunk
-
-2006/2/1 -- released version 20060201_trunk
-
-2006/1/31 -- released version 20060131_trunk
-
-2006/1/30 -- released version 20060130_trunk
-
-2006/1/29 -- released version 20060129_trunk
-
-2006/1/28 -- released version 20060128_trunk
-
-2006/1/27 -- released version 20060127_trunk
-
-2006/1/26 -- released version 20060126_trunk
-
-2006/1/25 -- released version 20060125_trunk
-
-2006/1/24 -- released version 20060124_trunk
-
-2006/1/23 -- released version 20060123_trunk
-
-2006/1/22 -- released version 20060122_trunk
-
-2006/1/21 -- released version 20060121_trunk
-
-2006/1/20 -- released version 20060120_trunk
-
-2006/1/19 -- released version 20060119_trunk
-
-2006/1/18 -- released version 20060118_trunk
-
-2006/1/17 -- released version 20060117_trunk
-
-2006/1/16 -- released version 20060116_trunk
-
-2006/1/15 -- released version 20060115_trunk
-
-2006/1/14 -- released version 20060114_trunk
-
-2006/1/13 -- released version 20060113_trunk
-
-2006/1/12 -- released version 20060112_trunk
-
-2006/1/11 -- released version 20060111_trunk
-
-2006/1/10 -- released version 20060110_trunk
-
-2006/1/9 -- released version 20060109_trunk
-
-2006/1/8 -- released version 20060108_trunk
-
-2006/1/7 -- released version 20060107_trunk
-
-2006/1/6 -- released version 20060106_trunk
-
+* make the way CGI self-referring links are created configurable, and
+  change the default (once more) to 'linkstyle = relative' 
+  -- niko, for Dmitry Semyonov <linulin *gmail.com> (Debian bug #351783)
 * make buggy_perl_version test work on perl 5.8.7 too ... 
   --tobi from Nathan Butcher <xqufa .yokohama.riken.jp>
-
-2006/1/5 -- released version 20060105_trunk
-
-2006/1/4 -- released version 20060104_trunk
-
-2006/1/3 -- released version 20060103_trunk
-
-2006/1/2 -- released version 20060102_trunk
-
-2006/1/1 -- released version 20060101_trunk
-
-2005/12/31 -- released version 20051231_trunk
-
-2005/12/30 -- released version 20051230_trunk
-
-2005/12/29 -- released version 20051229_trunk
-
-2005/12/28 -- released version 20051228_trunk
-
-2005/12/27 -- released version 20051227_trunk
-
-2005/12/26 -- released version 20051226_trunk
-
-2005/12/25 -- released version 20051225_trunk
-
-2005/12/24 -- released version 20051224_trunk
-
-2005/12/23 -- released version 20051223_trunk
-
-2005/12/22 -- released version 20051222_trunk
-
-2005/12/21 -- released version 20051221_trunk
-
+* include a Date field in alert emails, since all M[ST]As don't insert it. 
+  --niko
 * Set an --end time for graphs so that fetch does get its its
   undies in a twist when selecting the RRA and goes for hires
   due to coverage -- tobi
 * CiscoRTTMonEchoICMP.pm: new variable vrf
   - Kevin Stewart <kevins *callplus.co.nz>
-
-2005/12/20 -- released version 20051220_trunk
-
-2005/12/19 -- released version 20051219_trunk
-
-2005/12/18 -- released version 20051218_trunk
-
-2005/12/17 -- released version 20051217_trunk
-
-2005/12/16 -- released version 20051216_trunk
-
-2005/12/15 -- released version 20051215_trunk
-
-2005/12/14 -- released version 20051214_trunk
-
-2005/12/13 -- released version 20051213_trunk
-
-2005/12/12 -- released version 20051212_trunk
-
 * SSH.pm: new variable 'keytype' + bugfixes
   - niko, from Igor Petrovski <pigor *mm.st>
 * fix a bug that broke target sections with the same name
   in different branches  -- niko, reported by Igor Petrovski <pigor *mm.st>
-
-2005/12/11 -- released version 20051211_trunk
-
-2005/12/10 -- released version 20051210_trunk
-
-2005/12/9 -- released version 20051209_trunk
-
-2005/12/8 -- released version 20051208_trunk
-
-2005/12/7 -- released version 20051207_trunk
-
-2005/12/6 -- released version 20051206_trunk
-
-2005/12/5 -- released version 20051205_trunk
-
-2005/12/4 -- released version 20051204_trunk
-
-2005/12/3 -- released version 20051203_trunk
-
 * really send a test email with 'tSmoke --testmail' -- niko
 * Curl.pm: handle measurement of multiple URLs by adding the results together
   -- niko, requested by Rob de Jong <rob *dejongnet.net>
 * Curl.pm: new variables 'follow_redirects' and 'include_redirects'
   -- niko, requested by Rob de Jong <rob *dejongnet.net>
-
-2005/12/2 -- released version 20051202_trunk
-
-2005/12/1 -- released version 20051201_trunk
-
-2005/11/30 -- released version 20051130_trunk
-
-2005/11/29 -- released version 20051129_trunk
-
-2005/11/28 -- released version 20051128_trunk
-
-2005/11/27 -- released version 20051127_trunk
-
-2005/11/26 -- released version 20051126_trunk
-
-2005/11/25 -- released version 20051125_trunk
-
 * fixed spelling for height -- tobi
 
-2005/11/24 -- released version 20051124_trunk
-
-2005/11/23 -- released version 20051123_trunk
-
-2005/11/22 -- released version 20051122_trunk
-
-2005/11/21 -- released version 20051121_trunk
-
-2005/11/20 -- released version 20051120_trunk
-
-2005/11/19 -- released version 20051119_trunk
-
-2005/11/18 -- released version 20051118_trunk
-
-2005/11/17 -- released version 20051117_trunk
-
-2005/11/16 -- released version 20051116_trunk
-
-2005/11/15 -- released version 20051115_trunk
+2005/11/14 -- released version 2.0.5
 
 * remove the FPing 'timeout' variable, since it never really did anything
   -- niko
 * use the 'cgiurl' variable from the 'General' section for all CGI self-refering 
   links -- niko, from Christian Hammers <ch .*debian.org> (Debian bug #339019)
-
-2005/11/14 -- released version 20051114_trunk
-
-2005/11/13 -- released version 20051113_trunk
-
-2005/11/12 -- released version 20051112_trunk
-
-2005/11/11 -- released version 20051111_trunk
-
-2005/11/10 -- released version 20051110_trunk
-
-2005/11/9 -- released version 20051109_trunk
-
-2005/11/8 -- released version 20051108_trunk
-
-2005/11/7 -- released version 20051107_trunk
-
 * Curl.pm: don't take '0' for 'true' with the 'ssl2' or 'insecure_ssl' options
   -- niko, reported by Michael McCarn <mmccarn *sierracorp.us>
-
-2005/11/6 -- released version 20051106_trunk
-
-2005/11/5 -- released version 20051105_trunk
-
-2005/11/4 -- released version 20051104_trunk
-
-2005/11/3 -- released version 20051103_trunk
-
-2005/11/2 -- released version 20051102_trunk
-
-2005/11/1 -- released version 20051101_trunk
-
-2005/10/31 -- released version 20051031_trunk
-
-2005/10/30 -- released version 20051030_trunk
-
-2005/10/29 -- released version 20051029_trunk
-
 * add the 'scope' Net::LDAP search option to the LDAP probe
   -- niko, from Seppo Syrjänen <seppo.syrjanen *helsinki.fi>
-
-2005/10/28 -- released version 20051028_trunk
-
-2005/10/27 -- released version 20051027_trunk
-
-2005/10/26 -- released version 20051026_trunk
-
-2005/10/25 -- released version 20051025_trunk
-
-2005/10/24 -- released version 20051024_trunk
-
-2005/10/23 -- released version 20051023_trunk
-
-2005/10/22 -- released version 20051022_trunk
-
-2005/10/21 -- released version 20051021_trunk
-
-2005/10/20 -- released version 20051020_trunk
-
 * make the Curl probe compatible with Perl 5.6
   -- niko, reported by Ben Eisenbraun <bene *klatsch.org>
-
-2005/10/19 -- released version 20051019_trunk
-
 * get rid of 'Use of uninitialized value' messages when using the Avgratio matcher
   and 'edgetrigger' -- niko, reported by John L Hoo <jhoo *antapex.ca>
-
-2005/10/18 -- released version 20051018_trunk
-
-2005/10/17 -- released version 20051017_trunk
-
-2005/10/16 -- released version 20051016_trunk
-
-2005/10/15 -- released version 20051015_trunk
-
 * include the smallest ping value in the graphs too
   -- niko, from ChunjingHan <chjhan *cstnet.cn>
 
-2005/10/14 -- released version 20051014_trunk
-
-2005/10/13 -- released version 20051013_trunk
-
-2005/10/12 -- released version 20051012_trunk
+2005/10/12 -- released version 2.0.4
 
 * avoid creating new RRD files as the user running 'smokeping --reload'
   -- niko, reported by Stefan Schmidt <s.schmidt *mcbone.net>, 
   http://bugs.debian.org/333373
-
-2005/10/11 -- released version 20051011_trunk
-
-2005/10/10 -- released version 20051010_trunk
-
-2005/10/9 -- released version 20051009_trunk
-
-2005/10/8 -- released version 20051008_trunk
-
-* only warn if RRA parameters other than CF are different
+* only warn if RRA parameters other than CF are different 
   in the config file and an RRD -- niko, for Javier Oviedo <joviedo *plcendesa.com>
-
-2005/10/7 -- released version 20051007_trunk
-
-2005/10/6 -- released version 20051006_trunk
-
-2005/10/5 -- released version 20051005_trunk
-
-2005/10/4 -- released version 20051004_trunk
-
+* make having an older version of CGI::Carp a non-fatal error and
+  recommend a newer one in the docs
+  -- niko, reported by Ron Bisset <Ron.Bisset *cnrinternational.com>
 * make it work (hopefully) with even older versions of CGI::Carp if
   'changecgiprogramname' is set to 'no' in the General section
   -- niko
 
-2005/10/3 -- released version 20051003_trunk
-
-2005/10/2 -- released version 20051002_trunk
-
-2005/10/1 -- released version 20051001_trunk
-
-2005/9/30 -- released version 20050930_trunk
-
-2005/9/29 -- released version 20050929_trunk
-
-* make having an older version of CGI::Carp a non-fatal error and
-  recommend a newer one in the docs
-  -- niko, reported by Ron Bisset <Ron.Bisset *cnrinternational.com>
-
-2005/9/28 -- released version 20050928_trunk
-
-2005/9/27 -- released version 20050927_trunk
-
-2005/9/26 -- released version 20050926_trunk
+2005/9/26 -- released version 2.0.3
 
 * fixed FPing probe so it doesn't report 100% loss when the first ping is lost
   -- niko, reported by Matthew Swainston <njunk *exemail.com.au>
 * don't need to have all the external modules installed to build the
   documentation -- niko
 
-2005/9/25 -- released version 20050925_trunk
-
-2005/9/24 -- released version 20050924_trunk
-
-2005/9/23 -- released version 20050923_trunk
-
-2005/9/22 -- released version 20050922_trunk
-
-2005/9/21 -- released version 20050921_trunk
-
-2005/9/20 -- released version 20050920_trunk
-
-2005/9/19 -- released version 20050919_trunk
-
-2005/9/18 -- released version 20050918_trunk
-
-2005/9/17 -- released version 20050917_trunk
-
-2005/9/16 -- released version 20050916_trunk
-
-2005/9/15 -- released version 20050915_trunk
+2005/9/20 -- released version 2.0.2
 
 * reload the config file on HUP signal and switch to the new one if it 
   isn't broken. After reloading, restart gracefully so that no measurement is
   interrupted. The signal can also be triggered by 'smokeping --reload'.
   -- niko, suggested by Taisuke Yamada <tyamadajp *list.rakugaki.org>
-
-2005/9/14 -- released version 20050914_trunk
-
 * made some alert docs in smokeping_config visible --niko
-
-2005/9/13 -- released version 20050913_trunk
-
 * optionally only send alerts when the state changes ('edgetrigger')
   -- niko, suggested by Marc Haber <mh+smokeping-users *zugschlus.de>
-
-2005/9/12 -- released version 20050912_trunk
-
-2005/9/11 -- released version 20050911_trunk
-
-2005/9/10 -- released version 20050910_trunk
-
 * try to trigger an alert with the minimum number of values needed for it
   rather than require a stack with the maximum number of possible values.
   See http://lists.ee.ethz.ch/smokeping-users/msg01654.html for the problem.
   -- niko, reported by Leos Bitto <smokeping *leos.cz>
-
-2005/9/9 -- released version 20050909_trunk
-
-2005/9/8 -- released version 20050908_trunk
-
-2005/9/7 -- released version 20050907_trunk
-
 * automatically regenerate the logo images if Smokeping.pm has been updated --niko
 
-2005/9/6 -- released version 20050906_trunk
+2005/9/5 -- released version 2.0.1
 
-2005/9/5 -- released version 20050905_trunk
+* fixed version number display in basetemplate -- tobi
 
+2005/9/4 -- released version 2.0.0
+
+* updated page template to match new logos and included Niko
+  -- tobi
 * don't create directories in "datadir" when running as a CGI
   -- niko
 * the DYNAMIC-related files (.adr and .snmp) can now be located outside "datadir"

@@ -28,7 +28,7 @@ use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="20060829";
+$VERSION="2.001000";
 
 # we want opts everywhere
 my %opt;
@@ -102,12 +102,26 @@ sub snmpget_ident ($) {
     return $answer;
 }
 
+sub cgiurl {
+    my ($q, $cfg) = @_;
+    my %url_of = (
+        absolute => $cfg->{General}{cgiurl},
+        relative => q{},
+        original => $q->script_name,
+    );
+    my $linkstyle = $cfg->{General}->{linkstyle};
+    die('unknown value for $cfg->{General}->{linkstyle}: '
+                         . $linkstyle
+    ) unless exists $url_of{$linkstyle};
+    return $url_of{$linkstyle};
+}
+
 sub lnk ($$) {
     my ($q, $path) = @_;
     if ($q->isa('dummyCGI')) {
 	return $path . ".html";
     } else {
-	return $cfg->{General}->{cgiurl} . "?target=" . $path;
+	return cgiurl($q, $cfg) . "?target=" . $path;
     }
 }
 
@@ -795,6 +809,7 @@ sub get_detail ($$$$){
     # one \s doesn't seem to be enough
     my @upargs;
     my @upsmoke;
+
     my %lc;
     my %lcback;
     if ( defined $cfg->{Presentation}{detail}{loss_colors}{_table} ) {
@@ -871,6 +886,7 @@ sub get_detail ($$$$){
 		  );
 	my @lossargs = ();
 	my @losssmoke = ();
+
 	foreach my $loss (sort {$a <=> $b} keys %lc){
 	    next if $loss >= $pings;
 	    my $lvar = $loss; $lvar =~ s/\./d/g ;
@@ -904,6 +920,7 @@ sub get_detail ($$$$){
 	);
 
         # if we have uptime draw a colorful background or the graph showing the uptime
+
         my $cdir=dyndir($cfg)."/".(join "/", @dirs)."/";
         if ((not defined $cfg->{Presentation}{detail}{loss_background} or $cfg->{Presentation}{detail}{loss_background} ne 'yes') &&
  		(-f "$cdir/${file}.adr")) {
@@ -974,6 +991,7 @@ sub get_detail ($$$$){
 	   'COMMENT:\s',
            "COMMENT:Probe${BS}: $pings $ProbeDesc every $step seconds",
 	   'COMMENT:created on '.$date.'\j' );
+
 #	do_log ("***** begin task ***** <br />");
 #	do_log (@task);
 #	do_log ("***** end task ***** <br />");
@@ -1026,13 +1044,16 @@ sub display_webpage($$){
 	$tree = $tree->{$_};
     }
     gen_imgs($cfg); # create logos in imgcache
-
+    my $readversion = "?";
+    $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
+        
     print fill_template
       ($cfg->{Presentation}{template},
        {
 	menu => target_menu($cfg->{Targets},
 			    [@$open], #copy this because it gets changed
-			    $cfg->{General}->{cgiurl}."?target="),
+			    cgiurl($q, $cfg) ."?target="),
+
 	title => $tree->{title},
 	remark => ($tree->{remark} || ''),
 	overview => get_overview( $cfg,$q,$tree,$open ),
@@ -1040,8 +1061,10 @@ sub display_webpage($$){
         target_ip => ($tree->{host} || ''),
 	owner => $cfg->{General}{owner},
         contact => $cfg->{General}{contact},
+
         author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
-        smokeping => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$VERSION.'</A>',
+        smokeping => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
+
         step => $step,
         rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img border="0" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
         smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
@@ -1170,7 +1193,9 @@ sub update_rrds($$$$$) {
                         $urlline =  $cfg->{General}{cgiurl}."?target=".$line;
                         my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
                         my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
-                        my $stamp = scalar localtime time;
+			my $time = time;
+                        my @stamp = localtime($time);
+			my $stamp = localtime($time);
 			my @to;
 			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$cfg->{Alerts}{$_}{to}){
 			     next unless $addr;
@@ -1193,10 +1218,12 @@ SNPPALERT
 			     }
 			};
 			if (@to){
+			    my $rfc2822stamp =  strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
 			    my $to = join ",",@to;
 			    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
 From: $cfg->{Alerts}{from}
+Date: $rfc2822stamp
 Subject: [SmokeAlert] $_ $what on $line
 
 $stamp
@@ -1275,6 +1302,7 @@ sub get_parser () {
     my $KEY_RE = '[-_0-9a-zA-Z]+';
     my $KEYD_RE = '[-_0-9a-zA-Z.]+';
     my $PROBE_RE = '[A-Z][a-zA-Z]+';
+    my $e = "=";
     my %knownprobes; # the probes encountered so far
 
     # get a list of available probes for _dyndoc sections
@@ -1652,7 +1680,8 @@ DOC
 	 [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
               smokemail cgiurl mailhost contact netsnpp
 	      syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
-	      changecgiprogramname) ],
+	      changecgiprogramname linkstyle) ],
+
 	 _mandatory =>
 	 [ qw(owner imgcache imgurl datadir piddir
               smokemail cgiurl contact) ],
@@ -1690,9 +1719,9 @@ DOC
 	  _doc => <<DOC,
 
 Instead of using sendmail, you can specify the name of an smtp server and
-use perl's Net::SMTP module to send mail to DYNAMIC host owners (see below).
-Several comma separated mailhosts can be specified. SmokePing will try using
-the next one after not getting an answer for 5 seconds.
+use perl's Net::SMTP module to send mail (for alerts and DYNAMIC client
+script). Several comma separated mailhosts can be specified. SmokePing will
+try one after the other is one does not anwer answer for 5 seconds.
 DOC
           _sub => sub { require Net::SMTP ||return "ERROR: loading Net::SMTP"; return undef; }
 	 },
@@ -1766,6 +1795,41 @@ Complete URL path of the SmokePing.cgi
 DOC
 	  
 	 },
+     linkstyle =>
+     {
+      _re => '(?:absolute|relative|original)',
+      _default => 'relative',
+      _re_error =>
+      'linkstyle must be one of "absolute", "relative" or "original"',
+      _doc => <<DOC,
+How the CGI self-referring links are created. The possible values are 
+
+${e}over
+
+${e}item absolute 
+
+Full hostname and path derived from the 'cgiurl' variable 
+
+S<\<a href="http://hostname/path/smokeping.cgi?foo=bar"\>>
+
+${e}item relative 
+
+Only the parameter part is specified 
+
+S<\<a href="?foo=bar"\>>
+
+${e}item original 
+
+The way the links were generated before Smokeping version 2.0.4:
+no hostname, only the path 
+
+S<\<a href="/path/smokeping.cgi?foo=bar"\>>
+
+${e}back
+
+The default is "relative", which hopefully works for everybody.
+DOC
+    },
 	 syslogfacility	=>
 	 {
 	  _re => '\w+',
@@ -2600,8 +2664,6 @@ sub daemonize_me ($) {
 # The Main Program 
 ###########################################################################
 
-my $RCS_VERSION = '$Id: Smokeping.pm,v 1.5 2004/10/21 21:10:51 oetiker Exp $';
-
 sub load_cfg ($;$) { 
     my $cfgfile = shift;
     my $noinit = shift;
@@ -2753,7 +2815,8 @@ sub gen_page  ($$$) {
       open PAGEFILE, ">$cfg->{General}{pagedir}/$name";
 
     my $step = $probes->{$tree->{probe}}->step();
-
+    my $readversion = "?";
+    $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
     $page = fill_template
 	($cfg->{Presentation}{template},
 	 {
@@ -2767,8 +2830,8 @@ sub gen_page  ($$$) {
 	  target_ip => ($tree->{host} || ''),
 	  owner => $cfg->{General}{owner},
 	  contact => $cfg->{General}{contact},
-	  author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A>',
-	  smokeping => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$VERSION.'</A>',
+          author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
+	  smokeping => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
 	  step => $step,
 	  rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img border="0" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
 	  smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
@@ -2925,8 +2988,7 @@ sub main (;$) {
     $opt{filter}=[];
     GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
 		      'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
-		      'config=s', 'check', 'gen-examples', 'reload') or pod2usage(2);
-    if($opt{version})  { print "$RCS_VERSION\n"; exit(0) };
+    if($opt{version})  { print "$VERSION\n"; exit(0) };
     if(exists $opt{man}) {
     	if ($opt{man}) {
 		if ($opt{man} eq 'smokeping_config') {
