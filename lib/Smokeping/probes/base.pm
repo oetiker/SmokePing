@@ -131,6 +131,7 @@ sub rrdupdate_string($$)
       $age = 'U';
     }
     if ( $entries == 0 ){
+      $self->do_log("Warning: got zero answers from $tree->{addr}($tree->{probe}) $self->{targets}{$tree}");
       $age = 'U';
       $loss = 'U';
       if ( -f $dynbase.".adr"
