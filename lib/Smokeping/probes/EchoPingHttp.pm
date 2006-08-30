@@ -88,13 +88,13 @@ sub test_usage {
 	my $self = shift;
 	my $bin = $self->{properties}{binary};
 	croak("Your echoping binary doesn't support HTTP")
-		if `$bin -h/ 127.0.0.1 2>&1` =~ /(invalid option|not compiled|usage)/i;
-	if (`$bin -a -h/ 127.0.0.1 2>&1` =~ /(invalid option|not compiled|usage)/i) {
+		if `$bin -h / 127.0.0.1 2>&1` =~ /(invalid option|not compiled|usage)/i;
+	if (`$bin -a -h / 127.0.0.1 2>&1` =~ /(invalid option|not compiled|usage)/i) {
 		carp("Note: your echoping binary doesn't support revalidating (-a), disabling it");
 		$self->{_disabled}{a} = undef;
 	}
 
-	if (`$bin -A -h/ 127.0.0.1 2>&1` =~ /(invalid option|not compiled|usage)/i) {
+	if (`$bin -A -h / 127.0.0.1 2>&1` =~ /(invalid option|not compiled|usage)/i) {
 		carp("Note: your echoping binary doesn't support ignoring cache (-A), disabling it");
 		$self->{_disabled}{A} = undef;
 	}

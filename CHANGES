@@ -1,4 +1,5 @@
-* create a log entry when there are zero replies from a device.
+* fixed echoping test call to be compatible with echoping 6 -- tobi
+* create a log entry when there are zero replies from a device. -- tobi
 * maintaining trunk and branch is not realy sensible the way smokeping evolves. 
   I have merged everything back to trunk -- tobi
 * Allow several Mailservers to be specified in Mailhost -- tobi

@@ -54,7 +54,7 @@ sub test_usage {
 	my $self = shift;
 
 	my $bin = $self->{properties}{binary};
-	my $response  = `$bin -C -h/ 127.0.0.1 2>&1`;
+	my $response  = `$bin -C -h / 127.0.0.1 2>&1`;
 	croak("Your echoping binary doesn't support SSL")
 		if ($response =~ /(not compiled|invalid option|usage)/i);
 	$self->SUPER::test_usage;
