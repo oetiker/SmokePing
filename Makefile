@@ -8,6 +8,7 @@ VERSION = 2.1.0
 NUMVERSION = 2.001000
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|.svn
 GROFF = groff
+PERL = perl
 .PHONY: man html txt ref examples check-examples patch killdoc doc tar rename-man symlinks remove-symlinks
 .SUFFIXES:
 .SUFFIXES: .pm .pod .txt .html .man .1 .3 .5 .7
@@ -36,8 +37,8 @@ MAN2TXT = $(GROFF) -man -Tascii $< > $@
 # pod2html apparently needs to be in the target directory to get L<> links right
 POD2HTML= cd $(dir $@); top="$(shell echo $(dir $@)|sed -e 's,doc/,,' -e 's,[^/]*/,../,g' -e 's,/$$,,')"; top=$${top:-.}; pod2html --infile=$(CURDIR)/$< --noindex --htmlroot=. --podroot=. --podpath=$${top} --title=$* | $${top}/../util/fix-pod2html.pl > $(notdir $@)
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
-MAKEPOD= perl -I/home/oetiker/lib/fake-perl/ -Ilib -I/usr/pack/rrdtool-1.2svn-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
-GENEX= perl -I/home/oetiker/lib/fake-perl/ -Ilib -I/usr/pack/rrdtool-1.2svn-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
+MAKEPOD= $(PERL) -I/home/oetiker/lib/fake-perl/ -Ilib -I/usr/pack/rrdtool-1.2svn-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --makepod
+GENEX= $(PERL) -I/home/oetiker/lib/fake-perl/ -Ilib -I/usr/pack/rrdtool-1.2svn-to/lib/perl -mSmokeping -e 'Smokeping::main()' -- --gen-examples
 
 doc/%.7: doc/%.pod
 	$(POD2MAN) --section 7 > $@
@@ -135,9 +136,9 @@ doc/smokeping_config.pod: lib/Smokeping.pm
 doc/smokeping_examples.pod: lib/Smokeping/Examples.pm etc/config.dist
 	$(GENEX)
 patch:
-	perl -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
-	perl -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
-	perl -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
+	$(PERL) -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
+	$(PERL) -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
+	$(PERL) -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
 
 killdoc:
 	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod

@@ -1,3 +1,4 @@
+* make PERL binary configurable in Makefile -- tobi
 * fixed echoping test call to be compatible with echoping 6 -- tobi
 * create a log entry when there are zero replies from a device. -- tobi
 * maintaining trunk and branch is not realy sensible the way smokeping evolves. 
