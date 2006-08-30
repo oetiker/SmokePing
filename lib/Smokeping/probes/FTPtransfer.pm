@@ -53,7 +53,7 @@ Many variables can be specified either in the probe or in the target definition,
 the target-specific variable will override the prove-specific variable.
 DOC
 		authors => <<'DOC',
-Tobias Oetiker <tobi@oetiker.ch>
+Tobias Oetiker <tobi@oetiker.ch> sponsored by Virtela
 DOC
 		bugs => <<DOC,
 This probe has the capability for saturating your links, so don't use it
@@ -62,8 +62,12 @@ DOC
 	}
 }
 
-sub ProbeDesc {
-	return "FTP transfer";
+sub ProbeDesc ($) {
+	return "File transfers (FTP)";
+}
+
+sub ProbeUnit ($) {
+	return "Bytes/Second";
 }
 
 sub new {
@@ -126,7 +130,7 @@ sub pingone {
 		$ftp->quit;
 		$elapsed = ( $end - $start );
 		$ok or next;
-		my $speed = $elapsed / $size;
+		my $speed = $size / $elapsed;
 		$self->do_debug("$host: ftp $mode $speed Bytes/s");
 		push @rates, $speed;
 	}

@@ -1,4 +1,8 @@
-* make sure logo images get wrien in binary mode or they will not be usable on windows -- tobi
+* configuration option mailtemplate lets you configure the alert message content -- tobi
+* added new method ProbeUnit to base.pm in support of FTPtransfer.pm -- tobi
+* new probe FTPtransfer.pm added. It measures available bandwidth by
+  actually sending data over the wire to test (don't try this at home) -- tobi
+* make sure logo images get writen in binary mode or they will not be usable on windows -- tobi
 * make PERL binary configurable in Makefile -- tobi
 * fixed echoping test call to be compatible with echoping 6 -- tobi
 * create a log entry when there are zero replies from a device. -- tobi

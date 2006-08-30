@@ -90,6 +90,10 @@ sub ProbeDesc ($) {
     return "Probe which does not overrivd the ProbeDesc methode";
 }    
 
+sub ProbeUnit ($) {
+    return "Seconds";
+}    
+
 sub target2dynfile ($$) {
     # the targets are stored in the $self->{targets}
     # hash as filenames pointing to the RRD files

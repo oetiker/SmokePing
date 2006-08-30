@@ -548,16 +548,18 @@ sub target_menu($$$;$){
 };
 
 
-
-sub fill_template ($$){
+sub fill_template ($$;$){
     my $template = shift;
     my $subst = shift;
-    my $line = $/;
-    undef $/;
-    open I, $template or return "<HTML><BODY>ERROR: Reading page template $template: $!</BODY></HTML>";
-    my $data = <I>;
-    close I;
-    $/ = $line;
+    my $data = shift;
+    if ($template){
+	my $line = $/;
+	undef $/;
+	open I, $template or return undef;
+        $data = <I>;
+        close I;
+	$/ = $line;
+    }
     foreach my $tag (keys %{$subst}) {
 	$data =~ s/<##${tag}##>/$subst->{$tag}/g;
     }
@@ -603,6 +605,7 @@ sub get_overview ($$$$){
         my $max =  $cfg->{Presentation}{overview}{max_rtt} || "100000";
         my $medc = $cfg->{Presentation}{overview}{median_color} || "ff0000";
 	my $probe = $probes->{$tree->{$prop}{probe}};
+	my $ProbeUnit = $probe->ProbeUnit();
 	my $pings = $probe->_pings($tree->{$prop});
 	my ($graphret,$xs,$ys) = RRDs::graph 
 	  ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
@@ -611,7 +614,7 @@ sub get_overview ($$$$){
            '--title',$tree->{$prop}{title},
 	   '--height',$cfg->{Presentation}{overview}{height},
 	   '--width',$cfg->{Presentation}{overview}{width},
-	   '--vertical-label',"Seconds",
+	   '--vertical-label', $ProbeUnit,
 	   '--imgformat','PNG',
 	   '--alt-autoscale-max',
 	   '--alt-y-grid',
@@ -734,6 +737,7 @@ sub get_detail ($$$$){
 
     my $probe = $cfg->{__probes}{$tree->{probe}};
     my $ProbeDesc = $probe->ProbeDesc();
+    my $ProbeUnit = $probe->ProbeUnit();
     my $step = $probe->step();
     my $pings = $probe->_pings($tree);
     my $page;
@@ -966,7 +970,7 @@ sub get_detail ($$$$){
            '--rigid','--upper-limit', $max->{$start},
 	   @log,
 	   '--lower-limit',(@log ? ($max->{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
-	   '--vertical-label',"Seconds",
+	   '--vertical-label',$ProbeUnit,
 	   '--imgformat','PNG',
 	   '--color', 'SHADEA#ffffff',
 	   '--color', 'SHADEB#ffffff',
@@ -1022,7 +1026,7 @@ sub get_detail ($$$$){
 	    $page .= "<br/>";
 	    $page .= ( $ERROR || 
 		      qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
-		      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" );
+		      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
 	    $page .= "</div>";
 
 	}
@@ -1047,7 +1051,7 @@ sub display_webpage($$){
     my $readversion = "?";
     $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
         
-    print fill_template
+    my $page = fill_template
       ($cfg->{Presentation}{template},
        {
 	menu => target_menu($cfg->{Targets},
@@ -1070,6 +1074,8 @@ sub display_webpage($$){
         smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
        }
        );
+    print $page || "<HTML><BODY>ERROR: Reading page template".$cfg->{Presentation}{template}."</BODY></HTML>";
+
 }
 
 # fetch all data.
@@ -1218,33 +1224,47 @@ SNPPALERT
 			     }
 			};
 			if (@to){
+		        my $default_mail = <<DOC;
+Subject: [SmokeAlert] <##ALERT##> <##WHAT##> on <##LINE##>
+
+<##STAMP##>
+
+Alert "<##ALERT##>" <##WHAT##> for <##URL##>
+
+Pattern
+-------
+<##PAT##>
+
+Data (old --> now)
+------------------
+<##LOSS##>
+<##RTT##>
+
+Comment
+-------
+<##COMMENT##>
+
+DOC
+
+		            my $mail = fill_template($cfg->{Alerts}{$_}{mailtemplate},
+			       {
+				  ALERT => $_,
+				  WHAT  => $what,
+				  LINE  => $line,
+				  URL   => $urlline,
+				  STAMP => $stamp,
+				  PAT   => $cfg->{Alerts}{$_}{pattern},
+                                  LOSS  => $loss,
+                                  RTT   => $rtt,
+                                  COMMENT => $cfg->{Alerts}{$_}{comment}
+			         },$default_mail) || "Subject: smokeping failed to open mailtemplate '$cfg->{Alerts}{$_}{mailtemplate}'\n\nsee subject\n";
 			    my $rfc2822stamp =  strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
 			    my $to = join ",",@to;
 			    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
 From: $cfg->{Alerts}{from}
 Date: $rfc2822stamp
-Subject: [SmokeAlert] $_ $what on $line
-
-$stamp
-
-Alert "$_" $what for $urlline
-
-Pattern
--------
-$cfg->{Alerts}{$_}{pattern}
-
-Data (old --> now)
-------------------
-$loss
-$rtt
-
-Comment
--------
-$cfg->{Alerts}{$_}{comment}
-
-
-
+$mail
 ALERT
 			}
 		    } else {
@@ -1721,7 +1741,7 @@ DOC
 Instead of using sendmail, you can specify the name of an smtp server and
 use perl's Net::SMTP module to send mail (for alerts and DYNAMIC client
 script). Several comma separated mailhosts can be specified. SmokePing will
-try one after the other is one does not anwer answer for 5 seconds.
+try one after the other if one does not answer for 5 seconds.
 DOC
           _sub => sub { require Net::SMTP ||return "ERROR: loading Net::SMTP"; return undef; }
 	 },
@@ -2367,7 +2387,7 @@ A complete example
 DOC
 
 	     _sections => [ '/[^\s,]+/' ],
-	     _vars => [ qw(to from edgetrigger) ],
+	     _vars => [ qw(to from edgetrigger mailtemplate) ],
 	     _mandatory => [ qw(to from)],
 	     to => { _doc => <<DOC,
 Either an email address to send alerts to, or the name of a program to
@@ -2399,9 +2419,44 @@ DOC
                        _re_error =>"this must either be 'yes' or 'no'",
                        _default => 'no',
               },
+	      mailtemplate => {
+	   	      _doc => <<DOC,
+When sending out mails for alerts, smokeping normally uses an internally
+generated message. With the mailtemplate you can customize the alert mails
+to look they way you like them. The all B<E<lt>##>I<keyword>B<##E<gt>> type
+strings will get replaced in the template before it is sent out. the
+following keywords are supported:
+
+ <##ALERT##>    - target name
+ <##WHAT##>     - status (is active, was raised, was celared)
+ <##LINE##>     - path in the config tree
+ <##URL##>      - webpage for graph
+ <##STAMP##>    - date and time 
+ <##PAT##>      - pattern that matched the alert
+ <##LOSS##>     - loss history
+ <##RTT##>      - rtt history
+ <##COMMENT##>  - comment
+
+
+DOC
+
+  	                _sub => sub {
+			     open (my $tmpl, $_[0]) or
+		                     return "mailtemplate '$_[0]' not readable";
+			     my $subj;
+			     while (<$tmpl>){
+				$subj =1 if /^Subject: /;
+				next if /^\S+: /;
+				last if /^$/;
+				return "mailtemplate '$_[0]' should start with mail header lines";
+			     }
+			     return "mailtemplate '$_[0]' has no Subject: line" unless $subj;
+                	     return undef;
+			  },
+		       },
 	     '/[^\s,]+/' => {
-		  _vars => [ qw(type pattern comment to edgetrigger) ],
-                  _inherited => [ qw(edgetrigger) ],
+		  _vars => [ qw(type pattern comment to edgetrigger mailtemplate) ],
+                  _inherited => [ qw(edgetrigger mailtemplate) ],
 		  _mandatory => [ qw(type pattern comment) ],
 	          to => { _doc => 'Similar to the "to" parameter on the top-level except that  it will only be used IN ADDITION to the value of the toplevel parameter. Same rules apply.',
 			_re => '(\|.+|.+@\S+|snpp:)',
@@ -2433,7 +2488,22 @@ DOC
                        _re_error =>"this must either be 'yes' or 'no'",
 		  	_default => 'no',
 		  },
-		  },
+  	          mailtemplate => {
+  	                _sub => sub {
+			     open (my $tmpl, $_[0]) or
+		                     return "mailtemplate '$_[0]' not readable";
+			     my $subj;
+			     while (<$tmpl>){
+				$subj =1 if /^Subject: /;
+				next if /^\S+: /;
+				last if /^$/;
+				return "mailtemplate '$_[0]' should start with mail header lines";
+			     }
+			     return "mailtemplate '$_[0]' has no Subject: line" unless $subj;
+                	     return undef;
+			  },
+		       },
+	      },
         },
        Targets => {_doc        => <<DOC,
 The Target Section defines the actual work of SmokePing. It contains a hierarchical list
@@ -2837,7 +2907,7 @@ sub gen_page  ($$$) {
 	  smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
 	 });
 
-    print PAGEFILE $page;
+    print PAGEFILE $page || "<HTML><BODY>ERROR: Reading page template ".$cfg->{Presentation}{template}."</BODY></HTML>";
     close PAGEFILE;
 
     foreach my $key (keys %$tree) {
