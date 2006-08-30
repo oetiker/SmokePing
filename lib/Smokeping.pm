@@ -1112,7 +1112,7 @@ sub update_rrds($$$$$) {
         if (ref $tree->{$prop} eq 'HASH'){
             update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe;
         } 
-	# if we are looking down a branche where no probe propperty is set there is not sense
+	# if we are looking down a branche where no probe property is set there is no sense
         # in further exploring it
         next unless defined $probe;
 	next if defined $justthisprobe and $probe ne $justthisprobe;
@@ -1145,7 +1145,7 @@ sub update_rrds($$$$$) {
                 $tree->{stack} = {loss=>['S'],rtt=>['S']} unless defined $tree->{stack};
 		my $x = $tree->{stack};
 		my ($loss,$rtt) = 
-		    (split /:/, $probeobj->rrdupdate_string($tree))[1,2];
+		    (split /:/, $updatestring)[1,2];
 		$loss = undef if $loss eq 'U';
 		my $lossprct = $loss * 100 / $pings;
 		$rtt = undef if $rtt eq 'U';
