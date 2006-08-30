@@ -1,3 +1,4 @@
+* make sure logo images get wrien in binary mode or they will not be usable on windows -- tobi
 * make PERL binary configurable in Makefile -- tobi
 * fixed echoping test call to be compatible with echoping 6 -- tobi
 * create a log entry when there are zero replies from a device. -- tobi

@@ -3267,6 +3267,7 @@ sub gen_imgs ($){
       (defined $modulemodtime and $modulemodtime > (stat _)[9])){
 open W, ">".$cfg->{General}{imgcache}."/rrdtool.png" 
    or do { warn "WARNING: creating $cfg->{General}{imgcache}/rrdtool.png: $!\n"; return 0 };
+binmode W;
 print W unpack ('u', <<'UUENC');
 MB5!.1PT*&@H    -24A$4@   'D    P" 8    UK=7M    "7!(67,   YG
 M   .9P&/B8)Q   .]DE$051XG.V<"71.9QK''X14FMJ"JHHEDUJJC)-2M11I
@@ -3363,6 +3364,7 @@ close W;
       (defined $modulemodtime and $modulemodtime > (stat _)[9])){
 open W, ">".$cfg->{General}{imgcache}."/smokeping.png" 
    or do { warn "WARNING: creating $cfg->{General}{imgcache}/smokeping.png: $!\n"; return 0};
+binmode W;
 print W unpack ('u', <<'UUENC');
 MB5!.1PT*&@H    -24A$4@   '@    B" (    ;$XH4    "7!(67,   [#
 M   .PP'';ZAD   0T$E$051HWNU:2XQDUUG^S[FONO?6^]'555U=W5V>GA[W
