@@ -1,3 +1,5 @@
+
+* some touchups to the graph comments to be a bit less 'ping' focussed -- tobi
 * configuration option mailtemplate lets you configure the alert message content -- tobi
 * added new method ProbeUnit to base.pm in support of FTPtransfer.pm -- tobi
 * new probe FTPtransfer.pm added. It measures available bandwidth by

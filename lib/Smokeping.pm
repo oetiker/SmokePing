@@ -28,7 +28,7 @@ use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="2.001000";
+$VERSION="2.000901";
 
 # we want opts everywhere
 my %opt;
@@ -413,7 +413,6 @@ sub init_target_tree ($$$$) {
 			($name.".rrd", "--step",$step,
 			      "DS:uptime:GAUGE:".(2*$step).":0:U",
 			      "DS:loss:GAUGE:".(2*$step).":0:".$pings,
-                               # 180 Seconds  is the max rtt we consider valid ... 
 			      "DS:median:GAUGE:".(2*$step).":0:180",
 			      (map { "DS:ping${_}:GAUGE:".(2*$step).":0:180" }
 			                                                  1..$pings),
@@ -885,7 +884,7 @@ sub get_detail ($$$$){
 	my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
 	my @median = ("DEF:median=${rrd}:median:AVERAGE",
 		      "CDEF:ploss=loss,$pings,/,100,*",
-		      "GPRINT:median:AVERAGE:Median Ping RTT (%.1lf %ss avg) ",
+		      "GPRINT:median:AVERAGE:Median RTT (%.1lf %ss avg) ",
 		      "LINE1:median#202020"
 		  );
 	my @lossargs = ();
@@ -993,8 +992,8 @@ sub get_detail ($$$$){
 		 ()),
 	   'HRULE:0#000000',
 	   'COMMENT:\s',
-           "COMMENT:Probe${BS}: $pings $ProbeDesc every $step seconds",
-	   'COMMENT:created on '.$date.'\j' );
+           "COMMENT:Probe${BS}: $pings $ProbeDesc every ${step}s",
+	   'COMMENT:'.$date.'\j' );
 
 #	do_log ("***** begin task ***** <br />");
 #	do_log (@task);

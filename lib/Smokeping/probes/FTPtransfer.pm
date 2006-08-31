@@ -51,6 +51,10 @@ specific `min_interval' variable ($DEFAULTINTERVAL by default).
 
 Many variables can be specified either in the probe or in the target definition,
 the target-specific variable will override the prove-specific variable.
+
+If your transfer takes a lot of time, you may want to make sure to set the
+B<timeout> and B<max_rtt> properly so that smokeping does not abort the
+transfers of limit the graph size.
 DOC
 		authors => <<'DOC',
 Tobias Oetiker <tobi@oetiker.ch> sponsored by Virtela
@@ -58,16 +62,23 @@ DOC
 		bugs => <<DOC,
 This probe has the capability for saturating your links, so don't use it
 unless you know what you are doing.
+
+The FTPtransfer probe measures bandwidth, but we report the number of
+seconds it took to transfer the 'reference' file. This is because curently
+the notion of I<Round Trip Time> is at the core of the application. It would
+take some re-egineering to split this out in plugins and thus make it
+configurable ...
 DOC
 	}
 }
 
 sub ProbeDesc ($) {
-	return "File transfers (FTP)";
-}
-
-sub ProbeUnit ($) {
-	return "Bytes/Second";
+        my $self = shift;  
+        my $srcfile = $self->{properties}{srcfile};
+        my $destfile = $self->{properties}{destfile};
+        my $mode = $self->{properties}{mode};
+	my $size = $mode eq 'get' ? -s $destfile : -s $srcfile;
+	return sprintf("FTP File transfers (%.0f KB)",$size/1024);
 }
 
 sub new {
@@ -102,7 +113,7 @@ sub pingone {
 	push (@options, LocalAddr => $vars->{localaddr} ) if $vars->{localaddr};
 	push (@options, Passive   => 1 ) if $vars->{passive} and $vars->{passive} eq 'yes';
 
-	my @rates;
+	my @times;
 	my $elapsed;
 
 	for (1..$self->pings($target)) {
@@ -111,30 +122,29 @@ sub pingone {
 			sleep $timeleft if $timeleft > 0;
 		}
 		my $ftp = Net::FTP->new($host, @options) or 
-			$self->do_debug("Problem with $host: ftp session $@"), return;
+			$self->do_log("Problem with $host: ftp session $@"), return;
 		$ftp->login($username,$password) or
-		$self->do_debug("Problem with $host: ftp login ".$ftp->message), return;
+ 		        $self->do_log("Problem with $host: ftp login ".$ftp->message), return;
 		my $start = gettimeofday();
 		my $ok;
 		my $size;
 		if ($mode eq 'get'){
 			$ok = $ftp->get($srcfile,$destfile) or 
-        	                $self->do_debug("Problem with $host: ftp get ".$ftp->message);
+        	                $self->do_log("Problem with $host: ftp get ".$ftp->message);
 			$size = -s $destfile;
 		} else {
 			$ok = $ftp->put($srcfile,$destfile) or 
-        	                $self->do_debug("Problem with $host: ftp put ".$ftp->message);
+        	                $self->do_log("Problem with $host: ftp put ".$ftp->message);
 			$size = -s $srcfile;
 		}
 		my $end = gettimeofday();
 		$ftp->quit;
 		$elapsed = ( $end - $start );
 		$ok or next;
-		my $speed = $size / $elapsed;
-		$self->do_debug("$host: ftp $mode $speed Bytes/s");
-		push @rates, $speed;
+		$self->do_debug("$host - $mode mode transfered $size Bytes in ${elapsed}s");
+		push @times, $elapsed;
 	}
-	return sort { $a <=> $b } @rates;
+	return sort { $a <=> $b } @times;
 }
 
 sub probevars {
@@ -145,6 +155,10 @@ sub probevars {
 The timeout is the maximum amount of time you will allow the probe to
 transfer the file. If the probe does not succeed to transfer in the time specified,
 it will get killed and a 'loss' will be loged.
+
+Since FTPtransfer is an invasive probe you should make sure you do not load
+the link for more than a few seconds anyway. Smokeping curently has a hard
+limit of 180 seconds for any RTT.
 DOC
 
 	return $class->_makevars($h, {

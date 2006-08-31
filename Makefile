@@ -1,11 +1,11 @@
 SHELL = /bin/sh
-VERSION = 2.1.0
+VERSION = 2.0.901
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
 ############ 2.000001
 ############ 2.000002
-NUMVERSION = 2.001000
+NUMVERSION = 2.000901
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|.svn
 GROFF = groff
 PERL = perl
@@ -148,7 +148,7 @@ doc:    killdoc ref examples man html txt rename-man
 # patch first so Smokeping.pm is older than smokeping_config.pod in the tarball
 tar:	patch doc
 	-ln -s . smokeping-$(VERSION)
-	find smokeping-$(VERSION)/* -type f -follow -o -type l | egrep -v '$(IGNORE)' | gtar -T - -czvf smokeping-$(VERSION).tar.gz
+	find smokeping-$(VERSION)/* -type f -follow -o -type l | egrep -v '$(IGNORE)' | tar -T - -czvf smokeping-$(VERSION).tar.gz
 	rm smokeping-$(VERSION)
 
 commit:
