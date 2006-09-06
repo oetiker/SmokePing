@@ -222,7 +222,7 @@ sub targetvars {
 		},
 		passive => {
 			_doc => 'Use passive FTP protocol',
-			_re => 'yes|no',
+			_re => '(yes|no)',
 			_example => 'yes',
 		}
 
