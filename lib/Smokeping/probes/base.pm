@@ -87,7 +87,7 @@ sub round ($) {
 }
 
 sub ProbeDesc ($) {
-    return "Probe which does not overrivd the ProbeDesc methode";
+    return "Probe which does not override the ProbeDesc method";
 }    
 
 sub ProbeUnit ($) {
