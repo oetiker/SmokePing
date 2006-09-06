@@ -66,7 +66,7 @@ unless you know what you are doing.
 The FTPtransfer probe measures bandwidth, but we report the number of
 seconds it took to transfer the 'reference' file. This is because curently
 the notion of I<Round Trip Time> is at the core of the application. It would
-take some re-egineering to split this out in plugins and thus make it
+take some re-engineering to split this out in plugins and thus make it
 configurable ...
 DOC
 	}
@@ -180,7 +180,7 @@ DOC
 		},
 		mode => {
 			_doc => <<DOC,
-The ftp probe can be eitherin put or in get mode. If it is in put mode then it will send a to the ftp server. In get mode it will retreive a file
+The ftp probe can be in either put or get mode. If it is in put mode then it will send a file to the ftp server. In get mode it will retrieve a file
 from the ftp server.
 DOC
 			_example => 'get',
