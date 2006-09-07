@@ -1,4 +1,9 @@
+
 * make the LDAP probe 'scope' option actually work. -- niko
+* new probe WebProxyFilter exercies a filtering web proxy firewall by
+  requesting banned pages. It tests if the data returned from the proxy
+  looks like the page telling users that they came upon a banned page. When
+  ever a real page can be retreived, a loss is logged. --tobi
 * some touchups to the graph comments to be a bit less 'ping' focussed -- tobi
 * configuration option mailtemplate lets you configure the alert message content -- tobi
 * added new method ProbeUnit to base.pm in support of FTPtransfer.pm -- tobi
