@@ -4,11 +4,11 @@ package Smokeping::probes::FTPtransfer;
 
 This is a Smokeping probe module. Please use the command 
 
-C<smokeping -man Smokeping::probes::FtpTransfer>
+C<smokeping -man Smokeping::probes::FTPtransfer>
 
 to view the documentation or the command
 
-C<smokeping -makepod Smokeping::probes::FtpTransfer>
+C<smokeping -makepod Smokeping::probes::FTPtransfer>
 
 to generate the POD document.
 
