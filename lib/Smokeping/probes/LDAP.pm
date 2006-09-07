@@ -211,7 +211,7 @@ sub pingone {
 		}
 		local $IO::Socket::SSL::SSL_Context_obj; # ugly but necessary
 		$start = gettimeofday();
-		my $ldap = new Net::LDAP($host, port => $port, version => $version, timeout => $timeout, scope => $scope) 
+		my $ldap = new Net::LDAP($host, port => $port, version => $version, timeout => $timeout)
 			or do {
 				$self->do_log("connection error on $host: $!");
 				next;
@@ -238,7 +238,8 @@ sub pingone {
 			$ldap->unbind;
 			next;
 		};
-		$mesg = $ldap->search(base => $base, filter => $filter, attrs => $attrsref);
+		$mesg = $ldap->search(base => $base, filter => $filter, 
+		                      attrs => $attrsref, scope => $scope);
 		$mesg->code and do {
 			$self->do_log("filter error on $host: " . $mesg->error);
 			$ldap->unbind;
