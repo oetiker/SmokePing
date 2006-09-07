@@ -28,7 +28,7 @@ use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="2.000901";
+$VERSION="2.000903";
 
 # we want opts everywhere
 my %opt;
@@ -1147,6 +1147,7 @@ sub update_rrds($$$$$) {
 	    # check alerts
             # disabled
 	    if ( $tree->{alerts} ) {
+		my $priority_done;
                 $tree->{stack} = {loss=>['S'],rtt=>['S']} unless defined $tree->{stack};
 		my $x = $tree->{stack};
 		my ($loss,$rtt) = 
@@ -1160,12 +1161,14 @@ sub update_rrds($$$$$) {
 		    shift @{$x->{loss}};
 		    shift @{$x->{rtt}};
 		}
-		for (@{$tree->{alerts}}) {
-                    if ( not $cfg->{Alerts}{$_} ) {
+		for (sort { $cfg->{Alerts}{$a}{priority}||0  
+                            <=> $cfg->{Alerts}{$b}{priority}||0} @{$tree->{alerts}}) {
+                    my $alert = $cfg->{Alerts}{$_};
+                    if ( not $alert ) {
                         do_log "WARNING: Empty alert in ".(join ",", @{$tree->{alerts}})." ($name)\n";
                         next;
                     };
-                    if ( ref $cfg->{Alerts}{$_}{sub} ne 'CODE' ) {
+                    if ( ref $alert->{sub} ne 'CODE' ) {
        		        do_log "WARNING: Alert '$_' did not resolve to a Sub Ref. Skipping\n";
                         next;
                     };
@@ -1175,9 +1178,9 @@ sub update_rrds($$$$$) {
 		    # data passed into a matcher, which allows for somewhat 
 		    # more intelligent alerting due to state awareness.
 		    $x->{prevmatch} = $prevmatch;
-
-                    my $match = &{$cfg->{Alerts}{$_}{sub}}($x) || 0; # Avgratio returns undef
-                    my $edgetrigger = $cfg->{Alerts}{$_}{edgetrigger} eq 'yes';
+		    my $priority = $alert->{priority};
+                    my $match = &{$alert->{sub}}($x) || 0; # Avgratio returns undef
+                    my $edgetrigger = $alert->{edgetrigger} eq 'yes';
                     my $what;
                     if ($edgetrigger and $prevmatch != $match) {
                         $what = ($prevmatch == 0 ? "was raised" : "was cleared");
@@ -1185,7 +1188,8 @@ sub update_rrds($$$$$) {
                     if (not $edgetrigger and $match) {
                         $what = "is active";
                     }
-		    if ($what) {
+		    if ($what and (not defined $priority or not defined $priority_done )) {
+			$priority_done = $priority if $priority and not $priority_done;
 			# send something
 			my $from;
                         my $line = "$name/$prop";
@@ -1202,7 +1206,7 @@ sub update_rrds($$$$$) {
                         my @stamp = localtime($time);
 			my $stamp = localtime($time);
 			my @to;
-			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$cfg->{Alerts}{$_}{to}){
+			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$alert->{to}){
 			     next unless $addr;
 			     if ( $addr =~ /^\|(.+)/) {
 			     	 my $cmd = $1;
@@ -1213,7 +1217,7 @@ sub update_rrds($$$$$) {
                                  }
 			     } elsif ( $addr =~ /^snpp:(.+)/ ) {
 				 sendsnpp $1, <<SNPPALERT;
-$cfg->{Alerts}{$_}{comment}
+$alert->{comment}
 $_ $what on $line
 $loss
 $rtt
@@ -1245,18 +1249,18 @@ Comment
 
 DOC
 
-		            my $mail = fill_template($cfg->{Alerts}{$_}{mailtemplate},
+		            my $mail = fill_template($alert->{mailtemplate},
 			       {
 				  ALERT => $_,
 				  WHAT  => $what,
 				  LINE  => $line,
 				  URL   => $urlline,
 				  STAMP => $stamp,
-				  PAT   => $cfg->{Alerts}{$_}{pattern},
+				  PAT   => $alert->{pattern},
                                   LOSS  => $loss,
                                   RTT   => $rtt,
-                                  COMMENT => $cfg->{Alerts}{$_}{comment}
-			         },$default_mail) || "Subject: smokeping failed to open mailtemplate '$cfg->{Alerts}{$_}{mailtemplate}'\n\nsee subject\n";
+                                  COMMENT => $alert->{comment}
+			         },$default_mail) || "Subject: smokeping failed to open mailtemplate '$alert->{mailtemplate}'\n\nsee subject\n";
 			    my $rfc2822stamp =  strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
 			    my $to = join ",",@to;
 			    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
@@ -2487,6 +2491,14 @@ DOC
                        _re_error =>"this must either be 'yes' or 'no'",
 		  	_default => 'no',
 		  },
+		  priority => {
+		       _re => '[1-9]\d*',
+		       _re_error =>"priority must be between 1 and oo",
+		       _doc => <<DOC,
+if multiple alerts 'match' only the one with the highest priority (lowest number) will cause and
+alert to be sent. Alerts without priority will be sent in any case.
+DOC
+                  },
   	          mailtemplate => {
   	                _sub => sub {
 			     open (my $tmpl, $_[0]) or
