@@ -1161,8 +1161,8 @@ sub update_rrds($$$$$) {
 		    shift @{$x->{loss}};
 		    shift @{$x->{rtt}};
 		}
-		for (sort { $cfg->{Alerts}{$a}{priority}||0  
-                            <=> $cfg->{Alerts}{$b}{priority}||0} @{$tree->{alerts}}) {
+		for (sort { ($cfg->{Alerts}{$a}{priority}||0)  
+                            <=> ($cfg->{Alerts}{$b}{priority}||0)} @{$tree->{alerts}}) {
                     my $alert = $cfg->{Alerts}{$_};
                     if ( not $alert ) {
                         do_log "WARNING: Empty alert in ".(join ",", @{$tree->{alerts}})." ($name)\n";

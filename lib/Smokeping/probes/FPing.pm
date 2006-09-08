@@ -65,7 +65,7 @@ sub new($$$)
             if $return =~ m/only.+root/;
 
         if ($return =~ m/bytes, ([0-9.]+)\sms\s+.*\n.*\n.*:\s+([0-9.]+)/ and $1 > 0){
-            $self->{pingfactor} = 1000 * $2/$1;
+            $self->{pingfactor} = 1000 * $1/$2;
             print "### fping seems to report in ", $1/$2, " milliseconds\n";
         } else {
             $self->{pingfactor} = 1000; # Gives us a good-guess default
