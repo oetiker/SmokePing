@@ -28,7 +28,7 @@ use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="2.000903";
+$VERSION="2.000904";
 
 # we want opts everywhere
 my %opt;
@@ -2458,7 +2458,7 @@ DOC
 			  },
 		       },
 	     '/[^\s,]+/' => {
-		  _vars => [ qw(type pattern comment to edgetrigger mailtemplate) ],
+		  _vars => [ qw(type pattern comment to edgetrigger mailtemplate priority) ],
                   _inherited => [ qw(edgetrigger mailtemplate) ],
 		  _mandatory => [ qw(type pattern comment) ],
 	          to => { _doc => 'Similar to the "to" parameter on the top-level except that  it will only be used IN ADDITION to the value of the toplevel parameter. Same rules apply.',
