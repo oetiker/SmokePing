@@ -75,7 +75,7 @@ DOC
 sub ProbeDesc ($) {
         my $self = shift;  
         my $srcfile = $self->{properties}{srcfile};
-        my $destfile = $self->{properties}{destfile};
+        my $destfile = $self->{properties}{destfile} || $self->{properties}{srcfile};
         my $mode = $self->{properties}{mode};
 	my $size = $mode eq 'get' ? -s $destfile : -s $srcfile;
 	return sprintf("FTP File transfers (%.0f KB)",$size/1024);
@@ -95,7 +95,7 @@ sub pingone {
 	my $vars = $target->{vars};
 	my $mininterval = $self->{properties}{min_interval};
 	my $srcfile = $self->{properties}{srcfile};
-	my $destfile = $self->{properties}{destfile};
+	my $destfile = $self->{properties}{destfile} || $self->{properties}{srcfile};
 	my $mode = $self->{properties}{mode};
 	my $username = $vars->{username};
 
@@ -174,7 +174,7 @@ DOC
 		destfile => {
 			_doc => <<DOC,
 Normally the destination filename is the same as the source filename. If you keep files in different directories
-this may not work, and you have to specify a destfilename as well.
+this may not work, and you have to specify destfile as well.
 DOC
 			_example => 'destinationfile',
 		},
