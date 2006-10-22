@@ -2,6 +2,10 @@
 
 package Smokeping::Colorspace;
 
+=head1 NAME
+
+Smokeping::Colorspace - Simple Colorspace Conversion methods
+
 =head1 OVERVIEW
 
 This module provides simple colorspace conversion methods, primarily allowing 
