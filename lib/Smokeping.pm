@@ -28,7 +28,7 @@ use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="2.000906";
+$VERSION="2.000907";
 
 # we want opts everywhere
 my %opt;
@@ -1322,7 +1322,6 @@ sub get_parser () {
     #     current 'probe' setting.
 
 
-    my $KEY_RE = '[-_0-9a-zA-Z]+';
     my $KEYD_RE = '[-_0-9a-zA-Z.]+';
     my $PROBE_RE = '[A-Z][a-zA-Z]+';
     my $e = "=";
@@ -1366,15 +1365,15 @@ sub get_parser () {
       {
        _vars     => $TARGETCOMMONVARS,
        _inherited=> [ qw (probe alerts alertee) ],
-       _sections => [ "/$KEY_RE/" ],
-       _recursive=> [ "/$KEY_RE/" ],
+       _sections => [ "/$KEYD_RE/" ],
+       _recursive=> [ "/$KEYD_RE/" ],
        _sub => sub {
            my $val = shift;
 	   return "PROBE_CONF sections are neither needed nor supported any longer. Please see the smokeping_upgrade document."
 	   	if $val eq 'PROBE_CONF';
 	   return undef;
        },
-       "/$KEY_RE/" => {},
+       "/$KEYD_RE/" => {},
        _order    => 1,
        _varlist  => 1,
        _doc => <<DOC,
@@ -1509,7 +1508,7 @@ DOC
 
 				# the subsections differ only in that they inherit their vars from here
 				my $g = _deepcopy($grammar);
-				$grammar->{"/$KEY_RE/"} = $g;
+				$grammar->{"/$KEYD_RE/"} = $g;
 				push @{$g->{_inherited}}, @targetvars;
 
 				# this makes the variables mandatory only in those sections
@@ -1586,7 +1585,7 @@ DOC
 		$grammar->{_mandatory} = [ @mandatory ];
 
 		# do it for probe instances in subsections too
-		my $g = $grammar->{"/$KEY_RE/"};
+		my $g = $grammar->{"/$KEYD_RE/"};
 		for (@probevars) {
 			$grammar->{$_} = $probevars->{$_};
 			%{$g->{$_}} = %{$probevars->{$_}};
@@ -1655,8 +1654,8 @@ DOC
 		}
 	},
 	_dyndoc => $probelist, # all available probes
-	_sections => [ "/$KEY_RE/" ],
-	"/$KEY_RE/" => {
+	_sections => [ "/$KEYD_RE/" ],
+	"/$KEYD_RE/" => {
 		_doc => <<DOC,
 You can define multiple instances of the same probe with subsections. 
 These instances can have different values for their variables, so you
@@ -2295,13 +2294,13 @@ DOC
         
 	   }, #detail
         }, #present
-	Probes => { _sections => [ "/$KEY_RE/" ],
+	Probes => { _sections => [ "/$KEYD_RE/" ],
 		    _doc => <<DOC,
 The Probes Section configures Probe modules. Probe modules integrate
 an external ping command into SmokePing. Check the documentation of each
 module for more information about it.
 DOC
-		  "/$KEY_RE/" => $PROBES,
+		  "/$KEYD_RE/" => $PROBES,
 	},
 	Alerts  => {
 		    _doc => <<DOC,
@@ -2524,9 +2523,9 @@ DOC
 		   _vars       => [ qw(probe menu title remark alerts) ],
 		   _mandatory  => [ qw(probe menu title) ],
                    _order => 1,
-		   _sections   => [ "/$KEY_RE/" ],
-		   _recursive  => [ "/$KEY_RE/" ],
-		   "/$KEY_RE/" => $TARGETCOMMON, # this is just for documentation, _dyn() below replaces it
+		   _sections   => [ "/$KEYD_RE/" ],
+		   _recursive  => [ "/$KEYD_RE/" ],
+		   "/$KEYD_RE/" => $TARGETCOMMON, # this is just for documentation, _dyn() below replaces it
 		   probe => { 
 		   	_doc => <<DOC,
 The name of the probe module to be used for this host. The value of
@@ -2554,7 +2553,7 @@ DOC
 				}
 				push @{$grammar->{_vars}}, @targetvars;
 				my $g = { %{_deepcopy($TARGETCOMMON)}, %{_deepcopy($targetvars)} };
-				$grammar->{"/$KEY_RE/"} = $g;
+				$grammar->{"/$KEYD_RE/"} = $g;
 				$g->{_vars} = [ @{$g->{_vars}}, @targetvars ];
 				$g->{_inherited} = [ @{$g->{_inherited}}, @targetvars ];
 				# this makes the reference manual a bit less cluttered 

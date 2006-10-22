@@ -1,6 +1,9 @@
-2006/9/20 -- released version 2.0.906
+2006/10/4 -- released version 2.0.908
 
+
+* allow . in section names ... 
 * in FTPtransfer probe set destfilename to srcfilename if it is empty
+* in FTPtransfer probe strip path elements from srcfile when building destfile
 * alerts can now have a priority. if multiple prioritized alerts match,
   only the one with the highest priority will cause any action. Alerts
   without priority setting are not affected eitherway. --tobi
