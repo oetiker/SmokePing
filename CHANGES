@@ -1,4 +1,5 @@
-
+* don't die if syslogd is dead -- niko, reported by 
+  Christoph Biedl <cbiedl *gmx.de> as Debian bug #395056
 * add sourceaddress configurability to FPing probe (requires -S flag) -- Norman Rasmussen norman rasmussen.co.za
 * allow . in section names ... 
 * in FTPtransfer probe set destfilename to srcfilename if it is empty

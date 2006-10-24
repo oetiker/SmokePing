@@ -2705,12 +2705,22 @@ sub daemonize_me ($) {
 		$syslog_priority = $pri if defined $pri;
 		print "Note: logging to syslog as $syslog_facility/$syslog_priority.\n";
 		openlog(basename($0), 'pid', $syslog_facility);
+		eval {
+			syslog($syslog_priority, 'Starting syslog logging');
+		};
+		die("can't log to syslog: $@") if $@;
 	}
 
 	sub do_syslog ($){
                 my $str = shift;
                 $str =~ s,%,%%,g;
-		syslog("$syslog_facility|$syslog_priority", $str);
+		eval {
+			syslog("$syslog_facility|$syslog_priority", $str);
+		};
+		# syslogd is probably dead if that failed
+		# this message is most probably lost too, if we have daemonized
+		# let's try anyway, it shouldn't hurt
+		print STDERR qq(Can't log "$str" to syslog: $@) if $@;
 	}
 
 	sub do_cgilog ($){
