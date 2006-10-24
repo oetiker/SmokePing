@@ -1,6 +1,5 @@
-2006/10/4 -- released version 2.0.908
 
-
+* add sourceaddress configurability to FPing probe (requires -S flag) -- Norman Rasmussen norman rasmussen.co.za
 * allow . in section names ... 
 * in FTPtransfer probe set destfilename to srcfilename if it is empty
 * in FTPtransfer probe strip path elements from srcfile when building destfile
