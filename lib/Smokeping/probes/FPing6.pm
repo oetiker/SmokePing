@@ -47,6 +47,7 @@ sub probevars {
       my $h = $self->SUPER::probevars;
       $h->{binary}{_example} = "/usr/bin/fping6";
       $h->{sourceaddress}{_re} = "[0-9A-Fa-f:.]+";
+      $h->{sourceaddress}{_example} = "::1";
       return $h;
 }
 
