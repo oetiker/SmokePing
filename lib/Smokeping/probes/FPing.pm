@@ -109,7 +109,7 @@ sub ping ($){
     push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     push @params, "-i" . int(1000 * $self->{properties}{mininterval});
     push @params, "-p" . int(1000 * $self->{properties}{hostinterval}) if $self->{properties}{hostinterval};
-    push @params, "-S$self->{properties}{sourceaddress}" $self->{properties}{sourceaddress} and $self->{enable}{S};
+    push @params, "-S$self->{properties}{sourceaddress}" if $self->{properties}{sourceaddress} and $self->{enable}{S};
             
     my @cmd = (
                     $self->binary,
