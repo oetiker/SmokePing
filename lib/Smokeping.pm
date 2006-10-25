@@ -2708,7 +2708,10 @@ sub daemonize_me ($) {
 		eval {
 			syslog($syslog_priority, 'Starting syslog logging');
 		};
-		die("can't log to syslog: $@") if $@;
+		if ($@) {
+			print "Warning: can't connect to syslog. Messages will be lost.\n";
+			print "Error message was: $@";
+		}
 	}
 
 	sub do_syslog ($){
