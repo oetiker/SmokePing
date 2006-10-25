@@ -196,7 +196,7 @@ The minimum amount of time between sending a ping packet to any target.
 DOC
 		},
 		sourceaddress => {
-			_re => '(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}',
+			_re => '\d+(\.\d+){3}',
 			_example => '192.168.0.1',
 			_doc => <<DOC,
 The fping "-S" parameter . From fping(1):
