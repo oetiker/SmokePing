@@ -97,7 +97,7 @@ sub probevars {
 			_example => '/some/place/secret',
 			_sub => sub {
 				my $val = shift;
-				-r $val or return "ERROR: password file $val is not readable.";
+				-r $val or $ENV{SERVER_SOFTWARE} or return "ERROR: password file $val is not readable.";
 				return undef;
 			},
 		},
