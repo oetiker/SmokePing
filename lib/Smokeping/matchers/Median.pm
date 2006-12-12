@@ -73,8 +73,7 @@ sub Test($$)
     my $ac = $self->{param}{old};
     my $bc = $self->{param}{new};
     my $cc = $ac +$bc;
-    my $oldm = (sort {$a <=> $b} @{$data->{rtt}}[-$cc..-$bc-1])[int($a/2)];
-    $ac++;
+    my $oldm = (sort {$a <=> $b} @{$data->{rtt}}[-$cc..-$bc-1])[int($ac/2)];
     my $newm = (sort {$a <=> $b} @{$data->{rtt}}[-$bc..-1])[int($bc/2)];
     return abs($oldm-$newm) > $self->{param}{diff};
 }

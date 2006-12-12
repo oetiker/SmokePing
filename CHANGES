@@ -1,3 +1,5 @@
+* new matcher Medratio (compare two medians) -- tobi
+* fixes for Median matcher -- tobi
 * make the CGI not croak if a password file is not readable. -- niko
 * don't die if syslogd is dead -- niko, reported by 
   Christoph Biedl <cbiedl *gmx.de> as Debian bug #395056
