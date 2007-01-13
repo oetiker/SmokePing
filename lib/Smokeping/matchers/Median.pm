@@ -56,6 +56,18 @@ use vars qw($VERSION);
 $VERSION = 1.0;
 use Carp;
 
+sub new(@)
+{
+    my $class = shift;
+    my $rules = {
+                old=>'\d+',
+                new=>'\d+',
+                diff=>'\d+(\.\d+)?' };
+
+    my $self  = $class->SUPER::new($rules,@_);
+    return $self;
+}
+
 # how many values does the matcher need to do it's magic
 sub Length($)
 {
