@@ -1,3 +1,5 @@
+2007/1/15 -- released version 2.0.910
+
 * New Presentation option Charts. Charts are based on the new 'sorter' plugins.
   There are sample plugins for Loss, Max, Median, StdDev based Charts -- tobi
 * new matcher Medratio (compare two medians) -- tobi

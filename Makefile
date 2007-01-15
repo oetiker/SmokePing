@@ -23,7 +23,7 @@ PODSORT :=  $(wildcard lib/Smokeping/sorters/*.pm)
 DOCSBASE = $(subst .pod,,$(DOCS))
 MODBASE = $(subst .pm,,$(subst lib/,doc/,$(PM))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODPROBE))) \
-	$(subst .pm,,$(subst lib/,doc/,$(PODMATCH)))
+	$(subst .pm,,$(subst lib/,doc/,$(PODMATCH))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODSORT)))
 PROGBASE = doc/smokeping doc/smokeping.cgi doc/tSmoke
 DOCSCONFIGBASE = doc/smokeping_config
