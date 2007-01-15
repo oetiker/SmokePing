@@ -1,11 +1,11 @@
 SHELL = /bin/sh
-VERSION = 2.0.909
+VERSION = 2.0.910
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
 ############ 2.000001
 ############ 2.000002
-NUMVERSION = 2.000907
+NUMVERSION = 2.000910
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|\.svn|tar\.gz|DEADJOE
 GROFF = groff
 PERL = perl
@@ -18,11 +18,13 @@ DOCSCONFIG := doc/smokeping_config.pod # section 5
 PM :=  lib/Config/Grammar.pm lib/Smokeping.pm lib/Smokeping/Examples.pm lib/Smokeping/RRDtools.pm
 PODPROBE :=  $(wildcard lib/Smokeping/probes/*.pm)
 PODMATCH :=  $(wildcard lib/Smokeping/matchers/*.pm)
+PODSORT :=  $(wildcard lib/Smokeping/sorters/*.pm)
 
 DOCSBASE = $(subst .pod,,$(DOCS))
 MODBASE = $(subst .pm,,$(subst lib/,doc/,$(PM))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODPROBE))) \
 	$(subst .pm,,$(subst lib/,doc/,$(PODMATCH)))
+	$(subst .pm,,$(subst lib/,doc/,$(PODSORT)))
 PROGBASE = doc/smokeping doc/smokeping.cgi doc/tSmoke
 DOCSCONFIGBASE = doc/smokeping_config
 
@@ -59,6 +61,8 @@ doc/Smokeping/probes/%.3: doc/Smokeping/probes/%.pod
 	$(POD2MAN) --section 3 > $@
 doc/Smokeping/matchers/%.3: lib/Smokeping/matchers/%.pm
 	$(POD2MAN) --section 3 > $@
+doc/Smokeping/sorters/%.3: lib/Smokeping/sorters/%.pm
+	$(POD2MAN) --section 3 > $@
 doc/Config/%.3: lib/Config/%.pm
 	$(POD2MAN) --section 3 > $@
 doc/smokeping.1: bin/smokeping.dist
@@ -78,6 +82,8 @@ doc/Smokeping/RRDtools.html: lib/Smokeping/RRDtools.pm
 	$(POD2HTML)
 
 doc/Smokeping/matchers/%.html: lib/Smokeping/matchers/%.pm
+	$(POD2HTML)
+doc/Smokeping/sorters/%.html: lib/Smokeping/sorters/%.pm
 	$(POD2HTML)
 doc/Config/%.html: lib/Config/%.pm
 	$(POD2HTML)
@@ -104,7 +110,7 @@ html: symlinks $(HTML) remove-symlinks
 txt: $(TXT)
 
 rename-man: $(MAN)
-	for j in probes matchers; do \
+	for j in probes matchers sorters; do \
 	  for i in doc/Smokeping/$$j/*.3; do \
 	    if echo $$i | grep Smokeping::$$j>/dev/null; then :; else \
 	      mv $$i `echo $$i | sed s,$$j/,$$j/Smokeping::$$j::,`; \
@@ -141,7 +147,7 @@ patch:
 	$(PERL) -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
 
 killdoc:
-	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
+	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Smokeping/sorters/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
 
 doc:    killdoc ref examples man html txt rename-man
 

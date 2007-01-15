@@ -60,7 +60,7 @@ sub new($$$)
 	my $testhost = $self->testhost;
         my $return = `$binary -C 1 $testhost 2>&1`;
         $self->{enable}{S} = (`$binary -h 2>&1` =~ /\s-S\s/);
-	carp  "NOTE: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.\n" if !$self->{enable}{S};
+	warn  "NOTE: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.\n" if !$self->{enable}{S};
         croak "ERROR: fping ('$binary -C 1 $testhost') could not be run: $return"
             if $return =~ m/not found/;
         croak "ERROR: FPing must be installed setuid root or it will not work\n" 

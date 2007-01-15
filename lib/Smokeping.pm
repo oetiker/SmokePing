@@ -591,9 +591,11 @@ sub get_overview ($$$$){
 	die "ERROR: creating  $cfg->{General}{imgcache}$dir: $!\n"
                 unless -d  $cfg->{General}{imgcache}.$dir;
     }
+
     my $date = $cfg->{Presentation}{overview}{strftime} ? 
         POSIX::strftime($cfg->{Presentation}{overview}{strftime},
                         localtime(time)) : scalar localtime(time);
+
     if ( $RRDs::VERSION >= 1.199908 ){
 	    $date =~ s|:|\\:|g;
     }
@@ -712,15 +714,19 @@ sub parse_datetime($){
     };
 }
 	
-sub get_detail ($$$$){
-    # when drawing the detail page there are two modes for doing it
-    # a) classic with several static graphs on the page
-    # b) with one graph and below the graph one can specify the end time
-    #    and the length of the graph.
+sub get_detail ($$$$;$){
+    # when drawing the detail page there are three modes for doing it
+ 
+    # a) 's' classic with several static graphs on the page
+    # b) 'n' navigator mode with one graph. below the graph one can specify the end time
+    #        and the length of the graph.
+    # c) 'c' chart mode, one graph with a link to it's full page
+    #
     my $cfg = shift;
     my $q = shift;
     my $tree = shift;
     my $open = shift;
+    my $mode = shift || $q->param('displaymode') || 's';
 
     return "" unless $tree->{host};
     
@@ -741,9 +747,8 @@ sub get_detail ($$$$){
     my $pings = $probe->_pings($tree);
     my $page;
 
-    my $mode = $q->param('displaymode') || 's';
     return "<div>ERROR: unknown displaymode $mode</div>"
-      unless $mode =~ /^[sn]$/;
+      unless $mode =~ /^[snc]$/;
 
     for (@dirs) {
 	$dir .= "/$_";
@@ -782,7 +787,7 @@ sub get_detail ($$$$){
 	    }
 	    close HG;
 	}
-    } else {
+    } elsif ($mode eq 'n') {
 	mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $cfg->{General}{imgcache}."/__navcache";
 	# remove old images after one hour
 	my $pattern = $cfg->{General}{imgcache}."/__navcache/*.png";
@@ -791,12 +796,35 @@ sub get_detail ($$$$){
 	}
 	$imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
 	$imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
-	@tasks = (["Navigator Mode", parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
+	@tasks = (["Navigator Graph", parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
 
 	my ($graphret,$xs,$ys) = RRDs::graph
 	  ("dummy", 
 	   '--start', $tasks[0][1],
 	   '--end',$tasks[0][2], 
+           "DEF:maxping=${rrd}:median:AVERAGE",
+           'PRINT:maxping:MAX:%le' );
+        my $ERROR = RRDs::error();
+        return "<div>RRDtool did not understand your input: $ERROR.</div>" if $ERROR;     
+        my $val = $graphret->[0];
+        $val = 1 if $val =~ /nan/i;
+        $max = { $tasks[0][1] => $val * 1.5 };
+    } else  {
+	mkdir $cfg->{General}{imgcache}."/__chartscache",0755  unless -d  $cfg->{General}{imgcache}."/__chartscache";
+	# remove old images after one hour
+	my $pattern = $cfg->{General}{imgcache}."/__chartscache/*.png";
+	for (glob $pattern){
+		unlink $_ if time - (stat $_)[9] > 3600;
+	}
+	my $desc = join "/",@{$open};
+	@tasks = ([$desc , 3600]);
+	$imgbase = $cfg->{General}{imgcache}."/__chartscache/".(join ".", @dirs).".${file}";
+	$imghref = $cfg->{General}{imgurl}."/__chartscache/".(join ".", @dirs).".${file}";	
+
+	my ($graphret,$xs,$ys) = RRDs::graph
+	  ("dummy", 
+           '--start', time()-3600,
+           '--end', time(),  
            "DEF:maxping=${rrd}:median:AVERAGE",
            'PRINT:maxping:MAX:%le' );
         my $ERROR = RRDs::error();
@@ -875,7 +903,7 @@ sub get_detail ($$$$){
     for (@tasks) {
 	my ($desc,$start,$end) = @{$_};
 	$end ||= 'last';
-	$start = exp2seconds($start) if $mode eq 's';	
+	$start = exp2seconds($start) if $mode =~ /[s]/;	
 
         my $startstr = $start =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $start : time-$start)) : $start;
         my $endstr   = $end =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time)) : $end;
@@ -956,12 +984,11 @@ sub get_detail ($$$$){
 	
         my @lazy =();
         @lazy = ('--lazy') if $mode eq 's' and $lastheight{$start} and $lastheight{$start} == $max->{$start};
-	$desc = "Navigator Graph" if $mode eq 'n';
         my $timer_start = time();
         my @task =
 	  ("${imgbase}_${end}_${start}.png",
 	   @lazy,
-	   '--start',( $mode eq 's' ? '-'.$start : $start),
+	   '--start',( $mode =~ /[sc]/ ? '-'.$start : $start),
 	   ($end ne 'last' ? ('--end',$end) : ()),
 	   '--height',$cfg->{Presentation}{detail}{height},
 	   '--width',,$cfg->{Presentation}{detail}{width},
@@ -994,7 +1021,6 @@ sub get_detail ($$$$){
 	   'COMMENT:\s',
            "COMMENT:Probe${BS}: $pings $ProbeDesc every ${step}s",
 	   'COMMENT:'.$date.'\j' );
-
 #	do_log ("***** begin task ***** <br />");
 #	do_log (@task);
 #	do_log ("***** end task ***** <br />");
@@ -1016,7 +1042,7 @@ sub get_detail ($$$$){
 	      . $q->submit(-name=>'Generate!')
  	      . "</p>"
 	      . $q->end_form();
-	} else {
+	} elsif ($mode eq 's') {
 	    $startstr =~ s/\s/%20/g;
 	    $endstr =~ s/\s/%20/g;
 	    $page .= "<div>";
@@ -1028,10 +1054,97 @@ sub get_detail ($$$$){
 		      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
 	    $page .= "</div>";
 
+	} else {
+            $page .= "<div>";
+            $page .= ( $ERROR || 
+			qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
+                      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+            $page .= "</div>";
+	    
 	}
 
     }
     return $page;
+}
+
+sub get_charts ($$$){
+    my $cfg = shift;
+    my $q = shift;
+    my $open = shift;
+    my $cache = $cfg->{__sortercache};
+    
+    my $page = "<h1>$cfg->{Presentation}{charts}{title}</h1>";   
+    return $page."<p>Waiting for initial data ...</p>" unless $cache;
+ 
+    my %charts;
+    for my $chart ( keys %{$cfg->{Presentation}{charts}} ) {
+        next unless ref $cfg->{Presentation}{charts}{$chart} eq 'HASH';
+        $charts{$chart} = $cfg->{Presentation}{charts}{$chart}{__obj}->SortTree($cache->{$chart});
+    }
+    if (not defined $open->[1]){
+	for my $chart ( keys %charts ){
+	    $page .= "<h2>$cfg->{Presentation}{charts}{$chart}{title}</h2>\n";
+	    if (not defined $charts{$chart}[0]){
+		$page .= "<p>No targets retured by the sorter.</p>"
+	    } else {
+		my $tree = $cfg->{Targets};
+		my $chartentry = $charts{$chart}[0];
+	        for (@{$chartentry->{open}}) {
+	           die "ERROR: Section '$_' does not exist.\n"
+                       unless exists $tree->{$_};
+                   last unless  ref $tree->{$_} eq 'HASH';
+                   $tree = $tree->{$_};
+                }
+		$page .= get_detail($cfg,$q,$tree,$chartentry->{open},'c');
+            }
+         }
+     } else {
+	my $chart = $open->[1];
+	$page = "<h1>$cfg->{Presentation}{charts}{$chart}{title}</h1>\n";
+        if (not defined $charts{$chart}[0]){
+		$page .= "<p>No targets retured by the sorter.</p>"
+	} else {
+          my $rank =1;
+  	  for my $chartentry (@{$charts{$chart}}){
+   	    my $tree = $cfg->{Targets};
+            for (@{$chartentry->{open}}) {
+                die "ERROR: Section '$_' does not exist.\n"
+                    unless exists $tree->{$_};
+                last unless ref $tree->{$_} eq 'HASH';
+                $tree = $tree->{$_};
+            }       
+	    $page .= "<h2>$rank.";     
+	    $page .= " ".sprintf($cfg->{Presentation}{charts}{$chart}{format},$chartentry->{value})
+		if ($cfg->{Presentation}{charts}{$chart}{format});
+	    $page .= "</h2>";
+	    $rank++;
+	    $page .= get_detail($cfg,$q,$tree,$chartentry->{open},'c');
+	  }
+       }
+     }   
+     return $page;
+}
+
+sub load_sortercache($){
+    my $cfg = shift;
+    my %cache;
+    my $found;
+    for (glob "$cfg->{General}{datadir}/__sortercache/data*.storable"){
+	# kill old caches ...
+	if ((time - (stat "$_")[9]) > $cfg->{Database}{step}*2){
+	   unlink $_;
+	   next;
+        }
+        my $data = Storable::retrieve("$_");
+        for my $chart (keys %$data){
+	    for my $path (keys %{$data->{$chart}}){
+	        warn "Warning: Duplicate entry $chart/$path in sortercache\n" if defined $cache{$chart}{$path};
+	        $cache{$chart}{$path} = $data->{$chart}{$path}
+	    }
+        }
+	$found = 1;
+    }
+    return ( $found ? \%cache : undef )
 }
 
 sub display_webpage($$){
@@ -1039,29 +1152,54 @@ sub display_webpage($$){
     my $q = shift;
     my $open = [ split /\./,( $q->param('target') || '')];
     my $tree = $cfg->{Targets};
-    my $step = $cfg->{__probes}{$tree->{probe}}->step();
-    for (@$open) {
-        die "ERROR: Section '$_' does not exist.\n" 
-                unless exists $tree->{$_};
-	last unless  ref $tree->{$_} eq 'HASH';
-	$tree = $tree->{$_};
+    my $targets = $cfg->{Targets};
+    my $step = $cfg->{__probes}{$targets->{probe}}->step();
+    # lets see if the charts are opened
+    my $charts = 0;
+    $charts = 1 if defined $cfg->{Presentation}{charts} and $open->[0] eq '__charts';
+    if ($charts	and ( not defined $cfg->{__sortercache} 
+                      or $cfg->{__sortercachekeeptime} < time )){
+       # die "ERROR: Chart $open->[1] does not exit.\n"
+       #	   unless $cfg->{Presentation}{charts}{$open->[1]};	       
+       $cfg->{__sortercache} = load_sortercache $cfg;
+       $cfg->{__sortercachekeeptime} = time + 60;
+    };
+    if (not $charts){
+       for (@$open) {
+         die "ERROR: Section '$_' does not exist (display webpage).\n" 
+                 unless exists $tree->{$_};
+ 	 last unless  ref $tree->{$_} eq 'HASH';
+  	 $tree = $tree->{$_};
+       }
     }
     gen_imgs($cfg); # create logos in imgcache
     my $readversion = "?";
     $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
-        
+    my $menu = $targets;
+    if (defined $cfg->{Presentation}{charts}){
+	my $order = 1;
+	$targets = { %{$targets},
+  		    __charts => {
+			_order => -99,
+			menu => $cfg->{Presentation}{charts}{menu},
+			map { $_ => { menu => $cfg->{Presentation}{charts}{$_}{menu}, _order => $order++ } } 
+			    sort
+                               grep { ref $cfg->{Presentation}{charts}{$_} eq 'HASH' } keys %{$cfg->{Presentation}{charts}}
+                   }
+                 };
+    }			 
     my $page = fill_template
       ($cfg->{Presentation}{template},
        {
-	menu => target_menu($cfg->{Targets},
-			    [@$open], #copy this because it gets changed
-			    cgiurl($q, $cfg) ."?target="),
+	menu => target_menu( $targets,
+                             [@$open], #copy this because it gets changed
+			     cgiurl($q, $cfg) ."?target="),
 
-	title => $tree->{title},
-	remark => ($tree->{remark} || ''),
-	overview => get_overview( $cfg,$q,$tree,$open ),
-	body => get_detail( $cfg,$q,$tree,$open ),
-        target_ip => ($tree->{host} || ''),
+	title => $charts ? "" : $tree->{title},
+	remark => $charts ? "" : ($tree->{remark} || ''),
+	overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open ),
+	body => $charts ? "" : get_detail( $cfg,$q,$tree,$open ),
+        target_ip => $charts ? "" : ($tree->{host} || ''),
 	owner => $cfg->{General}{owner},
         contact => $cfg->{General}{contact},
 
@@ -1103,19 +1241,78 @@ sub report_probes($$) {
     }
 }
 
-sub update_rrds($$$$$);
-sub update_rrds($$$$$) {
+sub load_sorters($){
+    my $subcfg = shift;
+    foreach my $key ( keys %{$subcfg} ) {
+	my $x = $subcfg->{$key};
+	next unless ref $x eq 'HASH';
+        $x->{sorter} =~  /(\S+)\((.+)\)/;
+	my $sorter = $1;
+        my $arg = $2;
+        die "ERROR: sorter $sorter: all sorters start with a capital letter\n"
+            unless $sorter =~ /^[A-Z]/;
+	eval 'require Smokeping::sorters::'.$sorter;
+        die "Sorter '$sorter' could not be loaded: $@\n" if $@;
+        $x->{__obj} = eval "Smokeping::sorters::$sorter->new($arg)";
+	die "ERROR: sorter $sorter: instantiation with Smokeping::sorters::$sorter->new($arg): $@\n"
+   	   if $@;
+    }
+}
+
+
+    
+sub update_sortercache($$$$$){
+    my $cfg = shift;
+    return unless $cfg->{Presentation}{charts};
+    my $cache = shift;
+    my $path = shift;
+    my $base = $cfg->{General}{datadir};
+    $path =~ s/^$base\/?//;
+    my @updates = map {/U/ ? undef : 0.0+$_ } split /:/, shift;
+    my $alert = shift;
+    my %info;
+    $info{uptime} = shift @updates;
+    $info{loss} = shift @updates;
+    $info{median} = shift @updates;
+    $info{alert} = $alert;
+    $info{pings} = \@updates;
+    foreach my $chart ( keys %{$cfg->{Presentation}{charts}} ) {    
+        next unless ref $cfg->{Presentation}{charts}{$chart} eq 'HASH';
+        $cache->{$chart}{$path} = $cfg->{Presentation}{charts}{$chart}{__obj}->CalcValue(\%info);
+    }   
+}
+
+sub save_sortercache($$$){
+    my $cfg = shift;
+    my $cache = shift;
+    my $probe = shift;
+    return unless $cfg->{Presentation}{charts};
+    my $dir = $cfg->{General}{datadir}."/__sortercache";
+    my $ext = '';
+    $ext .= $probe if $probe;
+    $ext .= join "",@{$opt{filter}} if @{$opt{filter}};
+    $ext =~ s/[^-_=0-9a-z]/_/gi;
+    $ext = ".$ext" if $ext;
+    mkdir $dir,0755  unless -d $dir;
+    Storable::store ($cache, "$dir/new$ext"); 
+    rename "$dir/new$ext","$dir/data$ext.storable"
+}
+
+
+sub update_rrds($$$$$$);
+sub update_rrds($$$$$$) {
     my $cfg = shift;
     my $probes = shift;
     my $tree = shift;
     my $name = shift;
     my $justthisprobe = shift; # if defined, update only the targets probed by this probe
+    my $sortercache = shift;
 
     my $probe = $tree->{probe};
     foreach my $prop (keys %{$tree}) {
 
         if (ref $tree->{$prop} eq 'HASH'){
-            update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe;
+            update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe, $sortercache;
         } 
 	# if we are looking down a branche where no probe property is set there is no sense
         # in further exploring it
@@ -1146,6 +1343,7 @@ sub update_rrds($$$$$) {
 	    do_log "RRDs::update ERROR: $ERROR\n" if $ERROR;
 	    # check alerts
             # disabled
+	    my $gotalert;
 	    if ( $tree->{alerts} ) {
 		my $priority_done;
                 $tree->{stack} = {loss=>['S'],rtt=>['S']} unless defined $tree->{stack};
@@ -1180,6 +1378,7 @@ sub update_rrds($$$$$) {
 		    $x->{prevmatch} = $prevmatch;
 		    my $priority = $alert->{priority};
                     my $match = &{$alert->{sub}}($x) || 0; # Avgratio returns undef
+		    $gotalert = $match unless $gotalert;
                     my $edgetrigger = $alert->{edgetrigger} eq 'yes';
                     my $what;
                     if ($edgetrigger and $prevmatch != $match) {
@@ -1275,7 +1474,8 @@ ALERT
                     }
                     $tree->{prevmatch}{$_} = $match;
 		}
-	    }
+	    } # end alerts
+	    update_sortercache $cfg,$sortercache,$name,$updatestring,$gotalert;
 	}
     }
 }
@@ -1331,9 +1531,11 @@ sub get_parser () {
     my $libdir = find_libdir();
     my $probedir = $libdir . "/Smokeping/probes";
     my $matcherdir = $libdir . "/Smokeping/matchers";
+    my $sorterdir = $libdir . "/Smokeping/sorters";
 
     my $probelist;
     my @matcherlist;
+    my @sorterlist;
 
     die("Can't find probe module directory") unless defined $probedir;
     opendir(D, $probedir) or die("opendir $probedir: $!");
@@ -1350,6 +1552,14 @@ sub get_parser () {
     	next unless /[A-Z]/;
     	next unless s/\.pm$//;
 	push @matcherlist, $_;
+    }
+
+    die("Can't find sorter module directory") unless defined $sorterdir;
+    opendir(D, $sorterdir) or die("opendir $sorterdir: $!");
+    for (sort readdir D) {
+    	next unless /[A-Z]/;
+    	next unless s/\.pm$//;
+	push @sorterlist, $_;
     }
 
     # The target-specific vars of each probe
@@ -2028,7 +2238,7 @@ DOC
 	 _doc => <<DOC,
 Defines how the SmokePing data should be presented.
 DOC
-	 _sections => [ qw(overview detail) ],
+	 _sections => [ qw(overview detail charts) ],
 	  _mandatory => [ qw(overview template detail) ],
 	  _vars      => [ qw (template charset) ],
 	  template   => 
@@ -2052,45 +2262,79 @@ DOC
 By default, SmokePing assumes the 'iso-8859-15' character set. If you use
 something else, this is the place to speak up.
 DOC
-        },
-			 
+         },
+	 charts => {
+           _doc => <<DOC,
+The SmokePing Charts feature allow you to have Top X lists created according
+to various criteria.
+
+Each type of Chart must live in its own subsection.
+
+ + charts
+ menu = Charts
+ title = The most interesting destinations
+ ++ median
+ sorter = Median(entries=>10)
+ title = Sorted by Median Roundtrip Time
+ menu = Top Median RTT
+ format = Median RTT %e s
+
+DOC
+           _vars => [ qw(menu title) ],
+           _sections => [ "/$KEYD_RE/" ],
+           _mandatory => [ qw(menu title) ],
+
+           menu => { _doc => 'Menu entry for the Charts Section.' },
+           title => { _doc => 'Page title for the Charts Section.' },
+           "/$KEYD_RE/" =>
+           {
+	       _vars => [ qw(menu title sorter format) ],
+	       _mandatory => [ qw(menu title sorter) ],
+               menu => { _doc => 'Menu entry' },
+               title => { _doc => 'Page title' },
+               format => { _doc => 'sprintf format string to format curent value' },
+               sorter => { _re => '\S+\(\S+\)',
+                           _re_error => 'use a sorter call here: Sorter(arg1=>val1,arg2=>val2)'}
+	   }
+         },	
+
 	 overview   => 
 	 { _vars => [ qw(width height range max_rtt median_color strftime) ],
 	   _mandatory => [ qw(width height) ],           
 	   _doc => <<DOC,
 The Overview section defines how the Overview graphs should look.
 DOC
-         max_rtt => {    _doc => <<DOC },
+            max_rtt => {    _doc => <<DOC },
 Any roundtrip time larger than this value will cropped in the overview graph
 DOC
-        median_color => {    _doc => <<DOC,
+            median_color => {    _doc => <<DOC,
 By default the median line is drawn in red. Override it here with a hex color
 in the format I<rrggbb>.
 DOC
                               _re => '[0-9a-f]{6}',
                               _re_error => 'use rrggbb for color',
-           },
-          strftime => { _doc => <<DOC,
+                            },
+            strftime => { _doc => <<DOC,
 Use posix strftime to format the timestamp in the left hand
 lower corner of the overview graph
 DOC
-          _sub => sub {
+                          _sub => sub {
                 eval ( "POSIX::strftime( '$_[0]', localtime(time))" );
                 return $@ if $@;
                 return undef;
-	    },
-          },
+	                  },
+             },
 
               
-	   width      =>
-	   {
-	    _sub => sub {
-		return "width must be be an integer >= 10"
-		  unless $_[ 0 ] >= 10
-		    and int( $_[ 0 ] ) == $_[ 0 ];
-		return undef;
-	    },
-	    _doc => <<DOC,
+	     width      =>
+	     {
+	        _sub => sub {
+	   	   return "width must be be an integer >= 10"
+		     unless $_[ 0 ] >= 10
+		       and int( $_[ 0 ] ) == $_[ 0 ];
+		   return undef;
+	        },
+	        _doc => <<DOC,
 Width of the Overview Graphs.
 DOC
 	    },
@@ -2115,7 +2359,7 @@ as a number followed by a letter which specifies the unit of time. Known units a
 B<s>econds, B<m>inutes, B<h>ours, B<d>days, B<w>eeks, B<y>ears.
 DOC
 		   },
-	       },
+	 },
 	 detail => 
 	 { 
 	  _vars => [ qw(width height loss_background logarithmic unison_tolerance max_rtt strftime nodata_color) ],
@@ -2654,7 +2898,7 @@ sub daemonize_me ($) {
 	} else {
           warn "creating $pidfile: $!\n";
 	};
-	require 'POSIX.pm';
+	require POSIX;
         &POSIX::setsid or die "Can't start a new session: $!";
         open STDOUT,'>/dev/null' or die "ERROR: Redirecting STDOUT to /dev/null: $!";
         open STDIN, '</dev/null' or die "ERROR: Redirecting STDIN from /dev/null: $!";
@@ -2767,6 +3011,11 @@ sub load_cfg ($;$) {
         $cfg = undef;
         my $parser = get_parser;
 	$cfg = get_config $parser, $cfgfile;       
+	if (defined $cfg->{Presentation}{charts}){
+	   require Storable;
+	   die "ERROR: Could not load Storable Support. This is required for the Charts feature - $@\n" if $@;
+           load_sorters $cfg->{Presentation}{charts};
+        }
         $cfg->{__parser} = $parser;
 	$cfg->{__last} = $cfmod;
 	$cfg->{__cfgfile} = $cfgfile;
@@ -2885,7 +3134,7 @@ sub cgi ($) {
 	} else {
 		print $q->header; # no HTML output on success
 	}
-    } else {
+    } else {     
         print $q->header(-type=>'text/html',
                      -expires=>'+'.($cfg->{Database}{step}).'s',
                      -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
@@ -2994,7 +3243,7 @@ sub maybe_require {
 	# don't do the kludge unless we're building documentation
 	unless (exists $opt{makepod} or exists $opt{man}) {
 		eval "require $class";
-		die("require $class failed: $@") if $@;
+		die  "require $class failed: $@" if $@;
 		return;
 	}
 
@@ -3017,7 +3266,7 @@ sub maybe_require {
 		eval "require $class";
 		last unless $@;
 	}
-	die("require $class failed: $@") if $@;
+	die "require $class failed: $@" if $@;
 	my $libpath = find_libdir;
 	$INC{$file} = "$libpath/$file";
 }
@@ -3299,7 +3548,9 @@ KID:
 	}
         my $now = time;
 	run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
-	update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe;
+	my %sortercache;
+	update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe, \%sortercache;
+	save_sortercache($cfg,\%sortercache,$myprobe);
 	exit 0 if $opt{debug};
         my $runtime = time - $now;
 	if ($runtime > $step) {
