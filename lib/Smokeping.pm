@@ -20,7 +20,10 @@ setlogsock('unix')
 # make sure we do not end up with , in odd places where one would expect a '.'
 # we set the environment variable so that our 'kids' get the benefit too
 $ENV{LC_NUMERIC}='C';
-POSIX::setlocale(&POSIX::LC_NUMERIC,"");
+if (POSIX::setlocale(&POSIX::LC_NUMERIC,"") ne "C") {
+    die("Resetting LC_NUMERIC failed - try removing LC_ALL from the environment");
+}
+
 
 use File::Basename;
 use Smokeping::Examples;

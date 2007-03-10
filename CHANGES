@@ -1,3 +1,5 @@
+* bail out at startup with an error message if LC_ALL is set --niko
+
 2007/1/15 -- released version 2.0.910
 
 * New Presentation option Charts. Charts are based on the new 'sorter' plugins.
