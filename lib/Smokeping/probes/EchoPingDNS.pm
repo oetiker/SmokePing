@@ -53,17 +53,6 @@ sub plugin_args {
     return @args;
 }
 
-sub test_usage {
-	my $self = shift;
-	my $bin = $self->{properties}{binary};
-    # side effect: this sleeps for a random time between 0 and 1 seconds
-    # is there anything smarter to do?
-	croak("Your echoping binary doesn't support the dns plugin")
-		if `$bin -m dns 127.0.0.1 2>&1` =~ /(not compiled|invalid option|usage)/i;
-	$self->SUPER::test_usage;
-	return;
-}
-
 sub ProbeDesc($) {
 	return "DNS pings using the echoping_dns plugin";
 }
