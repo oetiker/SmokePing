@@ -25,6 +25,25 @@ that with upgrading instructions etc.
 
 =head1 2.0.9 to 2.1.0
 
+=head2 Echoping 6 support
+
+This is the first version that fully supports echoping 6. Earlier
+versions of the EchoPingHttp probes don't work with echoping 6 because
+of a command line incompatibility.
+
+This version also introduces three new probes using the new echoping plugin
+interface:
+
+=over
+
+=item L<EchoPingDNS|Smokeping::probes::EchoPingDNS>
+
+=item L<EchoPingLDAP|Smokeping::probes::EchoPingLDAP>
+
+=item L<EchoPingWhois|Smokeping::probes::EchoPingWhois>
+
+=back
+
 =head2 New method in base.pm (if you write your own probes)
 
 The F<base.pm> module defines the method ProbeUnit. Override this if your
