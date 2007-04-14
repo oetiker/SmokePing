@@ -188,7 +188,8 @@ sub new {
 
 	$self->_init if $self->can('_init');
 
-	$self->test_usage;
+    # no need for this if running as a CGI
+	$self->test_usage unless $ENV{SERVER_SOFTWARE};
 
 	return $self;
 }
