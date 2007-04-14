@@ -74,7 +74,9 @@ sub targetvars {
 	delete $h->{udp};
 	delete $h->{fill};
 	delete $h->{size};
-    $h->{plugin}{default} = 'dns';
+    $h->{_mandatory} = [ grep { $_ ne "plugin" } @{$h->{_mandatory}}];
+    $h->{plugin}{_default} = 'dns';
+    $h->{plugin}{_example} = '/path/to/dns.so';
     return $class->_makevars($h, {
         _mandatory => [ 'dns_request' ],
         dns_request => {
