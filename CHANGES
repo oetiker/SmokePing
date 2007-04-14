@@ -1,5 +1,5 @@
-* add new echoping 6 plugin probes: EchoPingDNS, EchoPingLDAP 
-  (with more coming up) --niko
+* add new echoping 6 plugin probes: EchoPingDNS, EchoPingLDAP, EchoPingWhois
+  -- niko
 * don't test echoping or curl usage if running as a CGI --niko
 * bail out at startup with an error message if LC_ALL is set --niko
 
