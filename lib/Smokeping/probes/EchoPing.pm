@@ -112,6 +112,9 @@ sub make_host {
 	return $target->{addr};
 }
 
+sub make_post_args {
+    return ();
+}
 
 # other than host, count and protocol-specific args come from here
 sub make_args {
@@ -178,11 +181,12 @@ sub make_commandline {
 	$count |= $self->pings($target);
 
 	my @args = $self->make_args($target);
+	my @post_args = $self->make_post_args($target);
 	my $host = $self->make_host($target);
 	push @args, $self->proto_args($target);
 	push @args, $self->count_args($count);
 	
-	return ($self->{properties}{binary}, @args, $host);
+	return ($self->{properties}{binary}, @args, $host, @post_args);
 }
 
 sub pingone {

@@ -29,6 +29,8 @@ Niko Tyni <ntyni@iki.fi>
 DOC
         notes => <<'DOC',
 The I<fill>, I<size> and I<udp> EchoPing variables are not valid by default for EchoPingPlugin -derived probes.
+
+Plugins are available starting with echoping version 6.
 DOC
 		see_also => <<DOC,
 L<Smokeping::probes::EchoPing>
@@ -49,6 +51,11 @@ sub _init {
     delete $arghashref->{udp};
 }
 
+sub post_args {
+    my $self = shift;
+    my $target = shift;
+    return $target->{vars}{pluginargs};
+}
 
 sub proto_args {
 	my $self = shift;
@@ -79,7 +86,22 @@ sub targetvars {
 	delete $h->{fill};
 	delete $h->{size};
     return $class->_makevars($h, {
-    });
+        pluginname => {
+            _doc => <<DOC,
+The name of the echoping plugin that will be used. See echoping(1)
+for details.
+DOC
+            _example => "random",
+        },
+        pluginargs => {
+            _doc => <<DOC,
+Any extra arguments needed by the echoping plugin specified with the 
+I<pluginname> variable. These are generally provided by the subclass probe.
+DOC
+            _example => "-p plugin_specific_arg",
+        },
+    },
+    );
 }
 
 1;
