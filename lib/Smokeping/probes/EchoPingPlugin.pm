@@ -54,7 +54,14 @@ sub _init {
 sub post_args {
     my $self = shift;
     my $target = shift;
-    return $target->{vars}{pluginargs};
+    return $self->plugin_args($target);
+}
+
+# derived classes should override this
+sub plugin_args {
+    my $self = shift;
+    my $target = shift;
+    return ();
 }
 
 sub proto_args {
@@ -67,10 +74,9 @@ sub proto_args {
 sub test_usage {
 	my $self = shift;
 	my $bin = $self->{properties}{binary};
-    # side effect: this sleeps for a random time between 0 and 1 seconds
     # is there anything smarter to do?
-	croak("Your echoping binary doesn't support plugins")
-		if `$bin -m random 127.0.0.1 2>&1` =~ /(not compiled|invalid option|usage)/i;
+	croak("Your echoping binary doesn't support plugins. At least version 6 is required.")
+		if `$bin -m improbable_plugin_name 127.0.0.1 2>&1` =~ /invalid option/i;
 	$self->SUPER::test_usage;
 	return;
 }
@@ -86,10 +92,12 @@ sub targetvars {
 	delete $h->{fill};
 	delete $h->{size};
     return $class->_makevars($h, {
-        pluginname => {
+        _mandatory => [ 'plugin' ],
+        plugin => {
             _doc => <<DOC,
-The name of the echoping plugin that will be used. See echoping(1)
-for details.
+The echoping plugin that will be used. See echoping(1) for details.
+This can either be the name of the plugin or a full path to the
+plugin shared object.
 DOC
             _example => "random",
         },

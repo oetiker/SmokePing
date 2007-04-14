@@ -112,7 +112,7 @@ sub make_host {
 	return $target->{addr};
 }
 
-sub make_post_args {
+sub post_args {
     return ();
 }
 
@@ -181,7 +181,7 @@ sub make_commandline {
 	$count |= $self->pings($target);
 
 	my @args = $self->make_args($target);
-	my @post_args = $self->make_post_args($target);
+	my @post_args = $self->post_args($target);
 	my $host = $self->make_host($target);
 	push @args, $self->proto_args($target);
 	push @args, $self->count_args($count);
