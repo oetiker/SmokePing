@@ -72,5 +72,14 @@ sub ProbeDesc($) {
 	return "Pings using an echoping(1) plugin";
 }
 
+sub targetvars {
+	my $class = shift;
+	my $h = $class->SUPER::targetvars;
+	delete $h->{udp};
+	delete $h->{fill};
+	delete $h->{size};
+    return $class->_makevars($h, {
+    });
+}
 
 1;
