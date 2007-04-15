@@ -44,6 +44,9 @@ interface:
 
 =back
 
+See the L<smokeping_examples> document for simple examples of using
+these probes.
+
 =head2 New method in base.pm (if you write your own probes)
 
 The F<base.pm> module defines the method ProbeUnit. Override this if your

@@ -545,6 +545,10 @@ binary = /usr/bin/fping
 + EchoPingHttps      # HTTPS (443/tcp) for web servers
 + EchoPingHttp       # HTTP (80/tcp) for web servers and caches
 + EchoPingIcp        # ICP (3130/udp) for caches
+# these need at least echoping 6 with the corresponding plugins
++ EchoPingDNS
++ EchoPingLDAP
++ EchoPingWhois
 DOC
 		probedoc => <<DOC,
 This example shows most of the echoping-derived probes in action.
@@ -611,6 +615,42 @@ menu = mail-server / SMTP
 title = Mail Server (mail-server) / SMTP
 probe = EchoPingSmtp
 host = mail-server.example
+
+++ ldap-server
+menu = ldap-server
+title = ldap-server / ICMP
+host = ldap-server.example
+
++++ ldap
+menu = ldap-server / LDAP
+title = LDAP Server (ldap-server) / LDAP
+probe = EchoPingLDAP
+ldap_request = (objectclass=*)
+host = ldap-server.example
+
+++ name-server
+menu = name-server
+title = name-server / ICMP
+host = name-server.example
+
++++ DNS
+menu = name-server / DNS
+title = DNS Server (name-server) / DNS
+probe = EchoPingDNS
+dns_request = name.example
+host = name-server.example
+
+++ whois-server
+menu = whois-server
+title = whois-server / ICMP
+host = whois-server.example
+
++++ Whois
+menu = whois-server / Whois
+title = Whois Server (whois-server) / Whois
+probe = EchoPingWhois
+whois_request = domain.example
+host = whois-server.example
 DOC
 	targetdoc => <<DOC,
 All the servers are pinged both with ICMP (the FPing probe)
