@@ -33,7 +33,10 @@ The I<fill>, I<size> and I<udp> EchoPing variables are not valid by default for 
 Plugins are available starting with echoping version 6.
 DOC
 		see_also => <<DOC,
-L<Smokeping::probes::EchoPing>
+L<Smokeping::probes::EchoPing>,
+L<Smokeping::probes::EchoPingLDAP>,
+L<Smokeping::probes::EchoPingDNS>,
+L<Smokeping::probes::EchoPingWhois>
 DOC
 	}
 }
