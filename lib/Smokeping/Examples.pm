@@ -546,9 +546,9 @@ binary = /usr/bin/fping
 + EchoPingHttp       # HTTP (80/tcp) for web servers and caches
 + EchoPingIcp        # ICP (3130/udp) for caches
 # these need at least echoping 6 with the corresponding plugins
-+ EchoPingDNS
-+ EchoPingLDAP
-+ EchoPingWhois
++ EchoPingDNS        # DNS (53/udp or tcp) servers
++ EchoPingLDAP       # LDAP (389/tcp) servers
++ EchoPingWhois      # Whois (43/tcp) servers
 DOC
 		probedoc => <<DOC,
 This example shows most of the echoping-derived probes in action.
