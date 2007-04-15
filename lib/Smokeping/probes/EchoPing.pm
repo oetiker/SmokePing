@@ -112,6 +112,7 @@ sub make_host {
 	return $target->{addr};
 }
 
+# This will be overridden by the EchoPingPlugin-derived probes
 sub post_args {
     return ();
 }
