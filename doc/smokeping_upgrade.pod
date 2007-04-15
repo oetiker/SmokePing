@@ -27,12 +27,12 @@ that with upgrading instructions etc.
 
 =head2 Echoping 6 support
 
-This is the first version that fully supports echoping 6. Earlier
+This is the first Smokeping version that fully supports echoping 6. Earlier
 versions of the EchoPingHttp probes don't work with echoping 6 because
-of a command line incompatibility.
+of a command line incompatibility. (Echoping 5 is still supported, of course.)
 
 This version also introduces three new probes using the new echoping plugin
-interface:
+interface introduced in version 6:
 
 =over
 
