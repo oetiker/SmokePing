@@ -161,7 +161,7 @@ commit:
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	
 dist:   tar commit
-	scp CHANGES smokeping-$(VERSION).tar.gz oposs@oss.oetiker.ch/smokeping/pub/
+	scp CHANGES smokeping-$(VERSION).tar.gz oposs@oss.oetiker.ch:public_html/smokeping/pub/
 
 tag:    dist
 	svn ls svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION) || \
