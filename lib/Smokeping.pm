@@ -210,7 +210,7 @@ sub sendsnpp ($$){
                      Message => $msg) || do_debuglog("ERROR - ". $snpp->message);
         $snpp->quit;
     } else {
-        warn "ERROR: not sending page to $to, as all SNPP setup faild\n";
+        warn "ERROR: not sending page to $to, as all SNPP setup failed\n";
     }
 }
 
