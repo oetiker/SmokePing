@@ -1,5 +1,5 @@
 2007/05/02 -- released version 2.1.1
-* fixed scaling of detail graphs. They were all sacled to max_rtt
+* fixed scaling of detail graphs. They were all scaled to max_rtt
   if it was defined --tobi
 
 2007/04/29 -- released version 2.1.0
