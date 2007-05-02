@@ -1,11 +1,11 @@
 SHELL = /bin/sh
-VERSION = 2.1.0
+VERSION = 2.1.1
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
 ############ 2.000001
 ############ 2.000002
-NUMVERSION = 2.001000
+NUMVERSION = 2.001001
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|\.svn|tar\.gz|DEADJOE
 GROFF = groff
 PERL = perl-5.8.8
