@@ -686,7 +686,8 @@ sub findmax ($$) {
         }
 
         $maxmedian{$x} = $cfg->{Presentation}{detail}{max_rtt} 
-                if $cfg->{Presentation}{detail}{max_rtt}
+            if $cfg->{Presentation}{detail}{max_rtt}
+	        and $maxmedian{$x} > $cfg->{Presentation}{detail}{max_rtt}
      };
      return \%maxmedian;    
 }
