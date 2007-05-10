@@ -1006,7 +1006,7 @@ sub get_detail ($$$$;$){
 	   '--color', 'BACK#ffffff',
 	   '--color', 'CANVAS#ffffff',
 	   (map {"DEF:ping${_}=${rrd}:ping${_}:AVERAGE"} 1..$pings),
-	   (map {"CDEF:cp${_}=ping${_},0,$max->{$start},LIMIT"} 1..$pings),
+	   (map {"CDEF:cp${_}=ping${_},$max->{$start},MIN"} 1..$pings),
            ("DEF:loss=${rrd}:loss:AVERAGE"),
 	   @upargs,# draw the uptime bg color
 	   @lossargs, # draw the loss bg color

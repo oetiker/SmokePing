@@ -1,3 +1,6 @@
+* show all smoke in the detail graphs, even if it's out of the scale. -- niko,
+  reported by Oskar Liljeblad <oskar *osk.mine.nu> as Debian bug #412826
+
 2007/05/02 -- released version 2.1.1
 * fixed scaling of detail graphs. They were all scaled to max_rtt
   if it was defined --tobi
