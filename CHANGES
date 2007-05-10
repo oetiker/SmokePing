@@ -1,3 +1,5 @@
+* fix usage regexp in the Curl probe. 
+  -- niko, found from Ubuntu Launchpad #73437
 * show all smoke in the detail graphs, even if it's out of the scale. -- niko,
   reported by Oskar Liljeblad <oskar *osk.mine.nu> as Debian bug #412826
 
