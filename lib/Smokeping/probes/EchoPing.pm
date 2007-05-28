@@ -90,7 +90,7 @@ sub test_usage {
 	my %arghash = %$arghashref;
 
 	for my $feature (keys %arghash) {
-		if (`$bin $arghash{$feature} 1 127.0.0.1 2>&1` =~ /invalid option|usage/i) {
+		if (`$bin $arghash{$feature} 1 0.0.0.1 2>&1` =~ /invalid option|usage/i) {
 			push @unsupported, $feature;
 			$self->do_log("Note: your echoping doesn't support the $feature feature (option $arghash{$feature}), disabling it");
 		}

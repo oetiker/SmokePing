@@ -79,7 +79,7 @@ sub test_usage {
 	my $bin = $self->{properties}{binary};
     # is there anything smarter to do?
 	croak("Your echoping binary doesn't support plugins. At least version 6 is required.")
-		if `$bin -m improbable_plugin_name 127.0.0.1 2>&1` =~ /invalid option/i;
+		if `$bin -m improbable_plugin_name 0.0.0.1 2>&1` =~ /invalid option/i;
 	$self->SUPER::test_usage;
 	return;
 }

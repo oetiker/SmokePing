@@ -46,7 +46,7 @@ sub test_usage {
 	my $self = shift;
 	my $bin = $self->{properties}{binary};
 	croak("Your echoping binary doesn't support DISCARD")
-		if `$bin -d 127.0.0.1 2>&1` =~ /(not compiled|invalid option|usage)/i;
+		if `$bin -d 0.0.0.1 2>&1` =~ /(not compiled|invalid option|usage)/i;
 	$self->SUPER::test_usage;
 	return;
 }

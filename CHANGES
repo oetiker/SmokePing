@@ -1,3 +1,6 @@
+* do not use 127.0.0.1 when testing echoping and curl functionality. There may be someone
+  behind this address. -- Michael Hanselmann public hansmi ch
+
 * show all smoke in the detail graphs, even if it's out of the scale. -- niko,
   reported by Oskar Liljeblad <oskar *osk.mine.nu> as Debian bug #412826
 
