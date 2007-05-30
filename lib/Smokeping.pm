@@ -697,13 +697,13 @@ sub smokecol ($) {
     return [] unless $count > 2;
     my $half = $count/2;
     my @items;
-    for (my $i=$count; $i > $half; $i--){
-	my $color = int(190/$half * ($i-$half))+50;
-	push @items, "AREA:cp".($i)."#".(sprintf("%02x",$color) x 3);
-    };
-    for (my $i=int($half); $i > 0; $i--){
-	my $color = int(190/$half * ($half - $i + 1))+64;
-	push @items, "AREA:cp".($i)."#".(sprintf("%02x",$color) x 3);
+    my $itop=$count;
+    my $ibot=1;
+    for (; $itop > $ibot; $itop--,$ibot++){
+	my $color = int(190/$half * ($half-$ibot))+50;
+	push @items, "CDEF:smoke${ibot}=cp${ibot},UN,UNKN,cp${itop},cp${ibot},-,IF";
+	push @items, "AREA:cp${ibot}";
+	push @items, "STACK:smoke${ibot}#".(sprintf("%02x",$color) x 3);
     };
     return \@items;
 }
@@ -1006,7 +1006,7 @@ sub get_detail ($$$$;$){
 	   '--color', 'BACK#ffffff',
 	   '--color', 'CANVAS#ffffff',
 	   (map {"DEF:ping${_}=${rrd}:ping${_}:AVERAGE"} 1..$pings),
-	   (map {"CDEF:cp${_}=ping${_},$max->{$start},MIN"} 1..$pings),
+	   (map {"CDEF:cp${_}=ping${_},0,$max->{$start},LIMIT"} 1..$pings),
            ("DEF:loss=${rrd}:loss:AVERAGE"),
 	   @upargs,# draw the uptime bg color
 	   @lossargs, # draw the loss bg color

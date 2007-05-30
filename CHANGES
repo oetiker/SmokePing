@@ -1,3 +1,5 @@
+* fixed smoke when there is a lot of 'loss' -- tobi
+
 * do not use 127.0.0.1 when testing echoping and curl functionality. There may be someone
   behind this address. -- Michael Hanselmann public hansmi ch
 
