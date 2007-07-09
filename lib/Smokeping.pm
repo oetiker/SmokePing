@@ -13,12 +13,14 @@ use Config::Grammar;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use Smokeping::Colorspace;
+use Smokeping::MasterSlave;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
 
 # make sure we do not end up with , in odd places where one would expect a '.'
 # we set the environment variable so that our 'kids' get the benefit too
+
 $ENV{LC_NUMERIC}='C';
 if (POSIX::setlocale(&POSIX::LC_NUMERIC,"") ne "C") {
     die("Resetting LC_NUMERIC failed - try removing LC_ALL from the environment");
@@ -2797,6 +2799,7 @@ END_DOC
               _vars => [ qw(url timeout) ],
               _mandatory => [ qw(url) ],
               _inherited => [ qw(timeout) ],
+              _sections => [ qw(override) ],
               _doc => <<END_DOC,
 Define some basic properties for the slave.
 END_DOC
@@ -2812,6 +2815,23 @@ END_DOC
                   _doc => <<END_DOC,
 The url where the master can find its slave host.
 END_DOC
+              override => {
+                  _doc => <<END_DOC,
+If part of the configuration information must be overwritten to match the
+settings of the you can specify this in this section. A setting is
+overwritten by giveing the full path of the configuration variable. If you
+have this configuration in the Probes section:
+
+ *** Probes ***
+ +FPing
+ binary = /usr/sepp/bin/fping
+
+You can override it for a particular slave like this:
+
+ ++override
+ Probes.FPing.binary = /usr/bin/fping
+END_DOC
+                _vars   => [ '/\S+/' ],
           }          
        },
        Targets => {_doc        => <<DOC,

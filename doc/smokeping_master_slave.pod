@@ -57,8 +57,11 @@ reboots if it is located on non-volatile storage.
 =head2 Master Configuration
 
 To configure a master/slave setup, add a slaves section to your smokeping
-configuration file. The secret and timeout parameters will be inherited
-by the slave config sections and can be overwritten if required.
+configuration file. The secret and timeout parameters will be inherited by
+the slave config sections and can be overwritten if required. If some
+configuration parameter must be set to a special value for the slave, use an
+override section to configure this.
+
 
  *** slaves ****
  secrets=/etc/smokeping/slavesecrets.conf 
@@ -66,6 +69,8 @@ by the slave config sections and can be overwritten if required.
  +slave1
  url=http://....
  timeout=60
+ ++override
+ Probes.FPing.binary = /usr/bin/fping
  ...
 
 Then in the targets section you can define slaves at every lvel. Again the
