@@ -1,0 +1,138 @@
+=head1 NAME
+
+smokeping_master_slave - How run multiple districuted instances of SmokePing
+
+=head1 OVERVIEW
+
+Normally smokeping probes run their tests from the host where smokeping runs
+to some target host and monitor the latency of the connection between the
+two. 
+
+The Master/Slave concept enables all smokeping probes to run remotely. The
+use case for this is, that you use somokeping to measure the overall
+connectivity of your network. If you are interested in seeing if you central
+DNS server or your file server works for everyone, you could setup several
+smokeping instances checking up on on the two servers from multiple
+locations within your network. With the Master/Slave smokeping configuration
+this process becomes much simpler, as one smokeping master server can
+control multiple slaves.
+
+All monitoring data is stored and presented on the server, but colleted by
+the slaves. The slaves will also get their configuration information from
+the master, so that you just have to maintain the master server
+configuration file and the rest is taken care of automatically.
+
+=head1 DESCRIPTION
+
+=head2 Architecture
+
+The master smokeping server communicates with it's slave servers through a
+polling protocol. Whenever it assumes the slave should have new data ready
+it will poll the slave. If the slave or the network is down, it will skip
+the particular slave and move on to the next one.
+
+When it polls a slave it will also tell the slave about any pending configuration
+changes.
+
+The communication between master and slave is digest authenticated. And
+optionally runns over https.
+
+              +---------------+
+              |    master     |
+              +---------------+
+                |     |     |
+        +-------+     |     +--------+
+        v             v              v
+    [slave 1]     [slave 2]      [slave 3]
+
+The slave is a normal smokeping setup where the configuration comes from the
+master instead of a local configuration file. The slave can run in two
+modes. In standalone mode it will fork off a service process that listens
+for incoming connections from the master. In cgi-mode the master connections
+will be served by a cgi script. The connection part will communicate with
+the local smokeping demon through a a perl storable file. The reason for
+using a storable is that it will survive smokeping restartes and even
+reboots if it is located on non-volatile storage.
+
+=head2 Master Configuration
+
+To configure a master/slave setup, add a slaves section to your smokeping
+configuration file. The secret and timeout parameters will be inherited
+by the slave config sections and can be overwritten if required.
+
+ *** slaves ****
+ secrets=/etc/smokeping/slavesecrets.conf 
+ timeout=30
+ +slave1
+ url=http://....
+ timeout=60
+ ...
+
+Then in the targets section you can define slaves at every lvel. Again the
+settings get inherited by lower order targets and can be overwritten
+anywhere in the tree.
+
+A slave will then get the appropriate configuration assigned by the server.
+ 
+ *** targets ***
+ slaves = slave1 slave2
+ ...
+ +dest1
+ slaves =
+ ...
+ +dest2
+ slaves = slave1
+ ...
+ +dest3
+ ... 
+
+=head2 Slave Configuration
+
+A smokeping slave setup has no configuration file. It just needs to know
+that it runs in slave-mode. And a few configuration parameters depending on
+your setup.
+
+When running in B<cgi-mode>, the only configuration option is to specify the
+location of communication cache file. By default this will be located in
+F</tmp/smokeping.$USER.cache>. Authentication and access restrictions can be
+configured using your webservers facilities.
+
+ ./smokeping --slavemode=cgi --cache=/var/smokeping/cache.file
+
+When running in standalone mode, the authentication parameters must be
+configured in the smokeping daemon.
+
+ ./smokeping --slavemode=standalone  --cache=/var/smokeping/cache.file \
+             --auth-file=/etc/smokeping/digest.conf \
+             --listen=ip:port \
+             --ssl_listen=ip:port \
+             --master-allow=128.223.22.2
+
+=head1 COPYRIGHT
+
+Copyright (c) 2007 by Tobias Oetiker, OETIKER+PARTNER AG. All right reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA.
+
+=head1 AUTHOR
+
+Tobias Oetiker E<lt>tobi@oetiker.chE<gt>
+
+=cut

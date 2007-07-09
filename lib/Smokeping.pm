@@ -1573,11 +1573,11 @@ sub get_parser () {
     # the part of target section syntax that doesn't depend on the selected probe
     my $TARGETCOMMON; # predeclare self-referencing structures
     # the common variables
-    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee) ];
+    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee slaves) ];
     $TARGETCOMMON = 
       {
        _vars     => $TARGETCOMMONVARS,
-       _inherited=> [ qw (probe alerts alertee) ],
+       _inherited=> [ qw (probe alerts alertee slaves) ],
        _sections => [ "/$KEYD_RE/" ],
        _recursive=> [ "/$KEYD_RE/" ],
        _sub => sub {
@@ -1686,6 +1686,11 @@ DOC
 			_doc => <<DOC },
 If you want to have alerts for this target and all targets below it go to a particular address
 on top of the address already specified in the alert, you can add it here. This can be a comma separated list of items.
+DOC
+	   slaves => { _re => '[-a-z0-9]+(?:\s+[-a-z0-9]+)*',
+			_re_error => 'slave1 [slave2]',
+			_doc => <<DOC },
+The slave names must match the slaves you have setup in the slaves section.
 DOC
 	   probe => {
 			_sub => sub {
@@ -1904,7 +1909,7 @@ DOC
     my $parser = Config::Grammar->new 
       (
        {
-	_sections  => [ qw(General Database Presentation Probes Alerts Targets) ],
+	_sections  => [ qw(General Database Presentation Probes Targets Alerts Slaves) ],
 	_mandatory => [ qw(General Database Presentation Probes Targets) ],
 	General    => 
 	{
@@ -1978,7 +1983,6 @@ DOC
 Mail address of the person responsible for this smokeping installation.
 DOC
 	 },
-            
 	 
 	 datadir  => 
 	 {
@@ -2144,6 +2148,7 @@ Path to your tSmoke HTML mail template file. See the tSmoke documentation for de
 DOC
       }
 	},
+
 	Database => 
 	{ 
 	 _vars => [ qw(step pings) ],
@@ -2762,12 +2767,61 @@ DOC
 		       },
 	      },
         },
+       Slaves => {_doc         => <<END_DOC,
+Your smokeping can remote control other somkeping instances running in slave
+mode on different hosts. Use this section to tell your master smokeping about the
+slaves you are going to use.
+END_DOC
+          _vars        => [ qw(secrets timeout) ],
+          _mandatory   => [ qw(secrets) ],
+          _sections    => [ "/$KEYD_RE/" ],
+          secrets => {              
+              %$FILECHECK_SUB,
+              _doc => <<END_DOC,
+The slave secrets file contines one line per slave with the name of the slave followed by a colon
+and the secret:
+
+ slave1:secret1
+ slave2:secret2
+ ...
+END_DOC
+
+          },
+          timeout => {
+              %$INTEGER_SUB,
+              _doc => <<END_DOC,
+How long should the master wait for its slave to answer?
+END_DOC
+          },     
+          "/$KEYD_RE/" => {
+              _vars => [ qw(url timeout) ],
+              _mandatory => [ qw(url) ],
+              _inherited => [ qw(timeout) ],
+              _doc => <<END_DOC,
+Define some basic properties for the slave.
+END_DOC
+              timeout => {
+                  %$INTEGER_SUB,
+                  _doc => <<END_DOC,
+How long should the master wait for its slave to answer?
+END_DOC
+              },
+              url => {
+                  _re => 'https?://\S+',
+                  _re_error => 'Use a url of the form http[s]://...',
+                  _doc => <<END_DOC,
+The url where the master can find its slave host.
+END_DOC
+          }          
+       },
        Targets => {_doc        => <<DOC,
-The Target Section defines the actual work of SmokePing. It contains a hierarchical list
-of hosts which mark the endpoints of the network connections the system should monitor.
-Each section can contain one host as well as other sections.
+The Target Section defines the actual work of SmokePing. It contains a
+hierarchical list of hosts which mark the endpoints of the network
+connections the system should monitor. Each section can contain one host as
+well as other sections. By adding slaves you can measure the connectivity of
+an endpoint looking from several sources.
 DOC
-		   _vars       => [ qw(probe menu title remark alerts) ],
+		   _vars       => [ qw(probe menu title remark alerts slaves) ],
 		   _mandatory  => [ qw(probe menu title) ],
                    _order => 1,
 		   _sections   => [ "/$KEYD_RE/" ],
