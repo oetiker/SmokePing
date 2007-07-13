@@ -13,7 +13,8 @@ use Config::Grammar;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use Smokeping::Colorspace;
-use Smokeping::MasterSlave;
+use Smokeping::Master;
+use Smokeping::Slave;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -2815,6 +2816,7 @@ END_DOC
                   _doc => <<END_DOC,
 The url where the master can find its slave host.
 END_DOC
+              },
               override => {
                   _doc => <<END_DOC,
 If part of the configuration information must be overwritten to match the
@@ -2831,8 +2833,9 @@ You can override it for a particular slave like this:
  ++override
  Probes.FPing.binary = /usr/bin/fping
 END_DOC
-                _vars   => [ '/\S+/' ],
-          }          
+                    _vars   => [ '/\S+/' ],
+               }
+           }          
        },
        Targets => {_doc        => <<DOC,
 The Target Section defines the actual work of SmokePing. It contains a
@@ -3168,7 +3171,7 @@ POD
 
 ${e}head1 COPYRIGHT
 
-Copyright (c) 2001-2003 by Tobias Oetiker. All right reserved.
+Copyright (c) 2001-2007 by Tobias Oetiker. All right reserved.
 
 ${e}head1 LICENSE
 
