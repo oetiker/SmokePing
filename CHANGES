@@ -1,3 +1,6 @@
+* fix uses of uninitialized value in the loss_background code
+  -- niko, reported by yilmaz.atag *abs.gov.au
+
 * added description of the master/slave mode I am implementing
   for dyndns -- tobi
 

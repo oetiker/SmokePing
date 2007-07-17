@@ -868,7 +868,10 @@ sub get_detail ($$$$;$){
     # determine a more 'pastel' version of the ping colours; this is 
     # used for the optional loss background colouring
     foreach my $key (keys %lc) {
-	next if ($key == 0);
+	if ($key == 0) {
+		$lcback{$key} = "";
+		next;
+	}
  	my $web = $lc{$key}[1];
  	my @rgb = Smokeping::Colorspace::web_to_rgb($web);
 	my @hsl = Smokeping::Colorspace::rgb_to_hsl(@rgb);
