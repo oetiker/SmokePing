@@ -9,13 +9,12 @@ to some target host and monitor the latency of the connection between the
 two. 
 
 The Master/Slave concept enables all smokeping probes to run remotely. The
-use case for this is, that you use somokeping to measure the overall
-connectivity of your network. If you are interested in seeing if you central
-DNS server or your file server works for everyone, you could setup several
-smokeping instances checking up on on the two servers from multiple
-locations within your network. With the Master/Slave smokeping configuration
-this process becomes much simpler, as one smokeping master server can
-control multiple slaves.
+use case for this is, to measure the overall connectivity in a network. If
+you are interested in checking that your central DNS server or your file
+server works for everyone, you could setup several smokeping instances
+checking up on on the two servers from multiple locations within your
+network. With the Master/Slave smokeping configuration this process becomes
+much simpler, as one smokeping master server can control multiple slaves.
 
 All monitoring data is stored and presented on the server, but colleted by
 the slaves. The slaves will also get their configuration information from
@@ -26,49 +25,47 @@ configuration file and the rest is taken care of automatically.
 
 =head2 Architecture
 
-The master smokeping server communicates with it's slave servers through a
-polling protocol. Whenever it assumes the slave should have new data ready
-it will poll the slave. If the slave or the network is down, it will skip
-the particular slave and move on to the next one.
+The slaves communicate with the master smokeping server via the normal
+smokeping web interface. On initial startup each slave connects to the
+master server and asks for its assignements. When the slave has done a round
+of probing it connects to the master again to deliver the results.
 
-When it polls a slave it will also tell the slave about any pending configuration
-changes.
+If the assignemt for a slave change, the master will tell the slave after
+the slave has delivered its results.
 
-The communication between master and slave is digest authenticated. And
-optionally runns over https.
+The master and slaves sign their messages by supplying an md5 hash of the
+message appended with a shared secret. Optionally the whole communication
+can run over ssl.
 
+    [slave 1]     [slave 2]      [slave 3]
+        |             |              |
+        +-------+     |     +--------+
+                |     |     |
+                v     v     v
               +---------------+
               |    master     |
               +---------------+
-                |     |     |
-        +-------+     |     +--------+
-        v             v              v
-    [slave 1]     [slave 2]      [slave 3]
 
-The slave is a normal smokeping setup where the configuration comes from the
-master instead of a local configuration file. The slave can run in two
-modes. In standalone mode it will fork off a service process that listens
-for incoming connections from the master. In cgi-mode the master connections
-will be served by a cgi script. The connection part will communicate with
-the local smokeping demon through a a perl storable file. The reason for
-using a storable is that it will survive smokeping restartes and even
-reboots if it is located on non-volatile storage.
+The slave is a normal smokeping instance setup where the configuration comes
+from the master instead of a local configuration file. The slave tries to
+contact the master server after every round of probing, supplying its
+results. If the master server can not be reached, the results will be sent
+to the server together with the next round of results. Results will be
+stored in a perl storable so that they survive a restart of the smokeping
+instance.
 
 =head2 Master Configuration
 
 To configure a master/slave setup, add a slaves section to your smokeping
-configuration file. The secret and timeout parameters will be inherited by
-the slave config sections and can be overwritten if required. If some
-configuration parameter must be set to a special value for the slave, use an
-override section to configure this.
+configuration file. If some configuration parameter must be set to a special
+value for the slave, use an override section to configure this.
 
 
  *** slaves ****
  secrets=/etc/smokeping/slavesecrets.conf 
- timeout=30
  +slave1
- url=http://....
- timeout=60
+ name=Slave 1
+ location=India
  ++override
  Probes.FPing.binary = /usr/bin/fping
  ...
@@ -94,24 +91,13 @@ A slave will then get the appropriate configuration assigned by the server.
 =head2 Slave Configuration
 
 A smokeping slave setup has no configuration file. It just needs to know
-that it runs in slave-mode. And a few configuration parameters depending on
-your setup.
+that it runs in slave-mode and its secret. The secet is stored in a file for
+optimal protection. By default the persitant data cache will be located in
+F</tmp/smokeping.$USER.cache>.
 
-When running in B<cgi-mode>, the only configuration option is to specify the
-location of communication cache file. By default this will be located in
-F</tmp/smokeping.$USER.cache>. Authentication and access restrictions can be
-configured using your webservers facilities.
-
- ./smokeping --slavemode=cgi --cache=/var/smokeping/cache.file
-
-When running in standalone mode, the authentication parameters must be
-configured in the smokeping daemon.
-
- ./smokeping --slavemode=standalone  --cache=/var/smokeping/cache.file \
-             --auth-file=/etc/smokeping/digest.conf \
-             --listen=ip:port \
-             --ssl_listen=ip:port \
-             --master-allow=128.223.22.2
+ ./smokeping --master=http://smokeping/smokeping.cgi \
+             --cache=/var/smokeping/cache.file \
+             --secret=/var/smokeping/secret.txt
 
 =head1 COPYRIGHT
 

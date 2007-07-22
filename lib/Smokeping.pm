@@ -2778,7 +2778,7 @@ Your smokeping can remote control other somkeping instances running in slave
 mode on different hosts. Use this section to tell your master smokeping about the
 slaves you are going to use.
 END_DOC
-          _vars        => [ qw(secrets timeout) ],
+          _vars        => [ qw(secrets) ],
           _mandatory   => [ qw(secrets) ],
           _sections    => [ "/$KEYD_RE/" ],
           secrets => {              
@@ -2800,24 +2800,20 @@ How long should the master wait for its slave to answer?
 END_DOC
           },     
           "/$KEYD_RE/" => {
-              _vars => [ qw(url timeout) ],
-              _mandatory => [ qw(url) ],
-              _inherited => [ qw(timeout) ],
+              _vars => [ qw(name location) ],
+              _mandatory => [ qw(name) ],
               _sections => [ qw(override) ],
               _doc => <<END_DOC,
 Define some basic properties for the slave.
 END_DOC
-              timeout => {
-                  %$INTEGER_SUB,
+              name => {
                   _doc => <<END_DOC,
-How long should the master wait for its slave to answer?
+The Name of the Slave.
 END_DOC
               },
-              url => {
-                  _re => 'https?://\S+',
-                  _re_error => 'Use a url of the form http[s]://...',
+              location => {
                   _doc => <<END_DOC,
-The url where the master can find its slave host.
+Where is the slave located.
 END_DOC
               },
               override => {
