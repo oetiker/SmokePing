@@ -1,55 +1,123 @@
 # -*- perl -*-
 package Smokeping::Slave;
-use HTTP::Daemon;
-use HTTP::Status;
+use warnings;
+use strict;
+use Data::Dumper;
+use Storable qw(nstore nretreive);
+use Digest::MD5 qw(md5_ base64);
+use LWP::UserAgent;
+use Smokeping;
+
 
 =head1 NAME
 
-Smokeping::Slave - Slave Functionality for Smokeping
+Smokeping::Slave - Slave functionality for Smokeping
 
 =head1 OVERVIEW
 
-This module handles all special functionality required by smokeping running
-in slave mode.
+The Module inmplements the functionality required to run in slave mode.
 
 =head2 IMPLEMENTATION
 
-=head3 slave_cfg=extract_config(cfg,slave)
+=head3 submit_results
 
-Extract the relevant configuration information for the selected slave. The
-configuration will only contain the information that is relevant for the
-slave. Any parameters overwritten in the B<Slaves> section of the configuration
-file will be patched for the slave.
+In slave mode we just hit our targets and submit the results to the server.
+If we can not get to the server, we submit the results in the next round.
+The server in turn sends us new config information if it sees that ours is
+out of date.
 
 =cut
 
-sub extract_config($$){
+sub get_results;
+sub get_results {
+    my $slave_cfg = shift;
     my $cfg = shift;
-    my $slave = shift;
+    my $probes = shift;
+    my $tree = shift;
+    my $name = shift;
+    my $justthisprobe = shift; # if defined, update only the targets probed by this probe
+    my $probe = $tree->{probe};
+    my $results = [];
+    foreach my $prop (keys %{$tree}) {
+        if (ref $tree->{$prop} eq 'HASH'){
+            my $subres = get_results $slave_cfg, $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe;
+            push @{$results}, @{$subres};
+        } 
+        next unless defined $probe;
+        next if defined $justthisprobe and $probe ne $justthisprobe;
+        my $probeobj = $probes->{$probe};
+        if ($prop eq 'host') {
+            #print "update $name\n";
+            my $updatestring = $probeobj->rrdupdate_string($tree);
+            my $pings = $probeobj->_pings($tree);
+            push @$results, [ $name, time, $updatestring];
+        }
+    }
+    return $results;
+}
+         
+sub submit_results {    
+    my $slave_cfg = shift;
+    my $cfg = shift;
+    my $myprobe = shift;
+    my $store = $slave_cfg->{cache_dir}."/data";
+    $store .= "_$myprobe" if $myprobe;
+    $store .= ".cache";
+    my $restore = nretrieve $store if -f $store; 
+    my $data =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe);    
+    push @$data, @$restore;    
+    my $data_dump = Dumper $data;
+    my $ua = LWP::UserAgent->new(
+        agent => 'smokeping-slave/1.0',
+        from => $slave_cfg->{slave_name},
+        timeout => 10,
+        env_proxy => 1 );
+    my $response = $ua->post(
+        $slave_cfg->{master_url},
+        Content_Type => 'form-data',
+        Content => [
+            key  => md5_base_64($slave_cfg->{shared_secret}.$data_dump) 
+            data => $data_dump,
+            config_time => $cfg->{__last} || 0;
+        ],
+    );
+    if ($response->is_success){
+        my $data = $response->decoded_content;
+        my $key = $response->header('Key');
+        if (md5_base_64($slave_cfg->{shared_secret}.$data) ne $key){
+            warn "Warning: $slave_cfg->{master_url} sent data with wrong key";
+            return undef;
+        }
+        my $VAR1;
+        eval $data;
+        if (ref $VAR1 eq 'HASH'){
+            update_config $cfg,$VAR1;
+        }                       
+    } else {
+        # ok we have to store the result so that we can try again later
+        nstore $store;
+        warn $response->status_line();
+    }
+    return undef;
 }
 
-=head3 expect_request(cfg)
+=head3 update_config 
+
+Update the config information based on the latest input form the server.
 
 =cut
 
-sub expect_request($){
+sub update_config {
     my $cfg = shift;
-    my $daemon = HTTP::Daemon->new or die "Creating HTTP daemon";
-    print "Please contact me at: <URL:", $d->url, ">\n";
-    while (my $c = $d->accept) {
-         while (my $r = $c->get_request) {
-                 if ($r->method eq 'GET' and $r->url->path eq "/xyzzy") {
-                     # remember, this is *not* recommended practice :-)
-                     $c->send_file_response("/etc/passwd");
-                 }
-                 else {
-                     $c->send_error(RC_FORBIDDEN)
-                 }
-             }
-             $c->close;
-             undef($c);
-         }
-    
+    my $data = shift;
+    $cfg->{General} = $data->{General};
+    $cfg->{Probes} = $data->{Probes};
+    $cfg->{Database} = $data->{Database};
+    $cfg->{Targets} = $data->{Targets};
+    $cfg->{__last} = $data->{__last};
+    $Smokeping::probes = Smokeping::load_probes $cfg;
+    $cfg->{__probes} = $probes;
+    add_targets $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
 }
 
 1;

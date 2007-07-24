@@ -95,9 +95,9 @@ that it runs in slave-mode and its secret. The secet is stored in a file for
 optimal protection. By default the persitant data cache will be located in
 F</tmp/smokeping.$USER.cache>.
 
- ./smokeping --master=http://smokeping/smokeping.cgi \
-             --cache=/var/smokeping/cache.file \
-             --secret=/var/smokeping/secret.txt
+ ./smokeping --master-url=http://smokeping/smokeping.cgi \
+             --cache-dir=/var/smokeping/cache.file \
+             --shared-secret=/var/smokeping/secret.txt
 
 =head1 COPYRIGHT
 

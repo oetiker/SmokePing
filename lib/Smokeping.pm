@@ -372,12 +372,37 @@ sub check_filter ($$) {
       return 1;
 }
 
+sub add_targets ($$$$);
+sub add_targets ($$$$){
+    my $cfg = shift;   
+    my $probes = shift;
+    my $tree = shift;
+    my $name = shift;
+    die "Error: Invalid Probe: $tree->{probe}" unless defined $probes->{$tree->{probe}};
+    my $probeobj = $probes->{$tree->{probe}};
+    foreach my $prop (keys %{$tree}) {
+        if (ref $tree->{$prop} eq 'HASH'){
+            add_targets $cfg, $probes, $tree->{$prop}, "$name/$prop";
+        }
+    	if ($prop eq 'host' and check_filter($cfg,$name)) {           
+            if($tree->{host} =~ /^DYNAMIC/) {
+                $probeobj->add($tree,$name);
+            } else {
+                $probeobj->add($tree,$tree->{host});
+            }
+        }
+    }
+}
+
+
 sub init_target_tree ($$$$); # predeclare recursive subs
 sub init_target_tree ($$$$) {
     my $cfg = shift;
     my $probes = shift;
     my $tree = shift;
     my $name = shift;
+    die "Error: Invalid Probe: $tree->{probe}" unless defined $probes->{$tree->{probe}};
+    my $probeobj = $probes->{$tree->{probe}};
 
     if ($tree->{alerts}){
 	die "ERROR: no Alerts section\n"
@@ -404,15 +429,8 @@ sub init_target_tree ($$$$) {
 	}
 	if ($prop eq 'host' and check_filter($cfg,$name)) {           
 	    # print "init $name\n";
-	    die "Error: Invalid Probe: $tree->{probe}" unless defined $probes->{$tree->{probe}};
-	    my $probeobj = $probes->{$tree->{probe}};
     	    my $step = $probeobj->step();
 	    # we have to do the add before calling the _pings method, it won't work otherwise
-	    if($tree->{$prop} =~ /^DYNAMIC/) {
-		$probeobj->add($tree,$name);
-	    } else {
-		$probeobj->add($tree,$tree->{$prop});
-	    }
 	    my $pings = $probeobj->_pings($tree);
 
 	   my @create = 
@@ -3089,20 +3107,21 @@ sub load_cfg ($;$) {
     if (not defined $cfg or not defined $probes or $cfg->{__last} < $cfmod ){
         $cfg = undef;
         my $parser = get_parser;
-	$cfg = get_config $parser, $cfgfile;       
-	if (defined $cfg->{Presentation}{charts}){
-	   require Storable;
-	   die "ERROR: Could not load Storable Support. This is required for the Charts feature - $@\n" if $@;
+    	$cfg = get_config $parser, $cfgfile;       
+    	if (defined $cfg->{Presentation}{charts}){
+	       require Storable;
+	       die "ERROR: Could not load Storable Support. This is required for the Charts feature - $@\n" if $@;
            load_sorters $cfg->{Presentation}{charts};
         }
         $cfg->{__parser} = $parser;
-	$cfg->{__last} = $cfmod;
-	$cfg->{__cfgfile} = $cfgfile;
+    	$cfg->{__last} = $cfmod;
+    	$cfg->{__cfgfile} = $cfgfile;
         $probes = undef;
-	$probes = load_probes $cfg;
-	$cfg->{__probes} = $probes;
-	return if $noinit;
-	init_alerts $cfg if $cfg->{Alerts};
+    	$probes = load_probes $cfg;
+    	$cfg->{__probes} = $probes;
+    	return if $noinit;
+    	init_alerts $cfg if $cfg->{Alerts};
+        add_targets $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};   
       	init_target_tree $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
     } else {
         do_log("Config file unmodified, skipping reload") unless $cgimode;
@@ -3446,6 +3465,7 @@ sub main (;$) {
         exit 0;
     };
     load_cfg $cfgfile;
+
     if(defined $opt{'static-pages'}) { makestaticpages $cfg, $opt{'static-pages'}; exit 0 };
     if($opt{email})    { enable_dynamic $cfg, $cfg->{Targets},"",""; exit 0 };
     if($opt{restart})  { kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGINT;};

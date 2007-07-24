@@ -1,7 +1,10 @@
 # -*- perl -*-
 package Smokeping::Master;
 use HTTP::Request;
-
+use Data::Dumper;
+use Storable qw(dclone nfreeze);
+use strict;
+use warnings;
 
 =head1 NAME
 
@@ -23,32 +26,54 @@ file will be patched for the slave.
 
 =cut
 
-sub extract_config($$){
-    my $cfg = shift;
+sub get_targets;
+sub get_targets {
+    my $trg = shift;
     my $slave = shift;
+    my %return;
+    my $ok;
+    foreach my $key (keys %{$trg}){
+        # dynamic hosts can only be queried from the
+        # master
+        next if $key eq 'host' and $trg->{$key} eq 'DYNAMIC';
+        next if $key eq 'host' and not ( defined $trg->{slaves} and $trg->{slaves} =~ /\b${slave}\b/);
+        if (ref $trg->{$key} eq 'HASH'){
+            $return{$key} = get_targets ($trg->{$key},$slave);
+            $ok = 1 if defined $return{$key};
+        } else {
+            $ok = 1 if $key eq 'host';
+            $return{$key} = $trg->{$key};
+        }
+    }    
+    return ($ok ? \%return : undef);
 }
-
-=head3 poll_slave(cfg,slave)
-
-Get latest measurement results from the slave
-
-=cut
-
-sub poll_slave($$){
+    
+            
+        
+sub extract_config {
     my $cfg = shift;
     my $slave = shift;
-}
-
-
-=head3 push_config(cfg,slave)
-
-Upload new config information to the slave if the poll result shows that it needs an update.
-
-=cut
-
-sub push_config ($$){
-    my $cfg = shift;
-    my $slave = shift;
+    # get relevant Targets
+    my %slave_config;
+    $slave_config{Database} = dclone $cfg->{Database}; 
+    $slave_config{General}  = dclone $cfg->{General};
+    $slave_config{Probes}   = dclone $cfg->{Probes};
+    $slave_config{Targets}  = get_targets($cfg->{Targets},$slave);
+    $slave_config{__last}   = $cfg->{__last};
+    if ($cfg->{Slaves} and $cfg->{Slaves}{$slave} and $cfg->{Slaves}{$slave}{override}){
+        for my $override (keys %{$cfg->{Slaves}{$slave}{override}}){
+            my $node = \%slave_config;
+            my @keys = split /\./, $override;
+            my $last_key = pop @keys;
+            for my $key (@keys){
+                $node->{$key} = {}
+                    unless $node->{$key} and ref $node->{$key} eq 'HASH';
+                $node = $node->{$key};
+            }
+            $node->{$last_key} = $cfg->{Slaves}{$slave}{override}{$override};
+        }
+    }
+    return nfreesze \%slave_config;
 }
 
 1;

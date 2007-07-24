@@ -10,11 +10,11 @@ mailhost = smtp.mailhost.abc
 sendmail = /usr/lib/sendmail
 imgcache = /home/oetiker/public_html/.simg
 imgurl   = ../.simg
-datadir  = /home/oetiker/data/projects/AADJ-smokeping/dist/var
-piddir  = /home/oetiker/data/projects/AADJ-smokeping/dist/var
-cgiurl   = http://people.ee.ethz.ch/~oetiker/smokeping/smokeping.cgi
-smokemail = /home/oetiker/data/projects/AADJ-smokeping/dist/etc/smokemail.dist
-tmail = /home/oetiker/data/projects/AADJ-smokeping/dist/etc/tmail.dist
+datadir  = /tmp/smokeping/data
+piddir  = /tmp/smokeping/var
+cgiurl   = http://tobi.oetiker.ch/smokeping/smokeping.cgi
+smokemail = /home/oetiker/checkouts/smokeping/trunk/software/etc/smokemail.dist
+tmail = /home/oetiker/checkouts/smokeping/trunk/software/etc/tmail.dist
 # specify this to get syslog logging
 syslogfacility = local0
 # each probe is now run in its own process
@@ -66,7 +66,7 @@ AVERAGE  0.5 144   720
 
 *** Presentation ***
 
-template = /home/oetiker/data/projects/AADJ-smokeping/dist/etc/basepage.html.dist
+template = /home/oetiker/checkouts/smokeping/trunk/software/etc/basepage.html.dist
 
 + overview 
 
@@ -89,7 +89,14 @@ unison_tolerance = 2
 
 + FPing
 
-binary = /usr/sepp/bin/fping
+binary = /usr/sbin/fping
+
+*** Slaves ***
+secrets=/home/oetiker/checkouts/smokeping/trunk/software/etc/smokeping_secrets.dist
++mipsrv01
+name=mipsrv01
+++override
+Probes.FPing.binary=/usr/bin/fping
 
 *** Targets ***
 
@@ -115,6 +122,7 @@ title =European Connectivity
 menu = Switzerland
 title =Swiss Connectivity
 alerts = bigloss,someloss,startloss
+slaves = mipsrv01 johan
 
 ++++ SBB
 
