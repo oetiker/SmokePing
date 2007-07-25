@@ -3,7 +3,7 @@ package Smokeping::Slave;
 use warnings;
 use strict;
 use Data::Dumper;
-use Storable qw(nstore nretreive);
+use Storable qw(nstore retreive);
 use Digest::MD5 qw(md5_ base64);
 use LWP::UserAgent;
 use Smokeping;
@@ -63,7 +63,7 @@ sub submit_results {
     my $store = $slave_cfg->{cache_dir}."/data";
     $store .= "_$myprobe" if $myprobe;
     $store .= ".cache";
-    my $restore = nretrieve $store if -f $store; 
+    my $restore = retrieve $store if -f $store; 
     my $data =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe);    
     push @$data, @$restore;    
     my $data_dump = Dumper $data;
