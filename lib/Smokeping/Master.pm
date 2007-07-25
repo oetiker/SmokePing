@@ -73,7 +73,7 @@ sub extract_config {
             $node->{$last_key} = $cfg->{Slaves}{$slave}{override}{$override};
         }
     }
-    return nfreesze \%slave_config;
+    return nfreeze \%slave_config;
 }
 
 1;
