@@ -2,9 +2,10 @@
 package Smokeping::Master;
 use HTTP::Request;
 use Data::Dumper;
-use Storable qw(dclone nfreeze);
+use Storable qw(lock_nstore dclone lock_retrieve);
 use strict;
 use warnings;
+use Fcntl qw(:flock);
 
 =head1 NAME
 
@@ -48,8 +49,6 @@ sub get_targets {
     return ($ok ? \%return : undef);
 }
     
-            
-        
 sub extract_config {
     my $cfg = shift;
     my $slave = shift;
@@ -73,8 +72,82 @@ sub extract_config {
             $node->{$last_key} = $cfg->{Slaves}{$slave}{override}{$override};
         }
     }
-    return nfreeze \%slave_config;
+    return Dumper \%slave_config;
 }
+
+=head3 save_updates (updates)
+
+When the cgi gets updates from a client, these updates are saved away, for
+each 'target' so that the updates can be integrated into the relevant rrd
+database by the rrd daemon as the next round of updates is processed. This
+two stage process is chosen so that all results flow through the same code
+path in the daemon.
+
+=cut
+
+sub save_updates {
+    my $cfg = shift;
+    my $slave = shift;
+    my $updates = shift;
+    # [ [ name, time, updatestring ],
+    #   [ name, time, updatestring ] ]
+    for my $update (split /\n/, $updates){
+        my ($name, $time, $updatestring) = split /\t/, $update;
+        my $file = $cfg->{General}{datadir}."/${name}.slaves";
+        if ( ! -f $cfg->{General}{datadir}."/${name}.rrd" ){
+            warn "Skipping update for $name since it does not exist in the local data structure ($cfg->{General}{datadir})\n";
+        } elsif ( open (my $hand, '+>>', $file) ) {
+            if ( flock $hand, LOCK_EX ){
+                my $existing;
+                if ( tell $hand > 0 ){
+                   eval { $existing = fd_retreive  $hand };
+                    if ($@) { #error
+                        warn "Loading $file: $@";
+                        $existing = [];
+                    }
+                };
+                push @{$existing}, [ $slave, $time, $updatestring];
+                nstore_fd ($existing, $hand);
+                flock $hand, LOCK_UN;
+            } else {
+                warn "Could not lock $file. Can't store data.\n";
+            }
+            close $hand;
+        } else {
+            warn "Could not write to $file: $!";
+        }
+    }            
+};
+
+=head3 answer_slave
+
+Answer the requests from the slave by accepting the data, verifying the secrets
+and providing updated config information if necessary.
+
+=cut
+
+sub anwer_slave {
+    my $cfg = shift;
+    my $q = shift;
+    my $slave = $q->param('slave');
+    my $secret = get_secret($slave);
+    my $key = $q->param('key');
+    my $data = $q->param('data');
+    my $config_time = $q->param('config_time');
+    
+    # lets make sure the she share a secret
+    if (md5_base64($secret.$data) eq $key){
+        save_updates $cfg, $slave, $data;
+    } else {
+        warn "Data from $slave was signed with $key which does not match our expectation\n";
+    }     
+    # does the client need new config ?
+    if ($config_time < $cfg->{__last}){
+        print extract_config $cfg, $slave;
+    } else {
+        print "\n"
+    };       
+}   
 
 1;
 

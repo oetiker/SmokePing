@@ -3,8 +3,8 @@ package Smokeping::Slave;
 use warnings;
 use strict;
 use Data::Dumper;
-use Storable qw(nstore retreive);
-use Digest::MD5 qw(md5_ base64);
+use Storable qw(nstore retrieve);
+use Digest::MD5 qw(md5_base64);
 use LWP::UserAgent;
 use Smokeping;
 
@@ -49,8 +49,7 @@ sub get_results {
         if ($prop eq 'host') {
             #print "update $name\n";
             my $updatestring = $probeobj->rrdupdate_string($tree);
-            my $pings = $probeobj->_pings($tree);
-            push @$results, [ $name, time, $updatestring];
+            push @$results, "$name\t".time()."\t$updatestring";
         }
     }
     return $results;
@@ -60,25 +59,26 @@ sub submit_results {
     my $slave_cfg = shift;
     my $cfg = shift;
     my $myprobe = shift;
+    my $probes = shift;
     my $store = $slave_cfg->{cache_dir}."/data";
     $store .= "_$myprobe" if $myprobe;
     $store .= ".cache";
     my $restore = retrieve $store if -f $store; 
-    my $data =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe);    
+    my $data =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, '', $myprobe);    
     push @$data, @$restore;    
-    my $data_dump = Dumper $data;
+    my $data_dump = join "\n",@{$data};
     my $ua = LWP::UserAgent->new(
         agent => 'smokeping-slave/1.0',
-        from => $slave_cfg->{slave_name},
         timeout => 10,
         env_proxy => 1 );
     my $response = $ua->post(
         $slave_cfg->{master_url},
         Content_Type => 'form-data',
         Content => [
-            key  => md5_base_64($slave_cfg->{shared_secret}.$data_dump) 
+            slave => $slave_cfg->{slave_name},
+            key  => md5_base_64($slave_cfg->{shared_secret}.$data_dump),
             data => $data_dump,
-            config_time => $cfg->{__last} || 0;
+            config_time => $cfg->{__last} || 0,
         ],
     );
     if ($response->is_success){
@@ -90,11 +90,14 @@ sub submit_results {
         }
         my $VAR1;
         eval $data;
-        if (ref $VAR1 eq 'HASH'){
-            update_config $cfg,$VAR1;
+        if ($@){
+            warn "evaluating new config from server failed: $@";
+        } elsif (definded $VAR1 and ref $VAR1 eq 'HASH'){
+            update_config($cfg,$VAR1);
         }                       
     } else {
-        # ok we have to store the result so that we can try again later
+        # ok did not manage to get our data to the server.
+        # we store the result so that we can try again later.
         nstore $store;
         warn $response->status_line();
     }
@@ -115,9 +118,10 @@ sub update_config {
     $cfg->{Database} = $data->{Database};
     $cfg->{Targets} = $data->{Targets};
     $cfg->{__last} = $data->{__last};
-    $Smokeping::probes = Smokeping::load_probes $cfg;
+    my $probes = Smokeping::load_probes $cfg;
     $cfg->{__probes} = $probes;
-    add_targets $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
+    add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
+    return $probes;
 }
 
 1;

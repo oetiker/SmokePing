@@ -1,7 +1,7 @@
 #!/usr/sepp/bin/perl-5.8.4 -w
 # -*-perl-*-
 
-use lib qw(/usr/pack/rrdtool-1.0.49-to/lib/perl);
+use lib qw(/usr/pack/rrdtool-1.2.23-mo/lib/perl);
 use lib qw(lib);
 
 use Smokeping 2.001001;

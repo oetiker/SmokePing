@@ -1325,135 +1325,104 @@ sub save_sortercache($$$){
     rename "$dir/new$ext","$dir/data$ext.storable"
 }
 
-
-sub update_rrds($$$$$$);
-sub update_rrds($$$$$$) {
+sub check_alerts {
     my $cfg = shift;
-    my $probes = shift;
     my $tree = shift;
+    my $pings = shift;
     my $name = shift;
-    my $justthisprobe = shift; # if defined, update only the targets probed by this probe
-    my $sortercache = shift;
+    my $prop = shift;
+    my $loss = shift;
+    my $rtt = shift;
+    my $slave = shift;
+    my $gotalert;
+    my $s = "";
+    if ($slave) {
+        $s = '~'.$slave
+    } 
+    if ( $tree->{alerts} ) {
+  		my $priority_done;
+        $tree->{'stack'.$s} = {loss=>['S'],rtt=>['S']} unless defined $tree->{'stack'.$s};
+      	my $x = $tree->{'stack'.$s};
+   	    $loss = undef if $loss eq 'U';
+        my $lossprct = $loss * 100 / $pings;
+	    $rtt = undef if $rtt eq 'U';
+	    push @{$x->{loss}}, $lossprct;
+        push @{$x->{rtt}}, $rtt;
+   	    if (scalar @{$x->{loss}} > $tree->{fetchlength}){
+            shift @{$x->{loss}};
+            shift @{$x->{rtt}};
+	    }
+        for (sort { ($cfg->{Alerts}{$a}{priority}||0)  
+                    <=> ($cfg->{Alerts}{$b}{priority}||0)} @{$tree->{alerts}}) {
+            my $alert = $cfg->{Alerts}{$_};
+            if ( not $alert ) {
+                do_log "WARNING: Empty alert in ".(join ",", @{$tree->{alerts}})." ($name)\n";
+                next;
+            };
+            if ( ref $alert->{sub} ne 'CODE' ) {
+           	    do_log "WARNING: Alert '$_' did not resolve to a Sub Ref. Skipping\n";
+                next;
+            };
+            my $prevmatch = $tree->{'prevmatch'.$s}{$_} || 0;
 
-    my $probe = $tree->{probe};
-    foreach my $prop (keys %{$tree}) {
-
-        if (ref $tree->{$prop} eq 'HASH'){
-            update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe, $sortercache;
-        } 
-	# if we are looking down a branche where no probe property is set there is no sense
-        # in further exploring it
-        next unless defined $probe;
-	next if defined $justthisprobe and $probe ne $justthisprobe;
-        my $probeobj = $probes->{$probe};
-        if ($prop eq 'host' and check_filter($cfg,$name)) {
-            #print "update $name\n";
-	    my $updatestring = $probeobj->rrdupdate_string($tree);
-	    my $pings = $probeobj->_pings($tree);
-	    if ( $tree->{rawlog} ){
-		my $file =  POSIX::strftime $tree->{rawlog},localtime(time);
-		if (open LOG,">>$name.$file.csv"){
-			print LOG time,"\t",join("\t",split /:/,$updatestring),"\n";
-			close LOG;
-		} else {
-			do_log "Warning: failed to open $file for logging: $!\n";
-		}
-            }	
-            my @update = ( $name.".rrd", 
-        	   '--template',(join ":", "uptime", "loss", "median",
-				 map { "ping${_}" } 1..$pings),
-	           "N:".$updatestring
-		 );     
-	    do_debuglog("Calling RRDs::update(@update)");
-            RRDs::update ( @update );
-            my $ERROR = RRDs::error();
-	    do_log "RRDs::update ERROR: $ERROR\n" if $ERROR;
-	    # check alerts
-            # disabled
-	    my $gotalert;
-	    if ( $tree->{alerts} ) {
-		my $priority_done;
-                $tree->{stack} = {loss=>['S'],rtt=>['S']} unless defined $tree->{stack};
-		my $x = $tree->{stack};
-		my ($loss,$rtt) = 
-		    (split /:/, $updatestring)[1,2];
-		$loss = undef if $loss eq 'U';
-		my $lossprct = $loss * 100 / $pings;
-		$rtt = undef if $rtt eq 'U';
-		push @{$x->{loss}}, $lossprct;
-		push @{$x->{rtt}}, $rtt;
-		if (scalar @{$x->{loss}} > $tree->{fetchlength}){
-		    shift @{$x->{loss}};
-		    shift @{$x->{rtt}};
-		}
-		for (sort { ($cfg->{Alerts}{$a}{priority}||0)  
-                            <=> ($cfg->{Alerts}{$b}{priority}||0)} @{$tree->{alerts}}) {
-                    my $alert = $cfg->{Alerts}{$_};
-                    if ( not $alert ) {
-                        do_log "WARNING: Empty alert in ".(join ",", @{$tree->{alerts}})." ($name)\n";
-                        next;
-                    };
-                    if ( ref $alert->{sub} ne 'CODE' ) {
-       		        do_log "WARNING: Alert '$_' did not resolve to a Sub Ref. Skipping\n";
-                        next;
-                    };
-                    my $prevmatch = $tree->{prevmatch}{$_} || 0;
-
-		    # add the current state of an edge triggered alert to the
-		    # data passed into a matcher, which allows for somewhat 
-		    # more intelligent alerting due to state awareness.
-		    $x->{prevmatch} = $prevmatch;
-		    my $priority = $alert->{priority};
-                    my $match = &{$alert->{sub}}($x) || 0; # Avgratio returns undef
-		    $gotalert = $match unless $gotalert;
-                    my $edgetrigger = $alert->{edgetrigger} eq 'yes';
-                    my $what;
-                    if ($edgetrigger and $prevmatch != $match) {
-                        $what = ($prevmatch == 0 ? "was raised" : "was cleared");
-                    }
-                    if (not $edgetrigger and $match) {
-                        $what = "is active";
-                    }
-		    if ($what and (not defined $priority or not defined $priority_done )) {
-			$priority_done = $priority if $priority and not $priority_done;
-			# send something
-			my $from;
-                        my $line = "$name/$prop";
-                        my $base = $cfg->{General}{datadir};
-                        $line =~ s|^$base/||;
-                        $line =~ s|/host$||;
-                        $line =~ s|/|.|g;
-			do_log("Alert $_ $what for $line");
-                        my $urlline = $line;
-                        $urlline =  $cfg->{General}{cgiurl}."?target=".$line;
-                        my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
-                        my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
-			my $time = time;
-                        my @stamp = localtime($time);
-			my $stamp = localtime($time);
-			my @to;
-			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$alert->{to}){
-			     next unless $addr;
-			     if ( $addr =~ /^\|(.+)/) {
-			     	 my $cmd = $1;
-                                 if ($edgetrigger) {
+            # add the current state of an edge triggered alert to the
+  		    # data passed into a matcher, which allows for somewhat 
+       		# more intelligent alerting due to state awareness.
+       		$x->{prevmatch} = $prevmatch;
+       		my $priority = $alert->{priority};
+            my $match = &{$alert->{sub}}($x) || 0; # Avgratio returns undef
+      		$gotalert = $match unless $gotalert;
+            my $edgetrigger = $alert->{edgetrigger} eq 'yes';
+            my $what;
+            if ($edgetrigger and $prevmatch != $match) {
+                $what = ($prevmatch == 0 ? "was raised" : "was cleared");
+            }
+            if (not $edgetrigger and $match) {
+                $what = "is active";
+            }
+      	    if ($what and (not defined $priority or not defined $priority_done )) {
+      			$priority_done = $priority if $priority and not $priority_done;
+    			# send something
+       			my $from;
+                my $line = "$name/$prop";
+                my $base = $cfg->{General}{datadir};
+                $line =~ s|^$base/||;
+                $line =~ s|/host$||;
+                $line =~ s|/|.|g;
+                $line .= "[from $slave]" if $slave;
+	            do_log("Alert $_ $what for $line");
+                my $urlline = $line;
+                $urlline =  $cfg->{General}{cgiurl}."?target=".$line;
+                my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
+                my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
+      			my $time = time;
+                my @stamp = localtime($time);
+      			my $stamp = localtime($time);
+      			my @to;
+       			foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$alert->{to}){
+	                next unless $addr;
+         	        if ( $addr =~ /^\|(.+)/) {
+            	        my $cmd = $1;
+                        if ($edgetrigger) {
   			                system $cmd,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
-                                 } else {
+                        } else {
   			                system $cmd,$_,$line,$loss,$rtt,$tree->{host};
-                                 }
-			     } elsif ( $addr =~ /^snpp:(.+)/ ) {
-				 sendsnpp $1, <<SNPPALERT;
+                        }
+                    }
+                    elsif ( $addr =~ /^snpp:(.+)/ ) {
+			            sendsnpp $1, <<SNPPALERT;
 $alert->{comment}
 $_ $what on $line
 $loss
 $rtt
 SNPPALERT
-			     } else {
-			    	 push @to, $addr;
-			     }
-			};
-			if (@to){
-		        my $default_mail = <<DOC;
+                    } 
+                    else {
+			            push @to, $addr;
+                    }
+                };
+                if (@to){
+                    my $default_mail = <<DOC;
 Subject: [SmokeAlert] <##ALERT##> <##WHAT##> on <##LINE##>
 
 <##STAMP##>
@@ -1476,34 +1445,90 @@ Comment
 DOC
 
 		            my $mail = fill_template($alert->{mailtemplate},
-			       {
-				  ALERT => $_,
-				  WHAT  => $what,
-				  LINE  => $line,
-				  URL   => $urlline,
-				  STAMP => $stamp,
-				  PAT   => $alert->{pattern},
-                                  LOSS  => $loss,
-                                  RTT   => $rtt,
-                                  COMMENT => $alert->{comment}
-			         },$default_mail) || "Subject: smokeping failed to open mailtemplate '$alert->{mailtemplate}'\n\nsee subject\n";
-			    my $rfc2822stamp =  strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
-			    my $to = join ",",@to;
-			    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
+            		      {
+			              	  ALERT => $_,
+                			  WHAT  => $what,
+                			  LINE  => $line,
+                			  URL   => $urlline,
+				              STAMP => $stamp,
+                	    	  PAT   => $alert->{pattern},
+                              LOSS  => $loss,
+                              RTT   => $rtt,
+                              COMMENT => $alert->{comment}
+			              },$default_mail) || "Subject: smokeping failed to open mailtemplate '$alert->{mailtemplate}'\n\nsee subject\n";
+                    my $rfc2822stamp =  strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
+			        my $to = join ",",@to;
+            			    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
 From: $cfg->{Alerts}{from}
 Date: $rfc2822stamp
 $mail
 ALERT
-			}
-		    } else {
+			    }
+            } else {
 		        do_debuglog("Alert \"$_\": no match for target $name\n");
-                    }
-                    $tree->{prevmatch}{$_} = $match;
-		}
-	    } # end alerts
-	    update_sortercache $cfg,$sortercache,$name,$updatestring,$gotalert;
-	}
+            }
+            $tree->{'prevmatch'.$s}{$_} = $match;
+        }
+    } # end alerts
+    return $gotalert;
+}
+
+
+sub update_rrds($$$$$$);
+sub update_rrds($$$$$$) {
+    my $cfg = shift;
+    my $probes = shift;
+    my $tree = shift;
+    my $name = shift;
+    my $justthisprobe = shift; # if defined, update only the targets probed by this probe
+    my $sortercache = shift;
+
+    my $probe = $tree->{probe};
+    foreach my $prop (keys %{$tree}) {
+        if (ref $tree->{$prop} eq 'HASH'){
+            update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe, $sortercache;
+        } 
+	    # if we are looking down a branche where no probe property is set there is no sense
+        # in further exploring it
+        next unless defined $probe;
+    	next if defined $justthisprobe and $probe ne $justthisprobe;
+        my $probeobj = $probes->{$probe};
+        if ($prop eq 'host' and check_filter($cfg,$name)) {
+            my @slaves = (""); # we start with the nameles slave which is the master
+            if ($tree->{slaves}){
+                push @slaves, split(/\s+/, $tree->{slaves});
+            }
+            for my $slave (@slaves){
+        	    my $updatestring = $probeobj->rrdupdate_string($tree);
+	            my $pings = $probeobj->_pings($tree);
+    	        if ( $tree->{rawlog} ){
+	    	        my $file =  POSIX::strftime $tree->{rawlog},localtime(time);
+    	    	    if (open LOG,">>$name.$file.csv"){
+	    	            print LOG time,"\t",join("\t",split /:/,$updatestring),"\n";
+		                close LOG;
+        		    } else {
+	        	        do_log "Warning: failed to open $file for logging: $!\n";
+		            }
+                }	
+                my @update = ( 
+                   $name.".rrd", 
+                   '--template', (
+                       join ":", "uptime", "loss", "median",
+                             map { "ping${_}" } 1..$pings
+                   ),
+	               "N:".$updatestring
+	            );     
+    	        do_debuglog("Calling RRDs::update(@update)");
+                RRDs::update ( @update );
+                my $ERROR = RRDs::error();
+    	        do_log "RRDs::update ERROR: $ERROR\n" if $ERROR;
+	            # check alerts
+                my ($loss,$rtt) = (split /:/, $updatestring)[1,2];
+        	    my $gotalert = check_alerts $cfg,$tree,$pings,$name,$prop,$loss,$rtt;
+	            update_sortercache $cfg,$sortercache,$name,$updatestring,$gotalert;
+	        }
+        }
     }
 }
 

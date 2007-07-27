@@ -49,6 +49,12 @@ type = rtt
 pattern = <10,<10,<10,<10,<10,<100,>100,>100,>100
 comment = routing mesed up again ?
 
++median
+type = matcher
+# in milli seconds
+pattern = Median(old=>5,new=>7,diff=>2)
+comment = median crossed
+
 *** Database ***
 
 step     = 300
@@ -170,6 +176,7 @@ host = www.iu.ali
 menu = U. C. Berkeley
 title = U. C. Berkeley Webserver
 host = www.berkly.udi
+alerts = median
 
 +++ UCSD
 
