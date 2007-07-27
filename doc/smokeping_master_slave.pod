@@ -60,7 +60,6 @@ To configure a master/slave setup, add a slaves section to your smokeping
 configuration file. If some configuration parameter must be set to a special
 value for the slave, use an override section to configure this.
 
-
  *** slaves ****
  secrets=/etc/smokeping/slavesecrets.conf 
  +slave1
@@ -87,6 +86,16 @@ A slave will then get the appropriate configuration assigned by the server.
  ...
  +dest3
  ... 
+
+The data from the slaves will be stored in F<TargetName~SlaveName.rrd>. So the example above would
+create the following files:
+
+ dest1.rrd
+ dest2.rrd
+ dest2~slave1.rrd
+ dest3.rrd
+ dest3~slave1.rrd
+ dest3~slave2.rrd
 
 =head2 Slave Configuration
 

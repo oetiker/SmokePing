@@ -93,7 +93,7 @@ sub save_updates {
     #   [ name, time, updatestring ] ]
     for my $update (split /\n/, $updates){
         my ($name, $time, $updatestring) = split /\t/, $update;
-        my $file = $cfg->{General}{datadir}."/${name}.slaves";
+        my $file = $cfg->{General}{datadir}."/${name}.slave_cache";
         if ( ! -f $cfg->{General}{datadir}."/${name}.rrd" ){
             warn "Skipping update for $name since it does not exist in the local data structure ($cfg->{General}{datadir})\n";
         } elsif ( open (my $hand, '+>>', $file) ) {
@@ -114,10 +114,59 @@ sub save_updates {
             }
             close $hand;
         } else {
-            warn "Could not write to $file: $!";
+            warn "Could not update $file: $!";
         }
     }            
 };
+
+=head3 get_slaveupdates
+
+Read in all updates provided by slaves and return an array reference.
+
+=cut
+
+sub get_slaveupdates {
+    my $name = shift;
+    my $file = $name.".slave_cache";
+    my $data;
+    if ( open (my $hand, '<', $file) ) {
+        if ( flock $hand, LOCK_EX ){
+            eval { $data = fd_retreive  $hand };
+            if ($@) { #error
+                warn "Loading $file: $@";  
+                return;
+            }
+            unlink $file;
+            flock $hand, LOCK_UN;
+        } else {
+            warn "Could not lock $file. Can't load data.\n";
+        }
+        close $hand;
+        return $data;
+    }
+    return;
+}
+
+
+=head3 get_secret
+
+Read the secrtes file and figure the secret for the slave which is talking to us.
+
+=cut
+
+sub get_secret {
+    my $cfg = shift;
+    my $slave = shift;
+    if (open my $hand, "<", $cfg->{Slaves}{secrets}){
+        while (<$hand>){
+            next unless /^${slave}:(\S+)/;
+            close $hand;
+            return $1;
+        }
+    } 
+    warn "WARNING: Opening $cfg->{Slaves}{secrets}: $!\n";    
+    return;
+}
 
 =head3 answer_slave
 
@@ -130,16 +179,24 @@ sub anwer_slave {
     my $cfg = shift;
     my $q = shift;
     my $slave = $q->param('slave');
-    my $secret = get_secret($slave);
+    my $secret = get_secret($cfg,$slave);
+    if (not $secret){
+        warn "WARNING: No secret found for slave ${slave}\n";       
+        return;
+    }
     my $key = $q->param('key');
     my $data = $q->param('data');
     my $config_time = $q->param('config_time');
-    
+    if (not ref $cfg->{Slaves}{$slave} eq 'HASH'){
+        warn "WARNING: I don't know the slave ${slave} ignoring it";
+        return;
+    }
     # lets make sure the she share a secret
     if (md5_base64($secret.$data) eq $key){
         save_updates $cfg, $slave, $data;
     } else {
-        warn "Data from $slave was signed with $key which does not match our expectation\n";
+        warn "WARNING: Data from $slave was signed with $key which does not match our expectation\n";
+        return;
     }     
     # does the client need new config ?
     if ($config_time < $cfg->{__last}){
@@ -148,6 +205,7 @@ sub anwer_slave {
         print "\n"
     };       
 }   
+
 
 1;
 
