@@ -60,7 +60,7 @@ sub new($$$)
 	my $testhost = $self->testhost;
         my $return = `$binary -C 1 $testhost 2>&1`;
         $self->{enable}{S} = (`$binary -h 2>&1` =~ /\s-S\s/);
-	warn  "NOTE: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.\n" if !$self->{enable}{S};
+    	warn  "NOTE: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.\n" if !$self->{enable}{S};
         croak "ERROR: fping ('$binary -C 1 $testhost') could not be run: $return"
             if $return =~ m/not found/;
         croak "ERROR: FPing must be installed setuid root or it will not work\n" 
@@ -68,10 +68,12 @@ sub new($$$)
 
         if ($return =~ m/bytes, ([0-9.]+)\sms\s+.*\n.*\n.*:\s+([0-9.]+)/ and $1 > 0){
             $self->{pingfactor} = 1000 * $1/$2;
-            print "### fping seems to report in ", $1/$2, " milliseconds\n";
+            if ($1 != $2){
+                warn "### fping seems to report in ", $1/$2, " milliseconds (old version?)";
+            }
         } else {
             $self->{pingfactor} = 1000; # Gives us a good-guess default
-            print "### assuming you are using an fping copy reporting in milliseconds\n";
+            warn "### assuming you are using an fping copy reporting in milliseconds\n";
         }
     };
 
