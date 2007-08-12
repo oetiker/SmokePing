@@ -29,8 +29,8 @@ logging and graphing in SmokePing.
 
 L<http://www.fping.com/>
 
-You should grab the newest version, 2.4b2_to-ipv6, as it has IPv6 support
-and actually builds, unlike the older ones.
+The official site seems to be a bit unmaintained. You might want to grab the 
+fping source from L<http://packages.debian.org/unstable/net/fping> (at the bottom of the page).
 
 Note that fping must be installed setuid root. It seems that older versions
 of fping report round trip times in 0.1 milliseconds instead of 1 milliseconds
