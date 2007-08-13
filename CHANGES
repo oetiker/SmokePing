@@ -1,3 +1,5 @@
+* first drop of the master/slave code added. now the debugging beginns. -- tobi
+
 * fix uses of uninitialized value in the loss_background code
   -- niko, reported by yilmaz.atag *abs.gov.au
 

@@ -38,6 +38,7 @@ sub get_results {
     my $justthisprobe = shift; # if defined, update only the targets probed by this probe
     my $probe = $tree->{probe};
     my $results = [];
+    return [] unless $cfg;
     foreach my $prop (keys %{$tree}) {
         if (ref $tree->{$prop} eq 'HASH'){
             my $subres = get_results $slave_cfg, $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe;

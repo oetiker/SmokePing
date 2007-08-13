@@ -56,6 +56,12 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
                 (to be used while building inside the smokeping distribution)
 		With --check : check the syntax of the generated examples.
 
+ --master-url=s Run smokeping in slave mode. Attach to master for config.
+
+ --shared-secret=s File containing the shared secret for talking to the server.
+
+ --cache-dir=s Directory for temporary data storage when running in slave mode.
+
 =head1 DESCRIPTION
 
 The B<smokeping> tool is the commandline part of the SmokePing system. Its

@@ -3263,7 +3263,9 @@ sub cgi ($) {
     load_cfg shift;
     my $q=new CGI;
     initialize_cgilog();
-    if ($q->param(-name=>'secret') && $q->param(-name=>'target') ) {
+    if ($q->param(-name=>'slave')) { # a slave is calling in
+        Smokeping::Master::answer_slave($cfg,$q);
+    } elsif ($q->param(-name=>'secret') && $q->param(-name=>'target') ) {
         my $ret = update_dynaddr $cfg,$q;
         if (defined $ret and $ret ne "") {
                 print $q->header(-status => "404 Not Found");
@@ -3467,7 +3469,8 @@ sub main (;$) {
     $opt{filter}=[];
     GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
                       'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
-                      'config=s', 'check', 'gen-examples', 'reload') or pod2usage(2);
+                      'config=s', 'check', 'gen-examples', 'reload', 
+                      'master-url=s','cache-dir=s','shared-secret=s') or pod2usage(2);
     if($opt{version})  { print "$VERSION\n"; exit(0) };
     if(exists $opt{man}) {
         if ($opt{man}) {
@@ -3495,20 +3498,36 @@ sub main (;$) {
         exit 0;
     }
     initialize_debuglog if $opt{debug} or $opt{'debug-daemon'};
-    my $cfgfile = $opt{config} || $defaultcfg;
-    if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
-    if($opt{reload})  { 
-        load_cfg $cfgfile, 'noinit'; # we need just the piddir
-        kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGHUP; 
-        print "HUP signal sent to the running SmokePing process, exiting.\n";
-        exit 0;
-    };
-    load_cfg $cfgfile;
+    my $slave_cfg;
+    if (exists $opt{'master-url'}){     # ok we go slave-mode
+        open my $fd, "<$secret" or die "ERROR: opening $secret: $!\n";
+        chomp(my $secret = <$fd>);
+        close $fd;
+        $slave_cfg = {
+            master_url => $opt{'master-url'},
+            cache_dir => $opt{'cache-dir'},
+            shared_secret => $secret,
+        };
+        # this should get us a config set from the server
+        Smokeping::Slave::submit_results($slave_cfg,\$::cfg);
+    } else {
+        my $cfgfile = $opt{config} || $defaultcfg;
+        if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
+        if($opt{reload})  { 
+            load_cfg $cfgfile, 'noinit'; # we need just the piddir
+            kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGHUP; 
+            print "HUP signal sent to the running SmokePing process, exiting.\n";
+            exit 0;
+        };
+        load_cfg $cfgfile;
 
-    if(defined $opt{'static-pages'}) { makestaticpages $cfg, $opt{'static-pages'}; exit 0 };
-    if($opt{email})    { enable_dynamic $cfg, $cfg->{Targets},"",""; exit 0 };
+        if(defined $opt{'static-pages'}) { makestaticpages $cfg, $opt{'static-pages'}; exit 0 };
+        if($opt{email})    { enable_dynamic $cfg, $cfg->{Targets},"",""; exit 0 };
+    }
     if($opt{restart})  { kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGINT;};
+
     if($opt{logfile})      { initialize_filelog($opt{logfile}) };
+
     if (not keys %$probes) {
         do_log("No probes defined, exiting.");
         exit 1;
@@ -3684,11 +3703,15 @@ KID:
                 sleep $sleeptime;
                 last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
         }
-        my $now = time;
+        my $now = time;       
         run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
         my %sortercache;
-        update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe, \%sortercache;
-        save_sortercache($cfg,\%sortercache,$myprobe);
+        if ($opt{'master-url'}){            
+            Smokeping::Slave::get_results $slave_cfg,$cfg,$probes,$cfg->{Targets},"",$myprobe;
+        } else {
+            update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe, \%sortercache;
+            save_sortercache($cfg,\%sortercache,$myprobe);
+        }
         exit 0 if $opt{debug};
         my $runtime = time - $now;
         if ($runtime > $step) {
