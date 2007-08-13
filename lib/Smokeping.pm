@@ -3513,7 +3513,7 @@ sub main (;$) {
             shared_secret => $secret,
         };
         # this should get us a config set from the server
-        Smokeping::Slave::submit_results($slave_cfg,\$::cfg,undef,{},'',undef);
+        Smokeping::Slave::submit_results($slave_cfg,$cfg);
     } else {
         if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
         if($opt{reload})  { 
