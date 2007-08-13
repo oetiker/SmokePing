@@ -2,10 +2,11 @@
 package Smokeping::Master;
 use HTTP::Request;
 use Data::Dumper;
-use Storable qw(lock_nstore dclone lock_retrieve);
+use Storable qw(nstore_fd dclone fd_retrieve);
 use strict;
 use warnings;
 use Fcntl qw(:flock);
+use Digest::MD5 qw(md5_base64);
 
 =head1 NAME
 
@@ -72,7 +73,11 @@ sub extract_config {
             $node->{$last_key} = $cfg->{Slaves}{$slave}{override}{$override};
         }
     }
-    return Dumper \%slave_config;
+    if ($slave_config{Targets}){
+        return Dumper \%slave_config;
+    } else {
+        return undef;
+    }
 }
 
 =head3 save_updates (updates)
@@ -89,24 +94,27 @@ sub save_updates {
     my $cfg = shift;
     my $slave = shift;
     my $updates = shift;
-    # [ [ name, time, updatestring ],
-    #   [ name, time, updatestring ] ]
+    # name\ttime\tupdatestring
+    # name\ttime\tupdatestring
     for my $update (split /\n/, $updates){
         my ($name, $time, $updatestring) = split /\t/, $update;
         my $file = $cfg->{General}{datadir}."/${name}.slave_cache";
         if ( ! -f $cfg->{General}{datadir}."/${name}.rrd" ){
-            warn "Skipping update for $name since it does not exist in the local data structure ($cfg->{General}{datadir})\n";
+            warn "Skipping update for ${name}.slave_cache since $cfg->{General}{datadir}/${name}.rrd  does not exist in the local data structure. Make sure you run the smokeping daemon. ($cfg->{General}{datadir})\n";
         } elsif ( open (my $hand, '+>>', $file) ) {
             if ( flock $hand, LOCK_EX ){
                 my $existing;
                 if ( tell $hand > 0 ){
-                   eval { $existing = fd_retreive  $hand };
+                   seek $hand, 0,0;
+                   eval { $existing = fd_retrieve $hand };
                     if ($@) { #error
                         warn "Loading $file: $@";
                         $existing = [];
                     }
                 };
                 push @{$existing}, [ $slave, $time, $updatestring];
+                seek $hand, 0,0;
+                truncate $hand, 0;
                 nstore_fd ($existing, $hand);
                 flock $hand, LOCK_UN;
             } else {
@@ -131,7 +139,7 @@ sub get_slaveupdates {
     my $data;
     if ( open (my $hand, '<', $file) ) {
         if ( flock $hand, LOCK_EX ){
-            eval { $data = fd_retreive  $hand };
+            eval { $data = fd_retrieve  $hand };
             if ($@) { #error
                 warn "Loading $file: $@";  
                 return;
@@ -175,35 +183,48 @@ and providing updated config information if necessary.
 
 =cut
 
-sub anwer_slave {
+sub answer_slave {
     my $cfg = shift;
     my $q = shift;
     my $slave = $q->param('slave');
     my $secret = get_secret($cfg,$slave);
     if (not $secret){
-        warn "WARNING: No secret found for slave ${slave}\n";       
+        print "Content-Type: text/plain\n\n";
+        print "WARNING: No secret found for slave ${slave}\n";       
         return;
     }
     my $key = $q->param('key');
     my $data = $q->param('data');
     my $config_time = $q->param('config_time');
     if (not ref $cfg->{Slaves}{$slave} eq 'HASH'){
-        warn "WARNING: I don't know the slave ${slave} ignoring it";
+        print "Content-Type: text/plain\n\n";
+        print "WARNING: I don't know the slave ${slave} ignoring it";
         return;
     }
     # lets make sure the she share a secret
     if (md5_base64($secret.$data) eq $key){
         save_updates $cfg, $slave, $data;
     } else {
-        warn "WARNING: Data from $slave was signed with $key which does not match our expectation\n";
+        print "Content-Type: text/plain\n\n";
+        print "WARNING: Data from $slave was signed with $key which does not match our expectation\n";
         return;
     }     
     # does the client need new config ?
     if ($config_time < $cfg->{__last}){
-        print extract_config $cfg, $slave;
+        my $config = extract_config $cfg, $slave;    
+        if ($config){
+            print "Content-Type: application/smokeping-config\n";
+            print "Key: ".md5_base64($secret.$config)."\n\n";
+            print $config;
+        } else {
+            print "Content-Type: text/plain\n\n";
+            print "WARNING: No targets found for slave '$slave'\n";
+            return;
+        }
     } else {
-        print "\n"
+        print "Content-Type: text/plain\n\nOK\n";
     };       
+    return;
 }   
 
 
