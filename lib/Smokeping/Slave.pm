@@ -67,62 +67,50 @@ sub submit_results {
     my $restore = retrieve $store if -f $store; 
     my $data =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, '', $myprobe);    
     push @$data, @$restore if $restore;    
-    my $data_dump = join "\n",@{$data};
+    my $data_dump = join("\n",@{$data}) || "";
     my $ua = LWP::UserAgent->new(
         agent => 'smokeping-slave/1.0',
         timeout => 10,
         env_proxy => 1 );
+
     my $response = $ua->post(
         $slave_cfg->{master_url},
         Content_Type => 'form-data',
         Content => [
             slave => $slave_cfg->{slave_name},
-            key  => md5_base_64($slave_cfg->{shared_secret}.$data_dump),
+            key  => md5_base64($slave_cfg->{shared_secret}.$data_dump),
             data => $data_dump,
             config_time => $cfg->{__last} || 0,
         ],
     );
     if ($response->is_success){
-        my $data = $response->decoded_content;
+        my $data = $response->content;
         my $key = $response->header('Key');
-        if (md5_base_64($slave_cfg->{shared_secret}.$data) ne $key){
-            warn "Warning: $slave_cfg->{master_url} sent data with wrong key";
+        if ($response->header('Content-Type') ne 'application/smokeping-config'){
+            warn "$data\n" unless $data =~ /OK/;
+            Smokeping::do_debuglog("Sent data to Server. Server said $data");
+            return undef;
+        };
+        if (md5_base64($slave_cfg->{shared_secret}.$data) ne $key){
+            warn "WARNING $slave_cfg->{master_url} sent data with wrong key";
             return undef;
         }
         my $VAR1;
         eval $data;
         if ($@){
-            warn "evaluating new config from server failed: $@";
-        } elsif (definded $VAR1 and ref $VAR1 eq 'HASH'){
-            update_config($cfg,$VAR1);
+            warn "WARNING evaluating new config from server failed: $@";
+        } elsif (defined $VAR1 and ref $VAR1 eq 'HASH'){
+            $VAR1->{General}{pidir} = $slave_cfg->{cache_dir};
+            Smokeping::do_debuglog("Sent data to Server and got new config");
+            return $VAR1;
         }                       
     } else {
         # ok did not manage to get our data to the server.
         # we store the result so that we can try again later.
-        nstore $store;
-        warn $response->status_line();
+        warn "WARNING Master said ".$response->status_line()."\n";
+        nstore $data, $store;
     }
     return undef;
-}
-
-=head3 update_config 
-
-Update the config information based on the latest input form the server.
-
-=cut
-
-sub update_config {
-    my $cfg = shift;
-    my $data = shift;
-    $cfg->{General} = $data->{General};
-    $cfg->{Probes} = $data->{Probes};
-    $cfg->{Database} = $data->{Database};
-    $cfg->{Targets} = $data->{Targets};
-    $cfg->{__last} = $data->{__last};
-    my $probes = Smokeping::load_probes $cfg;
-    $cfg->{__probes} = $probes;
-    add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
-    return $probes;
 }
 
 1;

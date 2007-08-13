@@ -12,6 +12,7 @@ use POSIX;
 use Config::Grammar;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
+use Sys::Hostname;
 use Smokeping::Colorspace;
 use Smokeping::Master;
 use Smokeping::Slave;
@@ -85,13 +86,18 @@ sub load_probes ($){
     return \%prbs;
 };
 
-sub load_probe ($$$$) {
+sub load_probe ($$$$) {        
         my $modname = shift;
         my $properties = shift;
         my $cfg = shift;
         my $name = shift;
         $name = $modname unless defined $name;
-        my $rv;
+        # just in case, make sure we have the module loaded. unless
+        # we are running as slave, this will already be the case
+        # after reading the config file
+        eval 'require Smokeping::probes::'.$modname;
+        die "$@\n" if $@;
+        my $rv;        
         eval '$rv = Smokeping::probes::'.$modname.'->new( $properties,$cfg,$name);';
         die "$@\n" if $@;
         die "Failed to load Probe $name (module $modname)\n" unless defined $rv;
@@ -3511,9 +3517,17 @@ sub main (;$) {
             master_url => $opt{'master-url'},
             cache_dir => $opt{'cache-dir'},
             shared_secret => $secret,
+            slave_name => hostname,
         };
         # this should get us a config set from the server
-        Smokeping::Slave::submit_results($slave_cfg,$cfg);
+        my $new_conf = Smokeping::Slave::submit_results($slave_cfg,$cfg);
+        if ($new_conf){
+            $cfg=$new_conf;
+            $probes = undef;
+            $probes = load_probes $cfg;
+            $cfg->{__probes} = $probes;
+            add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
+        }
     } else {
         if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
         if($opt{reload})  { 
@@ -3710,7 +3724,15 @@ KID:
         run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
         my %sortercache;
         if ($opt{'master-url'}){            
-            Smokeping::Slave::get_results $slave_cfg,$cfg,$probes,$cfg->{Targets},"",$myprobe;
+            my $new_conf = Smokeping::Slave::submit_results $slave_cfg,$cfg,$myprobe,$probes;
+            if ($new_conf){
+                $cfg=$new_conf;
+                $probes = undef;
+                $probes = load_probes $cfg;
+                $cfg->{__probes} = $probes;
+                add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
+                goto RESTART;
+            }
         } else {
             update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe, \%sortercache;
             save_sortercache($cfg,\%sortercache,$myprobe);
