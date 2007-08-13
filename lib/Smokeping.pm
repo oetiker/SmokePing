@@ -3501,7 +3501,7 @@ sub main (;$) {
     my $slave_cfg;
     my $cfgfile = $opt{config} || $defaultcfg;
     if (exists $opt{'master-url'}){     # ok we go slave-mode
-        open my $fd, "<$opt{'shared-secret'}" or die "ERROR: opening $secret: $!\n";
+        open my $fd, "<$opt{'shared-secret'}" or die "ERROR: opening $opt{'shared-secret'} $!\n";
         chomp(my $secret = <$fd>);
         close $fd;
         $slave_cfg = {
