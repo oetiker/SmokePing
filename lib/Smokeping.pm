@@ -3501,6 +3501,9 @@ sub main (;$) {
     my $slave_cfg;
     my $cfgfile = $opt{config} || $defaultcfg;
     if (exists $opt{'master-url'}){     # ok we go slave-mode
+        die "ERROR: no shared-secret defined along with master-url\n" unless $opt{'shared-secret'};
+        die "ERROR: no cache-dir defined along with master-url\n" unless $opt{'cache-dir'};
+        die "ERROR: no cache-dir ($opt{'cache-dir'}): $!\n" unless -d $opt{'cache-dir'};
         open my $fd, "<$opt{'shared-secret'}" or die "ERROR: opening $opt{'shared-secret'} $!\n";
         chomp(my $secret = <$fd>);
         close $fd;
@@ -3510,7 +3513,7 @@ sub main (;$) {
             shared_secret => $secret,
         };
         # this should get us a config set from the server
-        Smokeping::Slave::submit_results($slave_cfg,\$::cfg);
+        Smokeping::Slave::submit_results($slave_cfg,\$::cfg,undef,{},'',undef);
     } else {
         if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
         if($opt{reload})  { 
