@@ -3499,8 +3499,9 @@ sub main (;$) {
     }
     initialize_debuglog if $opt{debug} or $opt{'debug-daemon'};
     my $slave_cfg;
+    my $cfgfile = $opt{config} || $defaultcfg;
     if (exists $opt{'master-url'}){     # ok we go slave-mode
-        open my $fd, "<$secret" or die "ERROR: opening $secret: $!\n";
+        open my $fd, "<$opt{'shared-secret'}" or die "ERROR: opening $secret: $!\n";
         chomp(my $secret = <$fd>);
         close $fd;
         $slave_cfg = {
@@ -3511,7 +3512,6 @@ sub main (;$) {
         # this should get us a config set from the server
         Smokeping::Slave::submit_results($slave_cfg,\$::cfg);
     } else {
-        my $cfgfile = $opt{config} || $defaultcfg;
         if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
         if($opt{reload})  { 
             load_cfg $cfgfile, 'noinit'; # we need just the piddir
