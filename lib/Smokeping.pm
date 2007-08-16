@@ -1518,7 +1518,7 @@ sub update_rrds($$$$$$) {
         my $probeobj = $probes->{$probe};
         my $pings = $probeobj->_pings($tree);
         if ($prop eq 'host' and check_filter($cfg,$name)) {
-            my %slave_test = ( map { $_,1 } split(/\s+/, $tree->{slaves}));
+            my %slave_test = ( map { $_,1 } split($tree->{slaves}));
             my $slaveupdates = Smokeping::Master::get_slaveupdates($name);     
             my @updates = ([ "", time, $probeobj->rrdupdate_string($tree) ]);
             for my $slave (@{$slaveupdates}){
@@ -2395,7 +2395,8 @@ Any roundtrip time larger than this value will cropped in the overview graph
 DOC
             median_color => {    _doc => <<DOC,
 By default the median line is drawn in red. Override it here with a hex color
-in the format I<rrggbb>.
+in the format I<rrggbb>. Note that if you work with slaves, the slaves medians will
+be drawn in the slave color in the overview graph.
 DOC
                               _re => '[0-9a-f]{6}',
                               _re_error => 'use rrggbb for color',
@@ -2605,7 +2606,7 @@ DOC
                           1 =>  
                           {
                            _doc => <<DOC,
-Color for this uptime range range.
+Color for this uptime range.
 DOC
                            _re       => '[0-9a-f]{6}',
                            _re_error =>
@@ -2872,8 +2873,8 @@ How long should the master wait for its slave to answer?
 END_DOC
           },     
           "/$KEYD_RE/" => {
-              _vars => [ qw(name location) ],
-              _mandatory => [ qw(name) ],
+              _vars => [ qw(name location color) ],
+              _mandatory => [ qw(name color) ],
               _sections => [ qw(override) ],
               _doc => <<END_DOC,
 Define some basic properties for the slave.
@@ -2887,6 +2888,12 @@ END_DOC
                   _doc => <<END_DOC,
 Where is the slave located.
 END_DOC
+              color => {
+                  _doc => <<END_DOC,
+Color for the slave in graphs where input from multiple hosts is presented.
+END_DOC
+                  _re       => '[0-9a-f]{6}',
+                  _re_error => "I was expecting a color of the form rrggbb",
               },
               override => {
                   _doc => <<END_DOC,
