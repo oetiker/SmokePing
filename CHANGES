@@ -1,3 +1,5 @@
+* Integrated interactive Graph zoomer -- Roman Plessl rplessl oetiker.ch
+
 * first drop of the master/slave code added. now the debugging beginns. -- tobi
 
 * fix uses of uninitialized value in the loss_background code

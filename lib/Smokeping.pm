@@ -758,6 +758,7 @@ sub get_detail ($$$$;$){
     # b) 'n' navigator mode with one graph. below the graph one can specify the end time
     #        and the length of the graph.
     # c) 'c' chart mode, one graph with a link to it's full page
+    # d) 'a' ajax mode, generate image based on given url
     #
     my $cfg = shift;
     my $q = shift;
@@ -785,7 +786,7 @@ sub get_detail ($$$$;$){
     my $page;
 
     return "<div>ERROR: unknown displaymode $mode</div>"
-      unless $mode =~ /^[snc]$/;
+      unless $mode =~ /^[snca]$/;
 
     for (@dirs) {
         $dir .= "/$_";
@@ -824,15 +825,22 @@ sub get_detail ($$$$;$){
             }
             close HG;
         }
-    } elsif ($mode eq 'n') {
+    } 
+    elsif ($mode eq 'n' or $mode eq 'a') {
         mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $cfg->{General}{imgcache}."/__navcache";
         # remove old images after one hour
         my $pattern = $cfg->{General}{imgcache}."/__navcache/*.png";
         for (glob $pattern){
                 unlink $_ if time - (stat $_)[9] > 3600;
         }
-        $imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
-        $imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
+        if ($mode eq 'n') {
+	    $imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
+	    $imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
+        } else {
+            my $serial = $q->param('serial');
+            $imgbase =$cfg->{General}{imgcache}."/__navcache/".$serial;
+            $imghref =$cfg->{General}{imgurl}."/__navcache/".$serial;
+        }
         @tasks = (["Navigator Graph", parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
 
         my ($graphret,$xs,$ys) = RRDs::graph
@@ -1068,11 +1076,12 @@ sub get_detail ($$$$;$){
         my ($graphret,$xs,$ys) = RRDs::graph @task;
         
         my $ERROR = RRDs::error();
-        if ($mode eq 'n'){
-            $page .= "<div>";
-            $page .= ( $ERROR || qq|<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">| );
-            $page .= "</div>";
-            $page .= $q->start_form(-method=>'GET')
+	if ($mode eq 'n' or $mode eq 'a'){
+           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
+           $page .= ( $ERROR || qq|<IMG style="cursor: crosshair;" BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png"> | );
+           $page .= "</div>";
+
+           $page .= $q->start_form(-method=>'GET')
               . "<p>Time range: "
               . $q->textfield(-name=>'start',-default=>$startstr)
               . "&nbsp;&nbsp;to&nbsp;&nbsp;".$q->textfield(-name=>'end',-default=>$endstr)

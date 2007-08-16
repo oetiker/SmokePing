@@ -107,11 +107,11 @@ recommend using the F<suexec> system for running CGI scripts. Often it is
 sufficient to change the F<suexec> binary to setuid root and restart Apache.
 Using F<suexec> allow to run cgi scripts under proper user accounts.
 
-=item Perl 5.6.1
+=item Perl 5.8.8
 
 L<http://www.perl.com>
 
-I guess you will get away with older versions of perl. I am using 5.6.1 here
+I guess you will get away with older versions of perl. I am using 5.8.8 here
 and it works fine.
 
 =item SpeedyCGI 
@@ -170,7 +170,13 @@ Edit the F<smokeping.cgi> analog to the F<smokeping> script above. Make sure
 the first line of the script is pointing to your freshly installed copy of
 Speedy CGI. Store the script in a directory of your weberver where CGIs get
 executed. You also have to edit the B<use lib> line similar to what you did
-to F<smokeping>
+to F<smokeping>. 
+
+=item F<htdocs/js/*>
+
+To make the interactive graph-zoomer work, you have to place the relevant
+files somewhere on your webserver and adapt the links in F<basepage.html>
+(see below).
 
 =item F<etc/config>
 
@@ -181,7 +187,9 @@ L<smokeping_config> for details.
 =item F<etc/basepage.html>
 
 Edit the html template to your likings. Please do not remove the link to the
-SmokePing counter and my name from the template.
+SmokePing counter and my name from the template. The content of the template
+will be renderd by the smokeping.cgi. This means that all embeded links must
+be relative to smokeping.cgi.
 
 =item F<etc/smokemail>
 
