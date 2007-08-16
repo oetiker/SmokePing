@@ -22,7 +22,7 @@ function urlObj(url) {
 
    urlBaseAndParameters = url.split("?"); 
    this.urlBase = urlBaseAndParameters[0];
-   this.urlParameters = urlBaseAndParameters[1].split(";");
+   this.urlParameters = urlBaseAndParameters[1].split(/[;&]/);
 
    this.getUrlBase = urlObjGetUrlBase;
    this.getUrlParameterValue = urlObjGetUrlParameterValue;
