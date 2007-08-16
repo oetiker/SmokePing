@@ -54,7 +54,7 @@ function urlObjGetUrlParameterValue(parameter) {
 
 /*++++++++++++++++++++  isoDateToJS  +++++++++++++++++++++++++++++++++++++*/
 function ISODateToJS(rawisodate) {
-   var decode = decodeURI(rawisodate);
+   var decode = decodeURIComponent(rawisodate);
   if (decode == "now") {
        return new Date();
    } 
