@@ -612,6 +612,25 @@ sub exp2seconds ($) {
     return $x;
 }
 
+sub calc_stddev {
+    my $rrd = shift;
+    my $id = shift;
+    my $pings = shift;    
+    my @G = map {"DEF:p${id}p${_}=${rrd}:ping${_}:AVERAGE"} 1..$pings;
+    push @G, "CDEF:m${id}="."p${id}p1,".join(",",map {"p${id}p$_,+"} 2..$pings).",$pings,/";
+    push @G, "CDEF:sdev${id}=p${id}p1,m${id},-,DUP,*,".join(",",map {"p${id}p$_,m${id},-,DUP,*,+"} 2..$pings).",$pings,/,SQRT";
+    return @G;
+}    
+
+sub brighten_webcolor {
+    my $web = shift;
+    my @rgb = Smokeping::Colorspace::web_to_rgb($web);
+    my @hsl = Smokeping::Colorspace::rgb_to_hsl(@rgb);
+    $hsl[2] = (1 - $hsl[2]) * (2/3) + $hsl[2];
+    @rgb = Smokeping::Colorspace::hsl_to_rgb(@hsl);
+    return Smokeping::Colorspace::rgb_to_web(@rgb);
+}
+
 sub get_overview ($$$$){
     my $cfg = shift;
     my $q = shift;
@@ -639,12 +658,50 @@ sub get_overview ($$$$){
     foreach my $prop (sort {$tree->{$a}{_order} <=> $tree->{$b}{_order}} 
                       grep {  ref $tree->{$_} eq 'HASH' and defined $tree->{$_}{host}}
                       keys %$tree) {
-        my $rrd = $cfg->{General}{datadir}.$dir."/$prop.rrd";
+        my @slaves = ("");
+        if ($tree->{$prop}{slaves}){
+           push @slaves, split /\s+/,$tree->{$prop}{slaves};       
+        };
+        my @G; #Graph 'script'
         my $max =  $cfg->{Presentation}{overview}{max_rtt} || "100000";
-        my $medc = $cfg->{Presentation}{overview}{median_color} || "ff0000";
         my $probe = $probes->{$tree->{$prop}{probe}};
-        my $ProbeUnit = $probe->ProbeUnit();
         my $pings = $probe->_pings($tree->{$prop});
+        my $i = 0;
+        for my $slave (@slaves){
+            $i++;
+            my $s = $slave ? "~".$slave : "";  
+            my $rrd = $cfg->{General}{datadir}.$dir.'/'.$prop.$s.'.rrd';                
+            my $medc = $slave ? $cfg->{Slaves}{$slave}{color} : $cfg->{Presentation}{overview}{median_color} || "ff0000";
+            my $sdc = brighten_webcolor($medc);
+            my $name = sprintf("%-10s", $slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname);
+            push @G, 
+                "DEF:median$i=${rrd}:median:AVERAGE",
+                "DEF:loss$i=${rrd}:loss:AVERAGE",
+                "CDEF:ploss$i=loss$i,$pings,/,100,*",
+                "CDEF:dm$i=median$i,0,$max,LIMIT",
+                calc_stddev($rrd,$i,$pings),
+                "CDEF:dmlow$i=dm$i,sdev$i,-",
+                "CDEF:s2d$i=sdev$i,2,*",
+#                "CDEF:dm2=median,1.5,*,0,$max,LIMIT",
+#                "LINE1:dm2", # this is for kicking things down a bit
+                "AREA:dmlow$i",
+                "AREA:s2d${i}${sdc}::STACK";
+            if ($#slaves > 0){
+                push @G,
+                  "LINE1:dm$i#$medc:median RTT from $name  ",
+                  "GPRINT:median$i:AVERAGE:RTT\\: %.2lf %ss  ",
+                  "GPRINT:ploss$i:AVERAGE:pkt loss\\: %.2lf %%",                
+                  "GPRINT:sdev$i:AVERAGE:std dev\\: %.1le\\l",                
+            }
+            else {
+                push @G,
+                  "LINE1:dm$i#$medc:median RTT  ",
+                  "GPRINT:median$i:AVERAGE:\\: %.2lf %ss  ",
+                  "GPRINT:ploss$i:AVERAGE:pkt loss\\: %.2lf %%",
+                  "GPRINT:sdev$i:AVERAGE:std dev\\: %.1le\\l",                
+             }                                
+        }
+        my $ProbeUnit = $probe->ProbeUnit();
         my ($graphret,$xs,$ys) = RRDs::graph 
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
            '--lazy',
@@ -657,20 +714,12 @@ sub get_overview ($$$$){
            '--alt-autoscale-max',
            '--alt-y-grid',
            '--lower-limit','0',
-           "DEF:median=${rrd}:median:AVERAGE",
-           "DEF:loss=${rrd}:loss:AVERAGE",
-           "CDEF:ploss=loss,$pings,/,100,*",
-           "CDEF:dm=median,0,$max,LIMIT",
-           "CDEF:dm2=median,1.5,*,0,$max,LIMIT",
-           "LINE1:dm2", # this is for kicking things down a bit
-           "LINE1:dm#$medc:median RTT",
-           "GPRINT:median:AVERAGE:avg RTT\\: %.2lf %ss",
-           "GPRINT:ploss:AVERAGE:avg pkt loss\\: %.2lf %%",
-           "COMMENT:$date\\j");
+           @G,
+           "COMMENT:$date\\r");
         my $ERROR = RRDs::error();
         $page .= "<div>";
         if (defined $ERROR) {
-                $page .= "ERROR: $ERROR";
+                $page .= "ERROR: $ERROR<br>".join("<br>", map {"'$_'"} @G);
         } else {
          $page.="<A HREF=\"".lnk($q, (join ".", @$open, ${prop}))."\">".
             "<IMG BORDER=\"0\" WIDTH=\"$xs\" HEIGHT=\"$ys\" ".
@@ -758,7 +807,7 @@ sub get_detail ($$$$;$){
     # b) 'n' navigator mode with one graph. below the graph one can specify the end time
     #        and the length of the graph.
     # c) 'c' chart mode, one graph with a link to it's full page
-    # d) 'a' ajax mode, generate image based on given url
+    # d) 'a' ajax mode, generate image based on given url and dump in on stdout
     #
     my $cfg = shift;
     my $q = shift;
@@ -1076,9 +1125,24 @@ sub get_detail ($$$$;$){
         my ($graphret,$xs,$ys) = RRDs::graph @task;
         
         my $ERROR = RRDs::error();
-	if ($mode eq 'n' or $mode eq 'a'){
+        if ($ERROR) {
+           return "<div>ERROR: $ERROR</div>";
+        };
+
+        if ($mode eq 'a'){
+                open my $img, "${imgbase}_${end}_${start}.png";
+                binmode $img;
+                print "Content-Type: image/png\n\n";
+                my $data;
+                read($img,$data,(stat($img))[7]);
+                close $img;
+                print $data;
+                unlink "${imgbase}_${end}_${start}.png";
+                exit;
+        } 
+        elsif ($mode eq 'n'){
            $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
-           $page .= ( $ERROR || qq|<IMG style="cursor: crosshair;" BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png"> | );
+           $page .= qq|<IMG style="cursor: crosshair;" BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">| ;
            $page .= "</div>";
 
            $page .= $q->start_form(-method=>'GET')
@@ -1989,14 +2053,14 @@ DOC
        {
         _sections  => [ qw(General Database Presentation Probes Targets Alerts Slaves) ],
         _mandatory => [ qw(General Database Presentation Probes Targets) ],
-        General    => 
+        General => 
         {
          _doc => <<DOC,
 General configuration values valid for the whole SmokePing setup.
 DOC
          _vars =>
          [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
-              smokemail cgiurl mailhost contact netsnpp
+              smokemail cgiurl mailhost contact netsnpp display_name
               syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
               changecgiprogramname linkstyle) ],
 
@@ -2018,6 +2082,13 @@ SmokePing cgi.
 DOC
          },
 
+         display_name => 
+         {
+          _doc => <<DOC,
+What should the master host be called when working in master/slave mode. This is used in the overview
+graph for example.
+DOC
+         },
          pagedir =>
          {
           %$DIRCHECK_SUB,
@@ -2873,21 +2944,22 @@ How long should the master wait for its slave to answer?
 END_DOC
           },     
           "/$KEYD_RE/" => {
-              _vars => [ qw(name location color) ],
-              _mandatory => [ qw(name color) ],
+              _vars => [ qw(display_name location color) ],
+              _mandatory => [ qw(display_name color) ],
               _sections => [ qw(override) ],
               _doc => <<END_DOC,
 Define some basic properties for the slave.
 END_DOC
-              name => {
+              display_name => {
                   _doc => <<END_DOC,
-The Name of the Slave.
+Name of the Slave host.
 END_DOC
               },
               location => {
                   _doc => <<END_DOC,
 Where is the slave located.
 END_DOC
+              },
               color => {
                   _doc => <<END_DOC,
 Color for the slave in graphs where input from multiple hosts is presented.
@@ -3296,10 +3368,12 @@ sub cgi ($) {
                 print $q->header; # no HTML output on success
         }
     } else {     
-        print $q->header(-type=>'text/html',
-                     -expires=>'+'.($cfg->{Database}{step}).'s',
-                     -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
+        if ($q->param('displaymode') ne 'a'){ #in ayax mode we do not issue a header YET
+                print $q->header(-type=>'text/html',
+                                 -expires=>'+'.($cfg->{Database}{step}).'s',
+                                 -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
                      );
+        }
         display_webpage $cfg,$q;
     }
 }

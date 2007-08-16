@@ -169,13 +169,6 @@ function changeRRDImage(){
          EndDateString   = JSToISODate(StopDate);
 
          // construct Image URL
-         myGraph = "img/__navcache/" + mySerial + "_" + MinuteGenStop + "_" + MinuteGenStart + ".png";
-
-         // Fetch image with ajax
-         var result = $.get(myURL + "?displaymode=a;start=" + StartDateString+ ";end=" + EndDateString + ";target=" + myRawTarget + ";serial=" + mySerial,
-             function(){
-                // replacement image with AJAX
-                newimg.attr("src", myGraph);                                  
-             });
+         newimg.attr("src",myURL + "?displaymode=a;start=" + StartDateString+ ";end=" + EndDateString + ";target=" + myRawTarget + ";serial=" + mySerial);
 };
 
