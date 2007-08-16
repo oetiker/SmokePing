@@ -100,7 +100,7 @@ sub submit_results {
         if ($@){
             warn "WARNING evaluating new config from server failed: $@";
         } elsif (defined $VAR1 and ref $VAR1 eq 'HASH'){
-            $VAR1->{General}{pidir} = $slave_cfg->{cache_dir};
+            $VAR1->{General}{piddir} = $slave_cfg->{cache_dir};
             Smokeping::do_debuglog("Sent data to Server and got new config");
             return $VAR1;
         }                       
