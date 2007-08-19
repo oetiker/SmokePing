@@ -1141,9 +1141,9 @@ sub get_detail ($$$$;$){
                 exit;
         } 
         elsif ($mode eq 'n'){
-           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
-           $page .= qq|<IMG style="cursor: crosshair;" BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">| ;
-           $page .= "</div>";
+#           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
+           $page .= qq|<IMG id="zoom" BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">| ;
+#           $page .= "</div>";
 
            $page .= $q->start_form(-method=>'GET')
               . "<p>Time range: "
