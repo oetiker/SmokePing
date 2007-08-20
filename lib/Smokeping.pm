@@ -16,6 +16,7 @@ use Sys::Hostname;
 use Smokeping::Colorspace;
 use Smokeping::Master;
 use Smokeping::Slave;
+use Smokeping::RRDhelpers;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -689,10 +690,10 @@ sub get_overview ($$$$){
                 "AREA:s2d${i}${sdc}::STACK";
             if ($#slaves > 0){
                 push @G,
-                  "LINE1:dm$i#$medc:median RTT from $name  ",
-                  "GPRINT:median$i:AVERAGE:RTT\\: %.2lf %ss  ",
-                  "GPRINT:ploss$i:AVERAGE:pkt loss\\: %.2lf %%",                
-                  "GPRINT:sdev$i:AVERAGE:std dev\\: %.1le\\l",                
+                  "LINE1:dm$i#$medc:median RTT from $name",
+                  "GPRINT:median$i:AVERAGE:%6.1lf %ss avg rtt ",
+                  "GPRINT:ploss$i:AVERAGE:%6.1lf %% avg loss",                
+                  "GPRINT:sdev$i:AVERAGE:%.1le avg sdev\\l",                
             }
             else {
                 push @G,
@@ -705,15 +706,16 @@ sub get_overview ($$$$){
         my $ProbeUnit = $probe->ProbeUnit();
         my ($graphret,$xs,$ys) = RRDs::graph 
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
-           '--lazy',
+#           '--lazy',
            '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
            '--title',$tree->{$prop}{title},
            '--height',$cfg->{Presentation}{overview}{height},
            '--width',$cfg->{Presentation}{overview}{width},
            '--vertical-label', $ProbeUnit,
            '--imgformat','PNG',
-           '--alt-autoscale-max',
+#           '--alt-autoscale-max',
            '--alt-y-grid',
+           '--rigid',
            '--lower-limit','0',
            @G,
            "COMMENT:$date\\r");
@@ -1020,16 +1022,27 @@ sub get_detail ($$$$;$){
         my $endstr   = $end =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time)) : $end;
 
         my $last = -1;
-
+        my $realstart = ( $mode =~ /[sc]/ ? '-'.$start : $start);
         for my $slave (@slaves){
             my $s = $slave ? "~$slave" : "";
             my $swidth = $max->{$s}{$start} / $cfg->{Presentation}{detail}{height};
             my $rrd = $base_rrd.$s.".rrd";
+            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,time());
             my @median = ("DEF:median=${rrd}:median:AVERAGE",
                           "CDEF:ploss=loss,$pings,/,100,*",
-                          "GPRINT:median:AVERAGE:Median RTT (%.1lf %ss avg) ",
+                          'GPRINT:median:AVERAGE:median rtt\:  %.1lf %ss avg',
+                          'GPRINT:median:MAX:%.1lf %ss max',
+                          'GPRINT:median:MIN:%.1lf %ss min',
+                          'GPRINT:median:LAST:%.1lf %ss now',
+                          sprintf('COMMENT:%.1e sdev\l',$stddev),
                           "LINE1:median#202020"
                   );
+            push @median, ( "GPRINT:ploss:AVERAGE:packet loss\\: %.2lf %% avg",
+                        "GPRINT:ploss:MAX:%.2lf %% max",
+                        "GPRINT:ploss:MIN:%.2lf %% min",
+                        'GPRINT:ploss:LAST:%.2lf %% now\l',
+                        'COMMENT:loss color\:'
+            );
             my @lossargs = ();
             my @losssmoke = ();
 
@@ -1059,11 +1072,6 @@ sub get_detail ($$$$;$){
                 }
                 $last = $loss;
             }
-            push @median, ( "COMMENT:\\l",
-                        "GPRINT:ploss:AVERAGE:Packet Loss\\: %.2lf %% average",
-                        "GPRINT:ploss:MAX:%.2lf %% maximum",
-                        "GPRINT:ploss:LAST:%.2lf %% current\\l"
-            );
 
             # if we have uptime draw a colorful background or the graph showing the uptime
 
@@ -1104,7 +1112,7 @@ sub get_detail ($$$$;$){
             my @task =
                ("${imgbase}${s}_${end}_${start}.png",
                @lazy,
-               '--start',( $mode =~ /[sc]/ ? '-'.$start : $start),
+               '--start',$realstart,
                ($end ne 'last' ? ('--end',$end) : ()),
                '--height',$cfg->{Presentation}{detail}{height},
                '--width',,$cfg->{Presentation}{detail}{width},
@@ -1126,7 +1134,7 @@ sub get_detail ($$$$;$){
                @$smoke,
                @upsmoke, # draw the rest of the uptime bg color
                @losssmoke, # draw the rest of the loss bg color
-               @median,
+               @median,'COMMENT: \l',
                # Gray background for times when no data was collected, so they can
                # be distinguished from network being down.
                ( $cfg->{Presentation}{detail}{nodata_color} ? (
@@ -1134,8 +1142,7 @@ sub get_detail ($$$$;$){
                  "AREA:nodata#$cfg->{Presentation}{detail}{nodata_color}" ):
                  ()),
                  'HRULE:0#000000',
-                 'COMMENT:\s',
-                 "COMMENT:Probe${BS}: $pings $ProbeDesc every ${step}s",
+                 "COMMENT:probe${BS}:       $pings $ProbeDesc every ${step}s",
                  'COMMENT:'.$date.'\j' );
 #       do_log ("***** begin task ***** <br />");
 #       do_log (@task);
@@ -1286,8 +1293,11 @@ sub display_webpage($$){
     my $q = shift;
     my $open_orig = [ split /\./,( $q->param('target') || '')];
     my $open = [@$open_orig]; # in this version we get rid of the 'slave' part if there is any
-    my ($host,$slave) =  split(/~/, $open->[-1]);
-    $open->[-1] = $host;
+    my ($host,$slave);
+    if (0 < @$open){ 
+        ($host,$slave) =  split(/~/, $open->[-1]);
+        $open->[-1] = $host;
+    }
 
     my $tree = $cfg->{Targets};
     my $targets = $cfg->{Targets};
@@ -1617,8 +1627,7 @@ sub update_rrds($$$$$$) {
                 }
                 push @updates, $slave;
             }
-                       
-            for my $update (@updates){
+            for my $update (sort {$a->[1] <=> $b->[1]}  @updates){ # make sure we put the updates in chronological order in
                 my $s = $update->[0] ? "~".$update->[0] : "";
                 if ( $tree->{rawlog} ){
                         my $file =  POSIX::strftime $tree->{rawlog},$update->[1];

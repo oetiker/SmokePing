@@ -149,7 +149,7 @@ sub get_slaveupdates {
         } else {
             warn "Could not lock $file. Can't load data.\n";
         }
-        close $hand;
+        close $hand;        
         return $data;
     }
     return;
@@ -201,7 +201,7 @@ sub answer_slave {
         print "WARNING: I don't know the slave ${slave} ignoring it";
         return;
     }
-    # lets make sure the she share a secret
+    # lets make sure the we share a secret
     if (md5_base64($secret.$data) eq $key){
         save_updates $cfg, $slave, $data;
     } else {
