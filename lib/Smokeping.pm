@@ -690,30 +690,28 @@ sub get_overview ($$$$){
                 "AREA:s2d${i}${sdc}::STACK";
             if ($#slaves > 0){
                 push @G,
-                  "LINE1:dm$i#$medc:median RTT from $name",
-                  "GPRINT:median$i:AVERAGE:%6.1lf %ss avg rtt ",
-                  "GPRINT:ploss$i:AVERAGE:%6.1lf %% avg loss",                
-                  "GPRINT:sdev$i:AVERAGE:%.1le avg sdev\\l",                
+                  "LINE1:dm$i#$medc:median RTT from $name";
             }
             else {
                 push @G,
-                  "LINE1:dm$i#$medc:median RTT  ",
-                  "GPRINT:median$i:AVERAGE:\\: %.2lf %ss  ",
-                  "GPRINT:ploss$i:AVERAGE:pkt loss\\: %.2lf %%",
-                  "GPRINT:sdev$i:AVERAGE:std dev\\: %.1le\\l",                
-             }                                
+                  "LINE1:dm$i#$medc:median RTT";
+            };
+            push @G,
+                  "GPRINT:median$i:AVERAGE:%6.1lf %ss avg rtt ",
+                  "GPRINT:ploss$i:AVERAGE:%6.1lf %% avg loss",                
+                  "GPRINT:sdev$i:AVERAGE:%.1le avg sdev\\l";
         }
         my $ProbeUnit = $probe->ProbeUnit();
         my ($graphret,$xs,$ys) = RRDs::graph 
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
-#           '--lazy',
+           '--lazy',
            '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
            '--title',$tree->{$prop}{title},
            '--height',$cfg->{Presentation}{overview}{height},
            '--width',$cfg->{Presentation}{overview}{width},
            '--vertical-label', $ProbeUnit,
            '--imgformat','PNG',
-#           '--alt-autoscale-max',
+           '--alt-autoscale-max',
            '--alt-y-grid',
            '--rigid',
            '--lower-limit','0',
@@ -939,7 +937,7 @@ sub get_detail ($$$$;$){
         return "<div>RRDtool did not understand your input: $ERROR.</div>" if $ERROR;     
         my $val = $graphret->[0];
         $val = 1 if $val =~ /nan/i;
-        $max = { $tasks[0][1] => $val * 1.5 };
+        $max->{''} = { $tasks[0][1] => $val * 1.5 };
     }
         
     my $smoke = $pings >= 3
@@ -1021,8 +1019,8 @@ sub get_detail ($$$$;$){
         my $startstr = $start =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $start : time-$start)) : $start;
         my $endstr   = $end =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time)) : $end;
 
-        my $last = -1;
         my $realstart = ( $mode =~ /[sc]/ ? '-'.$start : $start);
+
         for my $slave (@slaves){
             my $s = $slave ? "~$slave" : "";
             my $swidth = $max->{$s}{$start} / $cfg->{Presentation}{detail}{height};
@@ -1045,7 +1043,7 @@ sub get_detail ($$$$;$){
             );
             my @lossargs = ();
             my @losssmoke = ();
-
+            my $last = -1;        
             foreach my $loss (sort {$a <=> $b} keys %lc){
                 next if $loss >= $pings;
                 my $lvar = $loss; $lvar =~ s/\./d/g ;
@@ -1150,7 +1148,7 @@ sub get_detail ($$$$;$){
                 
               my $graphret;
               ($graphret,$xs{$s},$ys{$s}) = RRDs::graph @task;
-        
+              #  print "<div>INFO:".join("<br/>",@task)."</div>";
               my $ERROR = RRDs::error();
               if ($ERROR) {
                   return "<div>ERROR: $ERROR</div><div>".join("<br/>",@task)."</div>";
