@@ -674,7 +674,8 @@ sub get_overview ($$$$){
             my $s = $slave ? "~".$slave : "";  
             my $rrd = $cfg->{General}{datadir}.$dir.'/'.$prop.$s.'.rrd';                
             my $medc = $slave ? $cfg->{Slaves}{$slave}{color} : $cfg->{Presentation}{overview}{median_color} || "ff0000";
-            my $sdc = brighten_webcolor($medc);
+            my $sdc = $medc;
+            $sdc =~ s/^(......).*/${1}20/;
             my $name = sprintf("%-10s", $slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname);
             push @G, 
                 "DEF:median$i=${rrd}:median:AVERAGE",
@@ -687,7 +688,7 @@ sub get_overview ($$$$){
 #                "CDEF:dm2=median,1.5,*,0,$max,LIMIT",
 #                "LINE1:dm2", # this is for kicking things down a bit
                 "AREA:dmlow$i",
-                "AREA:s2d${i}${sdc}::STACK";
+                "AREA:s2d${i}#${sdc}::STACK";
             if ($#slaves > 0){
                 push @G,
                   "LINE1:dm$i#$medc:median RTT from $name";
@@ -823,7 +824,7 @@ sub get_detail ($$$$;$){
     return "" unless $tree->{host};
     
     my @dirs = @{$open};
-    my $file = pop @dirs;
+    my $file = (split(/~/, pop @dirs))[0];
     my $dir = "";
 
     return "<div>ERROR: ".(join ".", @dirs)." has no probe defined</div>"
@@ -1229,10 +1230,11 @@ sub get_charts ($$$){
                 my $tree = $cfg->{Targets};
                 my $chartentry = $charts{$chart}[0];
                 for (@{$chartentry->{open}}) {
-                   die "ERROR: Section '$_' does not exist.\n"
-                       unless exists $tree->{$_};
-                   last unless  ref $tree->{$_} eq 'HASH';
-                   $tree = $tree->{$_};
+                   my ($host,$slave) = split(/~/, $_);
+                   die "ERROR: Section '$host' does not exist.\n"
+                       unless exists $tree->{$host};
+                   last unless  ref $tree->{$host} eq 'HASH';
+                   $tree = $tree->{$host};
                 }
                 $page .= get_detail($cfg,$q,$tree,$chartentry->{open},'c');
             }
@@ -1247,10 +1249,11 @@ sub get_charts ($$$){
           for my $chartentry (@{$charts{$chart}}){
             my $tree = $cfg->{Targets};
             for (@{$chartentry->{open}}) {
+                my ($host,$slave) = split(/~/, $_);
                 die "ERROR: Section '$_' does not exist.\n"
-                    unless exists $tree->{$_};
-                last unless ref $tree->{$_} eq 'HASH';
-                $tree = $tree->{$_};
+                    unless exists $tree->{$host};
+                last unless ref $tree->{$host} eq 'HASH';
+                $tree = $tree->{$host};
             }       
             $page .= "<h2>$rank.";     
             $page .= " ".sprintf($cfg->{Presentation}{charts}{$chart}{format},$chartentry->{value})
