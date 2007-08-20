@@ -1617,7 +1617,7 @@ sub update_rrds($$$$$$) {
         my $probeobj = $probes->{$probe};
         my $pings = $probeobj->_pings($tree);
         if ($prop eq 'host' and check_filter($cfg,$name)) {
-            my %slave_test = ( map { $_,1 } split($tree->{slaves}));
+            my %slave_test = ( map { $_,1 } split(/\s+/, $tree->{slaves}));
             my $slaveupdates = Smokeping::Master::get_slaveupdates($name);     
             my @updates = ([ "", time, $probeobj->rrdupdate_string($tree) ]);
             for my $slave (@{$slaveupdates}){
