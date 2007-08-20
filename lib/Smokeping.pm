@@ -617,9 +617,9 @@ sub calc_stddev {
     my $id = shift;
     my $pings = shift;    
     my @G = map {("DEF:pin${id}p${_}=${rrd}:ping${_}:AVERAGE","CDEF:p${id}p${_}=pin${id}p${_},UN,0,pin${id}p${_},IF")} 1..$pings;
-    push @G, "CDEF:pings="."$pings,p${id}p1,UN,".join(",",map {"p${id}p$_,UN,+"} 2..$pings).",$pings,-";
-    push @G, "CDEF:m${id}="."p${id}p1,".join(",",map {"p${id}p$_,+"} 2..$pings).",pings,/";
-    push @G, "CDEF:sdev${id}=p${id}p1,m${id},-,DUP,*,".join(",",map {"p${id}p$_,m${id},-,DUP,*,+"} 2..$pings).",pings,/,SQRT";
+    push @G, "CDEF:pings${id}="."$pings,p${id}p1,UN,".join(",",map {"p${id}p$_,UN,+"} 2..$pings).",-";
+    push @G, "CDEF:m${id}="."p${id}p1,".join(",",map {"p${id}p$_,+"} 2..$pings).",pings${id},/";
+    push @G, "CDEF:sdev${id}=p${id}p1,m${id},-,DUP,*,".join(",",map {"p${id}p$_,m${id},-,DUP,*,+"} 2..$pings).",pings${id},/,SQRT";
     return @G;
 }    
 
@@ -739,7 +739,7 @@ sub findmax ($$) {
     my @maxmedian;
     for (@{$cfg->{Presentation}{detail}{_table}}) {
         my ($desc,$start) = @{$_};
-        $start = exp2seconds($start);
+        $start = exp2seconds($start);        
         my ($graphret,$xs,$ys) = RRDs::graph
           ("dummy", '--start', -$start, 
            '--end','-'.int($start / $cfg->{Presentation}{detail}{width}),
@@ -816,8 +816,8 @@ sub get_detail ($$$$;$){
     my $open = shift;
     my $mode = shift || $q->param('displaymode') || 's';
     my @slaves = ("");
-    if ($tree->{$prop}{slaves} and $mode eq 's'){
-        push @slaves, split /\s+/,$tree->{$prop}{slaves};       
+    if ($tree->{slaves} and $mode eq 's'){
+        push @slaves, split /\s+/,$tree->{slaves};       
     };
  
     return "" unless $tree->{host};
@@ -864,8 +864,8 @@ sub get_detail ($$$$;$){
         $imgbase = $cfg->{General}{imgcache}."/".(join "/", @dirs)."/${file}";
         $imghref = $cfg->{General}{imgurl}."/".(join "/", @dirs)."/${file}";    
         @tasks = @{$cfg->{Presentation}{detail}{_table}};
-        for my $s (@slaves){
-            $s = "~$s" if $s;
+        for my $slave (@slaves){            
+            my $s = "~$slave" if $slave;
             if (open (HG,"<${imgbase}.maxheight$s")){
                  while (<HG>){
                      chomp;
@@ -874,7 +874,7 @@ sub get_detail ($$$$;$){
                  }
                  close HG;
              }
-             $max->{$s} = findmax $cfg, $rrd.$s.".rrd";
+             $max->{$s} = findmax $cfg, $base_rrd.$s.".rrd";
              if (open (HG,">${imgbase}.maxheight$s")){
                  foreach my $size (keys %{$max}){
                      print HG "$s $max->{$s}{$size}\n";        
@@ -884,6 +884,8 @@ sub get_detail ($$$$;$){
         }
     } 
     elsif ($mode eq 'n' or $mode eq 'a') {
+        my $slave = (split(/~/, $open->[-1]))[1];
+        my $name = $slave ? " as seen from ". $cfg->{Slaves}{$slave}{display_name} : "";
         mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $cfg->{General}{imgcache}."/__navcache";
         # remove old images after one hour
         my $pattern = $cfg->{General}{imgcache}."/__navcache/*.png";
@@ -898,7 +900,8 @@ sub get_detail ($$$$;$){
             $imgbase =$cfg->{General}{imgcache}."/__navcache/".$serial;
             $imghref =$cfg->{General}{imgurl}."/__navcache/".$serial;
         }
-        @tasks = (["Navigator Graph", parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
+
+        @tasks = (["Navigator Graph".$name, parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
 
         my ($graphret,$xs,$ys) = RRDs::graph
           ("dummy", 
@@ -910,7 +913,7 @@ sub get_detail ($$$$;$){
         return "<div>RRDtool did not understand your input: $ERROR.</div>" if $ERROR;     
         my $val = $graphret->[0];
         $val = 1 if $val =~ /nan/i;
-        $max = { $tasks[0][1] => $val * 1.5 };
+        $max->{''} = { $tasks[0][1] => $val * 1.5 };
     } else  { 
         # chart mode 
         mkdir $cfg->{General}{imgcache}."/__chartscache",0755  unless -d  $cfg->{General}{imgcache}."/__chartscache";
@@ -1008,6 +1011,8 @@ sub get_detail ($$$$;$){
 
     for (@tasks) {
         my ($desc,$start,$end) = @{$_};
+        my %xs;
+        my %ys;
         $end ||= 'last';
         $start = exp2seconds($start) if $mode =~ /[s]/; 
 
@@ -1015,10 +1020,10 @@ sub get_detail ($$$$;$){
         my $endstr   = $end =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time)) : $end;
 
         my $last = -1;
-        my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
 
         for my $slave (@slaves){
             my $s = $slave ? "~$slave" : "";
+            my $swidth = $max->{$s}{$start} / $cfg->{Presentation}{detail}{height};
             my $rrd = $base_rrd.$s.".rrd";
             my @median = ("DEF:median=${rrd}:median:AVERAGE",
                           "CDEF:ploss=loss,$pings,/,100,*",
@@ -1104,9 +1109,9 @@ sub get_detail ($$$$;$){
                '--height',$cfg->{Presentation}{detail}{height},
                '--width',,$cfg->{Presentation}{detail}{width},
                '--title',$desc.$from,
-               '--rigid','--upper-limit', $max->{$start},
+               '--rigid','--upper-limit', $max->{$s}{$start},
                @log,
-               '--lower-limit',(@log ? ($max->{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
+               '--lower-limit',(@log ? ($max->{$s}{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
                '--vertical-label',$ProbeUnit,
                '--imgformat','PNG',
                '--color', 'SHADEA#ffffff',
@@ -1114,7 +1119,7 @@ sub get_detail ($$$$;$){
                '--color', 'BACK#ffffff',
                '--color', 'CANVAS#ffffff',
                (map {"DEF:ping${_}=${rrd}:ping${_}:AVERAGE"} 1..$pings),
-               (map {"CDEF:cp${_}=ping${_},0,$max->{$start},LIMIT"} 1..$pings),
+               (map {"CDEF:cp${_}=ping${_},0,$max->{$s}{$start},LIMIT"} 1..$pings),
                ("DEF:loss=${rrd}:loss:AVERAGE"),
                @upargs,# draw the uptime bg color
                @lossargs, # draw the loss bg color
@@ -1135,14 +1140,16 @@ sub get_detail ($$$$;$){
 #       do_log ("***** begin task ***** <br />");
 #       do_log (@task);
 #       do_log ("***** end task ***** <br />");
-
-              my ($graphret,$xs,$ys) = RRDs::graph @task;
+                
+              my $graphret;
+              ($graphret,$xs{$s},$ys{$s}) = RRDs::graph @task;
         
               my $ERROR = RRDs::error();
               if ($ERROR) {
-                  return "<div>ERROR: $ERROR</div>";
+                  return "<div>ERROR: $ERROR</div><div>".join("<br/>",@task)."</div>";
               };
         }
+
         if ($mode eq 'a'){ # ajax mode
              open my $img, "${imgbase}_${end}_${start}.png";
              binmode $img;
@@ -1156,7 +1163,7 @@ sub get_detail ($$$$;$){
         } 
         elsif ($mode eq 'n'){ # navigator mode
 #           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
-           $page .= qq|<IMG id="zoom" BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">| ;
+           $page .= qq|<IMG id="zoom" BORDER="0" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
 #           $page .= "</div>";
 
            $page .= $q->start_form(-method=>'GET')
@@ -1178,16 +1185,14 @@ sub get_detail ($$$$;$){
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
                 $page .= "<br/>";
-                $page .= ( $ERROR || 
-                      qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').$s'">'
-                      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').$s.'">'
+                      . qq{<IMG BORDER="0" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
                 $page .= "</div>";
             }
         } else { # chart mode
             $page .= "<div>";
-            $page .= ( $ERROR || 
-                        qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
-                      . qq{<IMG BORDER="0" WIDTH="$xs" HEIGHT="$ys" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+            $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
+                      . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
             $page .= "</div>";
             
         }
@@ -1279,7 +1284,11 @@ sub load_sortercache($){
 sub display_webpage($$){
     my $cfg = shift;
     my $q = shift;
-    my $open = [ split /\./,( $q->param('target') || '')];
+    my $open_orig = [ split /\./,( $q->param('target') || '')];
+    my $open = [@$open_orig]; # in this version we get rid of the 'slave' part if there is any
+    my ($host,$slave) =  split(/~/, $open->[-1]);
+    $open->[-1] = $host;
+
     my $tree = $cfg->{Targets};
     my $targets = $cfg->{Targets};
     my $step = $cfg->{__probes}{$targets->{probe}}->step();
@@ -1327,7 +1336,7 @@ sub display_webpage($$){
         title => $charts ? "" : $tree->{title},
         remark => $charts ? "" : ($tree->{remark} || ''),
         overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open ),
-        body => $charts ? "" : get_detail( $cfg,$q,$tree,$open ),
+        body => $charts ? "" : get_detail( $cfg,$q,$tree,$open_orig ),
         target_ip => $charts ? "" : ($tree->{host} || ''),
         owner => $cfg->{General}{owner},
         contact => $cfg->{General}{contact},
