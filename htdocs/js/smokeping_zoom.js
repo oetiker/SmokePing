@@ -86,13 +86,12 @@ var    mySelectBottom  = 0;
   
 $(document).ready(function() { 
 
-
     var rrdimg   = jQuery("img#zoom");
- 
-    StartDateString = 0;
-    EndDateString  = 0;
-    jQuery('body',document).append('<div id="selector" oncontextmenu="return false"></div>')
-    var selector = jQuery("div#selector");
+    if (rrdimg.length){  // only do this if we actually have an zoom image
+      StartDateString = 0;
+      EndDateString  = 0;
+      jQuery('body',document).append('<div id="selector" oncontextmenu="return false"></div>')
+      var selector = jQuery("div#selector");
 
     selector.Selectable({
       opacity : 1,
@@ -112,8 +111,7 @@ $(document).ready(function() {
       padding: 0,
       'z-index':  1000
     });
- 
-
+   };
 });
 
 // will be started by modified iSelect (StopApply Function)
