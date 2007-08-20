@@ -1,4 +1,6 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"> 
+<?xml version="1.0" encoding="iso-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <HTML>
 <HEAD>
 <META HTTP-EQUIV="Cache-Control" content="no-cache">
@@ -77,9 +79,9 @@ a.menulink:hover       {
 </STYLE>
 
 <script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/idrag.js"></script>
-<script type="text/javascript" src="js/smokeping_iselect.js"></script>   
+<script type="text/javascript" src="js/jquery.dimensions.js"></script>
 <script type="text/javascript" src="js/iutil.js"></script>
+<script type="text/javascript" src="js/smokeping_iselect.js"></script>   
 <script type="text/javascript" src="js/smokeping_zoom.js"></script>
 
 

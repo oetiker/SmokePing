@@ -78,55 +78,57 @@ function JSToISODate(mydate) {
    isodate = isodate + mydate.getMinutes();
    return encodeURI(isodate);
 }
+
+var    mySelectTop     = 0;
+var   mySelectLeft    = 0;
+var    mySelectRight   = 0;
+var    mySelectBottom  = 0;
   
 $(document).ready(function() { 
 
-    mySelectTop     = 0;
-    mySelectLeft    = 0;
-    mySelectRight   = 0;
-    mySelectBottom  = 0;
 
-    myImgTop     = 0;
-    myImgLeft    = 0;
-    myImgRight   = 0;
-    myImgBottom  = 0;  
+    var rrdimg   = jQuery("img#zoom");
+    var myImgTop     = rrdimg.get(0).y;
+    var myImgLeft    = rrdimg.get(0).x;
+    var myImgRight   = myImgLeft + rrdimg.get(0).width;
+    var myImgBottom  = myImgTop + rrdimg.get(0).height;
  
-    RRDLeftDiff  = 68;        // difference between left border of RRD image and content
-    RRDRightDiff = 33;        // difference between right border of RRD image and content
-    RRDImgWidth  = 697;       // Width of the Smokeping RRD Graphik
-    RRDImgUsable = 596;       // 598 = 697 - 68 - 33;
-
-    mySelectTop     = 0;
-    mySelectLeft    = 0;
-    mySelectRight   = 0;
-    mySelectBottom  = 0;
-
     StartDateString = 0;
     EndDateString  = 0;
-   
-    $("div.zoom").mousedown(function() {
+    jQuery('body',document).append('<div id="selector"></div>')
+    var selector = jQuery("div#selector");
 
-         var rrdimg   = $("div.zoom").children("img");
-         myImgTop     = rrdimg.get(0).y;
-         myImgLeft    = rrdimg.get(0).x;
-         myImgRight   = myImgLeft + rrdimg.get(0).width;
-         myImgBottom  = myImgTop + rrdimg.get(0).height;
- 
-     });
-
-    $("div.zoom").Selectable({
-                accept : 'selectableitem',
-                opacity : 0.2,
-                selectedclass : 'selecteditem',
-                helperclass : 'selecthelper'
+    selector.Selectable({
+      opacity : 1,
+      helperclass : 'selecthelper'      
     });   
+    
+    selector.css({
+      cursor: 'crosshair',
+      top :     rrdimg.offset().top+30,
+      width :   rrdimg.width()-95,
+      left :    rrdimg.offset().left+68,
+      height :  rrdimg.height()-110,
+      position: 'absolute',
+      background: '#fefefe',
+      opacity: 0.1,
+      margin: 0,
+      padding: 0,
+      'z-index':  1000
+    });
+ 
 
 });
 
 // will be started by modified iSelect (StopApply Function)
 function changeRRDImage(){
 
-         var oldimg = $("div.zoom").children("img");
+    var RRDLeftDiff  = 0;        // difference between left border of RRD image and content
+    var RRDRightDiff = 0;        // difference between right border of RRD image and content
+    var RRDImgWidth  = 697;       // Width of the Smokeping RRD Graphik
+    var RRDImgUsable = 596;       // 598 = 697 - 68 - 33;
+
+         var oldimg = $("img#zoom");
 
          myURLObj = new urlObj(document.URL); 
 
