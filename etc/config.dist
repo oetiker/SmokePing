@@ -1,20 +1,16 @@
-# Note that all IP addresses in this file are false, to prevent some
-# machine falling under a deadly DOS storm because all users keep
-# the same addresses in their config.
-
 *** General ***
 
-owner    = Joe Random
-contact  = joe@some.place.xyz
-mailhost = smtp.mailhost.abc
+owner    = Tobi Oetiker
+contact  = tobi@oetiker.ch
+mailhost = johan.oetiker.ch
 sendmail = /usr/lib/sendmail
-imgcache = /home/oetiker/public_html/.simg
-imgurl   = ../.simg
-datadir  = /tmp/smokeping/data
-piddir  = /tmp/smokeping/var
-cgiurl   = http://tobi.oetiker.ch/smokeping/smokeping.cgi
-smokemail = /home/oetiker/checkouts/smokeping/trunk/software/etc/smokemail.dist
-tmail = /home/oetiker/checkouts/smokeping/trunk/software/etc/tmail.dist
+imgcache = /home/oetiker/public_html/smokeping-ms/cache
+imgurl   = cache
+datadir  = /tmp/smokeping-ms/data
+piddir  = /tmp/smokeping-ms/var
+cgiurl   = http://johan.oetiker.ch/~oetiker/smokeping-ms/smokeping.cgi
+smokemail = /scratch/oetiker/smoke-master/etc/smokemail.dist
+tmail = /scratch/oetiker/smoke-master/etc/tmail.dist
 # specify this to get syslog logging
 syslogfacility = local0
 # each probe is now run in its own process
@@ -22,38 +18,14 @@ syslogfacility = local0
 # concurrentprobes = no
 
 *** Alerts ***
-to = admin@company.xy
+to = tobi@oetiker.ch
 from = smokealert@company.xy
-
-+bigloss
-type = loss
-# in percent
-pattern = ==0%,==0%,==0%,==0%,>0%,>0%,>0%
-comment = suddenly there is packet loss
 
 +someloss
 type = loss
 # in percent
 pattern = >0%,*12*,>0%,*12*,>0%
 comment = loss 3 times  in a row
-
-+startloss
-type = loss
-# in percent
-pattern = ==S,>0%,>0%,>0%
-comment = loss at startup
-
-+rttdetect
-type = rtt
-# in milli seconds
-pattern = <10,<10,<10,<10,<10,<100,>100,>100,>100
-comment = routing mesed up again ?
-
-+median
-type = matcher
-# in milli seconds
-pattern = Median(old=>5,new=>7,diff=>2)
-comment = median crossed
 
 *** Database ***
 
@@ -72,7 +44,36 @@ AVERAGE  0.5 144   720
 
 *** Presentation ***
 
-template = /home/oetiker/checkouts/smokeping/trunk/software/etc/basepage.html.dist
+template = /scratch/oetiker/smoke-master/etc/basepage.html.dist
+
++ charts
+
+menu = Charts
+title = The most interesting destinations
+
+++ stddev
+sorter = StdDev(entries=>4)
+title = Top Standard Deviation
+menu = Std Deviation
+format = Stdandard Deviation %f
+
+++ max
+sorter = Max(entries=>5)
+title = Top Max Roundtrip Time
+menu = by Max
+format = Max Roundtrip Time %f seconds
+
+++ loss
+sorter = Loss(entries=>5)
+title = Top Packet Loss
+menu = Loss
+format = Packets Lost %f
+
+++ median
+sorter = Median(entries=>5)
+title = Top Median Roundtrip Time
+menu = by Median
+format = Median RTT %f seconds
 
 + overview 
 
@@ -98,11 +99,10 @@ unison_tolerance = 2
 binary = /usr/sbin/fping
 
 *** Slaves ***
-secrets=/home/oetiker/checkouts/smokeping/trunk/software/etc/smokeping_secrets.dist
-+mipsrv01
-name=mipsrv01
-++override
-Probes.FPing.binary=/usr/bin/fping
+secrets=/scratch/oetiker/smoke-master/etc/smokeping_secrets.dist
++boomer
+display_name=boomer
+color=0000ff
 
 *** Targets ***
 
@@ -113,80 +113,10 @@ title = Network Latency Grapher
 remark = Welcome to the SmokePing website of xxx Company. \
          Here you will learn all about the latency of our network.
 
-+ World
++ James
 
-menu = World
-title = Worldwide Connectivity
-
-++ Europe
-
-menu = Europe
-title =European Connectivity
-
-+++ Switzerland
-
-menu = Switzerland
-title =Swiss Connectivity
-alerts = bigloss,someloss,startloss
-slaves = mipsrv01 johan
-
-++++ SBB
-
-menu = SBB/CFF/FFS
-title =Swiss Federal Railways Webserver
-host = www.railway-server.abc
-
-
-++++ Tiscali
-
-menu = Tiscali Web
-title = Tiscali Webserver www.tiscali.abc
-host = www.tiscali-web.abc
-
-+++ UK
-
-menu = United Kingdom
-title = United Kingdom
-
-++++ UCL
-
-menu = UCL
-title = UCL
-host = www.ucl-abc.acc.uk
-
-++ USA
-
-menu = North America
-title =North American Connectivity
-
-+++ MIT
-
-menu = MIT
-title = Massachusetts Institute of Technology Webserver
-host = www.gurkoman.ybc
-
-+++ IU
-
-menu = IU
-title = Indiana University
-host = www.iu.ali
-
-+++ UCB
-
-menu = U. C. Berkeley
-title = U. C. Berkeley Webserver
-host = www.berkly.udi
-alerts = median
-
-+++ UCSD
-
-menu = U. C. San Diego
-title = U. C. San Diego Webserver
-host = www.ucsdddar.art
-
-+++ Sun
-
-menu = Sun Microsystems
-title = Sun Microsystems Webserver
-host = www.sun-web.com
-
+menu = Test Target
+title =Test Target
+alerts = someloss
+slaves = boomer
+host = james.oetiker.ch

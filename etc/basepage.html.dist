@@ -40,49 +40,14 @@ a.menulink {
 a.menulink:hover       {
         color: #e0e0ff;
         }
-
-.selectableitem {
-   border:2px solid #FFFFFF;
-   float:left;
-   height:140px;
-   margin:10px;
-   padding:10px;
-   text-align:center;
-   width:160px;
-}
-
-.selectableitem p {
-   font-weight:bold;
-}
-
-.selectableitem div {
-   height:120px;
-   line-height:120px;
-}
-
-.selecteditem {
-   border:2px solid #999999;
-}
-
-.selecthelper {
-   background-color:#000000;
-   opacity:0.3;
-}
-
-.zoom {
-  height:330px;
-  overflow:auto;
-  width:700px;
-}
-
 -->
 </STYLE>
 
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jquery.dimensions.js"></script>
-<script type="text/javascript" src="js/iutil.js"></script>
-<script type="text/javascript" src="js/smokeping_iselect.js"></script>   
-<script type="text/javascript" src="js/smokeping_zoom.js"></script>
+<script src="cropper/lib/prototype.js" type="text/javascript"></script>      
+<script src="cropper/lib/scriptaculous.js?load=builder,dragdrop" type="text/javascript"></script>
+<script src="cropper/cropper.js" type="text/javascript"></script>
+<script src="cropper/smokeping_cropper.js" type="text/javascript"></script>
+
 
 
 </HEAD>

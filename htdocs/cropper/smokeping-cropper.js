@@ -1,21 +1,3 @@
-<!--
-
-/*
- * This code replaces images in the smokeping website with ajax
- *
- * The jquery toolkit (version 1.1.3.1) was used for platform
- * independency. The URL parsing part was taken from the 
- * bonsaj.js script.
- *
- * Copyright (c) 2007 Roman Plessl <roman.plessl@oetiker.ch>
- * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
- *
- * $Date: 2007-08-15 17:14:56 +0200 $
- * $Rev: 36 $
- * 
- */
-
 /*++ from bonsai.js ++ urlObj  +++++++++++++++++++++++++++++++++++++++++*/
 function urlObj(url) {
    var urlBaseAndParameters;
@@ -79,51 +61,23 @@ function JSToISODate(mydate) {
    return encodeURI(isodate);
 }
 
-var    mySelectTop     = 0;
-var   mySelectLeft    = 0;
-var    mySelectRight   = 0;
-var    mySelectBottom  = 0;
-  
-$(document).ready(function() { 
+// example with minimum dimensions
+var myCropper;
 
-    var rrdimg   = jQuery("img#zoom");
-    if (rrdimg.length){  // only do this if we actually have an zoom image
-      StartDateString = 0;
-      EndDateString  = 0;
-      jQuery('body',document).append('<div id="selector" oncontextmenu="return false"></div>')
-      var selector = jQuery("div#selector");
-
-    selector.Selectable({
-      opacity : 1,
-      helperclass : 'selecthelper'      
-    });   
-    
-    selector.css({
-      cursor: 'crosshair',
-      top :     rrdimg.offset().top+30 + 'px',
-      width :   rrdimg.width()-95 + 'px',
-      left :    rrdimg.offset().left+68 + 'px',
-      height :  rrdimg.height()-110 + 'px',
-      position: 'absolute',
-      background: '#fefefe',
-      opacity: 0.1,
-      margin: 0,
-      padding: 0,
-      'z-index':  1000
-    });
-   };
-});
 
 // will be started by modified iSelect (StopApply Function)
-function changeRRDImage(){
+var StartDateString = 0;
+var EndDateString = 0;
 
-    var RRDLeftDiff  = 0;        // difference between left border of RRD image and content
-    var RRDRightDiff = 0;        // difference between right border of RRD image and content
+function changeRRDImage(coords,dimensions){
+
+    var RRDLeftDiff  = 50;        // difference between left border of RRD image and content
+    var RRDRightDiff = 30;        // difference between right border of RRD image and content
     var RRDImgWidth  = 697;       // Width of the Smokeping RRD Graphik
     var RRDImgUsable = 596;       // 598 = 697 - 68 - 33;
-
-         var oldimg = $("img#zoom");
-
+    var mySelectLeft = coords.x1;
+    var mySelectRight = coords.x2;
+    
          myURLObj = new urlObj(document.URL); 
 
          // parse start and stop parameter from URL  
@@ -157,14 +111,26 @@ function changeRRDImage(){
          var MinuteGenStart = ( Math.floor(floorGenStart / 60) * 60 );
          var MinuteGenStop  = ( Math.floor(floorGenStop  / 60) * 60 );
 
-         // create new image based on old image and fetched data
-         var newimg = new Image();
-         newimg = oldimg;
- 
          StartDateString = JSToISODate(StartDate);
          EndDateString   = JSToISODate(StopDate);
 
          // construct Image URL
-         newimg.attr("src",myURL + "?displaymode=a;start=" + StartDateString+ ";end=" + EndDateString + ";target=" + myRawTarget + ";serial=" + mySerial);
+         $('zoom').src = myURL + "?displaymode=a;start=" + StartDateString+ ";end=" + EndDateString + ";target=" + myRawTarget + ";serial=" + mySerial;
+         myCropper.setParams();
 };
+
+Event.observe( 
+           window, 
+           'load', 
+           function() { 
+               myCropper = new Cropper.Img( 
+                               'zoom', 
+                                        { 
+                                                minHeight: 321,
+                                                maxHeight: 321,
+                                                onEndCrop: changeRRDImage
+                                        } 
+                                ) 
+                   }
+           );
 
