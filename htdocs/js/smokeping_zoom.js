@@ -88,14 +88,10 @@ $(document).ready(function() {
 
 
     var rrdimg   = jQuery("img#zoom");
-    var myImgTop     = rrdimg.get(0).y;
-    var myImgLeft    = rrdimg.get(0).x;
-    var myImgRight   = myImgLeft + rrdimg.get(0).width;
-    var myImgBottom  = myImgTop + rrdimg.get(0).height;
  
     StartDateString = 0;
     EndDateString  = 0;
-    jQuery('body',document).append('<div id="selector"></div>')
+    jQuery('body',document).append('<div id="selector" oncontextmenu="return false"></div>')
     var selector = jQuery("div#selector");
 
     selector.Selectable({
@@ -105,10 +101,10 @@ $(document).ready(function() {
     
     selector.css({
       cursor: 'crosshair',
-      top :     rrdimg.offset().top+30,
-      width :   rrdimg.width()-95,
-      left :    rrdimg.offset().left+68,
-      height :  rrdimg.height()-110,
+      top :     rrdimg.offset().top+30 + 'px',
+      width :   rrdimg.width()-95 + 'px',
+      left :    rrdimg.offset().left+68 + 'px',
+      height :  rrdimg.height()-110 + 'px',
       position: 'absolute',
       background: '#fefefe',
       opacity: 0.1,
