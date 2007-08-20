@@ -1,3 +1,9 @@
+* Added stddev caclulation -- tobi
+
+* Added slave support into detail graphs -- tobi
+
+* Made interactive Graph zoomer somewhat work on ie6 and ie7 -- tobi
+
 * Integrated interactive Graph zoomer -- Roman Plessl rplessl oetiker.ch
 
 * first drop of the master/slave code added. now the debugging beginns. -- tobi
