@@ -41,7 +41,7 @@ function ISODateToJS(rawisodate) {
        return new Date();
    } 
    else  {
-      var M = decode.match(/(\d\d\d\d).(\d\d).(\d\d).(\d\d).(\d\d)/)
+      var M = decode.match(/(\d\d\d\d)-(\d\d?)-(\d\d?)[+ ](\d\d?):(\d\d?)/)
       var date = new Date(M[1], M[2]-1, M[3], M[4], M[5], "00")
       return date;
    }
@@ -77,7 +77,8 @@ function changeRRDImage(coords,dimensions){
     var RRDImgUsable = 596;       // 598 = 697 - 68 - 33;
     var mySelectLeft = coords.x1;
     var mySelectRight = coords.x2;
-    
+        if (mySelectLeft == mySelectRight) return; // abort if nothing is selected.
+
          myURLObj = new urlObj(document.URL); 
 
          // parse start and stop parameter from URL  
