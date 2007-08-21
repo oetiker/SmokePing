@@ -64,10 +64,11 @@ sub submit_results {
     my $store = $slave_cfg->{cache_dir}."/data";
     $store .= "_$myprobe" if $myprobe;
     $store .= ".cache";
-    my $restore = retrieve $store if -f $store; 
+    my $restore = -f $store ? retrieve $store : []; 
+    unlink $store;
     my $data =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, '', $myprobe);    
-    push @$data, @$restore if $restore;    
-    my $data_dump = join("\n",@{$data}) || "";
+    push @$restore, @$data;
+    my $data_dump = join("\n",@{$restore}) || "";
     my $ua = LWP::UserAgent->new(
         agent => 'smokeping-slave/1.0',
         timeout => 10,
