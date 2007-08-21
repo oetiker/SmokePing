@@ -675,7 +675,7 @@ sub get_overview ($$$$){
             my $rrd = $cfg->{General}{datadir}.$dir.'/'.$prop.$s.'.rrd';                
             my $medc = $slave ? $cfg->{Slaves}{$slave}{color} : $cfg->{Presentation}{overview}{median_color} || "ff0000";
             my $sdc = $medc;
-            $sdc =~ s/^(......).*/${1}20/;
+            $sdc =~ s/^(......).*/${1}30/;
             my $name = sprintf("%-10s", $slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname);
             push @G, 
                 "DEF:median$i=${rrd}:median:AVERAGE",
@@ -683,8 +683,8 @@ sub get_overview ($$$$){
                 "CDEF:ploss$i=loss$i,$pings,/,100,*",
                 "CDEF:dm$i=median$i,0,$max,LIMIT",
                 calc_stddev($rrd,$i,$pings),
-                "CDEF:dmlow$i=dm$i,sdev$i,-",
-                "CDEF:s2d$i=sdev$i,2,*",
+                "CDEF:dmlow$i=dm$i,sdev$i,2,/,-",
+                "CDEF:s2d$i=sdev$i",
 #                "CDEF:dm2=median,1.5,*,0,$max,LIMIT",
 #                "LINE1:dm2", # this is for kicking things down a bit
                 "AREA:dmlow$i",
@@ -698,14 +698,14 @@ sub get_overview ($$$$){
                   "LINE1:dm$i#$medc:median RTT";
             };
             push @G,
-                  "GPRINT:median$i:AVERAGE:%6.1lf %ss avg rtt ",
+                  "GPRINT:median$i:AVERAGE:%6.1lf %ss avg med rtt ",
                   "GPRINT:ploss$i:AVERAGE:%6.1lf %% avg loss",                
-                  "GPRINT:sdev$i:AVERAGE:%.1le avg sdev\\l";
+                  "GPRINT:sdev$i:AVERAGE:%6.1lf %ss avg sd\\l";
         }
         my $ProbeUnit = $probe->ProbeUnit();
         my ($graphret,$xs,$ys) = RRDs::graph 
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
-           '--lazy',
+    #       '--lazy',
            '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
            '--title',$tree->{$prop}{title},
            '--height',$cfg->{Presentation}{overview}{height},
@@ -1000,12 +1000,8 @@ sub get_detail ($$$$;$){
                 );
     }
                 
-    my $date = $cfg->{Presentation}{detail}{strftime} ? 
-      POSIX::strftime($cfg->{Presentation}{detail}{strftime},
-                      localtime(time)) : scalar localtime(time);
     my $BS = '';
     if ( $RRDs::VERSION >= 1.199908 ){
-        $date =~ s|:|\\:|g;
         $ProbeDesc =~ s|:|\\:|g;
         $BS = '\\';
     }
@@ -1014,6 +1010,12 @@ sub get_detail ($$$$;$){
         my ($desc,$start,$end) = @{$_};
         my %xs;
         my %ys;
+        my $sigtime = $end =~ /^\d+$/ ? $end : time;
+        my $date = $cfg->{Presentation}{detail}{strftime} ? 
+                   POSIX::strftime($cfg->{Presentation}{detail}{strftime}, localtime($sigtime)) : scalar localtime($sigtime);
+        if ( $RRDs::VERSION >= 1.199908 ){
+            $date =~ s|:|\\:|g;
+        }
         $end ||= 'last';
         $start = exp2seconds($start) if $mode =~ /[s]/; 
 
@@ -1026,14 +1028,14 @@ sub get_detail ($$$$;$){
             my $s = $slave ? "~$slave" : "";
             my $swidth = $max->{$s}{$start} / $cfg->{Presentation}{detail}{height};
             my $rrd = $base_rrd.$s.".rrd";
-            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,time());
+            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime);
             my @median = ("DEF:median=${rrd}:median:AVERAGE",
                           "CDEF:ploss=loss,$pings,/,100,*",
                           'GPRINT:median:AVERAGE:median rtt\:  %.1lf %ss avg',
                           'GPRINT:median:MAX:%.1lf %ss max',
                           'GPRINT:median:MIN:%.1lf %ss min',
                           'GPRINT:median:LAST:%.1lf %ss now',
-                          sprintf('COMMENT:%.1e sdev\l',$stddev),
+                          sprintf('COMMENT:%.1lf ms sd\l',$stddev*1000.0),
                           "LINE1:median#202020"
                   );
             push @median, ( "GPRINT:ploss:AVERAGE:packet loss\\: %.2lf %% avg",
@@ -1142,7 +1144,7 @@ sub get_detail ($$$$;$){
                  ()),
                  'HRULE:0#000000',
                  "COMMENT:probe${BS}:       $pings $ProbeDesc every ${step}s",
-                 'COMMENT:'.$date.'\j' );
+                 'COMMENT:end\: '.$date.'\j' );
 #       do_log ("***** begin task ***** <br />");
 #       do_log (@task);
 #       do_log ("***** end task ***** <br />");
