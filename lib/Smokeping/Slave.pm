@@ -66,8 +66,8 @@ sub submit_results {
     $store .= ".cache";
     my $restore = -f $store ? retrieve $store : []; 
     unlink $store;
-    my $data =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, '', $myprobe);    
-    push @$restore, @$data;
+    my $new =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, '', $myprobe);    
+    push @$restore, @$new;
     my $data_dump = join("\n",@{$restore}) || "";
     my $ua = LWP::UserAgent->new(
         agent => 'smokeping-slave/1.0',
@@ -109,7 +109,7 @@ sub submit_results {
         # ok did not manage to get our data to the server.
         # we store the result so that we can try again later.
         warn "WARNING Master said ".$response->status_line()."\n";
-        nstore $data, $store;
+        nstore $restore, $store;
     }
     return undef;
 }
