@@ -676,7 +676,7 @@ sub get_overview ($$$$){
             my $medc = $slave ? $cfg->{Slaves}{$slave}{color} : $cfg->{Presentation}{overview}{median_color} || "ff0000";
             my $sdc = $medc;
             $sdc =~ s/^(......).*/${1}30/;
-            my $name = sprintf("%-10s", $slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname);
+            my $name = sprintf("%-9s", $slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname);
             push @G, 
                 "DEF:median$i=${rrd}:median:AVERAGE",
                 "DEF:loss$i=${rrd}:loss:AVERAGE",
@@ -695,12 +695,18 @@ sub get_overview ($$$$){
             }
             else {
                 push @G,
-                  "LINE1:dm$i#$medc:median RTT";
+                  "LINE1:dm$i#$medc:med RTT";
             };
             push @G,
-                  "GPRINT:median$i:AVERAGE:%6.1lf %ss avg med rtt ",
-                  "GPRINT:ploss$i:AVERAGE:%6.1lf %% avg loss",                
-                  "GPRINT:sdev$i:AVERAGE:%6.1lf %ss avg sd\\l";
+                  "VDEF:avmed$i=median$i,AVERAGE",
+                  "VDEF:avsd$i=sdev$i,AVERAGE",
+                  "CDEF:msr$i=median$i,POP,avmed$i,avsd$i,/",
+                  "VDEF:avmsr$i=msr$i,AVERAGE",
+                  "GPRINT:avmed$i:%5.1lf %ss av md ",
+                  "GPRINT:ploss$i:AVERAGE:%5.1lf %% av ls",                
+                  "GPRINT:avsd$i:%5.1lf %ss av sd",
+                  "GPRINT:avmsr$i:%5.1lf %s am/as\\l";
+
         }
         my $ProbeUnit = $probe->ProbeUnit();
         my ($graphret,$xs,$ys) = RRDs::graph 
@@ -824,8 +830,7 @@ sub get_detail ($$$$;$){
     return "" unless $tree->{host};
     
     my @dirs = @{$open};
-
-    my $file = $mode eq 'c' ?  (split(/~/, pop @dirs))[0] : pop @dirs;
+    my $file = (split(/~/, pop @dirs))[0];
     my $dir = "";
 
     return "<div>ERROR: ".(join ".", @dirs)." has no probe defined</div>"
@@ -1032,11 +1037,14 @@ sub get_detail ($$$$;$){
             my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime);
             my @median = ("DEF:median=${rrd}:median:AVERAGE",
                           "CDEF:ploss=loss,$pings,/,100,*",
-                          'GPRINT:median:AVERAGE:median rtt\:  %.1lf %ss avg',
+                          "VDEF:avmed=median,AVERAGE",
+                          "CDEF:mesd=median,POP,avmed,$stddev,/",
+                          'GPRINT:avmed:median rtt\:  %.1lf %ss avg',
                           'GPRINT:median:MAX:%.1lf %ss max',
                           'GPRINT:median:MIN:%.1lf %ss min',
                           'GPRINT:median:LAST:%.1lf %ss now',
-                          sprintf('COMMENT:%.1lf ms sd\l',$stddev*1000.0),
+                          sprintf('COMMENT:%.1lf ms sd',$stddev*1000.0),
+                          'GPRINT:mesd:AVERAGE:%.1lf %s am/s\l',
                           "LINE1:median#202020"
                   );
             push @median, ( "GPRINT:ploss:AVERAGE:packet loss\\: %.2lf %% avg",
@@ -1653,7 +1661,7 @@ sub update_rrds($$$$$$) {
                 do_debuglog("Calling RRDs::update(@rrdupdate)");
                 RRDs::update ( @rrdupdate );
                 my $ERROR = RRDs::error();
-                do_log "RRDs::update ERROR: $ERROR (".join(' ',@rrdupdate)."\n" if $ERROR;
+                do_log "RRDs::update ERROR: $ERROR\n" if $ERROR;
                     # check alerts
                 my ($loss,$rtt) = (split /:/, $update->[2])[1,2];
                     my $gotalert = check_alerts $cfg,$tree,$pings,$name,$prop,$loss,$rtt,$update->[0];
@@ -1783,38 +1791,18 @@ DOC
        host      => 
        {
         _doc => <<DOC,
-There are three types of "hosts" in smokeping.
+Can either contain the name of a target host or the string B<DYNAMIC>.
 
-=over
-
-=item 1.
-
-The 'hostname' is a name of a host you want to target from smokeping
-
-=item 2.
-
-The string B<DYNAMIC>. Is for machines that have a dynamic IP address. These boxes
-are required to regularly contact the SmokePing server to confirm their IP address.
- When starting SmokePing with the commandline argument
+In the second case, the target machine has a dynamic IP address and
+thus is required to regularly contact the SmokePing server to verify
+its IP address.  When starting SmokePing with the commandline argument
 B<--email> it will add a secret password to each of the B<DYNAMIC>
 host lines and send a script to the owner of each host. This script
-must be started periodically (cron) on the host in question to let smokeping know
-where the host is curently located. If the target machine supports
+must be started regularly on the host in question to make sure
+SmokePing monitors the right box. If the target machine supports
 SNMP SmokePing will also query the hosts
 sysContact, sysName and sysLocation properties to make sure it is
 still the same host.
-
-=item 3.
-
-A space separated list of 'target-path' entries. All targets mentioned in
-this list will be displayed in one graph. Note that the graph will look
-different from the normal smokeping graphs the normal graph is designed to
-show only one host with all its information. The syntax is as follows:
-
- /target/target/target[~slave] [/target/...] ...
-
-=back
-
 DOC
 
         _sub => sub {
@@ -1822,7 +1810,6 @@ DOC
                 m|^DYNAMIC| && return undef;
                 /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ && return undef;
                 /^[0-9a-f]{0,4}(\:[0-9a-f]{0,4}){0,6}\:[0-9a-f]{0,4}$/i && return undef;
-                m|(?:/$KEYD_RE)+(?:~$KEYD_RE)?(?: (?:/$KEYD_RE)+(?:~$KEYD_RE))*| && return undef;
                 my $addressfound = 0;
                 my @tried;
                 if ($havegetaddrinfo) {

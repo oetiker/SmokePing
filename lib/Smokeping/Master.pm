@@ -139,14 +139,14 @@ sub get_slaveupdates {
     my $data;
     if ( open (my $hand, '<', $file) ) {
         if ( flock $hand, LOCK_EX ){
-            eval { $data = fd_retrieve  $hand };
+            rename $file,$file.$$;
+            eval { $data = fd_retrieve $hand };
+            unlink $file.$$;
+            flock $hand, LOCK_UN;            
             if ($@) { #error
                 warn "Loading $file: $@";  
                 return;
             }
-            seek $hand, 0,0;
-            truncate $hand, 0;
-            flock $hand, LOCK_UN;
         } else {
             warn "Could not lock $file. Can't load data.\n";
         }
