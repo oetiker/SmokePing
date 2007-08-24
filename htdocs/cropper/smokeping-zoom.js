@@ -88,12 +88,12 @@ function changeRRDImage(coords,dimensions){
          var myRawTarget    = myURLObj.getUrlParameterValue("target"); 
 
          var myParsedStartDate = ISODateToJS(myRawStartDate);
-         myParsedStartEpoch = Math.floor(myParsedStartDate.getTime()/1000.0);
+         var myParsedStartEpoch = Math.floor(myParsedStartDate.getTime()/1000.0);
  
          var myParsedStopDate  = ISODateToJS(myRawStopDate);
-         myParsedStopEpoch = Math.floor(myParsedStopDate.getTime()/1000.0);   
+         var myParsedStopEpoch = Math.floor(myParsedStopDate.getTime()/1000.0);   
  
-         myParsedDivEpoch = myParsedStopEpoch - myParsedStartEpoch; 
+         var myParsedDivEpoch = myParsedStopEpoch - myParsedStartEpoch; 
 
          var mySerialDate = new Date();
          var mySerial = mySerialDate.getTime();
