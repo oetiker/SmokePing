@@ -872,7 +872,7 @@ sub get_detail ($$$$;$){
         $imghref = $cfg->{General}{imgurl}."/".(join "/", @dirs)."/${file}";    
         @tasks = @{$cfg->{Presentation}{detail}{_table}};
         for my $slave (@slaves){            
-            my $s = "~$slave" if $slave;
+            my $s =  $slave ? "~$slave" : "";
             if (open (HG,"<${imgbase}.maxheight$s")){
                  while (<HG>){
                      chomp;
@@ -883,7 +883,7 @@ sub get_detail ($$$$;$){
              }
              $max->{$s} = findmax $cfg, $base_rrd.$s.".rrd";
              if (open (HG,">${imgbase}.maxheight$s")){
-                 foreach my $size (keys %{$max}){
+                 foreach my $size (keys %{$max->{$s}}){
                      print HG "$s $max->{$s}{$size}\n";        
                  }
                  close HG;
@@ -1016,7 +1016,7 @@ sub get_detail ($$$$;$){
         my ($desc,$start,$end) = @{$_};
         my %xs;
         my %ys;
-        my $sigtime = $end =~ /^\d+$/ ? $end : time;
+        my $sigtime = ($end and $end =~ /^\d+$/) ? $end : time;
         my $date = $cfg->{Presentation}{detail}{strftime} ? 
                    POSIX::strftime($cfg->{Presentation}{detail}{strftime}, localtime($sigtime)) : scalar localtime($sigtime);
         if ( $RRDs::VERSION >= 1.199908 ){
@@ -1316,7 +1316,7 @@ sub display_webpage($$){
     my $step = $cfg->{__probes}{$targets->{probe}}->step();
     # lets see if the charts are opened
     my $charts = 0;
-    $charts = 1 if defined $cfg->{Presentation}{charts} and $open->[0] eq '__charts';
+    $charts = 1 if defined $cfg->{Presentation}{charts} and $open->[0] and $open->[0] eq '__charts';
     if ($charts and ( not defined $cfg->{__sortercache} 
                       or $cfg->{__sortercachekeeptime} < time )){
        # die "ERROR: Chart $open->[1] does not exit.\n"
@@ -3414,7 +3414,7 @@ sub cgi ($) {
                 print $q->header; # no HTML output on success
         }
     } else {     
-        if ($q->param('displaymode') ne 'a'){ #in ayax mode we do not issue a header YET
+        if (not $q->param('displaymode') or $q->param('displaymode') ne 'a'){ #in ayax mode we do not issue a header YET
                 print $q->header(-type=>'text/html',
                                  -expires=>'+'.($cfg->{Database}{step}).'s',
                                  -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   

@@ -64,6 +64,7 @@ function JSToISODate(mydate) {
 // example with minimum dimensions
 var myCropper;
 
+
 // will be started by modified iSelect (StopApply Function)
 var StartDateString = 0;
 var EndDateString = 0;
@@ -87,12 +88,12 @@ function changeRRDImage(coords,dimensions){
          var myRawTarget    = myURLObj.getUrlParameterValue("target"); 
 
          var myParsedStartDate = ISODateToJS(myRawStartDate);
-         var myParsedStartEpoch = Math.floor(myParsedStartDate.getTime()/1000.0);
+         myParsedStartEpoch = Math.floor(myParsedStartDate.getTime()/1000.0);
  
          var myParsedStopDate  = ISODateToJS(myRawStopDate);
-         var myParsedStopEpoch = Math.floor(myParsedStopDate.getTime()/1000.0);   
+         myParsedStopEpoch = Math.floor(myParsedStopDate.getTime()/1000.0);   
  
-         var myParsedDivEpoch = myParsedStopEpoch - myParsedStartEpoch; 
+         myParsedDivEpoch = myParsedStopEpoch - myParsedStartEpoch; 
 
          var mySerialDate = new Date();
          var mySerial = mySerialDate.getTime();
