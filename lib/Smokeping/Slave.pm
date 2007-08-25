@@ -6,6 +6,7 @@ use Data::Dumper;
 use Storable qw(nstore retrieve);
 use Digest::MD5 qw(md5_base64);
 use LWP::UserAgent;
+use Safe;
 use Smokeping;
 
 
@@ -96,14 +97,15 @@ sub submit_results {
             warn "WARNING $slave_cfg->{master_url} sent data with wrong key";
             return undef;
         }
-        my $VAR1;
-        eval $data;
+        my $zone = new Safe;
+        $zone->permit_only(':base_core');
+        my $config = $zone->reval($data);
         if ($@){
             warn "WARNING evaluating new config from server failed: $@";
-        } elsif (defined $VAR1 and ref $VAR1 eq 'HASH'){
-            $VAR1->{General}{piddir} = $slave_cfg->{cache_dir};
+        } elsif (defined $config and ref $config eq 'HASH'){
+            $config->{General}{piddir} = $slave_cfg->{cache_dir};
             Smokeping::do_debuglog("Sent data to Server and got new config");
-            return $VAR1;
+            return $config;
         }                       
     } else {
         # ok did not manage to get our data to the server.
