@@ -1791,18 +1791,38 @@ DOC
        host      => 
        {
         _doc => <<DOC,
-Can either contain the name of a target host or the string B<DYNAMIC>.
+There are three types of "hosts" in smokeping.
 
-In the second case, the target machine has a dynamic IP address and
-thus is required to regularly contact the SmokePing server to verify
-its IP address.  When starting SmokePing with the commandline argument
+=over
+
+=item 1.
+
+The 'hostname' is a name of a host you want to target from smokeping
+
+=item 2.
+
+The string B<DYNAMIC>. Is for machines that have a dynamic IP address. These boxes
+are required to regularly contact the SmokePing server to confirm their IP address.
+ When starting SmokePing with the commandline argument
 B<--email> it will add a secret password to each of the B<DYNAMIC>
 host lines and send a script to the owner of each host. This script
-must be started regularly on the host in question to make sure
-SmokePing monitors the right box. If the target machine supports
+must be started periodically (cron) on the host in question to let smokeping know
+where the host is curently located. If the target machine supports
 SNMP SmokePing will also query the hosts
 sysContact, sysName and sysLocation properties to make sure it is
 still the same host.
+
+=item 3.
+
+A space separated list of 'target-path' entries. All targets mentioned in
+this list will be displayed in one graph. Note that the graph will look
+different from the normal smokeping graphs the normal graph is designed to
+show only one host with all its information. The syntax is as follows:
+
+ /target/target/target[~slave] [/target/...] ...
+
+=back
+
 DOC
 
         _sub => sub {
@@ -1810,6 +1830,7 @@ DOC
                 m|^DYNAMIC| && return undef;
                 /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ && return undef;
                 /^[0-9a-f]{0,4}(\:[0-9a-f]{0,4}){0,6}\:[0-9a-f]{0,4}$/i && return undef;
+                m|(?:/$KEYD_RE)+(?:~$KEYD_RE)?(?: (?:/$KEYD_RE)+(?:~$KEYD_RE))*| && return undef;
                 my $addressfound = 0;
                 my @tried;
                 if ($havegetaddrinfo) {
