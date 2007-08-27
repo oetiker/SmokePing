@@ -447,7 +447,7 @@ sub init_target_tree ($$$$) {
             for my $slave (@slaves){
                 my $s = $slave ? "~".$slave : "";
                 my @create =    
-                        ($name.$s.".rrd", "--step",$step,
+                        ($name.$s.".rrd", "--start",(time-1),"--step",$step,
                               "DS:uptime:GAUGE:".(2*$step).":0:U",
                               "DS:loss:GAUGE:".(2*$step).":0:".$pings,
                               "DS:median:GAUGE:".(2*$step).":0:180",
@@ -697,10 +697,11 @@ sub get_overview ($$$$){
                 my ($host,$real_slave) = split /~/, $tree_path[-1]; #/
                 $tree_path[-1]= $host;                
                 my $tree = get_tree($cfg,\@tree_path);
-                $label = "Med RDD ".$tree->{menu};
+                $label = $tree->{host};
                 if ($real_slave){
-                    $label .= " from ".  $cfg->{Slaves}{$real_slave}{display_name};
+                    $label .= " <- ".  $cfg->{Slaves}{$real_slave}{display_name};
                 }
+                $label = sprintf("%-20s",$label);
                 push @colors, $medc;                
             } 
             else {
@@ -728,9 +729,8 @@ sub get_overview ($$$$){
 #                "CDEF:dm2=median,1.5,*,0,$max,LIMIT",
 #                "LINE1:dm2", # this is for kicking things down a bit
                 "AREA:dmlow$i",
-                "AREA:s2d${i}#${sdc}::STACK";
-                "LINE1:dm$i#$medc:$label";
-            push @G,
+                "AREA:s2d${i}#${sdc}::STACK",
+                "LINE1:dm$i#${medc}:${label}",
                   "VDEF:avmed$i=median$i,AVERAGE",
                   "VDEF:avsd$i=sdev$i,AVERAGE",
                   "CDEF:msr$i=median$i,POP,avmed$i,avsd$i,/",
@@ -1067,7 +1067,7 @@ sub get_detail ($$$$;$){
             my $s = $slave ? "~$slave" : "";
             my $swidth = $max->{$s}{$start} / $cfg->{Presentation}{detail}{height};
             my $rrd = $base_rrd.$s.".rrd";
-            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime);
+            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime) || 0;
             my @median = ("DEF:median=${rrd}:median:AVERAGE",
                           "CDEF:ploss=loss,$pings,/,100,*",
                           "VDEF:avmed=median,AVERAGE",
@@ -2801,7 +2801,6 @@ DOC
               colors => {
                  _doc => "Space separated list of colors for multihost graphs",
                  _example => "ff0000 00ff00 0000ff",
-                 _default => "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1",
                  _re => '[0-9a-z]{6}(?: [0-9a-z]{6})*',
                 
               }
@@ -3186,7 +3185,14 @@ sub get_config ($$){
     my $parser = shift;
     my $cfgfile = shift;
 
-    return $parser->parse( $cfgfile ) || die "ERROR: $parser->{err}\n";
+    my $cfg = $parser->parse( $cfgfile ) or die "ERROR: $parser->{err}\n";
+    # lets do some checking
+    if (not $cfg->{Presentation}{multihost} or not $cfg->{Presentation}{multihost}{colors}){
+       $cfg->{Presentation}{multihost}{colors} = "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1";
+    }
+    return $cfg;
+
+
 }
 
 sub kill_smoke ($$) { 
@@ -3352,6 +3358,7 @@ sub load_cfg ($;$) {
         $cfg = undef;
         my $parser = get_parser;
         $cfg = get_config $parser, $cfgfile;       
+
         if (defined $cfg->{Presentation}{charts}){
                require Storable;
                die "ERROR: Could not load Storable Support. This is required for the Charts feature - $@\n" if $@;
