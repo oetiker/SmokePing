@@ -434,7 +434,7 @@ sub init_target_tree ($$$$) {
             };
             init_target_tree $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
-        if ($prop eq 'host' and check_filter($cfg,$name)) {           
+        if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ /^\//) {           
             # print "init $name\n";
             my $step = $probeobj->step();
             # we have to do the add before calling the _pings method, it won't work otherwise
@@ -540,6 +540,15 @@ sub enable_dynamic($$$$){
     }
 };
 
+sub get_tree($$){
+    my $cfg = shift;
+    my $open = shift;
+    my $tree = $cfg->{Targets};
+    for (@{$open}){
+        $tree =  $tree->{$_};
+    }
+    return $tree;
+}
 
 sub target_menu($$$;$);
 sub target_menu($$$;$){
@@ -661,22 +670,53 @@ sub get_overview ($$$$){
                       grep {  ref $tree->{$_} eq 'HASH' and defined $tree->{$_}{host}}
                       keys %$tree) {
         my @slaves = ("");
+
         if ($tree->{$prop}{slaves}){
-           push @slaves, split /\s+/,$tree->{$prop}{slaves};       
-        };
+            push @slaves, split /\s+/,$tree->{$prop}{slaves};       
+        } 
+        elsif ($tree->{$prop}{host} =~ m|^/|){            # multi host syntax
+            @slaves = split /\s+/, $tree->{$prop}{host};
+        }
+
         my @G; #Graph 'script'
         my $max =  $cfg->{Presentation}{overview}{max_rtt} || "100000";
         my $probe = $probes->{$tree->{$prop}{probe}};
         my $pings = $probe->_pings($tree->{$prop});
         my $i = 0;
+        my @colors = split /\s+/, $cfg->{Presentation}{multihost}{colors};
         for my $slave (@slaves){
             $i++;
-            my $s = $slave ? "~".$slave : "";  
-            my $rrd = $cfg->{General}{datadir}.$dir.'/'.$prop.$s.'.rrd';                
-            my $medc = $slave ? $cfg->{Slaves}{$slave}{color} : $cfg->{Presentation}{overview}{median_color} || "ff0000";
+            my $rrd;
+            my $medc; 
+            my $label;        
+            if ($slave =~ m|^/|){ # multihost entry
+                $rrd = $cfg->{General}{datadir}.'/'.$slave.".rrd";
+                $medc = shift @colors;
+                my @tree_path = split /\//,$slave;
+                shift @tree_path;
+                my ($host,$real_slave) = split /~/, $tree_path[-1]; #/
+                $tree_path[-1]= $host;                
+                my $tree = get_tree($cfg,\@tree_path);
+                $label = "Med RDD ".$tree->{menu};
+                if ($real_slave){
+                    $label .= " from ".  $cfg->{Slaves}{$real_slave}{display_name};
+                }
+                push @colors, $medc;                
+            } 
+            else {
+                my $s = $slave ? "~".$slave : "";  
+                $rrd = $cfg->{General}{datadir}.$dir.'/'.$prop.$s.'.rrd';                
+                $medc = $slave ? $cfg->{Slaves}{$slave}{color} : ($cfg->{Presentation}{overview}{median_color} || shift @colors);            
+                if ($#slaves > 0){
+                    $label = sprintf("%-20s","median RTT from ".($slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname));
+                }
+                else {
+                    $label = "med RTT"
+                }
+            };
+
             my $sdc = $medc;
             $sdc =~ s/^(......).*/${1}30/;
-            my $name = sprintf("%-9s", $slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname);
             push @G, 
                 "DEF:median$i=${rrd}:median:AVERAGE",
                 "DEF:loss$i=${rrd}:loss:AVERAGE",
@@ -689,14 +729,7 @@ sub get_overview ($$$$){
 #                "LINE1:dm2", # this is for kicking things down a bit
                 "AREA:dmlow$i",
                 "AREA:s2d${i}#${sdc}::STACK";
-            if ($#slaves > 0){
-                push @G,
-                  "LINE1:dm$i#$medc:median RTT from $name";
-            }
-            else {
-                push @G,
-                  "LINE1:dm$i#$medc:med RTT";
-            };
+                "LINE1:dm$i#$medc:$label";
             push @G,
                   "VDEF:avmed$i=median$i,AVERAGE",
                   "VDEF:avsd$i=sdev$i,AVERAGE",
@@ -2462,7 +2495,7 @@ DOC
          _doc => <<DOC,
 Defines how the SmokePing data should be presented.
 DOC
-         _sections => [ qw(overview detail charts) ],
+          _sections => [ qw(overview detail charts multihost) ],
           _mandatory => [ qw(overview template detail) ],
           _vars      => [ qw (template charset) ],
           template   => 
@@ -2762,6 +2795,17 @@ DOC
               }, #uptime_colors
         
            }, #detail
+           multihost => {
+              _vars => [ qw(colors) ],
+              _doc => "Settings for the multihost graphs",
+              colors => {
+                 _doc => "Space separated list of colors for multihost graphs",
+                 _example => "ff0000 00ff00 0000ff",
+                 _default => "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1",
+                 _re => '[0-9a-z]{6}(?: [0-9a-z]{6})*',
+                
+              }
+           }, #multi host
         }, #present
         Probes => { _sections => [ "/$KEYD_RE/" ],
                     _doc => <<DOC,
