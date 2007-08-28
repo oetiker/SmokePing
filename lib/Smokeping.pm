@@ -1662,15 +1662,19 @@ sub update_rrds($$$$$$) {
         my $probeobj = $probes->{$probe};
         my $pings = $probeobj->_pings($tree);
         if ($prop eq 'host' and check_filter($cfg,$name)) {
-            my %slave_test = ( map { $_,1 } split(/\s+/, $tree->{slaves}));
-            my $slaveupdates = Smokeping::Master::get_slaveupdates($name);     
+            my %slave_test;
+            my $slaveupdates;
             my @updates = ([ "", time, $probeobj->rrdupdate_string($tree) ]);
-            for my $slave (@{$slaveupdates}){
-                if (not $slave_test{$slave->[0]}){
-                    warn "WARNING: skipping update for $slave->[0] since it is not configured for $name\n";
-                    next;
+            if ($tree->{slaves}){
+                %slave_test = ( map { $_,1 } split(/\s+/, $tree->{slaves}));
+                $slaveupdates = Smokeping::Master::get_slaveupdates($name);     
+                for my $slave (@{$slaveupdates}){
+                    if (not $slave_test{$slave->[0]}){
+                        warn "WARNING: skipping update for $slave->[0] since it is not configured for $name\n";
+                        next;
+                    }
+                    push @updates, $slave;
                 }
-                push @updates, $slave;
             }
             for my $update (sort {$a->[1] <=> $b->[1]}  @updates){ # make sure we put the updates in chronological order in
                 my $s = $update->[0] ? "~".$update->[0] : "";
