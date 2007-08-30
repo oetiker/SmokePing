@@ -1,5 +1,5 @@
 SHELL = /bin/sh
-VERSION = 2.2.0
+VERSION = 2.2.1
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
