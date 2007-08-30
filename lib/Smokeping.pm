@@ -672,12 +672,12 @@ sub get_overview ($$$$){
                       keys %$tree) {
         my @slaves = ("");
 
-        if ($tree->{$prop}{slaves}){
-            push @slaves, split /\s+/,$tree->{$prop}{slaves};       
-        } 
-        elsif ($tree->{$prop}{host} =~ m|^/|){            # multi host syntax
+	if ($tree->{$prop}{host} =~ m|^/|){            # multi host syntax
             @slaves = split /\s+/, $tree->{$prop}{host};
         }
+        elsif ($tree->{$prop}{slaves}){
+            push @slaves, split /\s+/,$tree->{$prop}{slaves};       
+        } 
 
         my @G; #Graph 'script'
         my $max =  $cfg->{Presentation}{overview}{max_rtt} || "100000";
@@ -710,7 +710,7 @@ sub get_overview ($$$$){
                 $rrd = $cfg->{General}{datadir}.$dir.'/'.$prop.$s.'.rrd';                
                 $medc = $slave ? $cfg->{Slaves}{$slave}{color} : ($cfg->{Presentation}{overview}{median_color} || shift @colors);            
                 if ($#slaves > 0){
-                    $label = sprintf("%-20s","median RTT from ".($slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname));
+                    $label = sprintf("%-25s","median RTT from ".($slave ? $cfg->{Slaves}{$slave}{display_name} : $cfg->{General}{display_name} || hostname));
                 }
                 else {
                     $label = "med RTT"
@@ -868,7 +868,7 @@ sub get_detail ($$$$;$){
     return "" unless $tree->{host};
     
     my @dirs = @{$open};
-    my $file = (split(/~/, pop @dirs))[0];
+    my $file = $mode eq 'c' ? (split(/~/, pop @dirs))[0] : pop @dirs;
     my $dir = "";
 
     return "<div>ERROR: ".(join ".", @dirs)." has no probe defined</div>"
@@ -1395,7 +1395,7 @@ sub display_webpage($$){
 
         title => $charts ? "" : $tree->{title},
         remark => $charts ? "" : ($tree->{remark} || ''),
-        overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open ),
+        overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open),
         body => $charts ? "" : get_detail( $cfg,$q,$tree,$open_orig ),
         target_ip => $charts ? "" : ($tree->{host} || ''),
         owner => $cfg->{General}{owner},

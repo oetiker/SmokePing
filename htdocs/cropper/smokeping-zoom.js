@@ -71,13 +71,14 @@ var EndDateString = 0;
 
 function changeRRDImage(coords,dimensions){
 
-    var RRDLeftDiff  = 50;        // difference between left border of RRD image and content
-    var RRDRightDiff = 30;        // difference between right border of RRD image and content
-    var RRDImgWidth  = 697;       // Width of the Smokeping RRD Graphik
-    var RRDImgUsable = 596;       // 598 = 697 - 68 - 33;
     var mySelectLeft = coords.x1;
     var mySelectRight = coords.x2;
         if (mySelectLeft == mySelectRight) return; // abort if nothing is selected.
+
+    var RRDLeft  = 67;        // difference between left border of RRD image and content
+    var RRDRight = 26;        // difference between right border of RRD image and content
+    var RRDImgWidth  = $('zoom').getDimensions().width;       // Width of the Smokeping RRD Graphik
+    var RRDImgUsable = RRDImgWidth - RRDRight - RRDLeft;  
 
          myURLObj = new urlObj(document.URL); 
 
@@ -99,8 +100,8 @@ function changeRRDImage(coords,dimensions){
          var mySerial = mySerialDate.getTime();
 
          // Generate Selected Range in Unix Timestamps
-         var genStart = myParsedStartEpoch + (((mySelectLeft  - RRDLeftDiff) / RRDImgUsable ) * myParsedDivEpoch);
-         var genStop  = myParsedStartEpoch + (((mySelectRight - RRDLeftDiff) / RRDImgUsable ) * myParsedDivEpoch);
+         var genStart = myParsedStartEpoch + (((mySelectLeft  - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
+         var genStop  = myParsedStartEpoch + (((mySelectRight - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
 
          var floorGenStart = Math.floor(genStart);
          var floorGenStop  = Math.floor(genStop);
@@ -127,8 +128,8 @@ Event.observe(
                myCropper = new Cropper.Img( 
                                'zoom', 
                                         { 
-                                                minHeight: 321,
-                                                maxHeight: 321,
+                                                minHeight: $('zoom').getDimensions().height,
+                                                maxHeight: $('zoom').getDimensions().height,
                                                 onEndCrop: changeRRDImage
                                         } 
                                 ) 
