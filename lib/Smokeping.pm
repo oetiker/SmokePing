@@ -1246,7 +1246,8 @@ sub get_detail ($$$$;$){
             }
         } else { # chart mode
             $page .= "<div>";
-            $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
+            my $href= (split /~/, (join ".", @$open))[0]; #/ # the link is 'slave free'            
+            $page .= (  qq{<a href="}.lnk($q, $href).qq{">}
                       . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
             $page .= "</div>";
             
