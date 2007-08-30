@@ -805,9 +805,9 @@ sub findmax ($$) {
      }
      foreach my $x ( keys %maxmedian ){
         if (defined $maxmedian{$x}) {
-                $maxmedian{$x} *= 1.5;
+                $maxmedian{$x} *= 1.2;
         } else {
-                $maxmedian{$x} = $max * 1.5;
+                $maxmedian{$x} = $max * 1.2;
         }
 
         $maxmedian{$x} = $cfg->{Presentation}{detail}{max_rtt} 
