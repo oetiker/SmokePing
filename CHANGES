@@ -1,3 +1,5 @@
+2007/08/30 -- released version 2.2.0
+*** all the new features in this release has been done under contract with DynDNS ***
 
 * Added multi-host function (show data from several links in one graph) -- tobi
 * Added stddev caclulation -- tobi
