@@ -17,6 +17,7 @@ use Smokeping::Colorspace;
 use Smokeping::Master;
 use Smokeping::Slave;
 use Smokeping::RRDhelpers;
+use Smokeping::Graphs;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -391,7 +392,7 @@ sub add_targets ($$$$){
         if (ref $tree->{$prop} eq 'HASH'){
             add_targets $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
-        if ($prop eq 'host' and check_filter($cfg,$name)) {           
+        if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/| ) {           
             if($tree->{host} =~ /^DYNAMIC/) {
                 $probeobj->add($tree,$name);
             } else {
@@ -434,7 +435,7 @@ sub init_target_tree ($$$$) {
             };
             init_target_tree $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
-        if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ /^\//) {           
+        if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/|) {           
             # print "init $name\n";
             my $step = $probeobj->step();
             # we have to do the add before calling the _pings method, it won't work otherwise
@@ -697,9 +698,9 @@ sub get_overview ($$$$){
                 my ($host,$real_slave) = split /~/, $tree_path[-1]; #/
                 $tree_path[-1]= $host;                
                 my $tree = get_tree($cfg,\@tree_path);
-                $label = $tree->{host};
+                $label = $tree->{menu};
                 if ($real_slave){
-                    $label .= " <- ".  $cfg->{Slaves}{$real_slave}{display_name};
+                    $label .= "<".  $cfg->{Slaves}{$real_slave}{display_name};
                 }
                 $label = sprintf("%-20s",$label);
                 push @colors, $medc;                
@@ -788,7 +789,7 @@ sub findmax ($$) {
         my $ERROR = RRDs::error();
            do_log $ERROR if $ERROR;
         my $val = $graphret->[0];
-        $val = 1 if $val =~ /nan/i;
+        $val = 0 if $val =~ /nan/i;
         $maxmedian{$start} = $val;
         push @maxmedian, $val;
     }
@@ -849,12 +850,16 @@ sub get_detail ($$$$;$){
     #        and the length of the graph.
     # c) 'c' chart mode, one graph with a link to it's full page
     # d) 'a' ajax mode, generate image based on given url and dump in on stdout
-    #
+    #    
     my $cfg = shift;
     my $q = shift;
     my $tree = shift;
     my $open = shift;
     my $mode = shift || $q->param('displaymode') || 's';
+    if ($tree->{host} and $tree->{host} =~ m|^/|){
+        return Smokeping::Graphs::get_multi_detail($cfg,$q,$tree,$open,$mode);
+    }
+
     my @slaves = ("");
     if ($tree->{slaves} and $mode eq 's'){
         push @slaves, split /\s+/,$tree->{slaves};       
@@ -875,8 +880,8 @@ sub get_detail ($$$$;$){
     my $probe = $cfg->{__probes}{$tree->{probe}};
     my $ProbeDesc = $probe->ProbeDesc();
     my $ProbeUnit = $probe->ProbeUnit();
-    my $step = $probe->step();
     my $pings = $probe->_pings($tree);
+    my $step = $probe->step();
     my $page;
 
     return "<div>ERROR: unknown displaymode $mode</div>"
@@ -1661,7 +1666,7 @@ sub update_rrds($$$$$$) {
         next if defined $justthisprobe and $probe ne $justthisprobe;
         my $probeobj = $probes->{$probe};
         my $pings = $probeobj->_pings($tree);
-        if ($prop eq 'host' and check_filter($cfg,$name)) {
+        if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/|) { # skip multihost
             my %slave_test;
             my $slaveupdates;
             my @updates = ([ "", time, $probeobj->rrdupdate_string($tree) ]);

@@ -113,10 +113,19 @@ title = Network Latency Grapher
 remark = Welcome to the SmokePing website of xxx Company. \
          Here you will learn all about the latency of our network.
 
-+ James
++ Test
+menu= Targets
 
-menu = Test Target
-title =Test Target
+++ James
+
+menu = James
+title =James
 alerts = someloss
 slaves = boomer
 host = james.oetiker.ch
+
+++ Summer
+
+menu = Summer Host
+title = My Favorite hosts
+host = /Test/James /Test/James~boomer

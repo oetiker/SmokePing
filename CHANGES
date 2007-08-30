@@ -1,24 +1,17 @@
+
+* Added multi-host function (show data from several links in one graph) -- tobi
 * Added stddev caclulation -- tobi
-
 * Added slave support into detail graphs -- tobi
-
 * Made interactive Graph zoomer somewhat work on ie6 and ie7 -- tobi
-
 * Integrated interactive Graph zoomer -- Roman Plessl rplessl oetiker.ch
-
 * first drop of the master/slave code added. now the debugging beginns. -- tobi
-
 * fix uses of uninitialized value in the loss_background code
   -- niko, reported by yilmaz.atag *abs.gov.au
-
 * added description of the master/slave mode I am implementing
   for dyndns -- tobi
-
 * fixed smoke when there is a lot of 'loss' -- tobi
-
 * do not use 127.0.0.1 when testing echoping and curl functionality. There may be someone
   behind this address. -- Michael Hanselmann public hansmi ch
-
 * show all smoke in the detail graphs, even if it's out of the scale. -- niko,
   reported by Oskar Liljeblad <oskar *osk.mine.nu> as Debian bug #412826
 
