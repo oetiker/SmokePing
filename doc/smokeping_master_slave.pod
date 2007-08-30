@@ -57,13 +57,15 @@ instance.
 =head2 Master Configuration
 
 To configure a master/slave setup, add a slaves section to your smokeping
-configuration file. If some configuration parameter must be set to a special
-value for the slave, use an override section to configure this.
+configuration file. Each slave has a section in the slaves part of the
+master configuration file. The section name must match the hostname of the
+slave. If some configuration parameter must be set to a special value for
+the slave, use an override section to configure this.
 
  *** slaves ****
  secrets=/etc/smokeping/slavesecrets.conf 
  +slave1
- name=Slave 1
+ display_name=erul22
  location=India
  ++override
  Probes.FPing.binary = /usr/bin/fping

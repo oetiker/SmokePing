@@ -98,10 +98,10 @@ sub submit_results {
             return undef;
         }
         my $zone = new Safe;
-        $zone->permit_only(':base_core');
+        # $zone->permit_only(???); #input welcome as to good settings
         my $config = $zone->reval($data);
         if ($@){
-            warn "WARNING evaluating new config from server failed: $@";
+            warn "WARNING evaluating new config from server failed: $@ --\n$data";
         } elsif (defined $config and ref $config eq 'HASH'){
             $config->{General}{piddir} = $slave_cfg->{cache_dir};
             Smokeping::do_debuglog("Sent data to Server and got new config");
