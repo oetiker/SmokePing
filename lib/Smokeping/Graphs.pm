@@ -229,7 +229,7 @@ sub get_multi_detail ($$$$;$){
                 "VDEF:avmsr$i=msr$i,AVERAGE",
                 "GPRINT:avmed$i:%5.1lf %ss av md ",
                 "GPRINT:ploss$i:AVERAGE:%5.1lf %% av ls",
-                sprintf('COMMENT:%.1lf ms sd',$stddev*1000.0),
+                sprintf('COMMENT:%5.1lf ms sd',$stddev*1000.0),
                 "GPRINT:avmsr$i:%5.1lf %s am/as\\l";
              
         };
