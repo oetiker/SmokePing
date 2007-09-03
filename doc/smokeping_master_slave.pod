@@ -1,6 +1,6 @@
 =head1 NAME
 
-smokeping_master_slave - How run multiple districuted instances of SmokePing
+smokeping_master_slave - How run multiple distributed instances of SmokePing
 
 =head1 OVERVIEW
 
@@ -9,14 +9,14 @@ to some target host and monitor the latency of the connection between the
 two. 
 
 The Master/Slave concept enables all smokeping probes to run remotely. The
-use case for this is, to measure the overall connectivity in a network. If
+use case for this is to measure the overall connectivity in a network. If
 you are interested in checking that your central DNS server or your file
 server works for everyone, you could setup several smokeping instances
 checking up on on the two servers from multiple locations within your
 network. With the Master/Slave smokeping configuration this process becomes
 much simpler, as one smokeping master server can control multiple slaves.
 
-All monitoring data is stored and presented on the server, but colleted by
+All monitoring data is stored and presented on the server, but collected by
 the slaves. The slaves will also get their configuration information from
 the master, so that you just have to maintain the master server
 configuration file and the rest is taken care of automatically.
@@ -27,13 +27,13 @@ configuration file and the rest is taken care of automatically.
 
 The slaves communicate with the master smokeping server via the normal
 smokeping web interface. On initial startup each slave connects to the
-master server and asks for its assignements. When the slave has done a round
+master server and asks for its assignments. When the slave has done a round
 of probing it connects to the master again to deliver the results.
 
-If the assignemt for a slave change, the master will tell the slave after
+If the assignment for a slave changes, the master will tell the slave after
 the slave has delivered its results.
 
-The master and slaves sign their messages by supplying an md5 hash of the
+The master and the slaves sign their messages by supplying an md5 hash of the
 message appended with a shared secret. Optionally the whole communication
 can run over ssl.
 
@@ -71,7 +71,7 @@ the slave, use an override section to configure this.
  Probes.FPing.binary = /usr/bin/fping
  ...
 
-Then in the targets section you can define slaves at every lvel. Again the
+Then in the targets section you can define slaves at every level. Again the
 settings get inherited by lower order targets and can be overwritten
 anywhere in the tree.
 
@@ -102,8 +102,8 @@ create the following files:
 =head2 Slave Configuration
 
 A smokeping slave setup has no configuration file. It just needs to know
-that it runs in slave-mode and its secret. The secet is stored in a file for
-optimal protection. By default the persitant data cache will be located in
+that it runs in slave-mode and its secret. The secret is stored in a file for
+optimal protection. By default the persistent data cache will be located in
 F</tmp/smokeping.$USER.cache>.
 
  ./smokeping --master-url=http://smokeping/smokeping.cgi \
