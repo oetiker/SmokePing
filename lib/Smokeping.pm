@@ -1845,11 +1845,11 @@ There are three types of "hosts" in smokeping.
 
 =over
 
-=item 1.
+=item 1
 
 The 'hostname' is a name of a host you want to target from smokeping
 
-=item 2.
+=item 2
 
 The string B<DYNAMIC>. Is for machines that have a dynamic IP address. These boxes
 are required to regularly contact the SmokePing server to confirm their IP address.
@@ -1862,14 +1862,14 @@ SNMP SmokePing will also query the hosts
 sysContact, sysName and sysLocation properties to make sure it is
 still the same host.
 
-=item 3.
+=item 3
 
-A space separated list of 'target-path' entries. All targets mentioned in
-this list will be displayed in one graph. Note that the graph will look
-different from the normal smokeping graphs the normal graph is designed to
-show only one host with all its information. The syntax is as follows:
+A space separated list of 'target-path' entries (multihost target). All
+targets mentioned in this list will be displayed in one graph. Note that the
+graph will look different from the normal smokeping graphs. The syntax for
+multihost targets is as follows:
 
- /target/target/target[~slave] [/target/...] ...
+ host = /world/town/host1 /world/town2/host33 /world/town2/host1~slave
 
 =back
 
@@ -2817,7 +2817,7 @@ DOC
            }, #detail
            multihost => {
               _vars => [ qw(colors) ],
-              _doc => "Settings for the multihost graphs",
+              _doc => "Settings for the multihost graphs. At the moment this is only used for the color setting. Check the documentation on the host property of the target section for more.",
               colors => {
                  _doc => "Space separated list of colors for multihost graphs",
                  _example => "ff0000 00ff00 0000ff",

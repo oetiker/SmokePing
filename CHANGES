@@ -1,3 +1,4 @@
+* better documentation on multihost syntax added -- tobi
 * slaves should skip multi target hosts -- tobi
 * set Content-Length header to help multi request queries -- tobi
 

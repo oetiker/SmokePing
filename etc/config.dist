@@ -124,8 +124,9 @@ alerts = someloss
 slaves = boomer
 host = james.oetiker.ch
 
-++ Summer
+++ MultiHost
 
-menu = Summer Host
-title = My Favorite hosts
+menu = Multihost
+title = James and James as seen from Boomer
 host = /Test/James /Test/James~boomer
+
