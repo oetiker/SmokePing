@@ -172,10 +172,10 @@ Speedy CGI. Store the script in a directory of your weberver where CGIs get
 executed. You also have to edit the B<use lib> line similar to what you did
 to F<smokeping>. 
 
-=item F<htdocs/js/*>
+=item F<htdocs/cropper/*>
 
-To make the interactive graph-zoomer work, you have to place the relevant
-files somewhere on your webserver and adapt the links in F<basepage.html>
+To make the interactive graph-zoomer work, you have to place the content of the
+cropper directory somewhere on your webserver and adapt the links in F<basepage.html>
 (see below).
 
 =item F<etc/config>
