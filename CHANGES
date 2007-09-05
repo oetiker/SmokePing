@@ -1,3 +1,6 @@
+* slaves should skip multi target hosts -- tobi
+* set Content-Length header to help multi request queries -- tobi
+
 2007/8/30 -- released version 2.2.2
 * fixed links to slave graphs from chart mode -- tobi
 * minor cosmetic fixes -- tobi

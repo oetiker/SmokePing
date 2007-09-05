@@ -36,11 +36,17 @@ interface introduced in version 6:
 
 =over
 
-=item L<EchoPingDNS|Smokeping::probes::EchoPingDNS>
+=item *
 
-=item L<EchoPingLDAP|Smokeping::probes::EchoPingLDAP>
+L<EchoPingDNS|Smokeping::probes::EchoPingDNS>
 
-=item L<EchoPingWhois|Smokeping::probes::EchoPingWhois>
+=item *
+
+L<EchoPingLDAP|Smokeping::probes::EchoPingLDAP>
+
+=item *
+
+L<EchoPingWhois|Smokeping::probes::EchoPingWhois>
 
 =back
 

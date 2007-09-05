@@ -269,10 +269,11 @@ sub get_multi_detail ($$$$;$){
         if ($mode eq 'a'){ # ajax mode
              open my $img, "${imgbase}_${end}_${start}.png";
              binmode $img;
-             print "Content-Type: image/png\n\n";
+             print "Content-Type: image/png\n";
              my $data;
              read($img,$data,(stat($img))[7]);
              close $img;
+             print "Content-Length: ".length($data)."\n\n";
              print $data;
              unlink "${imgbase}_${end}_${start}.png";
              exit;

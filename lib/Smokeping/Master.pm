@@ -38,6 +38,7 @@ sub get_targets {
         # dynamic hosts can only be queried from the
         # master
         next if $key eq 'host' and $trg->{$key} eq 'DYNAMIC';
+        next if $key eq 'host' and $trg->{$key} =~ m|^/|; # skip multi targets
         next if $key eq 'host' and not ( defined $trg->{slaves} and $trg->{slaves} =~ /\b${slave}\b/);
         if (ref $trg->{$key} eq 'HASH'){
             $return{$key} = get_targets ($trg->{$key},$slave);

@@ -1208,10 +1208,11 @@ sub get_detail ($$$$;$){
         if ($mode eq 'a'){ # ajax mode
              open my $img, "${imgbase}_${end}_${start}.png";
              binmode $img;
-             print "Content-Type: image/png\n\n";
+             print "Content-Type: image/png\n";
              my $data;
              read($img,$data,(stat($img))[7]);
              close $img;
+             print "Content-Length: ".length($data)."\n\n";
              print $data;
              unlink "${imgbase}_${end}_${start}.png";
              exit;
@@ -1410,6 +1411,12 @@ sub display_webpage($$){
         smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
        }
        );
+    print $q->header(-type=>'text/html',
+                     -expires=>'+'.($cfg->{Database}{step}).'s',
+                     -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15'),
+                     -Content_length => length($page),
+                     );
+
     print $page || "<HTML><BODY>ERROR: Reading page template".$cfg->{Presentation}{template}."</BODY></HTML>";
 
 }
@@ -2060,9 +2067,9 @@ DOC
                         $grammar->{$_} = $probevars->{$_};
                         %{$g->{$_}} = %{$probevars->{$_}};
                         # this makes the reference manual a bit less cluttered 
-                        delete $g->{$_}{_doc};
+                        $g->{$_}{_doc} = 'see above';
                         delete $g->{$_}{_example};
-                        delete $grammar->{$_}{_doc};
+                        $grammar->{$_}{_doc} = 'see above';
                         delete $grammar->{$_}{_example};
                 }
                 # make any mandatory variable specified here non-mandatory in the Targets section
@@ -2079,7 +2086,7 @@ DOC
                         delete $g->{$var}{_doc};
                         delete $g->{$var}{_example};
                         # (note: intentionally overwrite _doc)
-                        $grammar->{$var}{_doc} = " (This variable can be overridden target-specifically in the Targets section.)";
+                        $grammar->{$var}{_doc} = "(This variable can be overridden target-specifically in the Targets section.)";
                         $grammar->{$var}{_dyn} = $sub 
                                 if grep { $_ eq $var } @{$targetvars->{_mandatory}};
                 }
@@ -2170,7 +2177,7 @@ General configuration values valid for the whole SmokePing setup.
 DOC
          _vars =>
          [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
-              smokemail cgiurl mailhost contact netsnpp display_name
+              smokemail cgiurl mailhost snpphost contact display_name
               syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
               changecgiprogramname linkstyle) ],
 
@@ -2224,6 +2231,7 @@ try one after the other if one does not answer for 5 seconds.
 DOC
           _sub => sub { require Net::SMTP ||return "ERROR: loading Net::SMTP"; return undef; }
          },
+
          snpphost  => 
          {
           _doc => <<DOC,
@@ -2352,7 +2360,7 @@ DOC
           _re => '(\d+%|random)',
           _re_error => 
           "Use offset either in % of operation interval or 'random'",
-         _doc => <<DOC,
+          _doc => <<DOC,
 If you run many instances of smokeping you may want to prevent them from
 hitting your network all at the same time. Using the offset parameter you
 can change the point in time when the probes are run. Offset is specified
@@ -2561,7 +2569,9 @@ DOC
                title => { _doc => 'Page title' },
                format => { _doc => 'sprintf format string to format curent value' },
                sorter => { _re => '\S+\(\S+\)',
-                           _re_error => 'use a sorter call here: Sorter(arg1=>val1,arg2=>val2)'}
+                           _re_error => 'use a sorter call here: Sorter(arg1=>val1,arg2=>val2)',
+                           _doc => 'sorter for this charts sections',
+                        }
            }
          },     
 
@@ -3151,10 +3161,12 @@ DOC
                                 $g->{_vars} = [ @{$g->{_vars}}, @targetvars ];
                                 $g->{_inherited} = [ @{$g->{_inherited}}, @targetvars ];
                                 # this makes the reference manual a bit less cluttered 
-                                delete $grammar->{$_}{_doc} for @targetvars;
-                                delete $grammar->{$_}{_example} for @targetvars;
-                                delete $g->{$_}{_doc} for @targetvars;
-                                delete $g->{$_}{_example} for @targetvars;
+                                for (@targetvars){
+                                    $g->{$_}{_doc} = 'see above';
+                                    $grammar->{$_}{_doc} = 'see above';
+                                    delete $grammar->{$_}{_example};
+                                    delete $g->{$_}{_example};
+                                }
                                 # make the mandatory variables mandatory only in sections
                                 # with 'host' defined
                                 # see 2.3 above
@@ -3497,10 +3509,6 @@ sub cgi ($) {
         }
     } else {     
         if (not $q->param('displaymode') or $q->param('displaymode') ne 'a'){ #in ayax mode we do not issue a header YET
-                print $q->header(-type=>'text/html',
-                                 -expires=>'+'.($cfg->{Database}{step}).'s',
-                                 -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15')                   
-                     );
         }
         display_webpage $cfg,$q;
     }
