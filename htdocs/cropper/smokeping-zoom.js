@@ -71,54 +71,53 @@ var EndDateString = 0;
 
 function changeRRDImage(coords,dimensions){
 
-    var mySelectLeft = coords.x1;
-    var mySelectRight = coords.x2;
-        if (mySelectLeft == mySelectRight) return; // abort if nothing is selected.
+    var mySelectLeft = Math.min(coords.x1,coords.x2);
+    var mySelectRight = Math.max(coords.x1,coords.x2);
+    if (mySelectLeft == mySelectRight) return; // abort if nothing is selected.
 
     var RRDLeft  = 67;        // difference between left border of RRD image and content
     var RRDRight = 26;        // difference between right border of RRD image and content
     var RRDImgWidth  = $('zoom').getDimensions().width;       // Width of the Smokeping RRD Graphik
     var RRDImgUsable = RRDImgWidth - RRDRight - RRDLeft;  
 
-         myURLObj = new urlObj(document.URL); 
+    var myURLObj = new urlObj(document.URL); 
 
-         // parse start and stop parameter from URL  
-         var myURL = myURLObj.getUrlBase(); 
-         var myRawStartDate = (StartDateString != 0) ? StartDateString : myURLObj.getUrlParameterValue("start");
-         var myRawStopDate  = (EndDateString != 0) ? EndDateString : myURLObj.getUrlParameterValue("end");   
-         var myRawTarget    = myURLObj.getUrlParameterValue("target"); 
+    // parse start and stop parameter from URL  
+    var myURL = myURLObj.getUrlBase(); 
+    var myRawStartDate = (StartDateString != 0) ? StartDateString : myURLObj.getUrlParameterValue("start");
+    var myRawStopDate  = (EndDateString != 0) ? EndDateString : myURLObj.getUrlParameterValue("end");   
+    var myRawTarget    = myURLObj.getUrlParameterValue("target"); 
 
-         var myParsedStartDate = ISODateToJS(myRawStartDate);
-         var myParsedStartEpoch = Math.floor(myParsedStartDate.getTime()/1000.0);
+    var myParsedStartDate = ISODateToJS(myRawStartDate);
+    var myParsedStartEpoch = Math.floor(myParsedStartDate.getTime()/1000.0);
+    var myParsedStopDate  = ISODateToJS(myRawStopDate);
+    var myParsedStopEpoch = Math.floor(myParsedStopDate.getTime()/1000.0);   
  
-         var myParsedStopDate  = ISODateToJS(myRawStopDate);
-         var myParsedStopEpoch = Math.floor(myParsedStopDate.getTime()/1000.0);   
- 
-         var myParsedDivEpoch = myParsedStopEpoch - myParsedStartEpoch; 
+    var myParsedDivEpoch = myParsedStopEpoch - myParsedStartEpoch; 
 
-         var mySerialDate = new Date();
-         var mySerial = mySerialDate.getTime();
+    var mySerialDate = new Date();
+    var mySerial = mySerialDate.getTime();
 
-         // Generate Selected Range in Unix Timestamps
-         var genStart = myParsedStartEpoch + (((mySelectLeft  - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
-         var genStop  = myParsedStartEpoch + (((mySelectRight - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
+    // Generate Selected Range in Unix Timestamps
+    var genStart = myParsedStartEpoch + (((mySelectLeft  - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
+    var genStop  = myParsedStartEpoch + (((mySelectRight - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
 
-         var floorGenStart = Math.floor(genStart);
-         var floorGenStop  = Math.floor(genStop);
+    var floorGenStart = Math.floor(genStart);
+    var floorGenStop  = Math.floor(genStop);
 
-         var StartDate = new Date(floorGenStart*1000); 
-         var StopDate  = new Date(floorGenStop*1000);
+    var StartDate = new Date(floorGenStart*1000); 
+    var StopDate  = new Date(floorGenStop*1000);
 
-         // floor to last full minute
-         var MinuteGenStart = ( Math.floor(floorGenStart / 60) * 60 );
-         var MinuteGenStop  = ( Math.floor(floorGenStop  / 60) * 60 );
+    // floor to last full minute
+    var MinuteGenStart = ( Math.floor(floorGenStart / 60) * 60 );
+    var MinuteGenStop  = ( Math.floor(floorGenStop  / 60) * 60 );
 
-         StartDateString = JSToISODate(StartDate);
-         EndDateString   = JSToISODate(StopDate);
+    StartDateString = JSToISODate(StartDate);
+    EndDateString   = JSToISODate(StopDate);
 
-         // construct Image URL
-         $('zoom').src = myURL + "?displaymode=a;start=" + StartDateString+ ";end=" + EndDateString + ";target=" + myRawTarget + ";serial=" + mySerial;
-         myCropper.setParams();
+    // construct Image URL
+    $('zoom').src = myURL + "?displaymode=a;start=" + StartDateString+ ";end=" + EndDateString + ";target=" + myRawTarget + ";serial=" + mySerial;
+    myCropper.setParams();
 };
 
 Event.observe( 
