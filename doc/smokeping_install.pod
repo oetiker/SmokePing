@@ -18,7 +18,7 @@ downloading the tool.
 
 =over
 
-=item RRDtool 1.0.x or 1.2.x
+=item RRDtool 1.2.x
 
 L<http://oss.oetiker.ch/rrdtool/>
 
