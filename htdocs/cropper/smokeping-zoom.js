@@ -1,8 +1,28 @@
+/*++ from bonsai.js ++ urlObj  +++++++++++++++++++++++++++++++++++++++++*/
+function urlObj(url) {
+   var urlBaseAndParameters;
+
+   urlBaseAndParameters = url.split("?"); 
+   this.urlBase = urlBaseAndParameters[0];
+   this.urlParameters = urlBaseAndParameters[1].split(/[;&]/);
+
+   this.getUrlBase = urlObjGetUrlBase;
+}
+
+/*++ from bonsai.js ++ urlObjGetUrlBase  +++++++++++++++++++++++++++++++*/
+
+function urlObjGetUrlBase() {
+   return this.urlBase;
+}
+
+
 // example with minimum dimensions
 var myCropper;
 
 var StartEpoch = 0;
 var EndEpoch = 0;
+
+
 
 function changeRRDImage(coords,dimensions){
 
@@ -17,23 +37,31 @@ function changeRRDImage(coords,dimensions){
     var RRDRight = 26;        // difference between right border of RRD image and content
     var RRDImgWidth  = $('zoom').getDimensions().width;       // Width of the Smokeping RRD Graphik
     var RRDImgUsable = RRDImgWidth - RRDRight - RRDLeft;  
-
-    if (StartEpoch == 0) 
-        StartEpoch = $('epoch_start').value;
+    var form = $('range_form');
+    
+    if (StartEpoch == 0)
+        StartEpoch = +$F('epoch_start');
+   
     if (EndEpoch  == 0)
-        EndEpoch = $('epoch_end').value;
+        EndEpoch = +$F('epoch_end');
+
     var DivEpoch = EndEpoch - StartEpoch; 
 
-    var Target = $('target').value;
+    var Target = $F('target');
+
+    // construct Image URL
+    var myURLObj = new urlObj(document.URL); 
+
+    var myURL = myURLObj.getUrlBase(); 
 
     // Generate Selected Range in Unix Timestamps
 
-    StartEpoch = Math.floor(StartEpoch + (((SelectLeft  - RRDLeft) / RRDImgUsable ) * DivEpoch));
-    EndEpoch  = Math.ceil(StartEpoch + (((SelectRight - RRDLeft) / RRDImgUsable ) * DivEpoch));
+    var NewStartEpoch = Math.floor(StartEpoch + (SelectLeft  - RRDLeft) * DivEpoch / RRDImgUsable );
+    EndEpoch  =  Math.ceil(StartEpoch + (SelectRight - RRDLeft) * DivEpoch / RRDImgUsable );
+    StartEpoch = NewStartEpoch;
 
-    // construct Image URL
+    $('zoom').src = myURL + '?displaymode=a;start=' + StartEpoch + ';end=' + EndEpoch + ';target=' + Target;
 
-    $('zoom').src = myURL + "?displaymode=a;start=" + genStart+ ";end=" + genEnd + ";target=" + Target;
     myCropper.setParams();
 
 };

@@ -109,7 +109,7 @@ sub get_multi_detail ($$$$;$){
             $imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
             $imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
         } else {
-            my $serial = $q->param('serial');
+            my $serial = int(rand(2000));
             $imgbase =$cfg->{General}{imgcache}."/__navcache/".$serial;
             $imghref =$cfg->{General}{imgurl}."/__navcache/".$serial;
         }

@@ -836,6 +836,7 @@ sub smokecol ($) {
 sub parse_datetime($){
     my $in = shift;
     for ($in){
+	/^(\d+)$/ && do { my $value = $1; $value = time if $value > 2**32; return $value};
         /^\s*(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?\s*$/  && 
             return POSIX::mktime($6||0,$5||0,$4||0,$3,$2-1,$1-1900,0,0,-1);
         /([ -:a-z0-9]+)/ && return $1;
@@ -941,13 +942,12 @@ sub get_detail ($$$$;$){
 	    $imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
 	    $imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
         } else {
-            my $serial = rand();
+            my $serial = int(rand(2000));
             $imgbase =$cfg->{General}{imgcache}."/__navcache/".$serial;
             $imghref =$cfg->{General}{imgurl}."/__navcache/".$serial;
         }
 
         @tasks = (["Navigator Graph".$name, parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
-
         my ($graphret,$xs,$ys) = RRDs::graph
           ("dummy", 
            '--start', $tasks[0][1],
@@ -1198,7 +1198,7 @@ sub get_detail ($$$$;$){
                 
               my $graphret;
               ($graphret,$xs{$s},$ys{$s}) = RRDs::graph @task;
-              #  print "<div>INFO:".join("<br/>",@task)."</div>";
+ #             die "<div>INFO:".join("<br/>",@task)."</div>";
               my $ERROR = RRDs::error();
               if ($ERROR) {
                   return "<div>ERROR: $ERROR</div><div>".join("<br/>",@task)."</div>";
@@ -1206,7 +1206,7 @@ sub get_detail ($$$$;$){
         }
 
         if ($mode eq 'a'){ # ajax mode
-             open my $img, "${imgbase}_${end}_${start}.png";
+             open my $img, "${imgbase}_${end}_${start}.png" or die "${imgbase}_${end}_${start}.png: $!";
              binmode $img;
              print "Content-Type: image/png\n";
              my $data;
@@ -1222,11 +1222,11 @@ sub get_detail ($$$$;$){
            $page .= qq|<IMG id="zoom" BORDER="0" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
 #           $page .= "</div>";
 
-           $page .= $q->start_form(-method=>'GET')
+           $page .= $q->start_form(-method=>'GET', -id=>'range_form')
               . "<p>Time range: "
-              . $q->hidden(-name=>'epoc_start',-id=>'epoc_start',-default=>$start)
-              . $q->hidden(-name=>'epoc_end',-id=>'epoc_end',-default=>$end)
-              . $q->hidden(-name=>'target' -id=>'target' )
+              . $q->hidden(-name=>'epoch_start',-id=>'epoch_start',-default=>$start)
+              . $q->hidden(-name=>'epoch_end',-id=>'epoch_end',-default=>time())
+              . $q->hidden(-name=>'target',-id=>'target' )
               . $q->hidden(-name=>'displaymode',-default=>$mode )
               . $q->textfield(-name=>'start',-default=>$startstr)
               . "&nbsp;&nbsp;to&nbsp;&nbsp;".$q->textfield(-name=>'end',-default=>$endstr)
