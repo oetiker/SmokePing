@@ -941,7 +941,7 @@ sub get_detail ($$$$;$){
 	    $imgbase =$cfg->{General}{imgcache}."/__navcache/".time()."$$";
 	    $imghref =$cfg->{General}{imgurl}."/__navcache/".time()."$$";
         } else {
-            my $serial = $q->param('serial');
+            my $serial = rand();
             $imgbase =$cfg->{General}{imgcache}."/__navcache/".$serial;
             $imghref =$cfg->{General}{imgurl}."/__navcache/".$serial;
         }
@@ -1224,10 +1224,12 @@ sub get_detail ($$$$;$){
 
            $page .= $q->start_form(-method=>'GET')
               . "<p>Time range: "
+              . $q->hidden(-name=>'epoc_start',-id=>'epoc_start',-default=>$start)
+              . $q->hidden(-name=>'epoc_end',-id=>'epoc_end',-default=>$end)
+              . $q->hidden(-name=>'target' -id=>'target' )
+              . $q->hidden(-name=>'displaymode',-default=>$mode )
               . $q->textfield(-name=>'start',-default=>$startstr)
               . "&nbsp;&nbsp;to&nbsp;&nbsp;".$q->textfield(-name=>'end',-default=>$endstr)
-              . $q->hidden(-name=>'target' )
-              . $q->hidden(-name=>'displaymode',-default=>$mode )
               . "&nbsp;"
               . $q->submit(-name=>'Generate!')
               . "</p>"

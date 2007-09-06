@@ -1,123 +1,41 @@
-/*++ from bonsai.js ++ urlObj  +++++++++++++++++++++++++++++++++++++++++*/
-function urlObj(url) {
-   var urlBaseAndParameters;
-
-   urlBaseAndParameters = url.split("?"); 
-   this.urlBase = urlBaseAndParameters[0];
-   this.urlParameters = urlBaseAndParameters[1].split(/[;&]/);
-
-   this.getUrlBase = urlObjGetUrlBase;
-   this.getUrlParameterValue = urlObjGetUrlParameterValue;
-}
-
-/*++ from bonsai.js ++ urlObjGetUrlBase  +++++++++++++++++++++++++++++++*/
-
-function urlObjGetUrlBase() {
-   return this.urlBase;
-}
-
-/*++ form bonsai.js ++  urlObjGetUrlParameterValue  +++++++++++++++++++++*/
-
-function urlObjGetUrlParameterValue(parameter) {
-   var i;
-   var fieldAndValue;
-   var value;
-
-   i = 0;
-   while (this.urlParameters [i] != undefined) {
-      fieldAndValue = this.urlParameters[i].split("=");
-      if (fieldAndValue[0] == parameter) {
-         value = fieldAndValue[1];
-      } 
-    i++;
-    }
-    return value;
-}
-
-/*++++++++++++++++++++  isoDateToJS  +++++++++++++++++++++++++++++++++++++*/
-function ISODateToJS(rawisodate) {
-   var decode = decodeURIComponent(rawisodate);
-  if (decode == "now") {
-       return new Date();
-   } 
-   else  {
-      var M = decode.match(/(\d\d\d\d)-(\d\d?)-(\d\d?)[+ ](\d\d?):(\d\d?)/)
-      var date = new Date(M[1], M[2]-1, M[3], M[4], M[5], "00")
-      return date;
-   }
-}
-
-/*++++++++++++++++++++++ JSToisoDate ++++++++++++++++++++++++++++++++++++++*/
-function JSToISODate(mydate) {
-   var isodate = mydate.getFullYear() + "-";
-   if ((mydate.getMonth() + 1) < 10)   { isodate = isodate + "0"; } 
-   isodate = isodate + (mydate.getMonth() + 1) + "-";
-   if (mydate.getDate() < 10)           { isodate = isodate + "0"; }  
-   isodate = isodate + mydate.getDate() + " ";
-   if (mydate.getHours() < 10)         { isodate = isodate + "0"; }   
-   isodate = isodate + mydate.getHours() + ":";
-   if (mydate.getMinutes() < 10)       { isodate = isodate + "0"; } 
-   isodate = isodate + mydate.getMinutes();
-   return encodeURI(isodate);
-}
-
 // example with minimum dimensions
 var myCropper;
 
-
-// will be started by modified iSelect (StopApply Function)
-var StartDateString = 0;
-var EndDateString = 0;
+var StartEpoch = 0;
+var EndEpoch = 0;
 
 function changeRRDImage(coords,dimensions){
 
-    var mySelectLeft = Math.min(coords.x1,coords.x2);
-    var mySelectRight = Math.max(coords.x1,coords.x2);
-    if (mySelectLeft == mySelectRight) return; // abort if nothing is selected.
+    var SelectLeft = Math.min(coords.x1,coords.x2);
+
+    var SelectRight = Math.max(coords.x1,coords.x2);
+
+    if (SelectLeft == SelectRight)
+         return; // abort if nothing is selected.
 
     var RRDLeft  = 67;        // difference between left border of RRD image and content
     var RRDRight = 26;        // difference between right border of RRD image and content
     var RRDImgWidth  = $('zoom').getDimensions().width;       // Width of the Smokeping RRD Graphik
     var RRDImgUsable = RRDImgWidth - RRDRight - RRDLeft;  
 
-    var myURLObj = new urlObj(document.URL); 
+    if (StartEpoch == 0) 
+        StartEpoch = $('epoch_start').value;
+    if (EndEpoch  == 0)
+        EndEpoch = $('epoch_end').value;
+    var DivEpoch = EndEpoch - StartEpoch; 
 
-    // parse start and stop parameter from URL  
-    var myURL = myURLObj.getUrlBase(); 
-    var myRawStartDate = (StartDateString != 0) ? StartDateString : myURLObj.getUrlParameterValue("start");
-    var myRawStopDate  = (EndDateString != 0) ? EndDateString : myURLObj.getUrlParameterValue("end");   
-    var myRawTarget    = myURLObj.getUrlParameterValue("target"); 
-
-    var myParsedStartDate = ISODateToJS(myRawStartDate);
-    var myParsedStartEpoch = Math.floor(myParsedStartDate.getTime()/1000.0);
-    var myParsedStopDate  = ISODateToJS(myRawStopDate);
-    var myParsedStopEpoch = Math.floor(myParsedStopDate.getTime()/1000.0);   
- 
-    var myParsedDivEpoch = myParsedStopEpoch - myParsedStartEpoch; 
-
-    var mySerialDate = new Date();
-    var mySerial = mySerialDate.getTime();
+    var Target = $('target').value;
 
     // Generate Selected Range in Unix Timestamps
-    var genStart = myParsedStartEpoch + (((mySelectLeft  - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
-    var genStop  = myParsedStartEpoch + (((mySelectRight - RRDLeft) / RRDImgUsable ) * myParsedDivEpoch);
 
-    var floorGenStart = Math.floor(genStart);
-    var floorGenStop  = Math.floor(genStop);
-
-    var StartDate = new Date(floorGenStart*1000); 
-    var StopDate  = new Date(floorGenStop*1000);
-
-    // floor to last full minute
-    var MinuteGenStart = ( Math.floor(floorGenStart / 60) * 60 );
-    var MinuteGenStop  = ( Math.floor(floorGenStop  / 60) * 60 );
-
-    StartDateString = JSToISODate(StartDate);
-    EndDateString   = JSToISODate(StopDate);
+    StartEpoch = Math.floor(StartEpoch + (((SelectLeft  - RRDLeft) / RRDImgUsable ) * DivEpoch));
+    EndEpoch  = Math.ceil(StartEpoch + (((SelectRight - RRDLeft) / RRDImgUsable ) * DivEpoch));
 
     // construct Image URL
-    $('zoom').src = myURL + "?displaymode=a;start=" + StartDateString+ ";end=" + EndDateString + ";target=" + myRawTarget + ";serial=" + mySerial;
+
+    $('zoom').src = myURL + "?displaymode=a;start=" + genStart+ ";end=" + genEnd + ";target=" + Target;
     myCropper.setParams();
+
 };
 
 Event.observe( 
