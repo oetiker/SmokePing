@@ -52,7 +52,8 @@ sub get_stddev{
         }
     }
     return undef unless $cnt;
-    return sqrt( 1.0 / $cnt * ( $sqsum - $sum**2 / $cnt ))
+    my $sqdev =  1.0 / $cnt * ( $sqsum - $sum**2 / $cnt );
+    return $sqdev < 0.0 ? 0.0 : sqrt($sqdev);
 }
 
 

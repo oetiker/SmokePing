@@ -1,3 +1,5 @@
+* fixed problem with rounding error in calculating stddev
+
 2007/9/06 -- released version 2.2.3
 * alter ajax grapher mode to use seconds timestamps and not iso dates
   this prevents timezone problems with the browser -- tobi
