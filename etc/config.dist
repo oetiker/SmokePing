@@ -1,14 +1,14 @@
 *** General ***
 
-owner    = Tobi Oetiker
-contact  = tobi@oetiker.ch
-mailhost = johan.oetiker.ch
+owner    = Peter Random
+contact  = some@address.nowhere
+mailhost = my.mail.host
 sendmail = /usr/lib/sendmail
 imgcache = /home/oetiker/public_html/smokeping-ms/cache
 imgurl   = cache
 datadir  = /tmp/smokeping-ms/data
 piddir  = /tmp/smokeping-ms/var
-cgiurl   = http://johan.oetiker.ch/~oetiker/smokeping-ms/smokeping.cgi
+cgiurl   = http://some.url/smokeping.cgi
 smokemail = /scratch/oetiker/smoke-master/etc/smokemail.dist
 tmail = /scratch/oetiker/smoke-master/etc/tmail.dist
 # specify this to get syslog logging
@@ -18,7 +18,7 @@ syslogfacility = local0
 # concurrentprobes = no
 
 *** Alerts ***
-to = tobi@oetiker.ch
+to = alertee@address.somewhere
 from = smokealert@company.xy
 
 +someloss
@@ -122,7 +122,7 @@ menu = James
 title =James
 alerts = someloss
 slaves = boomer
-host = james.oetiker.ch
+host = james.address
 
 ++ MultiHost
 
