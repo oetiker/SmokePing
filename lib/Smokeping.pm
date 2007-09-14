@@ -1845,13 +1845,13 @@ DOC
         _doc => <<DOC,
 There are three types of "hosts" in smokeping.
 
-=over
+${e}over
 
-=item 1
+${e}item 1
 
 The 'hostname' is a name of a host you want to target from smokeping
 
-=item 2
+${e}item 2
 
 The string B<DYNAMIC>. Is for machines that have a dynamic IP address. These boxes
 are required to regularly contact the SmokePing server to confirm their IP address.
@@ -1864,7 +1864,7 @@ SNMP SmokePing will also query the hosts
 sysContact, sysName and sysLocation properties to make sure it is
 still the same host.
 
-=item 3
+${e}item 3
 
 A space separated list of 'target-path' entries (multihost target). All
 targets mentioned in this list will be displayed in one graph. Note that the
@@ -1873,7 +1873,7 @@ multihost targets is as follows:
 
  host = /world/town/host1 /world/town2/host33 /world/town2/host1~slave
 
-=back
+${e}back
 
 DOC
 

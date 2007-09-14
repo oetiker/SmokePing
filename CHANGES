@@ -1,5 +1,6 @@
 * fixed problem with rounding error in calculating stddev
 * include the prototype.js license for completeness -- niko
+* fix Smokeping.pm POD documentation -- niko
 
 2007/9/06 -- released version 2.2.3
 * alter ajax grapher mode to use seconds timestamps and not iso dates
