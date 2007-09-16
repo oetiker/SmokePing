@@ -1,3 +1,5 @@
+2007/9/16 -- released version 2.2.4
+
 * Fixed zooming mode in multi host graphs -- tobi
 * Warn when smokeping uses takes over 80% of the time available for a polling cycle -- tobi
 * don't complain when there is no data in a graph yet while calculation stddev -- tobi
