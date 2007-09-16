@@ -3987,6 +3987,15 @@ KID:
                         do_log($warn);
                 }
         }
+        elsif ($runtime > $step * 0.8) {
+                my $warn = "NOTE: smokeping took $runtime seconds to complete 1 round of polling. ".
+                "This is over 80% of the max time available for a polling cycle ($step seconds).\n";
+                if (defined $myprobe) {
+                        $probes->{$myprobe}->do_log($warn);
+                } else {
+                        do_log($warn);
+                }
+        }
         last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
     }
     $0 =~ s/ \[$myprobe\]$// if $changeprocessnames;
