@@ -208,7 +208,7 @@ sub get_multi_detail ($$$$;$){
             $label = sprintf("%-20s",$label);
             push @colors, $medc;
             my $sdc = $medc;
-            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime);
+            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime) || 0;
             $sdc =~ s/^(......).*/${1}30/;
             push @G,
                 "DEF:median$i=${rrd}:median:AVERAGE",

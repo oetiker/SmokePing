@@ -685,6 +685,7 @@ sub get_overview ($$$$){
         my $pings = $probe->_pings($tree->{$prop});
         my $i = 0;
         my @colors = split /\s+/, $cfg->{Presentation}{multihost}{colors};
+        my $ProbeUnit = $probe->ProbeUnit();
         for my $slave (@slaves){
             $i++;
             my $rrd;
@@ -698,7 +699,15 @@ sub get_overview ($$$$){
                 my ($host,$real_slave) = split /~/, $tree_path[-1]; #/
                 $tree_path[-1]= $host;                
                 my $tree = get_tree($cfg,\@tree_path);
+                # not all multihost entries must have the same number of pings
+                $probe = $probes->{$tree->{$prop}{probe}};
+                $pings = $probe->_pings($tree->{$prop});
                 $label = $tree->{menu};
+                # if there are multiple units ... lets say so ... 
+                if ($ProbeUnit ne $probe->ProbeUnit()){
+                    $ProbeUnit = 'var units';
+                }
+                
                 if ($real_slave){
                     $label .= "<".  $cfg->{Slaves}{$real_slave}{display_name};
                 }
@@ -742,7 +751,6 @@ sub get_overview ($$$$){
                   "GPRINT:avmsr$i:%5.1lf %s am/as\\l";
 
         }
-        my $ProbeUnit = $probe->ProbeUnit();
         my ($graphret,$xs,$ys) = RRDs::graph 
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
     #       '--lazy',

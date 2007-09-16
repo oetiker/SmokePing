@@ -1,4 +1,6 @@
-* fixed problem with rounding error in calculating stddev
+* don't complain when there is no data in a graph yet while calculation stddev -- tobi
+* in a multihost graph take the number of pings for each component into consideration  -- tobi
+* fixed problem with rounding error in calculating stddev -- tobi
 * include the prototype.js license for completeness -- niko
 * fix Smokeping.pm POD documentation -- niko
 
