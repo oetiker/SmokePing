@@ -284,7 +284,7 @@ sub get_multi_detail ($$$$;$){
            $page .= qq|<IMG id="zoom" border="0" width="$xs" height="$ys" SRC="${imghref}_${end}_${start}.png">| ;
 #           $page .= "</div>";
 
-           $page .= $q->start_form(-method=>'GET')
+           $page .= $q->start_form(-method=>'GET', -id=>'range_form')
               . "<p>Time range: "
               . $q->textfield(-name=>'start',-default=>$startstr)
               . "&nbsp;&nbsp;to&nbsp;&nbsp;".$q->textfield(-name=>'end',-default=>$endstr)
