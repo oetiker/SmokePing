@@ -700,8 +700,8 @@ sub get_overview ($$$$){
                 $tree_path[-1]= $host;                
                 my $tree = get_tree($cfg,\@tree_path);
                 # not all multihost entries must have the same number of pings
-                $probe = $probes->{$tree->{$prop}{probe}};
-                $pings = $probe->_pings($tree->{$prop});
+                $probe = $probes->{$tree->{probe}};
+                $pings = $probe->_pings($tree);
                 $label = $tree->{menu};
                 # if there are multiple units ... lets say so ... 
                 if ($ProbeUnit ne $probe->ProbeUnit()){
