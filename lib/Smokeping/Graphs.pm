@@ -288,6 +288,8 @@ sub get_multi_detail ($$$$;$){
               . "<p>Time range: "
               . $q->textfield(-name=>'start',-default=>$startstr)
               . "&nbsp;&nbsp;to&nbsp;&nbsp;".$q->textfield(-name=>'end',-default=>$endstr)
+              . $q->hidden(-name=>'epoch_start',-id=>'epoch_start',-default=>$start)
+              . $q->hidden(-name=>'epoch_end',-id=>'epoch_end',-default=>time())
               . $q->hidden(-name=>'target' )
               . $q->hidden(-name=>'displaymode',-default=>$mode )
               . "&nbsp;"
