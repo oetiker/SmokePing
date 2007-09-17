@@ -66,7 +66,7 @@ function changeRRDImage(coords,dimensions){
     if (SelectRight > RRDImgWidth - RRDRight)
         RightFactor = 10;
 
-    EndEpoch  =  Math.ceil(StartEpoch + (SelectRight - RRDLeft) * DivEpoch / RRDImgUsable * RightFactor);
+    EndEpoch  =  Math.ceil(EndEpoch + (SelectRight - (RRDImgWidth - RRDRight) ) * DivEpoch / RRDImgUsable * RightFactor);
 
     StartEpoch = NewStartEpoch;
 
