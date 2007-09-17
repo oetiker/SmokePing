@@ -1,3 +1,5 @@
+* updated cropper: when selecting something outside the graph, multiply by 10. Use this to zoom out -- tobi
+
 2007/9/16 -- released version 2.2.4
 
 * Fixed zooming mode in multi host graphs -- tobi
