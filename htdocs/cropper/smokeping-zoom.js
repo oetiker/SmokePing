@@ -61,14 +61,13 @@ function changeRRDImage(coords,dimensions){
     if (SelectLeft < RRDLeft)
         LeftFactor = 10;        
 
-    var NewStartEpoch = Math.floor(StartEpoch + (SelectLeft  - RRDLeft) * DivEpoch / RRDImgUsable * LeftFactor );
+    StartEpoch = Math.floor(StartEpoch + (SelectLeft  - RRDLeft) * DivEpoch / RRDImgUsable * LeftFactor );
 
     if (SelectRight > RRDImgWidth - RRDRight)
         RightFactor = 10;
 
     EndEpoch  =  Math.ceil(EndEpoch + (SelectRight - (RRDImgWidth - RRDRight) ) * DivEpoch / RRDImgUsable * RightFactor);
 
-    StartEpoch = NewStartEpoch;
 
     $('zoom').src = myURL + '?displaymode=a;start=' + StartEpoch + ';end=' + EndEpoch + ';target=' + Target;
 
