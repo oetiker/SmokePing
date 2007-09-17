@@ -37,7 +37,7 @@ function changeRRDImage(coords,dimensions){
     var RRDRight = 26;        // difference between right border of RRD image and content
     var RRDImgWidth  = $('zoom').getDimensions().width;       // Width of the Smokeping RRD Graphik
     var RRDImgUsable = RRDImgWidth - RRDRight - RRDLeft;  
-    var form = $('range_form');
+    var form = $('range_form');   
     
     if (StartEpoch == 0)
         StartEpoch = +$F('epoch_start');
@@ -55,9 +55,19 @@ function changeRRDImage(coords,dimensions){
     var myURL = myURLObj.getUrlBase(); 
 
     // Generate Selected Range in Unix Timestamps
+    var LeftFactor = 1;
+    var RightFactor = 1;
 
-    var NewStartEpoch = Math.floor(StartEpoch + (SelectLeft  - RRDLeft) * DivEpoch / RRDImgUsable );
-    EndEpoch  =  Math.ceil(StartEpoch + (SelectRight - RRDLeft) * DivEpoch / RRDImgUsable );
+    if (SelectLeft < RRDLeft)
+        LeftFactor = 10;        
+
+    var NewStartEpoch = Math.floor(StartEpoch + (SelectLeft  - RRDLeft) * DivEpoch / RRDImgUsable * LeftFactor );
+
+    if (SelectRight > RRDImgWidth - RRDRight)
+        RightFactor = 10;
+
+    EndEpoch  =  Math.ceil(StartEpoch + (SelectRight - RRDLeft) * DivEpoch / RRDImgUsable * RightFactor);
+
     StartEpoch = NewStartEpoch;
 
     $('zoom').src = myURL + '?displaymode=a;start=' + StartEpoch + ';end=' + EndEpoch + ';target=' + Target;
