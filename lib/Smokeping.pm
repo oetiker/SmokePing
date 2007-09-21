@@ -4021,6 +4021,8 @@ sub reload_cfg ($) {
         my $cfgfile = shift;
         my ($oldcfg, $oldprobes) = ($cfg, $probes);
         do_log("Reloading configuration.");
+        $cfg = undef;
+        $probes = undef;
         eval { load_cfg($cfgfile) };
         if ($@) {
                 do_log("Reloading configuration from $cfgfile failed: $@");

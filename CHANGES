@@ -1,3 +1,7 @@
+* make sure reload_config reloads in any case even when the config has not changed ... 
+  with this we solve the problem that maybe some @include configs have changed
+  which we would not find out otherwise -- tobi
+
 * updated cropper: when selecting something outside the graph, multiply by 10. Use this to zoom out -- tobi
 
 2007/9/16 -- released version 2.2.4
