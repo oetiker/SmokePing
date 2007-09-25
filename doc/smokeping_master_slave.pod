@@ -62,6 +62,12 @@ master configuration file. The section name must match the hostname of the
 slave. If some configuration parameter must be set to a special value for
 the slave, use an override section to configure this.
 
+The slave names must be the names the hosts think they have not their
+outside hostnames or ip addresses or anything like that. When the slave
+calls the master to get its config or report its measurements it will tell
+the master its 'hostname'. This together with the shared secret is used to
+authenticate and identify who is who.
+
  *** slaves ****
  secrets=/etc/smokeping/slavesecrets.conf 
  +slave1
