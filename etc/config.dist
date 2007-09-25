@@ -9,8 +9,8 @@ imgurl   = cache
 datadir  = /tmp/smokeping-ms/data
 piddir  = /tmp/smokeping-ms/var
 cgiurl   = http://some.url/smokeping.cgi
-smokemail = /scratch/oetiker/smoke-master/etc/smokemail.dist
-tmail = /scratch/oetiker/smoke-master/etc/tmail.dist
+smokemail = /home/oetiker/checkouts/smokeping/trunk/software/etc/smokemail.dist
+tmail = /home/oetiker/checkouts/smokeping/trunk/software/etc/tmail.dist
 # specify this to get syslog logging
 syslogfacility = local0
 # each probe is now run in its own process
@@ -44,7 +44,7 @@ AVERAGE  0.5 144   720
 
 *** Presentation ***
 
-template = /scratch/oetiker/smoke-master/etc/basepage.html.dist
+template = /home/oetiker/checkouts/smokeping/trunk/software/etc/basepage.html.dist
 
 + charts
 
@@ -99,7 +99,7 @@ unison_tolerance = 2
 binary = /usr/sbin/fping
 
 *** Slaves ***
-secrets=/scratch/oetiker/smoke-master/etc/smokeping_secrets.dist
+secrets=/home/oetiker/checkouts/smokeping/trunk/software/etc/smokeping_secrets.dist
 +boomer
 display_name=boomer
 color=0000ff

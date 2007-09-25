@@ -1,3 +1,5 @@
+* switched to config grammar 1.10 (pre release) -- tobi
+
 * make sure reload_config reloads in any case even when the config has not changed ... 
   with this we solve the problem that maybe some @include configs have changed
   which we would not find out otherwise -- tobi

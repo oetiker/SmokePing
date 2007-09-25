@@ -9,7 +9,7 @@ use Digest::MD5 qw(md5_base64);
 use SNMP_util;
 use SNMP_Session;
 use POSIX;
-use Config::Grammar;
+use Smokeping::Config;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
 use Sys::Hostname;
@@ -2175,7 +2175,7 @@ DOC
         },
     }; # $PROBES
 
-    my $parser = Config::Grammar->new 
+    my $parser = Smokeping::Config->new 
       (
        {
         _sections  => [ qw(General Database Presentation Probes Targets Alerts Slaves) ],
