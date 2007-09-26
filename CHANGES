@@ -1,4 +1,4 @@
-* switched to config grammar 1.10 (pre release) -- tobi
+* switched to config grammar 1.10  -- tobi
 
 * make sure reload_config reloads in any case even when the config has not changed ... 
   with this we solve the problem that maybe some @include configs have changed
