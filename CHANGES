@@ -1,3 +1,9 @@
+* In the SSH probe let the user configure the port to use when talking to the client --tobi
+
+* Make master/slave work when slave names contain uppercase letters and full dots. -- tobi
+
+* Allow slave-name to be configured -- tobi
+
 * switched to config grammar 1.10  -- tobi
 
 * make sure reload_config reloads in any case even when the config has not changed ... 

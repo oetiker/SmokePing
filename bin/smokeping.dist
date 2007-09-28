@@ -58,6 +58,11 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
 
  --master-url=s Run smokeping in slave mode. Attach to master for config.
 
+ --slave-name=s By default the slave will use whatever it thinks its name
+                is, when talking to its master. In some cases you may
+                probably want to override this.
+
+
  --shared-secret=s File containing the shared secret for talking to the server.
 
  --cache-dir=s Directory for temporary data storage when running in slave mode.

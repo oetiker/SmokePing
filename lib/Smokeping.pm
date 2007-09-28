@@ -1956,7 +1956,7 @@ DOC
 If you want to have alerts for this target and all targets below it go to a particular address
 on top of the address already specified in the alert, you can add it here. This can be a comma separated list of items.
 DOC
-           slaves => { _re => '[-a-z0-9]+(?:\s+[-a-z0-9]+)*',
+           slaves => { _re => '${KEYD_RE}(?:\s+${KEYD_RE})*',
                         _re_error => 'slave1 [slave2]',
                         _doc => <<DOC },
 The slave names must match the slaves you have setup in the slaves section.
@@ -3712,7 +3712,7 @@ sub main (;$) {
     GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
                       'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
                       'config=s', 'check', 'gen-examples', 'reload', 
-                      'master-url=s','cache-dir=s','shared-secret=s') or pod2usage(2);
+                      'master-url=s','cache-dir=s','shared-secret=s','slave-name=s') or pod2usage(2);
     if($opt{version})  { print "$VERSION\n"; exit(0) };
     if(exists $opt{man}) {
         if ($opt{man}) {
@@ -3753,7 +3753,7 @@ sub main (;$) {
             master_url => $opt{'master-url'},
             cache_dir => $opt{'cache-dir'},
             shared_secret => $secret,
-            slave_name => hostname,
+            slave_name => $opt{'slave-name'} || hostname(),
         };
         # this should get us a config set from the server
         my $new_conf = Smokeping::Slave::submit_results($slave_cfg,$cfg);

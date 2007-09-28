@@ -82,7 +82,7 @@ sub pingone ($){
 
     my $host = $target->{addr};
 
-    my $query = "$self->{properties}{binary} -t $target->{vars}->{keytype} $host";
+    my $query = "$self->{properties}{binary} -t $target->{vars}->{keytype}  -p $target->{vars}->{port} $host";
     my @times;
 
     # get the user and system times before and after the test
@@ -129,10 +129,16 @@ sub targetvars {
         my $class = shift;
         return $class->_makevars($class->SUPER::targetvars, {
            keytype => {
-               _doc => "Type of key, used in ssh-keyscan -t <keytype>",
+               _doc => "Type of key, used in ssh-keyscan -t I<keytype>",
 	       _re => "[dt]sa1*",
                _example => 'dsa',
-                _default => 'rsa',
+               _default => 'rsa',
+           },
+           port => {
+               _doc => "Port to use when testing the ssh connection -p I<port>",
+	       _re => "\d+",
+               _example => '5000',
+               _default => '22',
            },
        })
 }
