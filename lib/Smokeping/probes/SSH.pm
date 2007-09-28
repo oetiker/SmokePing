@@ -136,7 +136,7 @@ sub targetvars {
            },
            port => {
                _doc => "Port to use when testing the ssh connection -p I<port>",
-	       _re => "\d+",
+	       _re => '\d+',
                _example => '5000',
                _default => '22',
            },
