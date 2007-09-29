@@ -458,12 +458,14 @@ this.resizing=true;
 this.resizeHandle=Event.element(e).classNames().toString().replace(/([^N|NE|E|SE|S|SW|W|NW])+/,"");
 Event.stop(e);
 },startDrag:function(e){
+if(Event.isLeftClick(e)){
 this.selArea.show();
 this.clickCoords=this.getCurPos(e);
 this.setAreaCoords({x1:this.clickCoords.x,y1:this.clickCoords.y,x2:this.clickCoords.x,y2:this.clickCoords.y},false,false,null);
 this.dragging=true;
 this.onDrag(e);
 Event.stop(e);
+}
 },getCurPos:function(e){
 var el=this.imgWrap,wrapOffsets=Position.cumulativeOffset(el);
 while(el.nodeName!="BODY"){

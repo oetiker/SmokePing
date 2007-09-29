@@ -1081,14 +1081,16 @@ Cropper.Img.prototype = {
 	 * @return void
 	 */
 	startDrag: function( e ) {	
+             if(Event.isLeftClick(e)){
 		this.selArea.show();
 		this.clickCoords = this.getCurPos( e );
      	
-    	this.setAreaCoords( { x1: this.clickCoords.x, y1: this.clickCoords.y, x2: this.clickCoords.x, y2: this.clickCoords.y }, false, false, null );
+         	this.setAreaCoords( { x1: this.clickCoords.x, y1: this.clickCoords.y, x2: this.clickCoords.x, y2: this.clickCoords.y }, false, false, null );
     	
-    	this.dragging = true;
-    	this.onDrag( e ); // incase the user just clicks once after already making a selection
-    	Event.stop( e );
+        	this.dragging = true;
+            	this.onDrag( e ); // incase the user just clicks once after already making a selection
+            	Event.stop( e );
+          }
 	},
 	
 	/**
