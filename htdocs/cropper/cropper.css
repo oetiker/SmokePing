@@ -163,7 +163,7 @@
  */
 .imgCrop_dragArea {
 	width: 100%;
-	height: 100%;
+	height: 80%;
 	z-index: 200;
 	position: absolute;
 	top: 0;
