@@ -88,15 +88,16 @@ sub test_usage {
 
 	my $arghashref = $self->features;
 	my %arghash = %$arghashref;
-
 	for my $feature (keys %arghash) {
-		if (`$bin $arghash{$feature} 1 0.0.0.1 2>&1` =~ /invalid option|usage/i) {
+                # when the option is invalid, then echoping would
+                # complain. if it is valid, then it will just display
+                # the usage message.
+		if (`$bin $arghash{$feature} 2>&1` !~ /^Usage/i) {
 			push @unsupported, $feature;
 			$self->do_log("Note: your echoping doesn't support the $feature feature (option $arghash{$feature}), disabling it");
 		}
 	}
 	map { delete $arghashref->{$_} } @unsupported;
-
 	return;
 }
 

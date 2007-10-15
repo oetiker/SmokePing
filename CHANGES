@@ -1,6 +1,19 @@
-* In the SSH probe let the user configure the port to use when talking to the client --tobi
+* fixed parsing of slaves statements in config file. This did not work at
+  all it seems --tobi
 
-* Make master/slave work when slave names contain uppercase letters and full dots. -- tobi
+* modified all the 'live' tests with curl and echoping to not be live but
+  use other indications to see if the software is happy or not. Manly for
+  echoping this depends on the way echo ping complains about option usage.
+  So this may need tuning in the future. --tobi
+
+* allow rightclicks in the legnd area of the zoom image. this allows to save
+  the image. -- tobi
+
+* In the SSH probe let the user configure the port to use when talking to
+  the client --tobi
+
+* Make master/slave work when slave names contain uppercase letters and full
+  dots. -- tobi
 
 * Allow slave-name to be configured -- tobi
 
@@ -10,7 +23,8 @@
   with this we solve the problem that maybe some @include configs have changed
   which we would not find out otherwise -- tobi
 
-* updated cropper: when selecting something outside the graph, multiply by 10. Use this to zoom out -- tobi
+* updated cropper: when selecting something outside the graph, multiply by
+  10. Use this to zoom out -- tobi
 
 2007/9/16 -- released version 2.2.4
 

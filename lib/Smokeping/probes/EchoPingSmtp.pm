@@ -54,7 +54,7 @@ sub test_usage {
 	my $self = shift;
 	my $bin = $self->{properties}{binary};
 	croak("Your echoping binary doesn't support SMTP")
-		if `$bin -S 0.0.0.1 2>&1` =~ /(not compiled|invalid option|usage)/i;
+		if `$bin -S  2>&1`  !~ /^Usage/;
 	$self->SUPER::test_usage;
 	return;
 }

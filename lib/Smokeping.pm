@@ -1956,7 +1956,7 @@ DOC
 If you want to have alerts for this target and all targets below it go to a particular address
 on top of the address already specified in the alert, you can add it here. This can be a comma separated list of items.
 DOC
-           slaves => {  _re => "${KEYD_RE}(:?\\s+${KEYD_RE})*",
+           slaves => {  _re => "${KEYD_RE}(?:\\s+${KEYD_RE})*",
                         _re_error => 'Use the format: slaves='.${KEYD_RE}.' [slave2]',
                         _doc => <<DOC },
 The slave names must match the slaves you have setup in the slaves section.

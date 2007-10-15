@@ -103,6 +103,7 @@ secrets=/home/oetiker/checkouts/smokeping/trunk/software/etc/smokeping_secrets.d
 +boomer
 display_name=boomer
 color=0000ff
++slave2
 
 *** Targets ***
 
@@ -121,7 +122,7 @@ menu= Targets
 menu = James
 title =James
 alerts = someloss
-slaves = boomer
+slaves = boomer slave2
 host = james.address
 
 ++ MultiHost
