@@ -100,6 +100,10 @@ sub testhost {
 sub ping ($){
     my $self = shift;
     # do NOT call superclass ... the ping method MUST be overwriten
+
+    # increment the internal 'rounds' counter
+    $self->increment_rounds_count;
+
     my %upd;
     my $inh = gensym;
     my $outh = gensym;

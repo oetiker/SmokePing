@@ -64,7 +64,7 @@ sub new($$)
     my $class   = ref($this) || $this;
     my $self = { properties => shift, cfg => shift, 
     name => shift,
-    targets => {}, rtts => {}, addrlookup => {}};
+    targets => {}, rtts => {}, addrlookup => {}, rounds_count => 0};
     bless $self, $class;
     return $self;
 }
@@ -93,6 +93,18 @@ sub ProbeDesc ($) {
 sub ProbeUnit ($) {
     return "Seconds";
 }    
+
+# this is a read-only variable that should get incremented by
+# the ping() method
+sub rounds_count ($) {
+    my $self = shift;
+    return $self->{rounds_count};
+}
+
+sub increment_rounds_count ($) {
+    my $self = shift;
+    $self->{rounds_count}++;
+}
 
 sub target2dynfile ($$) {
     # the targets are stored in the $self->{targets}

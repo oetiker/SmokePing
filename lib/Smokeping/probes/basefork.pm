@@ -146,6 +146,9 @@ DOC
 sub ping {
 	my $self = shift;
 
+	# increment the internal 'rounds' counter
+	$self->increment_rounds_count;
+
 	my @targets = @{$self->targets};
 	return unless @targets;
 
