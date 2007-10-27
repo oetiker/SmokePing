@@ -165,4 +165,4 @@ dist:   tar commit
 
 tag:    dist
 	svn ls svn://svn.oetiker.ch/smokeping/tags/$(VERSION) || \
-	svn copy -m "tagging version $(VERSION)" svn://svn.oetiker.ch/smokeping/trunk/software svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION)
+	svn copy -m "tagging version $(VERSION)" svn://svn.oetiker.ch/smokeping/trunk/software svn://svn.oetiker.ch/smokeping/tags/$(VERSION)
