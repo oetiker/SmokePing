@@ -74,16 +74,6 @@ sub proto_args {
 	return ("-m", $plugin);
 }
 
-sub test_usage {
-	my $self = shift;
-	my $bin = $self->{properties}{binary};
-    # is there anything smarter to do?
-	croak("Your echoping binary doesn't support plugins. At least version 6 is required.")
-		if `$bin -m improbable_plugin_name 0.0.0.1 2>&1` =~ /invalid option/i;
-	$self->SUPER::test_usage;
-	return;
-}
-
 sub ProbeDesc($) {
 	return "Pings using an echoping(1) plugin";
 }

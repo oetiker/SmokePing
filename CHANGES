@@ -1,10 +1,13 @@
+* removed all the 'live' tests from the echoping probes --niko
+
+* log a warning message on the first 'round' of pinging if curl or 
+  echoping exits with non-zero status --niko
+
 * fixed parsing of slaves statements in config file. This did not work at
   all it seems --tobi
 
-* modified all the 'live' tests with curl and echoping to not be live but
-  use other indications to see if the software is happy or not. Manly for
-  echoping this depends on the way echo ping complains about option usage.
-  So this may need tuning in the future. --tobi
+* modified all the 'live' tests with curl to not be live but
+  use other indications to see if the software is happy or not. --tobi
 
 * allow rightclicks in the legnd area of the zoom image. this allows to save
   the image. -- tobi

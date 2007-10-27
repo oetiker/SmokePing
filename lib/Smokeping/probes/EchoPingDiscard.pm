@@ -42,15 +42,6 @@ sub proto_args {
 	return ("-d", @args);
 }
 
-sub test_usage {
-	my $self = shift;
-	my $bin = $self->{properties}{binary};
-	croak("Your echoping binary doesn't support DISCARD")
-		if `$bin -d  2>&1`  !~ /^Usage/i;
-	$self->SUPER::test_usage;
-	return;
-}
-
 sub ProbeDesc($) {
 	return "TCP or UDP Discard pings using echoping(1)";
 }

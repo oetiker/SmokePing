@@ -303,7 +303,20 @@ sub pingone {
 				$self->do_debug("curl output: '$_', result: $val");
 			};
 		}
-		close P and defined $val and push @times, $val;
+		close P;
+		if ($?) {
+			my $status = $? >> 8;
+			my $signal = $? & 127;
+			my $why = "with status $status";
+			$why .= " [signal $signal]" if $signal;
+
+			# only log warnings on the first ping of the first ping round
+			my $function = ($self->rounds_count == 1 and $i == 0) ? 
+				"do_log" : "do_debug";
+
+			$self->$function(qq(WARNING: curl exited $why on $t->{addr}));
+		}
+		push @times, $val if defined $val;
 	}
 	
 	# carp("Got @times") if $self->debug;

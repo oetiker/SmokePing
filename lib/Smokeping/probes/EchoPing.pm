@@ -74,31 +74,7 @@ sub new {
 
 	$self->_init if $self->can('_init');
 
-    # no need for this if running as a CGI
-	$self->test_usage unless $ENV{SERVER_SOFTWARE};
-
 	return $self;
-}
-
-# warn about unsupported features
-sub test_usage {
-	my $self = shift;
-	my $bin = $self->{properties}{binary};
-	my @unsupported;
-
-	my $arghashref = $self->features;
-	my %arghash = %$arghashref;
-	for my $feature (keys %arghash) {
-                # when the option is invalid, then echoping would
-                # complain. if it is valid, then it will just display
-                # the usage message.
-		if (`$bin $arghash{$feature} 2>&1` !~ /^Usage/i) {
-			push @unsupported, $feature;
-			$self->do_log("Note: your echoping doesn't support the $feature feature (option $arghash{$feature}), disabling it");
-		}
-	}
-	map { delete $arghashref->{$_} } @unsupported;
-	return;
 }
 
 sub ProbeDesc($) {
@@ -205,14 +181,25 @@ sub pingone {
 
 	open(P, "$cmd 2>&1 |") or carp("fork: $!");
 	
-	# what should we do with error messages?
-	my $echoret;
+	my @output;
 	while (<P>) {
-		$echoret .= $_;
+		chomp;
+		push @output, $_;
 		/^Elapsed time: (\d+\.\d+) seconds/ and push @times, $1;
 	}
 	close P;
-	$self->do_log("WARNING: $cmd was not happy: $echoret") if $?;
+	if ($?) {
+		my $status = $? >> 8;
+		my $signal = $? & 127;
+		my $why = "with status $status";
+		$why .= " [signal $signal]" if $signal;
+
+		# only log warnings on the first ping round
+		my $function = ($self->rounds_count == 1 ? "do_log" : "do_debug");
+
+		$self->$function(qq(WARNING: "$cmd" exited $why - output follows));
+		$self->$function(qq(         $_)) for @output;
+	}
 	# carp("Got @times") if $self->debug;
 	return sort { $a <=> $b } @times;
 }

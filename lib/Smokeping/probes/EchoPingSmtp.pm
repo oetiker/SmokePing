@@ -50,15 +50,6 @@ sub proto_args {
 	return ("-S");
 }
 
-sub test_usage {
-	my $self = shift;
-	my $bin = $self->{properties}{binary};
-	croak("Your echoping binary doesn't support SMTP")
-		if `$bin -S  2>&1`  !~ /^Usage/;
-	$self->SUPER::test_usage;
-	return;
-}
-
 sub ProbeDesc($) {
         return "SMTP pings using echoping(1)";
 }

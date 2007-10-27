@@ -84,25 +84,6 @@ sub proto_args {
 	return @args;
 }
 
-sub test_usage {
-	my $self = shift;
-	my $bin = $self->{properties}{binary};
-	croak("Your echoping binary doesn't support HTTP")
-		if `$bin -h /  2>&1`  !~ /^Usage/;
-	if (`$bin -a -h /  2>&1`  !~ /^Usage/) {
-		carp("Note: your echoping binary doesn't support revalidating (-a), disabling it");
-		$self->{_disabled}{a} = undef;
-	}
-
-	if (`$bin -A -h /  2>&1`  !~ /^Usage/) {
-		carp("Note: your echoping binary doesn't support ignoring cache (-A), disabling it");
-		$self->{_disabled}{A} = undef;
-	}
-
-	$self->SUPER::test_usage;
-	return;
-}
-
 sub ProbeDesc($) {
         return "HTTP pings using echoping(1)";
 }

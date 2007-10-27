@@ -50,17 +50,6 @@ sub proto_args {
 	return ("-C", @args);
 }
 
-sub test_usage {
-	my $self = shift;
-
-	my $bin = $self->{properties}{binary};
-	my $response  = `$bin -C -h / 0.0.0.1 2>&1`;
-	croak("Your echoping binary doesn't support SSL")
-		if ($response =~ /(not compiled|invalid option|usage)/i);
-	$self->SUPER::test_usage;
-	return;
-}
-
 sub ProbeDesc($) {
         return "HTTPS pings using echoping(1)";
 }
