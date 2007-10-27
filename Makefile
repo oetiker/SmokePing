@@ -1,5 +1,5 @@
 SHELL = /bin/sh
-VERSION = 2.2.4
+VERSION = 2.2.5
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
@@ -164,5 +164,5 @@ dist:   tar commit
 	scp CHANGES smokeping-$(VERSION).tar.gz oposs@oss.oetiker.ch:public_html/smokeping/pub/
 
 tag:    dist
-	svn ls svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION) || \
-	svn copy -m "tagging version $(VERSION)" svn://svn.ee.ethz.ch/smokeping/branches/2.0 svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION)
+	svn ls svn://svn.oetiker.ch/smokeping/tags/$(VERSION) || \
+	svn copy -m "tagging version $(VERSION)" svn://svn.oetiker.ch/smokeping/trunk/software svn://svn.ee.ethz.ch/smokeping/tags/$(VERSION)
