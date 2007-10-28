@@ -1,6 +1,6 @@
 SHELL = /bin/sh
 VERSION = 2.2.6
-SVNREPO = svn://svn.oetiker.ch/smokeping
+SVNREPO := svn://svn.oetiker.ch/smokeping
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
