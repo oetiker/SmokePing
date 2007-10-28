@@ -1,3 +1,9 @@
+2007/10/28 -- released version 2.2.6
+* removed some cruft from the release archive -- tobi
+* fixed release process to prevent furture cruft -- tobi
+* use curl --manual to figure which options are supported (this was in 2.2.5
+  already) --tobi
+
 2007/10/27 -- released version 2.2.5
 
 * removed all the 'live' tests from the echoping probes --niko
