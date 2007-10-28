@@ -1,5 +1,6 @@
 SHELL = /bin/sh
 VERSION = 2.2.5
+SVNREPO = svn://svn.oetiker.ch/smokeping
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
@@ -152,17 +153,17 @@ killdoc:
 doc:    killdoc ref examples man html txt rename-man
 
 # patch first so Smokeping.pm is older than smokeping_config.pod in the tarball
-tar:	patch doc
-	-ln -s . smokeping-$(VERSION)
-	find smokeping-$(VERSION)/* -type f -follow -o -type l | egrep -v '$(IGNORE)' | tar -T - -czvf smokeping-$(VERSION).tar.gz
-	rm smokeping-$(VERSION)
+tar:	patch doc commit
+	svn checkout $(SVNREPO)/software/trunk smokeping-$(VERSION)
+	tar --exclude .svn czvf smokeping-$(VERSION).tar.gz smokeping-$(VERSION)
+	rm -rf smokeping-$(VERSION)
 
 commit:
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	
-dist:   tar commit
+dist:   tar
 	scp CHANGES smokeping-$(VERSION).tar.gz oposs@oss.oetiker.ch:public_html/smokeping/pub/
 
 tag:    dist
-	svn ls svn://svn.oetiker.ch/smokeping/tags/$(VERSION) || \
-	svn copy -m "tagging version $(VERSION)" svn://svn.oetiker.ch/smokeping/trunk/software svn://svn.oetiker.ch/smokeping/tags/$(VERSION)
+	svn ls $(SVNREPO)/tags/$(VERSION) || \
+	svn copy -m "tagging version $(VERSION)" $(SVNREPO)/trunk/software $(SVNREPO)/tags/$(VERSION)
