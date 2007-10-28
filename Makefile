@@ -142,10 +142,6 @@ doc/smokeping_config.pod: lib/Smokeping.pm
 	$(MAKEPOD) > $@
 doc/smokeping_examples.pod: lib/Smokeping/Examples.pm etc/config.dist
 	$(GENEX)
-patch:
-	$(PERL) -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
-	$(PERL) -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
-	$(PERL) -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
 
 killdoc:
 	-rm doc/*.[1357] doc/*.txt doc/*.html doc/Smokeping/* doc/Smokeping/probes/* doc/Smokeping/matchers/* doc/Smokeping/sorters/* doc/Config/* doc/examples/* doc/smokeping_examples.pod doc/smokeping_config.pod doc/smokeping.pod doc/smokeping.cgi.pod
@@ -153,16 +149,17 @@ killdoc:
 doc:    killdoc ref examples man html txt rename-man
 
 # patch first so Smokeping.pm is older than smokeping_config.pod in the tarball
-smokeping-2.2.6.tar.gz: patch commit
+smokeping-$(VERSION).tar.gz:
+	$(PERL) -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
+	$(PERL) -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
+	$(PERL) -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
+	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	svn checkout $(SVNREPO)/trunk/software smokeping-$(VERSION)
 	(cd smokeping-$(VERSION) && make doc)
 	tar czvf smokeping-$(VERSION).tar.gz --exclude .svn smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 
-commit:
-	svn commit -m "prepare for the release of smokeping-$(VERSION)"
-	
-dist:   smokeping-2.2.6.tar.gz
+dist:   smokeping-$(VERSION).tar.gz
 	scp CHANGES smokeping-$(VERSION).tar.gz oposs@oss.oetiker.ch:public_html/smokeping/pub/
 
 tag:    dist
