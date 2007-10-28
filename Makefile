@@ -153,8 +153,9 @@ killdoc:
 doc:    killdoc ref examples man html txt rename-man
 
 # patch first so Smokeping.pm is older than smokeping_config.pod in the tarball
-tar:	patch doc commit
-	svn checkout $(SVNREPO)/software/trunk smokeping-$(VERSION)
+tar:	commit
+	svn checkout $(SVNREPO)/trunk/software smokeping-$(VERSION)
+	(cd smokeping-$(VERSION) &&  make patch && make doc)
 	tar --exclude .svn czvf smokeping-$(VERSION).tar.gz smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 
