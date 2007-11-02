@@ -1,4 +1,5 @@
 * Do not force a page reload more frequently than every 120s -- tobi
+* Make sure slaves in targets match up with entries in the slaves section -- tobi
 
 2007/10/28 -- released version 2.2.6
 * removed some cruft from the release archive -- tobi
