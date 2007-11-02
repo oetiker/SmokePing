@@ -1421,8 +1421,9 @@ sub display_webpage($$){
         smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
        }
        );
+    my $expi = $cfg->{Database}{step} > 120 ? $cfg->{Database}{step} : 120;
     print $q->header(-type=>'text/html',
-                     -expires=>'+'.($cfg->{Database}{step}).'s',
+                     -expires=>'+'.$expi.'s',
                      -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15'),
                      -Content_length => length($page),
                      );
