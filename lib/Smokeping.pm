@@ -447,7 +447,7 @@ sub init_target_tree ($$$$) {
             };
             for my $slave (@slaves){
                 die "ERROR: slave '$slave' is not defined in the '*** Slaves ***' section!\n"
-                        unless $cfg->{Slaves}{$slave};
+                        unless $slave eq '' or defined $cfg->{Slaves}{$slave};
                 my $s = $slave ? "~".$slave : "";
                 my @create =    
                         ($name.$s.".rrd", "--start",(time-1),"--step",$step,
