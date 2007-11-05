@@ -389,7 +389,7 @@ sub list_rrds($$$) {
         if (ref $tree->{$rrds} eq 'HASH'){
 			$prline .= list_rrds( $tree->{$rrds}, $path."/$rrds", $print );
         } 
-        if ($rrds eq 'host') {
+        if ($rrds eq 'host' and $tree->{$rrds} !~ m|/| ) {
             $prline .= "$cfg->{General}{datadir}$path".".rrd\n";
 		}
 	}
