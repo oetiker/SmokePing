@@ -37,7 +37,7 @@ use Smokeping::RRDtools;
 
 # globale persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
-$VERSION="2.002006";
+$VERSION="2.002007";
 
 # we want opts everywhere
 my %opt;
@@ -1355,13 +1355,10 @@ sub load_sortercache($){
 sub display_webpage($$){
     my $cfg = shift;
     my $q = shift;
-    my $open_orig = [ split /\./,( $q->param('target') || '')];
-    my $open = [@$open_orig]; # in this version we get rid of the 'slave' part if there is any
-    my ($host,$slave);
-    if (0 < @$open){ 
-        ($host,$slave) =  split(/~/, $open->[-1]);
-        $open->[-1] = $host;
-    }
+    my ($path,$slave) = split(/~/,$q->param('target') || '');
+    my $open = [ (split /\./,$path) ];
+    my $open_orig = [@$open];
+    $open_orig->[-1] .= '~'.$slave if $slave;
 
     my $tree = $cfg->{Targets};
     my $targets = $cfg->{Targets};

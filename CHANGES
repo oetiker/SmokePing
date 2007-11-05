@@ -1,3 +1,8 @@
+2007/10/29 -- released version 2.2.7
+
+* Make slaves with FQDN work properly -- tobi
+* Report when *** slaves *** section and slaves statements in the
+  target section do not agree. -- tobi
 * Make tsmoke work with multihost targets -- tobi
 * Do not force a page reload more frequently than every 120s -- tobi
 * Make sure slaves in targets match up with entries in the slaves section -- tobi

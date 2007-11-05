@@ -4,7 +4,7 @@
 use lib qw(/usr/pack/rrdtool-1.2.23-mo/lib/perl);
 use lib qw(lib);
 
-use Smokeping 2.002006;
+use Smokeping 2.002007;
  
 Smokeping::main("etc/config.dist");
 
