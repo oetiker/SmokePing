@@ -126,10 +126,17 @@ sub morning_update($) {
 		$target =~ s/.rrd//;
 		$TmpBody .= "$target\n" if $Loss == 0;
 	}
-	$Body = "Subject: Of $Count Hosts, $Down Down\n";
-	$Body .= "To: $To\n\n";
-	$Body .= "Of $Count Hosts, $Down Down:\n";
-	$Body .= $TmpBody;
+	$Body = <<MAIL_END;
+Subject: Of $Count Hosts, $Down Down
+To: $To
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-encoding: 8bit
+MIME-Version: 1.0
+
+Of $Count Hosts, $Down Down:
+
+$TmpBody
+MAIL_END
 	Smokeping::sendmail($cfg->{Alerts}{from},$To,$Body);
 }
 
@@ -207,8 +214,14 @@ sub weekly_update($) {
 	}
 
         # Prepare the e-mail message
-	    $Body = "Subject: IT System Availability\n";
-	    $Body .= "To: $To\n\n";
+	$Body = <<MAIL_END;
+Subject: IT System Availability
+To: $To
+Content-Type: text/html; charset=iso-8859-15
+Content-Transfer-encoding: 8bit
+MIME-Version: 1.0
+
+MAIL_END
 	    open tSMOKE, $cfg->{General}{tmail} or die "ERROR: can't read $cfg->{General}{tmail}\n";
 	    while (<tSMOKE>){
                 my $Summary = Summary_Sheet();

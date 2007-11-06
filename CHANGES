@@ -1,3 +1,5 @@
+* make sure tsmoke sends mime conformant mails -- tobi
+
 2007/10/29 -- released version 2.2.7
 
 * Make slaves with FQDN work properly -- tobi
