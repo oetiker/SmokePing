@@ -1,0 +1,202 @@
+# English translations for PACKAGE package.
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-11-14 11:29-0600\n"
+"PO-Revision-Date: 2007-10-26 23:25+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: source/class/Smokeping/Application.js:47
+msgid "Root Node"
+msgstr ""
+
+#~ msgid "Start Date"
+#~ msgstr "Start Date"
+
+#, fuzzy
+#~ msgid "Time"
+#~ msgstr "Title"
+
+#~ msgid "End Date"
+#~ msgstr "End Date"
+
+#~ msgid "Location"
+#~ msgstr "Location"
+
+#~ msgid "Data Source"
+#~ msgstr "Data Source"
+
+#~ msgid "Data Massage"
+#~ msgstr "Data Massage"
+
+#~ msgid "Location/Client"
+#~ msgstr "Location/Client"
+
+#~ msgid "Data Filter"
+#~ msgstr "Data Filter"
+
+#~ msgid "Y axis"
+#~ msgstr "Y axis"
+
+#~ msgid "Plot Data"
+#~ msgstr "Plot Data"
+
+#~ msgid "Open in Excel"
+#~ msgstr "Open in Excel"
+
+#~ msgid "Please make sure all entries in the form are valid!"
+#~ msgstr "Please make sure all entries in the form are valid!"
+
+#, fuzzy
+#~ msgid "Snap"
+#~ msgstr "Sunday"
+
+#~ msgid "Client"
+#~ msgstr "Client"
+
+#~ msgid "Low"
+#~ msgstr "Low"
+
+#~ msgid "Filter out values lower than this"
+#~ msgstr "Filter out values lower than this"
+
+#~ msgid "High"
+#~ msgstr "High"
+
+#~ msgid "Filter out values higher than this"
+#~ msgstr "Filter out values higher than this"
+
+#, fuzzy
+#~ msgid "Data Set 1"
+#~ msgstr "Data Source"
+
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#~ msgid "Title"
+#~ msgstr "Title"
+
+#~ msgid "Unit"
+#~ msgstr "Unit"
+
+#, fuzzy
+#~ msgid "Data Set 2"
+#~ msgstr "Data Source"
+
+#~ msgid "Start"
+#~ msgstr "Start"
+
+#~ msgid "End"
+#~ msgstr "End"
+
+#~ msgid "From"
+#~ msgstr "From"
+
+#~ msgid "To"
+#~ msgstr "To"
+
+#~ msgid "Time filter: Use only data in the specified time range"
+#~ msgstr "Time filter: Use only data in the specified time range"
+
+#~ msgid "DOW"
+#~ msgstr "DOW"
+
+#~ msgid "Weekday filter: Use only data for the selected weekday"
+#~ msgstr "Weekday filter: Use only data for the selected weekday"
+
+#~ msgid "Monday"
+#~ msgstr "Monday"
+
+#~ msgid "Tuesday"
+#~ msgstr "Tuesday"
+
+#~ msgid "Wednesday"
+#~ msgstr "Wednesday"
+
+#~ msgid "Thursday"
+#~ msgstr "Thursday"
+
+#~ msgid "Friday"
+#~ msgstr "Friday"
+
+#~ msgid "Saturday"
+#~ msgstr "Saturday"
+
+#~ msgid "Sunday"
+#~ msgstr "Sunday"
+
+#~ msgid "y-min"
+#~ msgstr "y-min"
+
+#~ msgid "y-max"
+#~ msgstr "y-max"
+
+#~ msgid "Merge"
+#~ msgstr "Merge"
+
+#~ msgid "day"
+#~ msgstr "day"
+
+#~ msgid "1 week"
+#~ msgstr "1 week"
+
+#~ msgid "2 weeks"
+#~ msgstr "2 weeks"
+
+#~ msgid "3 weeks"
+#~ msgstr "3 weeks"
+
+#~ msgid "4 weeks"
+#~ msgstr "4 weeks"
+
+#~ msgid "Contents"
+#~ msgstr "Contents"
+
+#~ msgid "Fit"
+#~ msgstr "Fit"
+
+#~ msgid "Scale"
+#~ msgstr "Scale"
+
+#~ msgid "Time series"
+#~ msgstr "Time series"
+
+#~ msgid "Histogram"
+#~ msgstr "Histogram"
+
+#~ msgid "Bins"
+#~ msgstr "Bins"
+
+#, fuzzy
+#~ msgid "Bin data (for mean/median and histograms)"
+#~ msgstr ""
+#~ "Number of date ranges for calculation\n"
+#~ " of mean/median values and histogram bins"
+
+#, fuzzy
+#~ msgid "Message:"
+#~ msgstr "Merge"
+
+#, fuzzy
+#~ msgid "Fetch Data"
+#~ msgstr "Plot Data"
+
+#~ msgid "Graph Window"
+#~ msgstr "Graph Window"
+
+#, fuzzy
+#~ msgid "Choose language"
+#~ msgstr "Choose language: "
+
+#~ msgid "Data"
+#~ msgstr "Data"

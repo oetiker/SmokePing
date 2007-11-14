@@ -1,0 +1,223 @@
+# German translations for PACKAGE package. ö
+# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Automatically generated, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-11-14 11:29-0600\n"
+"PO-Revision-Date: 2007-10-19 09:30+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: source/class/Smokeping/Application.js:47
+msgid "Root Node"
+msgstr ""
+
+#~ msgid "Start Date"
+#~ msgstr "Start-Datum"
+
+#, fuzzy
+#~ msgid "Time"
+#~ msgstr "Titel"
+
+#~ msgid "End Date"
+#~ msgstr "End-Datum"
+
+#~ msgid "Location"
+#~ msgstr "Standort"
+
+#~ msgid "Data Source"
+#~ msgstr "Daten-Quelle"
+
+#~ msgid "Data Massage"
+#~ msgstr "Daten Massage"
+
+#~ msgid "Location/Client"
+#~ msgstr "Standort/GWP"
+
+#~ msgid "Data Filter"
+#~ msgstr "Daten-Filter"
+
+#~ msgid "Y axis"
+#~ msgstr "Y-Achse"
+
+#~ msgid "Plot Data"
+#~ msgstr "Grafik erzeugen"
+
+#~ msgid "Open in Excel"
+#~ msgstr "Oeffne in Excel"
+
+#~ msgid "Please make sure all entries in the form are valid!"
+#~ msgstr "Alle Felder müssen gültige Werte enhalten!"
+
+#, fuzzy
+#~ msgid "Snap"
+#~ msgstr "Sonntag"
+
+#~ msgid "Client"
+#~ msgstr "GWP"
+
+#~ msgid "Hostname"
+#~ msgstr "GWP"
+
+#~ msgid "Team"
+#~ msgstr "Team"
+
+#~ msgid "Ip"
+#~ msgstr "Ip"
+
+#~ msgid "User"
+#~ msgstr "Benutzer"
+
+#~ msgid "CPV"
+#~ msgstr "CPV"
+
+#~ msgid "Last Update"
+#~ msgstr "Letztes Update"
+
+#~ msgid "Low"
+#~ msgstr "Tief"
+
+#~ msgid "Filter out values lower than this"
+#~ msgstr "Keine Werte tiefer als dieser"
+
+#~ msgid "High"
+#~ msgstr "Hoch"
+
+#, fuzzy
+#~ msgid "Filter out values higher than this"
+#~ msgstr "Keine Werte höher als dieser"
+
+#, fuzzy
+#~ msgid "Data Set 1"
+#~ msgstr "Daten-Quelle"
+
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#, fuzzy
+#~ msgid "Title"
+#~ msgstr "Titel"
+
+#~ msgid "Unit"
+#~ msgstr "Einheit"
+
+#, fuzzy
+#~ msgid "Data Set 2"
+#~ msgstr "Daten-Quelle"
+
+#, fuzzy
+#~ msgid "Start"
+#~ msgstr "Start"
+
+#~ msgid "End"
+#~ msgstr "Ende"
+
+#~ msgid "From"
+#~ msgstr "Von"
+
+#~ msgid "To"
+#~ msgstr "bis"
+
+#, fuzzy
+#~ msgid "Time filter: Use only data in the specified time range"
+#~ msgstr "Zeitfilter: Verwende nur Daten für den angegebenen Zeitraum"
+
+#~ msgid "DOW"
+#~ msgstr "Wochentag"
+
+#, fuzzy
+#~ msgid "Weekday filter: Use only data for the selected weekday"
+#~ msgstr "Wochentag: Verwende nur Daten fuer den ausgewaehlten Wochentag"
+
+#~ msgid "Monday"
+#~ msgstr "Montag"
+
+#~ msgid "Tuesday"
+#~ msgstr "Dienstag"
+
+#~ msgid "Wednesday"
+#~ msgstr "Mittwoch"
+
+#~ msgid "Thursday"
+#~ msgstr "Donnerstag"
+
+#~ msgid "Friday"
+#~ msgstr "Freitag"
+
+#~ msgid "Saturday"
+#~ msgstr "Samstag"
+
+#~ msgid "Sunday"
+#~ msgstr "Sonntag"
+
+#~ msgid "Start value for y-axis"
+#~ msgstr "Startwert für die y-Achse"
+
+#~ msgid "End value for y-axis"
+#~ msgstr "Endwert für die y-Achse"
+
+#~ msgid "Merge"
+#~ msgstr "Ueberlagern"
+
+#, fuzzy
+#~ msgid "day"
+#~ msgstr "Tag"
+
+#~ msgid "1 week"
+#~ msgstr "1 Woche"
+
+#~ msgid "2 weeks"
+#~ msgstr "2 Wochen"
+
+#~ msgid "3 weeks"
+#~ msgstr "3 Wochen"
+
+#~ msgid "4 weeks"
+#~ msgstr "4 Wochen"
+
+#~ msgid "Contents"
+#~ msgstr "Inhalt"
+
+#~ msgid "Scale"
+#~ msgstr "Skalierung"
+
+#~ msgid "Time series"
+#~ msgstr "Zeitreihe"
+
+#~ msgid "Histogram"
+#~ msgstr "Histogramm"
+
+#~ msgid "Bins"
+#~ msgstr "Zeitbereiche"
+
+#, fuzzy
+#~ msgid "Bin data (for mean/median and histograms)"
+#~ msgstr ""
+#~ "Anzahl der Zeitbereiche für die Berechnung\n"
+#~ "von Durchschnitts/Median-Werten und Histogrammen"
+
+#, fuzzy
+#~ msgid "Message:"
+#~ msgstr "Ueberlagern"
+
+#, fuzzy
+#~ msgid "Fetch Data"
+#~ msgstr "Grafik erzeugen"
+
+#~ msgid "Graph Window"
+#~ msgstr "Grafik Fenster"
+
+#, fuzzy
+#~ msgid "Choose language"
+#~ msgstr "Sprachauswahl: "
+
+#~ msgid "Data"
+#~ msgstr "Daten"
