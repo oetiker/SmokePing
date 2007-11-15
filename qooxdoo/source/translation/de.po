@@ -16,10 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: source/class/Smokeping/Application.js:47
-msgid "Root Node"
-msgstr ""
-
 #~ msgid "Start Date"
 #~ msgstr "Start-Datum"
 

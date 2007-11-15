@@ -23,27 +23,43 @@ qx.Class.define('Smokeping.ui.TargetTree',
      * @param rpc        {rpcObject}  An rpc object providing access to the Smokeping service
      */
 
-    construct: function (rpc,root_node) {
+    construct: function (rpc) {
 
         with(this){
-			base(arguments,root_node);
+			base(arguments,'root node');
             setBackgroundColor('white');
             setBorder('inset');
+//			setOverflow('scrollY');
             setWidth('100%'); 
             setHeight('100%');
             setPadding(5);
-        }
+			setHideNode(true);
+        };
 
-		return this;
+        var self = this;
+
+		var fill_tree = function(data,exc,id){
+			if (exc == null){
+				var nodes = data.length;
+				for(var i=0;i<nodes;i++){
+					Smokeping.ui.TargetTree.__fill_folder(self,data[i]);		
+				}
+			}
+			else {
+				alert(exc);
+			}				
+        };
+
+        rpc.callAsync(fill_tree,'get_tree');		
     },
 
     /*
     *****************************************************************************
-     MEMBERS
+     Statics
     *****************************************************************************
     */
 
-    members :
+    statics :
     {
 
 		/*
@@ -53,7 +69,7 @@ qx.Class.define('Smokeping.ui.TargetTree',
         */
 
         /**
-         * Tell about the BaseUrl we found.
+         * Create the tree based on input from the Server
          *
          * @type member
 		 *
@@ -62,9 +78,25 @@ qx.Class.define('Smokeping.ui.TargetTree',
 		 * @return BaseUrl {Strings}
 		 */
 
-//        getBaseUrl: function(){
-//            return  this.__base_url;
-//        }
+
+        __fill_folder: function(node,data){
+			// in data[0] we have the id of the folder
+			var folder = new qx.ui.tree.TreeFolder(data[1]);
+			folder.setUserData('id',data[0]);
+			node.add(folder);
+			var length = data.length;
+			for (var i=2;i<length;i++){
+				if(qx.util.Validation.isValidArray(data[i])){
+					Smokeping.ui.TargetTree.__fill_folder(folder,data[i]);
+				} else {
+					i++; // skip the node id for now
+					var file = new qx.ui.tree.TreeFile(data[i]);		
+					file.setUserData('id',data[i-1]);
+					folder.add(file);
+				}
+			}			
+		}
+
     }
 });
  

@@ -17,8 +17,8 @@ qx.Class.define(
             var self=this;
             this.base(arguments);
 
-			// this will provide access to the server side of this app
-			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq');
+  			// this will provide access to the server side of this app
+			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq/');
             
 			var base_url = rpc.getBaseUrl();
 
@@ -39,24 +39,22 @@ qx.Class.define(
 			prime.add(title);
 
 		    var splitpane = new qx.ui.splitpane.HorizontalSplitPane('1*', '3*');
-		    splitpane.setEdge(1);
+		    splitpane.setEdge(0);
 			splitpane.setHeight('1*');
 		    splitpane.setShowKnob(true);
   		    prime.add(splitpane);
 
- 		    var tree = new Smokeping.ui.TargetTree(rpc,this.tr("Root Node"));
+ 		    var tree = new Smokeping.ui.TargetTree(rpc);
 	        splitpane.addLeft(tree);
 
-			var graphs = new qx.ui.layout.VerticalBoxLayout();
-			with(graphs){
-				setBackgroundColor('white');
-				setBorder('inset');
-				setWidth('100%');
-				setHeight('100%');
-			};
+			tree.getManager().addEventListener("changeSelection", function(e) {
+				if (e.getData().length > 0) {
+		            this.debug(e.getData()[0].getUserData('id'));
+				}
+			},this);
 
+			var graphs = new Smokeping.ui.Graphs(rpc.getBaseUrl());
 			splitpane.addRight(graphs);
-
 
         },
         
