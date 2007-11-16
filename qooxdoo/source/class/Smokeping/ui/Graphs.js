@@ -32,56 +32,39 @@ qx.Class.define('Smokeping.ui.Graphs',
             setHeight('100%');
             setVerticalSpacing(10);
             setHorizontalSpacing(10);
+			setPadding(10);
         };
-        for(var i=0;i<2000;i++){
-            var button = new qx.ui.basic.Atom(i.toString());
-            this.add(button);
-        }
-    },
 
-    /*
-    *****************************************************************************
-     Statics
-    *****************************************************************************
-    */
-
-    statics :
-    {
-
-		/*
-        ---------------------------------------------------------------------------
-        CORE METHODS
-        ---------------------------------------------------------------------------
-        */
-
-        /**
-         * Create the tree based on input from the Server
-         *
-         * @type member
-		 *
-         * @param {void}
-         *
-		 * @return BaseUrl {Strings}
-		 */
-
-
-        __fill_folder: function(node,data){
-			// in data[0] we have the id of the folder
-			var folder = new qx.ui.tree.TreeFolder(data[1]);
-			node.add(folder);
-			var length = data.length;
-			for (var i=2;i<length;i++){
-				if(qx.util.Validation.isValidArray(data[i])){
-					Smokeping.ui.TargetTree.__fill_folder(folder,data[i]);
-				} else {
-					i++; // skip the node id for now
-					var file = new qx.ui.tree.TreeFile(data[i]);		
-					folder.add(file);
-				}
-			}			
-		}
-
+		var load_graphs = function(m){
+			var files = m.getData()
+			this.removeAll();
+			for(var i=0;i<files.length;i++){
+				this.debug('adding '+files[i])
+   			   	var button = new qx.ui.form.Button(null,qx.io.Alias.getInstance().resolve('SP/image/ajax-loader.gif'));
+				this.add(button);
+				var image = button.getIconObject();
+				var preloader = qx.io.image.PreloaderManager.getInstance().create(url + 'grapher.cgi?g=' + files[i]);
+				preloader.setUserData('image',image); // it seems javascript does not do closures
+				preloader.addEventListener('load', function(e) {
+					var image = this.getUserData('image');	/// so we use this to whisk the image into the event			
+					// image.setWidth(preloader.getWidth()-10);
+					this.debug('load image event: '+preloader.getSource());
+					image.setPreloader(this);
+					qx.io.image.PreloaderManager.getInstance().remove(this);
+		    		//if (image.isLoaded()) {
+					//	this.debug('outer '+image.getOuterHeight());
+					//	this.debug('inner '+image.getInnerHeight());
+					//	this.debug('box '+image.getBoxHeight());
+				    //	this.debug('prefinner '+image.getPreferredInnerHeight());
+					//	this.debug('prefbox '+image.getPreferredBoxHeight());
+				},preloader);
+			}
+		};
+                    
+		qx.event.message.Bus.subscribe('sp.menu.folder',load_graphs,this);
     }
+
+
 });
  
  

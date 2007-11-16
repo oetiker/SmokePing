@@ -17,6 +17,10 @@ qx.Class.define(
             var self=this;
             this.base(arguments);
 
+	        qx.io.Alias.getInstance().add(
+    	       'SP', qx.core.Setting.get('Smokeping.resourceUri')
+        	);
+
   			// this will provide access to the server side of this app
 			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq/');
             
@@ -47,12 +51,6 @@ qx.Class.define(
  		    var tree = new Smokeping.ui.TargetTree(rpc);
 	        splitpane.addLeft(tree);
 
-			tree.getManager().addEventListener("changeSelection", function(e) {
-				if (e.getData().length > 0) {
-		            this.debug(e.getData()[0].getUserData('id'));
-				}
-			},this);
-
 			var graphs = new Smokeping.ui.Graphs(rpc.getBaseUrl());
 			splitpane.addRight(graphs);
 
@@ -68,23 +66,12 @@ qx.Class.define(
 			
 		terminate : function(e) {
 			this.base(arguments);
-		},
+		}
 
         /********************************************************************
          * Functional Block Methods
          ********************************************************************/
 
-        /**
-        * Get the base url of this page
-        *
-        * @return {String} the base url of the page
-        */
-
-        __getBaseUrl: function() {
-            var our_href = new String(document.location.href);
-            var last_slash = our_href.lastIndexOf("/");
-            return our_href.substring(0,last_slash+1);   
-        }
     },
 		
 

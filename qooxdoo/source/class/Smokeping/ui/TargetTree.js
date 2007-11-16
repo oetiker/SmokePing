@@ -29,7 +29,7 @@ qx.Class.define('Smokeping.ui.TargetTree',
 			base(arguments,'root node');
             setBackgroundColor('white');
             setBorder('inset');
-//			setOverflow('scrollY');
+			setOverflow('scrollY');
             setWidth('100%'); 
             setHeight('100%');
             setPadding(5);
@@ -49,6 +49,14 @@ qx.Class.define('Smokeping.ui.TargetTree',
 				alert(exc);
 			}				
         };
+
+        this.getManager().addEventListener('changeSelection', function(e) {
+            if (e.getData().length > 0) {
+				if ( e.getData()[0].basename == 'TreeFolder' ){
+					qx.event.message.Bus.dispatch('sp.menu.folder',e.getData()[0].getUserData('ids'));
+				}
+            }
+        },this);
 
         rpc.callAsync(fill_tree,'get_tree');		
     },
@@ -82,8 +90,8 @@ qx.Class.define('Smokeping.ui.TargetTree',
         __fill_folder: function(node,data){
 			// in data[0] we have the id of the folder
 			var folder = new qx.ui.tree.TreeFolder(data[1]);
-			folder.setUserData('id',data[0]);
 			node.add(folder);
+			var files = new Array();
 			var length = data.length;
 			for (var i=2;i<length;i++){
 				if(qx.util.Validation.isValidArray(data[i])){
@@ -91,10 +99,11 @@ qx.Class.define('Smokeping.ui.TargetTree',
 				} else {
 					i++; // skip the node id for now
 					var file = new qx.ui.tree.TreeFile(data[i]);		
-					file.setUserData('id',data[i-1]);
+					files[files.length] = data[i-1];
 					folder.add(file);
 				}
 			}			
+			folder.setUserData('ids',files);
 		}
 
     }
