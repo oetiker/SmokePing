@@ -51,8 +51,8 @@ qx.Class.define(
  		    var tree = new Smokeping.ui.TargetTree(rpc);
 	        splitpane.addLeft(tree);
 
-			var graphs = new Smokeping.ui.Graphs(rpc.getBaseUrl());
-			splitpane.addRight(graphs);
+			var graphlist = new Smokeping.ui.GraphList(rpc.getBaseUrl());
+			splitpane.addRight(graphlist);
  
 
         },

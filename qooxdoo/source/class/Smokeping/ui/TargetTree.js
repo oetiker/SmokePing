@@ -28,7 +28,7 @@ qx.Class.define('Smokeping.ui.TargetTree',
         with(this){
 			base(arguments,'root node');
             setBackgroundColor('white');
-            setBorder('inset');
+            setBorder(new qx.ui.core.Border(1,'solid','#a0a0a0'));           
 			setOverflow('scrollY');
             setWidth('100%'); 
             setHeight('100%');
