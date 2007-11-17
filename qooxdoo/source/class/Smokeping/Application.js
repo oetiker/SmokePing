@@ -53,6 +53,7 @@ qx.Class.define(
 
 			var graphs = new Smokeping.ui.Graphs(rpc.getBaseUrl());
 			splitpane.addRight(graphs);
+ 
 
         },
         

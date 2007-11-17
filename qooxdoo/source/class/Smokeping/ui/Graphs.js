@@ -34,23 +34,35 @@ qx.Class.define('Smokeping.ui.Graphs',
             setHorizontalSpacing(10);
 			setPadding(10);
         };
-
 		var load_graphs = function(m){
 			var files = m.getData()
 			this.removeAll();
 			for(var i=0;i<files.length;i++){
-				this.debug('adding '+files[i])
    			   	var button = new qx.ui.form.Button(null,qx.io.Alias.getInstance().resolve('SP/image/ajax-loader.gif'));
 				this.add(button);
-				var image = button.getIconObject();
+				button.addEventListener('execute',function(e){					
+					this.setEnabled(false);
+					var window = this.getUserData('window');					
+					window.positionRelativeTo(this.getElement(),2,-4);
+					window.open();
+				},button);
+
 				var preloader = qx.io.image.PreloaderManager.getInstance().create(url + 'grapher.cgi?g=' + files[i]);
-				preloader.setUserData('image',image); // it seems javascript does not do closures
-				preloader.addEventListener('load', function(e) {
-					var image = this.getUserData('image');	/// so we use this to whisk the image into the event			
-					// image.setWidth(preloader.getWidth()-10);
-					this.debug('load image event: '+preloader.getSource());
-					image.setPreloader(this);
+				preloader.setUserData('button',button); // it seems javascript does not do closures
+				preloader.addEventListener('load', function(e) {					
+					var button = this.getUserData('button');	/// so we use this to whisk the image into the event			
+					var image = button.getIconObject();
+					image.setSource(this.getSource());
 					qx.io.image.PreloaderManager.getInstance().remove(this);
+
+					var window = new Smokeping.ui.Navigator(image);
+					window.addToDocument();
+					window.addEventListener('beforeDisappear',function (e){
+						this.setEnabled(true);
+					},button);
+					button.setUserData('window',window);
+
+					// image.setWidth(preloader.getWidth()-10);
 		    		//if (image.isLoaded()) {
 					//	this.debug('outer '+image.getOuterHeight());
 					//	this.debug('inner '+image.getInnerHeight());

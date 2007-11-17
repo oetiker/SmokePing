@@ -158,6 +158,17 @@ if(!window.qxvariants)qxvariants={};\
 <script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/layout/impl/FlowLayoutImpl.js"></script>\
 <script type="text/javascript" src="./class/Smokeping/ui/Graphs.js"></script>\
 <script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/form/Button.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/popup/Popup.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/popup/PopupManager.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/util/Compare.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/util/Normalization.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/resizer/MResizable.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/resizer/IResizable.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/resizer/ResizablePopup.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/window/Window.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/basic/HorizontalSpacer.js"></script>\
+<script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/ui/window/Manager.js"></script>\
+<script type="text/javascript" src="./class/Smokeping/ui/Navigator.js"></script>\
 <script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/locale/Locale.js"></script>\
 <script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/locale/data/C.js"></script>\
 <script type="text/javascript" src="../qooxdoolink/frontend/framework/source/class/qx/locale/data/en.js"></script>\

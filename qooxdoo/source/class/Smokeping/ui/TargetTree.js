@@ -99,7 +99,7 @@ qx.Class.define('Smokeping.ui.TargetTree',
 				} else {
 					i++; // skip the node id for now
 					var file = new qx.ui.tree.TreeFile(data[i]);		
-					files[files.length] = data[i-1];
+					files.push(data[i-1]);
 					folder.add(file);
 				}
 			}			
