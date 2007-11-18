@@ -7,6 +7,7 @@ use Pod::Usage 1.14;
 #use CGI::Fast;
 use CGI;
 use lib qw(/home/oetiker/scratch/rrd-13dev/lib/perl);
+use lib qw(/usr/pack/rrdtool-1.2.23-mo/lib/perl/);
 use RRDs;
 
 '$Revision: 3879 $ ' =~ /Revision: (\S*)/;
@@ -38,9 +39,9 @@ sub main()
 #		    '--zoom' 		=> '0.75',
 		    '--width' 		=> $width,
 		    '--height' 		=> $height,
-		    '--color'		=> 'BACK#bfbfbf00',
-		    '--color'		=> 'SHADEA#bfbfbf00',
-		    '--color'		=> 'SHADEB#bfbfbf00',		
+		    '--color'		=> 'BACK#ffffff00',
+		    '--color'		=> 'SHADEA#ffffff00',
+		    '--color'		=> 'SHADEB#ffffff00',		
 		    'DEF:in=lan.rrd:out:AVERAGE',
 		    'CDEF:green=in,100000,LT,in,100000,IF',
 		    'AREA:green#00ff00',

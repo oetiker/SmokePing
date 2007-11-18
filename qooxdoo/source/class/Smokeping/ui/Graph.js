@@ -38,7 +38,7 @@ qx.Class.define('Smokeping.ui.Graph',
 			this.setHeight('auto');
 		};
 		this.set({
-			border : new qx.ui.core.Border(1,'dotted','transparent'),
+			border : new qx.ui.core.Border(1,'dotted','#ffffff'),
 		    horizontalChildrenAlign: 'center',
 	        verticalChildrenAlign: 'middle'
 		});
@@ -97,7 +97,7 @@ qx.Class.define('Smokeping.ui.Graph',
 		_unhighlight: function(e){
 			this.setBackgroundColor('transparent');
 			this.getBorder().set({
-				color: 'transparent'
+				color: '#ffffff'
 			});
 		}
 	}
