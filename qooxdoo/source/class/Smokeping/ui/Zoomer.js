@@ -116,7 +116,8 @@ qx.Class.define('Smokeping.ui.Zoomer',
 			z['left'].set({
                 width: this._canvas_left,
                 height: this._image_height,
-                visibility: true,
+                visibility: true
+            });
 
             z['right'].set({
 				left: this._image_width - this._canvas_right,

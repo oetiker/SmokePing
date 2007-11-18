@@ -90,6 +90,9 @@ qx.Class.define('Smokeping.ui.Navigator',
    				qx.io.image.PreloaderManager.getInstance().remove(this._preloader);
 				removeAll();
 				add(image);
+                var zoomer = new Smokeping.ui.Zoomer(width,height,10,10);
+                add(zoomer);
+
 			}
 		}
 	}
