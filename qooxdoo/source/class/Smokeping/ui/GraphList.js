@@ -25,14 +25,16 @@ qx.Class.define('Smokeping.ui.GraphList',
 
         with(this){
 			base(arguments);
-            setOverflow('scrollY');
-            setBackgroundColor('white');
-		    setBorder(new qx.ui.core.Border(1,'solid','#a0a0a0'));
-            setWidth('100%');
-            setHeight('100%');
-            setVerticalSpacing(10);
-            setHorizontalSpacing(10);
-			setPadding(10);
+			set({
+            	overflow: 'auto',
+	            backgroundColor: 'white',
+		    	border: new qx.ui.core.Border(1,'solid','#a0a0a0'),
+ 	           	width: '100%',
+            	height: '100%',
+            	verticalSpacing: 10,
+            	horizontalSpacing: 10,
+				padding: 10
+			})
         };
 		this._url = url;
    		qx.event.message.Bus.subscribe('sp.menu.folder',this._load_graphs,this);
@@ -43,8 +45,8 @@ qx.Class.define('Smokeping.ui.GraphList',
 			var files = m.getData()
 			this.removeAll();
 			for(var i=0;i<files.length;i++){
-   			   	var button = new Smokeping.ui.Graph(this._url + 'grapher.cgi?g=' + files[i]);
-				this.add(button);
+   			   	var image = new Smokeping.ui.Graph(this._url + 'grapher.cgi?g=' + files[i],300,150);
+				this.add(image);
 			}
 		}
 	}

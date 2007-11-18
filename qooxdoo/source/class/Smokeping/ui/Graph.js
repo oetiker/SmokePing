@@ -6,8 +6,8 @@
  * a widget showing the smokeping graph overview
  */
 
-var default_width = null;
-var default_height = null;
+var  Smokeping_ui_Graph_default_width = null;
+var  Smokeping_ui_Graph_default_height = null;
 
 qx.Class.define('Smokeping.ui.Graph', 
 {
@@ -24,55 +24,56 @@ qx.Class.define('Smokeping.ui.Graph',
      *
      */
 
-    construct: function (src) {
-        with(this){
-			base(arguments);
-			if (default_width){
-				setWidth(default_width)
-			} 
-			else {
-	            setWidth('auto');
-			}
-			if (default_height){
-				setHeight(default_height);
-			}
-			else {
-				setHeight('auto');
-			};
-			setBorder(new qx.ui.core.Border(1));
-		    setHorizontalChildrenAlign('center');
-	        setVerticalChildrenAlign('middle');
-			_highlight();
-			var loader = new qx.ui.basic.Image(qx.io.Alias.getInstance().resolve('SP/image/ajax-loader.gif'));	
-    	    add(loader);
-			_preloader = qx.io.image.PreloaderManager.getInstance().create(src);
-			if (_preloader.isLoaded()){
-				qx.client.Timer.once(_image_loader,this,0);
-			} else {
-				_preloader.addEventListener('load', _image_loader, this);
-			}
-			addEventListener('mouseover',_highlight,this);
-			addEventListener('mouseout',_unhighlight,this);
+    construct: function (src,width,height) {
+		this.base(arguments);
+		this._src=src;
+		this._width=width;
+		this._height=height;
+		if ( Smokeping_ui_Graph_default_width){
+			this.setWidth( Smokeping_ui_Graph_default_width)
+ 			this.setHeight( Smokeping_ui_Graph_default_height);
+		} 
+		else {
+            this.setWidth('auto');
+			this.setHeight('auto');
+		};
+		this.set({
+			border : new qx.ui.core.Border(1,'dotted','transparent'),
+		    horizontalChildrenAlign: 'center',
+	        verticalChildrenAlign: 'middle'
+		});
+		this._highlight();
+		var loader = new Smokeping.ui.LoadingAnimation();
+    	this.add(loader);
+		this._preloader = qx.io.image.PreloaderManager.getInstance().create(this._src+';w='+this._width+';h='+this._height);
+		if (this._preloader.isLoaded()){
+			qx.client.Timer.once(this._image_loader,this,0);
+		} else {
+			this._preloader.addEventListener('load', this._image_loader, this);
 		}
+		this.addEventListener('mouseover',this._highlight,this);
+		this.addEventListener('mouseout',this._unhighlight,this);
 	},
 
 	members: {
 		_image_loader: function(e) {					
+			 Smokeping_ui_Graph_default_width = this._preloader.getWidth();
+			 Smokeping_ui_Graph_default_height = this._preloader.getHeight();
+			var image = new qx.ui.basic.Image();
+			image.setPreloader(this._preloader);
+            qx.io.image.PreloaderManager.getInstance().remove(this._preloader);
 			with(this){
-				default_width = _preloader.getWidth();
-				default_height = _preloader.getHeight();
-				_image = new qx.ui.basic.Image(_preloader.getSource());
+				removeAll();
+				add(image);
+				addEventListener('click',this._open_navigator,this);
 				_unhighlight();
-				removeAll()
-				add(_image);
-				addEventListener('click',_open_navigator,this);
 			}
 		},
 		_open_navigator: function(e){
 			with(this){
 				setEnabled(false);
 				_unhighlight();
-				_window = new Smokeping.ui.Navigator(_image);
+				this._window = new Smokeping.ui.Navigator(this._src,this._width,this._height);
 				_window.addToDocument();
 				_window.positionRelativeTo(getElement(),2,-4);
 				addEventListener('beforeDisappear',_kill_window,this);
@@ -84,25 +85,21 @@ qx.Class.define('Smokeping.ui.Graph',
 			this.setEnabled(true);
 		},
 		_kill_window: function(e){
-			with(this){
-				_window.close();
-				_window.dispose();
-			}
+			this._window.close();
+			this._window.dispose();
 		},
-		_highlight: function(e){
+		_highlight: function(e){	
 			this.setBackgroundColor('#f8f8f8');
-			with(this.getBorder()){
-				setStyle('dotted');
-				setColor('#808080');
-			}
+			this.getBorder().set({
+				color: '#808080'
+			});
 		},
 		_unhighlight: function(e){
 			this.setBackgroundColor('transparent');
-			with(this.getBorder()){
-				setStyle('solid');
-				setColor('transparent');
-			}			
-		},
+			this.getBorder().set({
+				color: 'transparent'
+			});
+		}
 	}
 	
 

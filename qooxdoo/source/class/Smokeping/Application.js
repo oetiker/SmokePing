@@ -42,7 +42,7 @@ qx.Class.define(
 			}
 			prime.add(title);
 
-		    var splitpane = new qx.ui.splitpane.HorizontalSplitPane('1*', '3*');
+		    var splitpane = new qx.ui.splitpane.HorizontalSplitPane(200, '1*');
 		    splitpane.setEdge(0);
 			splitpane.setHeight('1*');
 		    splitpane.setShowKnob(true);
