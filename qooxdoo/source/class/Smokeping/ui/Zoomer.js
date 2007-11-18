@@ -85,86 +85,112 @@ qx.Class.define('Smokeping.ui.Zoomer',
             this._canvas_bottom = this._image_height-this._height-this._top;
 		},
 
-		_zoom_start: function(e){
+        _get_mouse_y: function(e){
+	            var mouse_y = e.getPageY()-this._page_top;
+	
+    	        if (mouse_y < this._canvas_top) {
+        	        mouse_y = this._canvas_top;
+            	} 
+                if (mouse_y > this._canvas_top + this._height) {
+                	mouse_y = this._canvas_top + this._height;
+	            }
+                return mouse_y;
+        },
+
+        _get_mouse_x: function(e){
+	            var mouse_x = e.getPageX()-this._page_left;
+	
+    	        if (mouse_x < this._canvas_left) {
+        	        mouse_x = this._canvas_left;
+            	} 
+                if (mouse_x > this._canvas_left + this._width) {
+                	mouse_x = this._canvas_left + this._width;
+	            }
+                return mouse_x;
+        },
+
+    	_zoom_start: function(e){
 			var z = this._zoomer;
 			this._init_cache();	
-            var mouse_y = e.getPageY()-this._page_top;
-//			var mouse_x = e.getPageX()-this._page_left;
 
-            if (mouse_y < this._canvas_top) {
-                mouse_y = this._canvas_top;
-            }
-            if (mouse_y > this._canvas_top + this._height) {
-                mouse_y = this._canvas_top + this._height;
-            }
-
-            this._selector_start_y = mouse_y;
+            this._selector_start_x = this._get_mouse_x(e); 
+            this._selector_start_y = this._get_mouse_y(e);
  
             this._target.setCapture(true);                                    
-
-            z['top'].set({
-				left: this._canvas_left,
-		        width: this._width,
-                top: 0,
-                height: mouse_y
-			});
-	        this.debug(mouse_y);
-	        this.debug(z['top'].getWidth());
-	        this.debug(z['top'].getLeft());;
-	        this.debug(z['top'].getTop());;
-	        this.debug(z['top'].getHeight());;
-                        
-            z['bottom'].set({
-                left: this._canvas_left,
-                width: this._width,
-                height: this._image_height - mouse_y,
-                top: mouse_y
-			});
-
-			z['left'].set({
-                width: this._canvas_left,
-                height: this._image_height
-            });
-
-            z['right'].set({
-				left: this._image_width - this._canvas_right,
-                width: this._canvas_right,
-                height: this._image_height
-			});
-
-            z['frame'].set({
-				left: this._canvas_left,
-			    width: this._width,
-                top: mouse_y
-			});			
+            this._zoom_move(e);
             this.setVisibility(true);
     	},
 
 		_zoom_move: function(e){
 			var z = this._zoomer;
             if (this._target.getCapture()){        
-	            var mouse_y = e.getPageY()-this._page_top;
-				var mouse_x = e.getPageX()-this._page_left;
-	
-    	        if (mouse_y < this._canvas_top) {
-        	        mouse_y = this._canvas_top;
-            	}
-            	if (mouse_y > this._canvas_top + this._height) {
-                	mouse_y = this._canvas_top + this._height;
-	            }
 
-                if (mouse_y > this._selector_start_y) {
-                    z['bottom'].set({
-						height: this._image_height - mouse_y,
-						top:    mouse_y
-					});
-                } else {
-                    z['top'].setHeight(mouse_y);
-                }   
+       			var mouse_x = this._get_mouse_x(e);
+
+                var mouse_left_x;
+                var mouse_right_x;
+	            if (mouse_x > this._selector_start_x){
+                    mouse_left_x = this._selector_start_x;
+                    mouse_right_x = mouse_x;
+                }
+                else {
+                    mouse_right_x = this._selector_start_x;
+                    mouse_left_x = mouse_x;
+                }        
+
+       			var mouse_y = this._get_mouse_y(e);
+                var mouse_top_y;
+                var mouse_bottom_y;
+	            if (mouse_y > this._selector_start_y){
+                    mouse_top_y = this._selector_start_y;
+                    mouse_bottom_y = mouse_y;
+                }
+                else {
+                    mouse_bottom_y = this._selector_start_y;
+                    mouse_top_y = mouse_y;
+                }        
+
+                var time_sel = 1;
+                var range_sel = 1;
+                var pi = 3.14159265;
+                var angle = Math.atan ((mouse_right_x - mouse_left_x) / (mouse_bottom_y - mouse_top_y));
+                if ( angle > Math.PI/2 * 0.85){
+                    range_sel = 0;
+                }
+                if ( angle < Math.PI/2 * 0.15){
+                    time_sel = 0;
+                }
+                
+                z['top'].set({
+	    			left: time_sel ? mouse_left_x : this._canvas_left,
+		            width: time_sel ? mouse_right_x - mouse_left_x : this._width,
+                    top: 0,
+                    height: range_sel ? mouse_top_y : this._canvas_top
+    			});
+                           
+                z['bottom'].set({
+	    			left: time_sel ? mouse_left_x : this._canvas_left,
+		            width: time_sel ? mouse_right_x - mouse_left_x : this._width,
+                    top: range_sel ? mouse_bottom_y : this._canvas_top + this._height,
+                    height: range_sel ? this._image_height - mouse_bottom_y : this._canvas_bottom
+		    	});
+
+    			z['left'].set({
+		            width: time_sel ? mouse_left_x: this._canvas_left,
+                    height: this._image_height
+                });
+
+                z['right'].set({
+	    			left: time_sel ? mouse_right_x : this._image_width - this._canvas_right,
+		            width: time_sel ? this._image_width - mouse_right_x :  this._canvas_right,
+                    height: this._image_height
+    			});
                 z['frame'].set({
-					top: z['top'].getHeight(),
-                    height: z['bottom'].getTop()-z['top'].getHeight()
-				});
+		    		left: time_sel ? mouse_left_x : this._canvas_left,        
+			        width: time_sel ? mouse_right_x - mouse_left_x : this._width,
+                    top: range_sel ? mouse_top_y : this._canvas_top,
+                    height: range_sel ? mouse_bottom_y - mouse_top_y : this._height
+    			});			
 			}
 		},
 		_zoom_end: function(e){
