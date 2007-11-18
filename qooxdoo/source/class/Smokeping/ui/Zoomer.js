@@ -3,7 +3,9 @@
 ************************************************************************ */
 
 /**
- * Zoom into the graph
+ * Lets you selcet an Area. Depending on the angel of your selection you get
+ * a time, a range or both.
+ *
  */
 
 qx.Class.define('Smokeping.ui.Zoomer',
@@ -17,13 +19,15 @@ qx.Class.define('Smokeping.ui.Zoomer',
     */
 
     /**
-     * @param width   {Integer}   Width of the canvas
+     * @param target  {Widget}    What surface should we base our selection on
      *
-     * @param height  {Integer}   Height ot the canvas
+     * @param width   {Integer}   Width of the 'interesting' area of the target
+     *
+     * @param height  {Integer}   Height ot the 'interesting' area of the target
      *
      * @param right   {Integer}   Distance from the right edge
      *
-     * @param top     {Integer}   Dist from the top
+     * @param top     {Integer}   Distance from the top
      *
      */
 
