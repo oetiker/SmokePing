@@ -32,7 +32,6 @@ qx.Class.define('Smokeping.ui.Zoomer',
      */
 
     construct: function (target,width,height,top,right) {
-        this.debug('hell');
         this._target = target;
 		this._width = width;
 		this._height = height+1; // some where the calc is 1 off. this fixes it
@@ -73,7 +72,6 @@ qx.Class.define('Smokeping.ui.Zoomer',
   		this._target.addEventListener("mousedown", this._zoom_start,this);
         this._target.addEventListener("mousemove", this._zoom_move,this);
         this._target.addEventListener("mouseup",   this._zoom_end,this);
-        this.debug('got zoomer');
     },
 
 	members: {

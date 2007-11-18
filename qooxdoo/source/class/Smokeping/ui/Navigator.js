@@ -48,8 +48,6 @@ qx.Class.define('Smokeping.ui.Navigator',
         // in this case
 		_changeWidth: function(newWidth) {
 			var diff = newWidth - this.getBoxWidth();			
-			this.debug(this.getBoxWidth());
-			this.debug(this.getBoxHeight());
 			this.base(arguments, newWidth);
 			this.add(this._loader);
 			this._graph_width = this._graph_width + diff;
@@ -90,10 +88,8 @@ qx.Class.define('Smokeping.ui.Navigator',
    				qx.io.image.PreloaderManager.getInstance().remove(this._preloader);
 				removeAll();
 				add(image);
-                this.debug('added image');
                 var zoomer = new Smokeping.ui.Zoomer(image,this._graph_width,this._graph_height,33,30);
                 add(zoomer);
-                this.debug('added zoomer');
 			}
 		}
 	}
