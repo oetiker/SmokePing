@@ -45,7 +45,7 @@ qx.Class.define('Smokeping.ui.GraphList',
 			var files = m.getData()
 			this.removeAll();
 			for(var i=0;i<files.length;i++){
-   			   	var image = new Smokeping.ui.Graph(this._url + 'grapher.cgi?g=' + files[i],300,150);
+   			   	var image = new Smokeping.ui.Graph(this._url + 'grapher.cgi?g=' + files[i],150,75);
 				this.add(image);
 			}
 		}

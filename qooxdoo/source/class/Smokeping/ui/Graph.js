@@ -73,7 +73,7 @@ qx.Class.define('Smokeping.ui.Graph',
 			with(this){
 				setEnabled(false);
 				_unhighlight();
-				this._window = new Smokeping.ui.Navigator(this._src,this._width,this._height);
+				this._window = new Smokeping.ui.Navigator(this._src,this._width*2,this._height*2);
 				_window.addToDocument();
 				_window.positionRelativeTo(getElement(),2,-4);
 				addEventListener('beforeDisappear',_kill_window,this);
