@@ -90,6 +90,8 @@ qx.Class.define('Smokeping.ui.Navigator',
 				add(image);
                 var zoomer = new Smokeping.ui.Zoomer(image,this._graph_width,this._graph_height,33,30);
                 add(zoomer);
+                var mover = new Smokeping.ui.Mover(image,this._graph_src,this._graph_width,this._graph_height,33,30);
+                add(mover);
 			}
 		}
 	}

@@ -12,6 +12,7 @@ qx.Class.define('Smokeping.ui.Zoomer',
 {
     extend: qx.ui.layout.CanvasLayout,        
 
+	include: Smokeping.ui.MPosition,
     /*
     *****************************************************************************
        CONSTRUCTOR
@@ -28,6 +29,9 @@ qx.Class.define('Smokeping.ui.Zoomer',
      * @param right   {Integer}   Distance from the right edge
      *
      * @param top     {Integer}   Distance from the top
+     *
+	 * The zoomer will not activate if the ctrl key is pressed. This allows
+     * for the Mover to act on these events
      *
      */
 
@@ -68,50 +72,16 @@ qx.Class.define('Smokeping.ui.Zoomer',
         });
         
 		this.add(z['frame']);
-
+		this._zooming = false; // we are not curently in zoom mode
   		this._target.addEventListener("mousedown", this._zoom_start,this);
         this._target.addEventListener("mousemove", this._zoom_move,this);
         this._target.addEventListener("mouseup",   this._zoom_end,this);
     },
 
 	members: {
-		_init_cache: function(){
-	        var el = this._target.getElement();
-	        this._page_left = qx.html.Location.getPageAreaLeft(el);
-	        this._page_top = qx.html.Location.getPageAreaTop(el);
-			this._image_width = qx.html.Location.getPageAreaRight(el) - this._page_left;
-	        this._image_height = qx.html.Location.getPageAreaBottom(el) - this._page_top ;
-            this._canvas_top = this._top;
-	        this._canvas_left = this._image_width-this._width-this._right;
-	        this._canvas_right = this._right;
-            this._canvas_bottom = this._image_height-this._height-this._top;
-		},
-
-        _get_mouse_y: function(e){
-	            var mouse_y = e.getPageY()-this._page_top;
-	
-    	        if (mouse_y < this._canvas_top) {
-        	        mouse_y = this._canvas_top;
-            	} 
-                if (mouse_y > this._canvas_top + this._height) {
-                	mouse_y = this._canvas_top + this._height;
-	            }
-                return mouse_y;
-        },
-
-        _get_mouse_x: function(e){
-	            var mouse_x = e.getPageX()-this._page_left;
-	
-    	        if (mouse_x < this._canvas_left) {
-        	        mouse_x = this._canvas_left;
-            	} 
-                if (mouse_x > this._canvas_left + this._width) {
-                	mouse_x = this._canvas_left + this._width;
-	            }
-                return mouse_x;
-        },
-
     	_zoom_start: function(e){
+			if (e.isCtrlPressed()) return;
+			this._zooming = true;
 			var z = this._zoomer;
 			this._init_cache();	
 
@@ -125,7 +95,7 @@ qx.Class.define('Smokeping.ui.Zoomer',
 
 		_zoom_move: function(e){
 			var z = this._zoomer;
-            if (this._target.getCapture()){        
+            if (this._target.getCapture() && this._zooming ){        
 
        			var mouse_x = this._get_mouse_x(e);
 
@@ -196,9 +166,11 @@ qx.Class.define('Smokeping.ui.Zoomer',
 			}
 		},
 		_zoom_end: function(e){
+			if (!this._zooming) return;
 			var z = this._zoomer;
 			this._target.setCapture(false);
             this.setVisibility(false);
+			this._zooming = false;
 
             if (z['bottom'].getTop() == z['top'].getTop()+z['top'].getHeight()){
                 this._zoom_factor_top = 0;

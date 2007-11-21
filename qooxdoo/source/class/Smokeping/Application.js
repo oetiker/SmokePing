@@ -6,8 +6,8 @@
 
 ************************************************************************ */
 
-qx.Class.define(
-    'Smokeping.Application', {
+qx.Class.define('Smokeping.Application', 
+{
     extend: qx.application.Gui,
        
     members: 
@@ -22,8 +22,8 @@ qx.Class.define(
         	);
 
   			// this will provide access to the server side of this app
-//			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq/');
-    		var rpc = new Smokeping.io.Rpc('http://johan.oetiker.ch/~oetiker/smq/');
+			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq/');
+//    		var rpc = new Smokeping.io.Rpc('http://johan.oetiker.ch/~oetiker/smq/');
             
 			var base_url = rpc.getBaseUrl();
 
@@ -88,6 +88,5 @@ qx.Class.define(
     settings : {
 			'Smokeping.resourceUri' : './resource'
 	}
-	}
-);
+});
  

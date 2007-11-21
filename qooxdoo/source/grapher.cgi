@@ -28,14 +28,21 @@ sub main()
 #    while (my $q = new CGI::Fast) {
 	my $q = new CGI;
 	my $graph = $q->param('g');
-	my $width = $q->param('w') || 300;
-	my $height = $q->param('h') || 150;	
+	my $width = $q->param('w');
+	my $height = $q->param('h');
+	my $start = $q->param('s');
+	my $end = $q->param('e');
+	my $top = $q->param('t');	
+	my $bottom = $q->param('b');
 	warn "groesse: $width $height\n";
 	RRDs::graph("/tmp/$$.tmpgraph",
 		    '--title'		=> "Demo ".$graph,
 	            '--vertical-label'	=> "Bytes/s",
-		    '--start'		=> '20071101',
-		    '--end' 		=> '20071112',
+		    '--start'		=> $start,			
+		    '--end' 		=> $end,
+		    '--upper-limit'	=> $top,
+		    '--lower-limit'	=> $bottom,
+		    '--riggid',
 #		    '--zoom' 		=> '0.75',
 		    '--width' 		=> $width,
 		    '--height' 		=> $height,
