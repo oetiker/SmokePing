@@ -22,8 +22,8 @@ qx.Class.define('Smokeping.Application',
         	);
 
   			// this will provide access to the server side of this app
-			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq/');
-//    		var rpc = new Smokeping.io.Rpc('http://johan.oetiker.ch/~oetiker/smq/');
+//			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq/');
+    		var rpc = new Smokeping.io.Rpc('http://johan.oetiker.ch/~oetiker/smq/');
             
 			var base_url = rpc.getBaseUrl();
 

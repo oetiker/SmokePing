@@ -42,7 +42,7 @@ sub main()
 		    '--end' 		=> $end,
 		    '--upper-limit'	=> $top,
 		    '--lower-limit'	=> $bottom,
-		    '--riggid',
+		    '--rigid',
 #		    '--zoom' 		=> '0.75',
 		    '--width' 		=> $width,
 		    '--height' 		=> $height,

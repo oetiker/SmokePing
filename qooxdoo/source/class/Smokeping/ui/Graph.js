@@ -20,15 +20,13 @@ qx.Class.define('Smokeping.ui.Graph',
     */
 
     /**
-     * @param base_url   {String}   Path to the location of the image generator
+     * @param object  {GraphShadow}   What happens when the SNCF conductors tamazing.
      *
      */
 
-    construct: function (src,width,height) {
+    construct: function (graph) {
 		this.base(arguments);
-		this._src=src;
-		this._width=width;
-		this._height=height;
+		this._graph=graph;
 		if ( Smokeping_ui_Graph_default_width){
 			this.setWidth( Smokeping_ui_Graph_default_width)
  			this.setHeight( Smokeping_ui_Graph_default_height);
@@ -45,7 +43,7 @@ qx.Class.define('Smokeping.ui.Graph',
 		this._highlight();
 		var loader = new Smokeping.ui.LoadingAnimation();
     	this.add(loader);
-		this._preloader = qx.io.image.PreloaderManager.getInstance().create(this._src+';w='+this._width+';h='+this._height);
+		this._preloader = qx.io.image.PreloaderManager.getInstance().create(this._graph.getSrc());
 		if (this._preloader.isLoaded()){
 			qx.client.Timer.once(this._image_loader,this,0);
 		} else {
@@ -73,7 +71,7 @@ qx.Class.define('Smokeping.ui.Graph',
 			with(this){
 				setEnabled(false);
 				_unhighlight();
-				this._window = new Smokeping.ui.Navigator(this._src,this._width*2,this._height*2);
+				this._window = new Smokeping.ui.Navigator(this._graph);
 				_window.addToDocument();
 				_window.positionRelativeTo(getElement(),2,-4);
 				addEventListener('beforeDisappear',_kill_window,this);

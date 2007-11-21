@@ -21,17 +21,16 @@ qx.Class.define('Smokeping.ui.Navigator',
      *
      */
 
-    construct: function (src,width,height) {
-		this._graph_src = src;
-		this._graph_width = width;
-		this._graph_height = height;
+    construct: function (graph) {
+		this._graph = graph;
+
 		with(this){
 			base(arguments,tr("Smokeping Graph Navigator"));
 			set({
 				showMaximize: false,
 				showMinimize: false,
-				width:		  width,
-				height:		  height,
+				width:		  graph.getWidth(),
+				height:		  graph.getHeight(),
 				minWidth: 	  120,
 				minHeight:    80,
 				backgroundColor: '#f0f0f0'
@@ -64,8 +63,7 @@ qx.Class.define('Smokeping.ui.Navigator',
 		_update_image: function(){
 			var now = (new Date()).getTime();
             if (this._lastrun + 1000 < now) {
-				this._preloader = qx.io.image.PreloaderManager.getInstance().create(
-					this._graph_src+';w='+this._graph_width+';h='+this._graph_height);
+				this._preloader = qx.io.image.PreloaderManager.getInstance().create(this._graph.getSrc());
               	if (this._preloader.isLoaded()){
      		        	qx.client.Timer.once(this._show_image,this,0);
 	          	} else {
@@ -88,9 +86,9 @@ qx.Class.define('Smokeping.ui.Navigator',
    				qx.io.image.PreloaderManager.getInstance().remove(this._preloader);
 				removeAll();
 				add(image);
-                var zoomer = new Smokeping.ui.Zoomer(image,this._graph_width,this._graph_height,33,30);
+                var zoomer = new Smokeping.ui.Zoomer(image,this._graph,33,30);
                 add(zoomer);
-                var mover = new Smokeping.ui.Mover(image,this._graph_src,this._graph_width,this._graph_height,33,30);
+                var mover = new Smokeping.ui.Mover(image,this._graph,33,30);
                 add(mover);
 			}
 		}
