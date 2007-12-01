@@ -1,3 +1,6 @@
+* fix restart behaviour of clients in multiprocess mode. now we just send
+  ourself a SIGHUP and let 'it' happen -- tobi
+
 * make sure tsmoke sends mime conformant mails -- tobi
 
 2007/10/29 -- released version 2.2.7
