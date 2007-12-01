@@ -3755,7 +3755,7 @@ sub main (;$) {
             shared_secret => $secret,
             slave_name => $opt{'slave-name'} || hostname(),
         };
-        # this should get us a config set from the server
+        # this should get us an initial  config set from the server
         my $new_conf = Smokeping::Slave::submit_results($slave_cfg,$cfg);
         if ($new_conf){
             $cfg=$new_conf;
@@ -3844,7 +3844,7 @@ RESTART:
                 $gothup = 1;
         };
         while (1) { # just wait for the signals
-                sleep;
+                sleep; #sleep until we get a signal
                 next unless $gothup;
                 $reloading = 1;
                 $gothup = 0;
@@ -3963,13 +3963,8 @@ KID:
         my %sortercache;
         if ($opt{'master-url'}){            
             my $new_conf = Smokeping::Slave::submit_results $slave_cfg,$cfg,$myprobe,$probes;
-            if ($new_conf){
-                $cfg=$new_conf;
-                $probes = undef;
-                $probes = load_probes $cfg;
-                $cfg->{__probes} = $probes;
-                add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
-                goto RESTART;
+            if ($new_conf){                
+                kill $$, SIGHUP;
             }
         } else {
             update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe, \%sortercache;
