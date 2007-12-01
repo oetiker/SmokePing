@@ -61,11 +61,17 @@ L<http://www.openssh.org/>
 
 You need this for the SSH probe.
 
-=item Various Perl modules (Optional)
+=item Various Perl modules (Most of these are optional)
 
 You can get these from L<http://www.cpan.org/>.
 
 =over
+
+=item libwww-perl
+
+The master/slave functionality introduced a dependency LWP::UserAgent
+from the libwww-perl (also known as LWP) library. Currently the module
+is needed even if the master/slave mode is not enabled.
 
 =item Socket6 0.11-1
 
