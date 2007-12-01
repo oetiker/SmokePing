@@ -1,6 +1,5 @@
 # -*- perl -*-
 package Smokeping::Master;
-use HTTP::Request;
 use Data::Dumper;
 use Storable qw(nstore_fd dclone fd_retrieve);
 use strict;
