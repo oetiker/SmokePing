@@ -3956,7 +3956,7 @@ KID:
                         do_debuglog("Sleeping $sleeptime seconds.");
                 }
                 sleep $sleeptime;
-                last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile) );
+                last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
         }
         my $now = time;       
         run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
