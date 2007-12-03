@@ -104,7 +104,7 @@ sub submit_results {
             warn "WARNING evaluating new config from server failed: $@ --\n$data";
         } elsif (defined $config and ref $config eq 'HASH'){
             $config->{General}{piddir} = $slave_cfg->{cache_dir};
-            Smokeping::do_debuglog("Sent data to Server and got new config");
+            Smokeping::do_log("Sent data to Server and got new config in response.");
             return $config;
         }                       
     } else {

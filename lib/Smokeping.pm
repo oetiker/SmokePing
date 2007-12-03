@@ -3956,16 +3956,23 @@ KID:
                         do_debuglog("Sleeping $sleeptime seconds.");
                 }
                 sleep $sleeptime;
-                last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
+                last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile) );
         }
         my $now = time;       
         run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
         my %sortercache;
         if ($opt{'master-url'}){            
             my $new_conf = Smokeping::Slave::submit_results $slave_cfg,$cfg,$myprobe,$probes;
-            if ($new_conf){                
-                kill $$, SIGHUP;
-            }
+            if ($new_conf){
+                do_log('server has new config for me ... HUPing myself');                
+                $gothup = 1;
+                $cfg=$new_conf;
+                $probes = undef;
+                $probes = load_probes $cfg;
+                $cfg->{__probes} = $probes;
+                add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
+                last;
+             }
         } else {
             update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe, \%sortercache;
             save_sortercache($cfg,\%sortercache,$myprobe);
@@ -4014,6 +4021,7 @@ sub checkhup ($$) {
 
 sub reload_cfg ($) {
         my $cfgfile = shift;
+        return 1 if exists $opt{'master-url'};
         my ($oldcfg, $oldprobes) = ($cfg, $probes);
         do_log("Reloading configuration.");
         $cfg = undef;
