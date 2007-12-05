@@ -102,23 +102,27 @@ sub save_updates {
         if ( ! -f $cfg->{General}{datadir}."/${name}.rrd" ){
             warn "Skipping update for ${name}.slave_cache since $cfg->{General}{datadir}/${name}.rrd  does not exist in the local data structure. Make sure you run the smokeping daemon. ($cfg->{General}{datadir})\n";
         } elsif ( open (my $hand, '+>>', $file) ) {
-            if ( flock $hand, LOCK_EX ){
-                my $existing = [];
-                if ( tell $hand > 0 ){
-                   seek $hand, 0,0;
-                   eval { $existing = fd_retrieve $hand };
-                   if ($@) { #error
-                        warn "Loading $file: $@";
-                        $existing = [];
-                   }
-                };
-                push @{$existing}, [ $slave, $time, $updatestring];
-                seek $hand, 0,0;
-                truncate $hand, 0;
-                nstore_fd ($existing, $hand);
-                flock $hand, LOCK_UN;
-            } else {
-                warn "Could not lock $file. Can't store data.\n";
+            for (my $i = 10; $i < 0; $i--){
+                if ( flock $hand, LOCK_EX ){
+                    my $existing = [];
+                    if ( tell $hand > 0 ){
+                        seek $hand, 0,0;
+                        eval { $existing = fd_retrieve $hand };
+                        if ($@) { #error
+                            warn "Loading $file: $@";
+                            $existing = [];
+                        }
+                    };
+                    push @{$existing}, [ $slave, $time, $updatestring];
+                    seek $hand, 0,0;
+                    truncate $hand, 0;
+                    nstore_fd ($existing, $hand);
+                    flock $hand, LOCK_UN;                
+                    last;
+                } else {
+                    warn "Could not lock $file. Trying again for $i rounds.\n";
+                    sleep 1;
+                }
             }
             close $hand;
         } else {
@@ -137,7 +141,7 @@ sub get_slaveupdates {
     my $name = shift;
     my $file = $name.".slave_cache";
     my $data;
-    if ( open (my $hand, '<', $file) ) {
+    if ( open (my $hand, '+<', $file) ) {
         if ( flock $hand, LOCK_EX ){
             rename $file,$file.$$;
             eval { $data = fd_retrieve $hand };
@@ -148,7 +152,7 @@ sub get_slaveupdates {
                 return;
             }
         } else {
-            warn "Could not lock $file. Can't load data.\n";
+            warn "Could not lock $file. Will skip and try again in the next round. No harm done!\n";
         }
         close $hand;        
         return $data;
