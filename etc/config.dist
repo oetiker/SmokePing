@@ -4,6 +4,9 @@ owner    = Peter Random
 contact  = some@address.nowhere
 mailhost = my.mail.host
 sendmail = /usr/lib/sendmail
+# NOTE: do not put the Image Cache below cgi-bin
+# since all files under cgi-bin will be executed ... this is not
+# good for images.
 imgcache = /home/oetiker/public_html/smokeping-ms/cache
 imgurl   = cache
 datadir  = /tmp/smokeping-ms/data
