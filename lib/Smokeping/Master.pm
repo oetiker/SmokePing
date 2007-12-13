@@ -101,12 +101,12 @@ sub save_updates {
         my $file = $cfg->{General}{datadir}."/${name}.slave_cache";
         if ( ! -f $cfg->{General}{datadir}."/${name}.rrd" ){
             warn "Skipping update for ${name}.slave_cache since $cfg->{General}{datadir}/${name}.rrd  does not exist in the local data structure. Make sure you run the smokeping daemon. ($cfg->{General}{datadir})\n";
-        } elsif ( open (my $hand, '+>>', $file) ) {
+        } 
+        elsif ( open (my $hand, '+<', $file) ) {
             for (my $i = 10; $i < 0; $i--){
                 if ( flock $hand, LOCK_EX ){
                     my $existing = [];
-                    if ( tell $hand > 0 ){
-                        seek $hand, 0,0;
+                    if ( (stat($hand))[7] > 0 ){
                         eval { $existing = fd_retrieve $hand };
                         if ($@) { #error
                             warn "Loading $file: $@";
@@ -121,14 +121,14 @@ sub save_updates {
                     last;
                 } else {
                     warn "Could not lock $file. Trying again for $i rounds.\n";
-                    sleep 1;
+                    sleep rand(3);
                 }
             }
             close $hand;
         } else {
             warn "Could not update $file: $!";
         }
-    }            
+    }         
 };
 
 =head3 get_slaveupdates
