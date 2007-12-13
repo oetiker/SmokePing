@@ -100,7 +100,10 @@ sub save_updates {
         my ($name, $time, $updatestring) = split /\t/, $update;
         my $file = $cfg->{General}{datadir}."/${name}.slave_cache";
         if ( ! -f $cfg->{General}{datadir}."/${name}.rrd" ){
-            warn "Skipping update for ${name}.slave_cache since $cfg->{General}{datadir}/${name}.rrd  does not exist in the local data structure. Make sure you run the smokeping daemon. ($cfg->{General}{datadir})\n";
+            warn "Skipping update for ${name}.slave_cache since ".
+                 "$cfg->{General}{datadir}/${name}.rrd  does not exist ".
+                 " in the local data structure. Make sure you run the ".
+                 "smokeping daemon. ($cfg->{General}{datadir})\n";
         } 
         elsif ( open (my $hand, '+<', $file) ) {
             for (my $i = 10; $i < 0; $i--){

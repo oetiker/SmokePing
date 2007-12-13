@@ -82,7 +82,6 @@ APPLICATION_THEME_ICON = qx.theme.icon.CrystalClear
 ################################################################################
 # INTERNALS (PLEASE DO NOT CHANGE)
 ################################################################################
-
 ifneq ($(QOOXDOO_PATH),PLEASE_DEFINE_QOOXDOO_PATH)
 	include $(QOOXDOO_PATH)/frontend/framework/tool/make/targets.mk
 #	include $(QOOXDOO_PATH)/frontend/framework/tool/make/application.mk
