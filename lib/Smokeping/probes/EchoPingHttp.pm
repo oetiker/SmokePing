@@ -73,13 +73,13 @@ sub proto_args {
 	$ignore = 1 
 		if (defined $ignore and $ignore ne "no" 
 			and $ignore ne "0");
-	push @args, "-A" if $ignore and not exists $self->{_disabled}{A};
+	push @args, "-A" if $ignore;
 
 	# -a : force cache to revalidate the data
 	my $revalidate = $target->{vars}{revalidate_data};
 	$revalidate= 1 if (defined $revalidate and $revalidate ne "no" 
 		and $revalidate ne "0");
-	push @args, "-a" if $revalidate and not exists $self->{_disabled}{a};
+	push @args, "-a" if $revalidate;
 
     # -R : accept HTTP redirects
 	my $accept_redirects = $target->{vars}{accept_redirects};
