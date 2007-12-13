@@ -81,6 +81,13 @@ sub proto_args {
 		and $revalidate ne "0");
 	push @args, "-a" if $revalidate and not exists $self->{_disabled}{a};
 
+    # -R : accept HTTP redirects
+	my $accept_redirects = $target->{vars}{accept_redirects};
+	$accept_redirects= 1 if (defined $accept_redirects 
+        and $accept_redirects ne "no" 
+		and $accept_redirects ne "0");
+	push @args, "-R" if $accept_redirects;
+
 	return @args;
 }
 
@@ -123,6 +130,16 @@ server. Enabled if the value is anything other than 'no' or '0'.
 DOC
 			_example => 'no',
 		},
+        accept_redirects => {
+            _doc => <<DOC,
+The echoping(1) "-R" option: Accept  HTTP  status  codes  3xx (redirections) 
+as normal responses instead of treating them as errors. Note that this option
+is only available starting with Echoping 6.
+
+Enabled if the value is anything other than 'no' or '0'.
+DOC
+            _example => 'yes',
+        },
 	});
 }
 

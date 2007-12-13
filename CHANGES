@@ -1,3 +1,5 @@
+* EchoPingHttp: add the 'accept_redirects' option, suggested by 
+  Kelly Shutt <kelly *websitesource.com> --niko
 * remove a leftover 'use HTTP::Request' from Smokeping::Master -- niko
 * document the LWP dependency of the Smokeping::Slave module -- niko
 * fix restart behaviour of clients in multiprocess mode. now we just send
