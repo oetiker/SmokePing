@@ -1091,7 +1091,7 @@ sub get_detail ($$$$;$){
                           'GPRINT:median:MAX:%.1lf %ss max',
                           'GPRINT:median:MIN:%.1lf %ss min',
                           'GPRINT:median:LAST:%.1lf %ss now',
-                          sprintf('COMMENT:%.1lf ms sd',$stddev*1000.0),
+                          sprintf('COMMENT:%.1f ms sd',$stddev*1000.0),
                           'GPRINT:mesd:AVERAGE:%.1lf %s am/s\l',
                           "LINE1:median#202020"
                   );

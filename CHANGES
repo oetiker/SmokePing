@@ -1,3 +1,5 @@
+* made Smokeping.pm more portable by using %.1f in perl sprintf -- tobi
+
 * fix file locking for solaris in master/slave setups. work in progress. -- tobi
 
 * EchoPingHttp: add the 'accept_redirects' option, suggested by 
