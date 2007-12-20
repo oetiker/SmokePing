@@ -210,9 +210,9 @@ sub test_usage {
 		$self->do_log("Note: your curl doesn't support the $feature feature (option $arghash{$feature}), disabling it");
 	}
 	map { delete $arghashref->{$_} } @unsupported;
-	if ($curl_man !~ /\stime_redirect\s/) {
-		$self->do_log("Note: your curl doesn't support the 'time_redirect' output variable; 'include_redirects' will not function.");
-	}
+#	if ($curl_man !~ /\stime_redirect\s/) {
+#		$self->do_log("Note: your curl doesn't support the 'time_redirect' output variable; 'include_redirects' will not function.");
+#	}
 	return;
 }
 
