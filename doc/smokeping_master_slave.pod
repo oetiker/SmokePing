@@ -70,9 +70,12 @@ authenticate and identify who is who.
 
  *** slaves ****
  secrets=/etc/smokeping/slavesecrets.conf 
+
  +slave1
  display_name=erul22
  location=India
+ color=ff0000
+
  ++override
  Probes.FPing.binary = /usr/bin/fping
  ...
@@ -113,7 +116,7 @@ optimal protection. By default the persistent data cache will be located in
 F</tmp/smokeping.$USER.cache>.
 
  ./smokeping --master-url=http://smokeping/smokeping.cgi \
-             --cache-dir=/var/smokeping/cache.file \
+             --cache-dir=/var/smokeping/ \
              --shared-secret=/var/smokeping/secret.txt
 
 =head1 COPYRIGHT
