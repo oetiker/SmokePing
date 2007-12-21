@@ -105,7 +105,7 @@ sub save_updates {
                  " in the local data structure. Make sure you run the ".
                  "smokeping daemon. ($cfg->{General}{datadir})\n";
         } 
-        elsif ( open ($hand, '+>>' , $file) ) {
+        elsif ( open (my $hand, '+>>' , $file) ) {
             for (my $i = 10; $i < 0; $i--){
                 if ( flock $hand, LOCK_EX ){
                     my $existing = [];
