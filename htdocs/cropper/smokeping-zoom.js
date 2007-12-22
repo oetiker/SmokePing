@@ -79,8 +79,9 @@ Event.observe(
            window, 
            'load', 
            function() { 
-               myCropper = new Cropper.Img( 
-                               'zoom', 
+               if ( $('zoom') != null ){
+                 myCropper = new Cropper.Img( 
+                                'zoom', 
                                         { 
                                                 minHeight: $('zoom').getDimensions().height,
                                                 maxHeight: $('zoom').getDimensions().height,
@@ -88,5 +89,6 @@ Event.observe(
                                         } 
                                 ) 
                    }
+                }
            );
 
