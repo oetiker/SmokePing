@@ -130,16 +130,20 @@ sub cgiurl {
     return $url_of{$linkstyle};
 }
 
+sub hierarchy ($){
+    my $q = shift;
+    my $hierarchy = '';
+    if ($q->param('hierarchy')){
+       $hierarchy = 'hierarchy='.$q->param('hierarchy').';';
+    }; 
+    return $hierarchy;
+}        
 sub lnk ($$) {
     my ($q, $path) = @_;
     if ($q->isa('dummyCGI')) {
         return $path . ".html";
     } else {
-        my $hierarchy = '';
-        if ($q->param('hierarchy')){
-            my $hierarchy = 'hierarchy='.$q->param('hierarchy').';';
-        }
-        return cgiurl($q, $cfg) . "?${hierarchy}target=" . $path;
+        return cgiurl($q, $cfg) . "?".hierarchy($q)."target=" . $path;
     }
 }
 
@@ -432,6 +436,10 @@ sub init_target_tree ($$$$) {
     # fill in menu and title if missing
     $tree->{menu} ||=  $tree->{host} || "unknown";
     $tree->{title} ||=  $tree->{host} || "unknown";
+    my $real_path = $name;
+    my $dataroot = $cfg->{General}{datadir};
+    $real_path =~ s/^$dataroot\/*//;
+    my @real_path = split /\//, $real_path;
 
     foreach my $prop (keys %{$tree}) {
         if (ref $tree->{$prop} eq 'HASH'){
@@ -457,10 +465,9 @@ sub init_target_tree ($$$$) {
                         $point = $point->{$item};
                     };
                     $point->{$prop}{__tree_link} = $tree->{$prop};
+	            $point->{$prop}{__real_path} = [ @real_path,$prop ];
                 }
-            }
-               
-
+            }               
             init_target_tree $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
         if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/|) {           
@@ -591,7 +598,7 @@ sub target_menu($$$;$){
     my $current =  shift @{$open} || "";
     my @hashes;
     if (not defined $tree->{_order}){
-        foreach my $prop ( sort grep { ref $tree->{$_} eq 'HASH' } keys %{$tree}) {
+        foreach my $prop ( sort grep { ref $tree->{$_} eq 'HASH' and  not /^__/} keys %{$tree}) {
             push @hashes, $prop;
         }
     } else {
@@ -613,7 +620,12 @@ sub target_menu($$$;$){
         } else {
             $class = 'menuitem';
         };
-        my $menu = $tree->{$_}{menu};
+	my $menu = $_;
+        if ($tree->{__tree_link}){
+	    $menu = $tree->{$_}{__tree_link}{menu};
+	} elsif ($tree->{$_}{menu}){	
+            $menu = $tree->{$_}{menu};
+        };
         $menu =~ s/ /&nbsp;/g;
         my $menuadd ="";
         $menuadd = "&nbsp;" x (20 - length($menu)) if length($menu) < 20;
@@ -682,17 +694,8 @@ sub get_overview ($$$$){
     my $q = shift;
     my $tree = shift;
     my $open = shift;
-    my $dir = "";
 
     my $page ="";
-
-    for (@$open) {
-        $dir .= "/$_";
-        mkdir $cfg->{General}{imgcache}.$dir, 0755 
-            unless -d  $cfg->{General}{imgcache}.$dir;
-        die "ERROR: creating  $cfg->{General}{imgcache}$dir: $!\n"
-                unless -d  $cfg->{General}{imgcache}.$dir;
-    }
 
     my $date = $cfg->{Presentation}{overview}{strftime} ? 
         POSIX::strftime($cfg->{Presentation}{overview}{strftime},
@@ -701,22 +704,40 @@ sub get_overview ($$$$){
     if ( $RRDs::VERSION >= 1.199908 ){
             $date =~ s|:|\\:|g;
     }
-    foreach my $prop (sort {$tree->{$a}{_order} <=> $tree->{$b}{_order}} 
-                      grep {  ref $tree->{$_} eq 'HASH' and defined $tree->{$_}{host}}
+    foreach my $prop (sort {$tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)} 
+                      grep {  ref $tree->{$_} eq 'HASH' and not /^__/ }
                       keys %$tree) {
         my @slaves = ("");
+        my $phys_tree = $tree->{$prop};
+	my $phys_open = $open;
+	my $dir = "";
+	if ($tree->{$prop}{__tree_link}){
+            $phys_tree = $tree->{$prop}{__tree_link};
+	    $phys_open = [ @{$tree->{$prop}{__real_path}} ];
+	    pop @$phys_open;
+	}
 
-	if ($tree->{$prop}{host} =~ m|^/|){            # multi host syntax
-            @slaves = split /\s+/, $tree->{$prop}{host};
+	next unless $phys_tree->{host};
+
+	if ($phys_tree->{host} =~ m|^/|){            # multi host syntax
+            @slaves = split /\s+/, $phys_tree->{host};
         }
-        elsif ($tree->{$prop}{slaves}){
-            push @slaves, split /\s+/,$tree->{$prop}{slaves};       
+        elsif ($phys_tree->{slaves}){
+            push @slaves, split /\s+/,$phys_tree->{slaves};       
         } 
+
+        for (@$phys_open) {
+            $dir .= "/$_";
+            mkdir $cfg->{General}{imgcache}.$dir, 0755 
+                unless -d  $cfg->{General}{imgcache}.$dir;
+            die "ERROR: creating  $cfg->{General}{imgcache}$dir: $!\n"
+                unless -d  $cfg->{General}{imgcache}.$dir;
+        }
 
         my @G; #Graph 'script'
         my $max =  $cfg->{Presentation}{overview}{max_rtt} || "100000";
-        my $probe = $probes->{$tree->{$prop}{probe}};
-        my $pings = $probe->_pings($tree->{$prop});
+        my $probe = $probes->{$phys_tree->{probe}};
+        my $pings = $probe->_pings($phys_tree);
         my $i = 0;
         my @colors = split /\s+/, $cfg->{Presentation}{multihost}{colors};
         my $ProbeUnit = $probe->ProbeUnit();
@@ -789,7 +810,7 @@ sub get_overview ($$$$){
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
     #       '--lazy',
            '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
-           '--title',$tree->{$prop}{title},
+           '--title',$phys_tree->{title},
            '--height',$cfg->{Presentation}{overview}{height},
            '--width',$cfg->{Presentation}{overview}{width},
            '--vertical-label', $ProbeUnit,
@@ -898,9 +919,18 @@ sub get_detail ($$$$;$){
     my $q = shift;
     my $tree = shift;
     my $open = shift;
+    if ($tree->{__tree_link}){
+	$tree=$tree->{__tree_link};
+    }
+
     my $mode = shift || $q->param('displaymode') || 's';
     if ($tree->{host} and $tree->{host} =~ m|^/|){
         return Smokeping::Graphs::get_multi_detail($cfg,$q,$tree,$open,$mode);
+    }
+
+    my $open_phys = $open;    
+    if ($tree->{__real_path}){
+	$open_phys = $tree->{__real_path};
     }
 
     my @slaves = ("");
@@ -910,8 +940,9 @@ sub get_detail ($$$$;$){
  
     return "" unless $tree->{host};
     
-    my @dirs = @{$open};
-    my $file = $mode eq 'c' ? (split(/~/, pop @dirs))[0] : pop @dirs;
+    my $file = $mode eq 'c' ? (split(/~/, $open->[-1]))[0] : $open->[-1];
+    my @dirs = @{$open_phys};
+    pop @dirs;
     my $dir = "";
 
     return "<div>ERROR: ".(join ".", @dirs)." has no probe defined</div>"
@@ -1267,6 +1298,7 @@ sub get_detail ($$$$;$){
            $page .= $q->start_form(-method=>'GET', -id=>'range_form')
               . "<p>Time range: "
               . $q->hidden(-name=>'epoch_start',-id=>'epoch_start',-default=>$start)
+              . ($q->param('hierarchy') ? $q->hidden(-name=>'hierarchy',-id=>'hierarchy') : '')
               . $q->hidden(-name=>'epoch_end',-id=>'epoch_end',-default=>time())
               . $q->hidden(-name=>'target',-id=>'target' )
               . $q->hidden(-name=>'displaymode',-default=>$mode )
@@ -1285,7 +1317,7 @@ sub get_detail ($$$$;$){
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
                 $page .= "<br/>";
-                $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').$s.'">'
+                $page .= ( qq{<a href="?}.hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').$s.'">'
                       . qq{<IMG BORDER="0" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
                 $page .= "</div>";
             }
@@ -1384,11 +1416,36 @@ sub load_sortercache($){
     return ( $found ? \%cache : undef )
 }
 
+sub hierarchy_switcher($$){
+    my $q = shift;
+    my $cfg = shift;
+    my $print ="";
+    if ($cfg->{Presentation}{hierarchies}){
+            $print .= "<br/><br/><div id='hierarchy_title'><small>Hierarchy:</small></div>";
+	    $print .= "<div id='hierarchy_popup'>".$q->start_form(-name=>'hswitch',-method=>'get',-action=>$q->url(-relative=>1));
+	    $print .= $q->popup_menu(-name=>'hierarchy',
+			             -onChange=>'hswitch.submit()',
+            		             -values=>['', sort map {ref $cfg->{Presentation}{hierarchies}{$_} eq 'HASH' 
+                                                 ? $_ : () } keys %{$cfg->{Presentation}{hierarchies}}],
+            		             -labels=>{''=>'Default Hierarchy',
+					       map {ref $cfg->{Presentation}{hierarchies}{$_} eq 'HASH' 
+                                                    ? ($_ => $cfg->{Presentation}{hierarchies}{$_}{title} )
+                                                    : () } keys %{$cfg->{Presentation}{hierarchies}}
+					      }
+				    );
+	    $print .= $q->end_form();
+	$print .= "</div>";
+    }
+    return $print;
+}
+
 sub display_webpage($$){
     my $cfg = shift;
     my $q = shift;
     my ($path,$slave) = split(/~/,$q->param('target') || '');
     my $hierarchy = $q->param('hierarchy');
+    die "ERROR: unknown hierarchy $hierarchy\n" 
+	if not $cfg->{Presentation}{hierarchies} and $cfg->{Presentation}{hierarchies}{$hierarchy};
     my $open = [ (split /\./,$path) ];
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;
@@ -1402,7 +1459,7 @@ sub display_webpage($$){
     my $step = $cfg->{__probes}{$targets->{probe}}->step();
     # lets see if the charts are opened
     my $charts = 0;
-    $charts = 1 if defined $cfg->{Presentation}{charts} and $open->[0] and $open->[0] eq '__charts';
+    $charts = 1 if defined $cfg->{Presentation}{charts} and $open->[0] and $open->[0] eq '_charts';
     if ($charts and ( not defined $cfg->{__sortercache} 
                       or $cfg->{__sortercachekeeptime} < time )){
        # die "ERROR: Chart $open->[1] does not exit.\n"
@@ -1417,10 +1474,6 @@ sub display_webpage($$){
          last unless  ref $tree->{$_} eq 'HASH';
          $tree = $tree->{$_};
        }
-       # we are in a hierarchy. Point to the original tree
-       if (exists $tree->{__tree_link}){
-           $tree = $tree->{__tree_link};
-       }
     }
     gen_imgs($cfg); # create logos in imgcache
     my $readversion = "?";
@@ -1429,10 +1482,10 @@ sub display_webpage($$){
     my $hierarchy_arg = '';
 
         
-    if (defined $cfg->{Presentation}{charts}){
+    if (defined $cfg->{Presentation}{charts} and not $hierarchy){
         my $order = 1;
-        $targets = { %{$targets},
-                    __charts => {
+        $menu_root = { %{$menu_root},
+                       _charts => {
                         _order => -99,
                         menu => $cfg->{Presentation}{charts}{menu},
                         map { $_ => { menu => $cfg->{Presentation}{charts}{$_}{menu}, _order => $order++ } } 
@@ -1446,18 +1499,22 @@ sub display_webpage($$){
         $hierarchy_arg = 'hierarchy='.$hierarchy.';';
 
     };
+    # if we are in a hierarchy, recover the original path
+
+    my $display_tree = $tree->{__tree_link} ? $tree->{__tree_link} : $tree;
+
     my $page = fill_template
       ($cfg->{Presentation}{template},
        {
         menu => target_menu( $menu_root,
                              [@$open], #copy this because it gets changed
-                             cgiurl($q, $cfg) ."?${hierarchy_arg}target="),
-
-        title => $charts ? "" : $tree->{title},
-        remark => $charts ? "" : ($tree->{remark} || ''),
+                             cgiurl($q, $cfg) ."?${hierarchy_arg}target=").
+		hierarchy_switcher($q,$cfg),
+        title => $charts ? "" : $display_tree->{title},
+        remark => $charts ? "" : ($display_tree->{remark} || ''),
         overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open),
         body => $charts ? "" : get_detail( $cfg,$q,$tree,$open_orig ),
-        target_ip => $charts ? "" : ($tree->{host} || ''),
+        target_ip => $charts ? "" : ($display_tree->{host} || ''),
         owner => $cfg->{General}{owner},
         contact => $cfg->{General}{contact},
 
@@ -1475,7 +1532,6 @@ sub display_webpage($$){
                      -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15'),
                      -Content_length => length($page),
                      );
-
     print $page || "<HTML><BODY>ERROR: Reading page template".$cfg->{Presentation}{template}."</BODY></HTML>";
 
 }

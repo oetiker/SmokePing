@@ -1,3 +1,7 @@
+
+* Added support for alternate presentation hierarchies
+  check Presentation->hierarchies and Target->parents --tobi
+
 * fix javascript error about non existing zoom div -- tobi
 
 * Switch to curl --help since some distros seem to compile without --manual

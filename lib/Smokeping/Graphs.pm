@@ -34,9 +34,13 @@ sub get_multi_detail ($$$$;$){
     my $tree = shift;
     my $open = shift;
     my $mode = shift || $q->param('displaymode') || 's';
+    my $open_phys = $open;
+    if ($tree->{__real_path}){         
+        $open_phys = $tree->{__real_path};
+    }
 
     
-    my @dirs = @{$open};
+    my @dirs = @{$open_phys};
 
     return "<div>ERROR: ".(join ".", @dirs)." has no probe defined</div>"
         unless $tree->{probe};
@@ -291,6 +295,7 @@ sub get_multi_detail ($$$$;$){
               . $q->hidden(-name=>'epoch_start',-id=>'epoch_start',-default=>$start)
               . $q->hidden(-name=>'epoch_end',-id=>'epoch_end',-default=>time())
               . $q->hidden(-name=>'target',-id=>'target' )
+              . $q->hidden(-name=>'hierarchy',-id=>'hierarchy' )
               . $q->hidden(-name=>'displaymode',-default=>$mode )
               . "&nbsp;"
               . $q->submit(-name=>'Generate!')
