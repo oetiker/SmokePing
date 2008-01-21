@@ -95,6 +95,12 @@ unison_tolerance = 2
 "Last 10 Days"    10d
 "Last 400 Days"   400d
 
+#+ hierarchies
+#++ owner
+#title = Host Owner
+#++ location
+#title = Location
+
 *** Probes ***
 
 + FPing
@@ -119,6 +125,7 @@ remark = Welcome to the SmokePing website of xxx Company. \
 
 + Test
 menu= Targets
+#parents = owner:/Test/James location:/
 
 ++ James
 

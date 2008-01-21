@@ -135,7 +135,11 @@ sub lnk ($$) {
     if ($q->isa('dummyCGI')) {
         return $path . ".html";
     } else {
-        return cgiurl($q, $cfg) . "?target=" . $path;
+        my $hierarchy = '';
+        if ($q->param('hierarchy')){
+            my $hierarchy = 'hierarchy='.$q->param('hierarchy').';';
+        }
+        return cgiurl($q, $cfg) . "?${hierarchy}target=" . $path;
     }
 }
 
@@ -409,6 +413,7 @@ sub init_target_tree ($$$$) {
     my $probes = shift;
     my $tree = shift;
     my $name = shift;
+    my $hierarchies = $cfg->{__hierarchies};
     die "Error: Invalid Probe: $tree->{probe}" unless defined $probes->{$tree->{probe}};
     my $probeobj = $probes->{$tree->{probe}};
 
@@ -433,6 +438,29 @@ sub init_target_tree ($$$$) {
             if (not -d $name and not $cgimode) {
                 mkdir $name, 0755 or die "ERROR: mkdir $name: $!\n";
             };
+
+            if (defined $tree->{$prop}{parents}){
+                for my $parent (split /\s/, $tree->{$prop}{parents}){
+                    my($hierarchy,$path)=split /:/,$parent,2;
+                    die "ERROR: unknown hierarchy $hierarchy in $name. Make sure it is listed in Presentation->hierarchies.\n"
+                        unless $cfg->{Presentation}{hierarchies} and $cfg->{Presentation}{hierarchies}{$hierarchy};
+                    my @path = split /\/+/, $path;
+                    shift @path; # drop empty root element;
+                    if ( not exists $hierarchies->{$hierarchy} ){
+                        $hierarchies->{$hierarchy} = {};
+                    };
+                    my $point = $hierarchies->{$hierarchy};
+                    for my $item (@path){
+                        if (not exists $point->{$item}){
+                            $point->{$item} = {};
+                        }
+                        $point = $point->{$item};
+                    };
+                    $point->{$prop}{__tree_link} = $tree->{$prop};
+                }
+            }
+               
+
             init_target_tree $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
         if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/|) {           
@@ -561,12 +589,16 @@ sub target_menu($$$;$){
     my $suffix = shift || '';
     my $print;
     my $current =  shift @{$open} || "";
-     
     my @hashes;
-    foreach my $prop (sort { $tree->{$a}{_order} <=> $tree->{$b}{_order}}
-                      grep { ref $tree->{$_} eq 'HASH' }
-                      keys %{$tree}) {
-        push @hashes, $prop;
+    if (not defined $tree->{_order}){
+        foreach my $prop ( sort grep { ref $tree->{$_} eq 'HASH' } keys %{$tree}) {
+            push @hashes, $prop;
+        }
+    } else {
+        foreach my $prop (sort { $tree->{$a}{_order} <=> $tree->{$b}{_order}}
+                           grep { ref $tree->{$_} eq 'HASH' } keys %{$tree}) {
+            push @hashes, $prop;
+        }
     }
     return "" unless @hashes;
     $print .= "<table width=\"100%\" class=\"menu\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
@@ -1356,11 +1388,16 @@ sub display_webpage($$){
     my $cfg = shift;
     my $q = shift;
     my ($path,$slave) = split(/~/,$q->param('target') || '');
+    my $hierarchy = $q->param('hierarchy');
     my $open = [ (split /\./,$path) ];
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;
 
     my $tree = $cfg->{Targets};
+    if ($hierarchy){
+        $tree = $cfg->{__hierarchies}{$hierarchy};
+    };
+    my $menu_root = $tree;
     my $targets = $cfg->{Targets};
     my $step = $cfg->{__probes}{$targets->{probe}}->step();
     # lets see if the charts are opened
@@ -1380,11 +1417,18 @@ sub display_webpage($$){
          last unless  ref $tree->{$_} eq 'HASH';
          $tree = $tree->{$_};
        }
+       # we are in a hierarchy. Point to the original tree
+       if (exists $tree->{__tree_link}){
+           $tree = $tree->{__tree_link};
+       }
     }
     gen_imgs($cfg); # create logos in imgcache
     my $readversion = "?";
     $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
     my $menu = $targets;
+    my $hierarchy_arg = '';
+
+        
     if (defined $cfg->{Presentation}{charts}){
         my $order = 1;
         $targets = { %{$targets},
@@ -1397,12 +1441,17 @@ sub display_webpage($$){
                    }
                  };
     }                    
+
+    if ($hierarchy){
+        $hierarchy_arg = 'hierarchy='.$hierarchy.';';
+
+    };
     my $page = fill_template
       ($cfg->{Presentation}{template},
        {
-        menu => target_menu( $targets,
+        menu => target_menu( $menu_root,
                              [@$open], #copy this because it gets changed
-                             cgiurl($q, $cfg) ."?target="),
+                             cgiurl($q, $cfg) ."?${hierarchy_arg}target="),
 
         title => $charts ? "" : $tree->{title},
         remark => $charts ? "" : ($tree->{remark} || ''),
@@ -1821,7 +1870,7 @@ sub get_parser () {
     # the part of target section syntax that doesn't depend on the selected probe
     my $TARGETCOMMON; # predeclare self-referencing structures
     # the common variables
-    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee slaves) ];
+    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee slaves parents) ];
     $TARGETCOMMON = 
       {
        _vars     => $TARGETCOMMONVARS,
@@ -1950,6 +1999,25 @@ DOC
                         return undef;
                   }, 
            },
+           parents => {
+                        _re => "${KEYD_RE}:/(?:${KEYD_RE}(?:/${KEYD_RE})*)?(?: ${KEYD_RE}:/(?:${KEYD_RE}(?:/${KEYD_RE})*)?)*",
+                        _re_error => "Use hierarcy:/parent/path syntax",
+                        _doc => <<DOC
+After setting up a hierarchy in the Presentation section of the
+configuration file you can use this property to assign an entry to alternate
+hierarchies. The format for parent entries is.
+
+ hierarchyA:/Node1/Node2 hierarchyB:/Node3
+      
+The entries from all parent properties together will build a new tree for
+each hierarchy. With this method it is possible to make a single target show
+up multiple times in a tree. If you think this is a good thing, go ahead,
+nothing is stopping you. Since you do not only define the parent but the full path
+of the parent node, circular dependencies are not possible.
+
+DOC
+           },
+
            alertee => { _re => '(\|.+|.+@\S+|snpp:)',
                         _re_error => 'the alertee must be an email address here',
                         _doc => <<DOC },
@@ -2523,7 +2591,7 @@ DOC
          _doc => <<DOC,
 Defines how the SmokePing data should be presented.
 DOC
-          _sections => [ qw(overview detail charts multihost) ],
+          _sections => [ qw(overview detail charts multihost hierarchies) ],
           _mandatory => [ qw(overview template detail) ],
           _vars      => [ qw (template charset) ],
           template   => 
@@ -2835,6 +2903,22 @@ DOC
                 
               }
            }, #multi host
+           hierarchies => {
+              _doc => <<DOC,
+Provide an alternative presentation hierarchy for your smokeping data. After setting up a hierarchy in this
+section. You can use it in each tagets parent property. A drop-down menu in the smokeping website lets
+the user switch presentation hierarchy.
+DOC
+              _sections => [ "/$KEYD_RE/" ],
+              "/$KEYD_RE/" => {
+                  _doc => "Identifier of the hierarchie. Use this as prefix in the targets parent property",
+                  _vars => [ qw(title) ],
+                  _mandatory => [ qw(title) ],
+                  title => {
+                     _doc => "Title for this hierarchy",
+                  }
+              }
+           }, #hierarchies
         }, #present
         Probes => { _sections => [ "/$KEYD_RE/" ],
                     _doc => <<DOC,
@@ -3134,7 +3218,7 @@ connections the system should monitor. Each section can contain one host as
 well as other sections. By adding slaves you can measure the connectivity of
 an endpoint looking from several sources.
 DOC
-                   _vars       => [ qw(probe menu title remark alerts slaves) ],
+                   _vars       => [ qw(probe menu title remark alerts slaves parents) ],
                    _mandatory  => [ qw(probe menu title) ],
                    _order => 1,
                    _sections   => [ "/$KEYD_RE/" ],
@@ -3206,7 +3290,7 @@ DOC
 An optional remark on the current section. It gets displayed on the webpage.
 DOC
 
-                  }
+           }
 
       }
     );
@@ -3218,7 +3302,7 @@ sub get_config ($$){
     my $cfgfile = shift;
 
     my $cfg = $parser->parse( $cfgfile ) or die "ERROR: $parser->{err}\n";
-    # lets do some checking
+    # lets have defaults for multihost colors
     if (not $cfg->{Presentation}{multihost} or not $cfg->{Presentation}{multihost}{colors}){
        $cfg->{Presentation}{multihost}{colors} = "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1";
     }
@@ -3402,10 +3486,13 @@ sub load_cfg ($;$) {
         $probes = undef;
         $probes = load_probes $cfg;
         $cfg->{__probes} = $probes;
+        $cfg->{__hierarchies} = {};
         return if $noinit;
         init_alerts $cfg if $cfg->{Alerts};
         add_targets $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};   
         init_target_tree $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
+        #use Data::Dumper;
+        #die Dumper $cfg->{__hierarchies};
     } else {
         do_log("Config file unmodified, skipping reload") unless $cgimode;
     }
