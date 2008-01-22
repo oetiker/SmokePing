@@ -638,7 +638,7 @@ sub target_menu($$$$;$){
    	    };
 
 		if ($filter){
-			if (($menu and $menu =~ /$filter/) or ($title and $title =~ /$filter/)){
+			if (($menu and $menu =~ /$filter/i) or ($title and $title =~ /$filter/i)){
 				push @matches, ["$path$key$suffix",$menu,$class];
 			};
 			push @matches, target_menu($tree->{$key}, $open, "$path$key.",$filter, $suffix);
