@@ -1298,7 +1298,7 @@ sub get_detail ($$$$;$){
            $page .= $q->start_form(-method=>'GET', -id=>'range_form')
               . "<p>Time range: "
               . $q->hidden(-name=>'epoch_start',-id=>'epoch_start',-default=>$start)
-              . ($q->param('hierarchy') ? $q->hidden(-name=>'hierarchy',-id=>'hierarchy') : '')
+              . $q->hidden(-name=>'hierarchy',-id=>'hierarchy')
               . $q->hidden(-name=>'epoch_end',-id=>'epoch_end',-default=>time())
               . $q->hidden(-name=>'target',-id=>'target' )
               . $q->hidden(-name=>'displaymode',-default=>$mode )

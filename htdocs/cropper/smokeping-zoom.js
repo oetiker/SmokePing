@@ -70,7 +70,7 @@ function changeRRDImage(coords,dimensions){
     EndEpoch  =  Math.ceil(EndEpoch + (SelectRight - (RRDImgWidth - RRDRight) ) * DivEpoch / RRDImgUsable * RightFactor);
 
 
-    $('zoom').src = myURL + '?displaymode=a;start=' + StartEpoch + ';end=' + EndEpoch + ';target=' + Target + (Hierarchy != '' ? ';hierarchy=' + Hierarchy : '');    
+    $('zoom').src = myURL + '?displaymode=a;start=' + StartEpoch + ';end=' + EndEpoch + ';target=' + Target + ';hierarchy=' + Hierarchy;    
 
     myCropper.setParams();
 
