@@ -18,6 +18,7 @@ use Smokeping::Master;
 use Smokeping::Slave;
 use Smokeping::RRDhelpers;
 use Smokeping::Graphs;
+use URI::Escape;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -588,11 +589,13 @@ sub get_tree($$){
     return $tree;
 }
 
-sub target_menu($$$;$);
-sub target_menu($$$;$){
+sub target_menu($$$$;$);
+sub target_menu($$$$;$){
     my $tree = shift;
     my $open = shift;
+    $open = [@$open]; # make a copy 
     my $path = shift;
+    my $filter = shift;
     my $suffix = shift || '';
     my $print;
     my $current =  shift @{$open} || "";
@@ -607,36 +610,63 @@ sub target_menu($$$;$){
             push @hashes, $prop;
         }
     }
-    return "" unless @hashes;
-    $print .= "<table width=\"100%\" class=\"menu\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
-    for (@hashes) {
-        my $class;
-        if ($_ eq $current ){
-             if ( @$open ) {
-                 $class = 'menuopen';
-             } else {
-                 $class = 'menuactive';
-             }
-        } else {
-            $class = 'menuitem';
+    return wantarray ? () : "" unless @hashes;
+
+	$print .= qq{<table width="100%" class="menu" border="0" cellpadding="0" cellspacing="0">\n}
+		unless $filter;
+
+	my @matches;
+    for my $key (@hashes) {
+
+		my $menu = $key;
+        my $title = $key;
+        if ($tree->{$key}{__tree_link} and $tree->{$key}{__tree_link}{menu}){
+    		$menu = $tree->{$key}{__tree_link}{menu};
+    		$title = $tree->{$key}{__tree_link}{title};
+		} elsif ($tree->{$key}{menu}) {	
+	        $menu = $tree->{$key}{menu};
+	        $title = $tree->{$key}{title};
         };
-	my $menu = $_;
-        if ($tree->{__tree_link}){
-	    $menu = $tree->{$_}{__tree_link}{menu};
-	} elsif ($tree->{$_}{menu}){	
-            $menu = $tree->{$_}{menu};
-        };
-        $menu =~ s/ /&nbsp;/g;
-        my $menuadd ="";
-        $menuadd = "&nbsp;" x (20 - length($menu)) if length($menu) < 20;
-        $print .= "<tr><td class=\"$class\" colspan=\"2\">&nbsp;-&nbsp;<a class=\"menulink\" HREF=\"$path$_$suffix\">$menu</a>$menuadd</td></tr>\n";
-        if ($_ eq $current){
-            my $prline = target_menu $tree->{$_}, $open, "$path$_.", $suffix;
-            $print .= "<tr><td class=\"$class\">&nbsp;&nbsp;</td><td align=\"left\">$prline</td></tr>"
-              if $prline;
-        }
+
+		my $class = 'menuitem';
+   	    if ($key eq $current ){
+			if ( @$open ) {
+         		$class = 'menuopen';
+    		} else {
+   	            $class = 'menuactive';
+            }
+   	    };
+
+		if ($filter){
+			if (($menu and $menu =~ /$filter/) or ($title and $title =~ /$filter/)){
+				push @matches, ["$path$key$suffix",$menu,$class];
+			};
+			push @matches, target_menu($tree->{$key}, $open, "$path$key.",$filter, $suffix);
+		}
+		else {
+    	    $menu =~ s/ /&nbsp;/g;
+        	my $menuadd ="";
+		    $menuadd = "&nbsp;" x (20 - length($menu)) if length($menu) < 20;
+	        $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="menulink" HREF="$path$key$suffix">$menu</a>$menuadd</td></tr>\n};
+    	    if ($key eq $current){
+        	    my $prline = target_menu $tree->{$key}, $open, "$path$key.",$filter, $suffix;
+	            $print .= qq{<tr><td class="$class">&nbsp;&nbsp;</td><td align="left">$prline</td></tr>}
+   		           if $prline;
+        	}
+		}
     }
-    $print .= "</table>\n";
+    $print .= "</table>\n" unless $filter;
+	if ($filter){
+		if (wantarray()){
+			return @matches;
+		}
+		else {
+			for my $entry (sort {$a->[1] cmp $b->[1] } grep {ref $_ eq 'ARRAY'} @matches) {
+				my ($href,$menu,$class) = @{$entry};
+				$print .= qq{<div class="$class">-&nbsp;<a class="menulink" href="$href">$menu</a></div>\n};
+			}			
+		}
+	}
     return $print;
 };
 
@@ -654,7 +684,8 @@ sub fill_template ($$;$){
         $/ = $line;
     }
     foreach my $tag (keys %{$subst}) {
-        $data =~ s/<##${tag}##>/$subst->{$tag}/g;
+	my $replace = $subst->{$tag} || '';
+        $data =~ s/<##${tag}##>/$replace/g;
     }
     return $data;
 }
@@ -919,19 +950,20 @@ sub get_detail ($$$$;$){
     my $q = shift;
     my $tree = shift;
     my $open = shift;
+    my $mode = shift || $q->param('displaymode') || 's';
+
+    my $phys_tree = $tree;
+    my $phys_open = $open;    
     if ($tree->{__tree_link}){
-	$tree=$tree->{__tree_link};
+	$phys_tree=$tree->{__tree_link};
+	$phys_open = $tree->{__real_path};
     }
 
-    my $mode = shift || $q->param('displaymode') || 's';
-    if ($tree->{host} and $tree->{host} =~ m|^/|){
+    if ($phys_tree->{host} and $phys_tree->{host} =~ m|^/|){
         return Smokeping::Graphs::get_multi_detail($cfg,$q,$tree,$open,$mode);
     }
 
-    my $open_phys = $open;    
-    if ($tree->{__real_path}){
-	$open_phys = $tree->{__real_path};
-    }
+    $tree = $phys_tree;
 
     my @slaves = ("");
     if ($tree->{slaves} and $mode eq 's'){
@@ -941,7 +973,7 @@ sub get_detail ($$$$;$){
     return "" unless $tree->{host};
     
     my $file = $mode eq 'c' ? (split(/~/, $open->[-1]))[0] : $open->[-1];
-    my @dirs = @{$open_phys};
+    my @dirs = @{$phys_open};
     pop @dirs;
     my $dir = "";
 
@@ -1419,10 +1451,10 @@ sub load_sortercache($){
 sub hierarchy_switcher($$){
     my $q = shift;
     my $cfg = shift;
-    my $print ="";
+    my $print =$q->start_form(-name=>'hswitch',-method=>'get',-action=>$q->url(-relative=>1));    
     if ($cfg->{Presentation}{hierarchies}){
-            $print .= "<br/><br/><div id='hierarchy_title'><small>Hierarchy:</small></div>";
-	    $print .= "<div id='hierarchy_popup'>".$q->start_form(-name=>'hswitch',-method=>'get',-action=>$q->url(-relative=>1));
+            $print .= "<div id='hierarchy_title'><small>Hierarchy:</small></div>";
+	    $print .= "<div id='hierarchy_popup'>";
 	    $print .= $q->popup_menu(-name=>'hierarchy',
 			             -onChange=>'hswitch.submit()',
             		             -values=>['', sort map {ref $cfg->{Presentation}{hierarchies}{$_} eq 'HASH' 
@@ -1433,10 +1465,16 @@ sub hierarchy_switcher($$){
                                                     : () } keys %{$cfg->{Presentation}{hierarchies}}
 					      }
 				    );
-	    $print .= $q->end_form();
-	$print .= "</div>";
-    }
-    return $print;
+             $print .= "</div>";
+     }
+     $print .= "<div><small>Filter:</small></div>";
+     $print .= $q->textfield (-name=>'filter',
+		             -onChange=>'hswitch.submit()',
+		             -size=>15,
+			    );
+     $print .= $q->end_form();
+     $print .= "</div><br/><br/>";
+     return $print;
 }
 
 sub display_webpage($$){
@@ -1446,9 +1484,11 @@ sub display_webpage($$){
     my $hierarchy = $q->param('hierarchy');
     die "ERROR: unknown hierarchy $hierarchy\n" 
 	if not $cfg->{Presentation}{hierarchies} and $cfg->{Presentation}{hierarchies}{$hierarchy};
-    my $open = [ (split /\./,$path) ];
+    my $open = [ (split /\./,$path||'') ];
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;
+
+    my($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
 
     my $tree = $cfg->{Targets};
     if ($hierarchy){
@@ -1479,7 +1519,6 @@ sub display_webpage($$){
     my $readversion = "?";
     $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
     my $menu = $targets;
-    my $hierarchy_arg = '';
 
         
     if (defined $cfg->{Presentation}{charts} and not $hierarchy){
@@ -1495,8 +1534,14 @@ sub display_webpage($$){
                  };
     }                    
 
+    my $hierarchy_arg = '';
     if ($hierarchy){
-        $hierarchy_arg = 'hierarchy='.$hierarchy.';';
+        $hierarchy_arg = 'hierarchy='.uri_escape($hierarchy).';';
+
+    };
+    my $filter_arg ='';
+    if ($filter){
+        $filter_arg = 'filter='.uri_escape($filter).';';
 
     };
     # if we are in a hierarchy, recover the original path
@@ -1506,10 +1551,12 @@ sub display_webpage($$){
     my $page = fill_template
       ($cfg->{Presentation}{template},
        {
-        menu => target_menu( $menu_root,
+        menu => hierarchy_switcher($q,$cfg).
+		target_menu( $menu_root,
                              [@$open], #copy this because it gets changed
-                             cgiurl($q, $cfg) ."?${hierarchy_arg}target=").
-		hierarchy_switcher($q,$cfg),
+                             cgiurl($q, $cfg) ."?${hierarchy_arg}${filter_arg}target=",
+		             $filter
+			   ),
         title => $charts ? "" : $display_tree->{title},
         remark => $charts ? "" : ($display_tree->{remark} || ''),
         overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open),
@@ -3688,7 +3735,7 @@ sub gen_page  ($$$) {
          {
           menu => target_menu($cfg->{Targets},
                               [@$open], #copy this because it gets changed
-                              "", ".html"),
+                              "", '',".html"),
           title => $tree->{title},
           remark => ($tree->{remark} || ''),
           overview => get_overview( $cfg,$q,$tree,$open ),

@@ -34,13 +34,13 @@ sub get_multi_detail ($$$$;$){
     my $tree = shift;
     my $open = shift;
     my $mode = shift || $q->param('displaymode') || 's';
-    my $open_phys = $open;
-    if ($tree->{__real_path}){         
-        $open_phys = $tree->{__real_path};
+    my $phys_open = $open;
+    if ($tree->{__tree_link}){
+        $tree=$tree->{__tree_link};
+        $phys_open = $tree->{__real_path};
     }
-
     
-    my @dirs = @{$open_phys};
+    my @dirs = @{$phys_open};
 
     return "<div>ERROR: ".(join ".", @dirs)." has no probe defined</div>"
         unless $tree->{probe};

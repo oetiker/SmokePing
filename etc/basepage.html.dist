@@ -10,26 +10,26 @@
 <STYLE type="text/css">
 <!--
 
-td.menubar, 
-td.menubar a
+.menubar, 
+.menubar a
 {
     color: white;
     text-decoration: none;
 }
 
-td.menubar {
+.menubar {
     background: #4c4c4c;
 }
 
-td.menu,
-td.menuitem,
-td.menuopen,
-td.menuactive
+.menu,
+.menuitem,
+.menuopen,
+.menuactive
  {      font-size: 10px;
         font-family: sans-serif;
        }
        
-td.menuactive {
+.menuactive {
         background: #202040;
        }
 

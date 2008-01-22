@@ -1,3 +1,4 @@
+* Added filter function to interface. --tobi
 
 * Added support for alternate presentation hierarchies
   check Presentation->hierarchies and Target->parents --tobi
