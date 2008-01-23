@@ -180,6 +180,7 @@ sub get_multi_detail ($$$$;$){
             $i++;
             my $swidth = $max->{$start} / $cfg->{Presentation}{detail}{height};
             my $rrd = $cfg->{General}{datadir}.$host.".rrd";
+            next unless -r $rrd; # skip things that do not exist;
             my $medc = shift @colors;
             my @tree_path = split /\//,$host;
             shift @tree_path;

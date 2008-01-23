@@ -401,7 +401,7 @@ sub add_targets ($$$$){
         if (ref $tree->{$prop} eq 'HASH'){
             add_targets $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
-        if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/| ) {           
+        if ($prop eq 'host' and $tree->{nomasterpoll} eq 'no' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/| ) {           
             if($tree->{host} =~ /^DYNAMIC/) {
                 $probeobj->add($tree,$name);
             } else {
@@ -620,12 +620,15 @@ sub target_menu($$$$;$){
 
 		my $menu = $key;
         my $title = $key;
+        my $hide;
         if ($tree->{$key}{__tree_link} and $tree->{$key}{__tree_link}{menu}){
     		$menu = $tree->{$key}{__tree_link}{menu};
     		$title = $tree->{$key}{__tree_link}{title};
+                next if $tree->{$key}{__tree_link}{hide} eq 'yes';
 		} elsif ($tree->{$key}{menu}) {	
 	        $menu = $tree->{$key}{menu};
 	        $title = $tree->{$key}{title};
+                next if $tree->{$key}{hide} eq 'yes';
         };
 
 		my $class = 'menuitem';
@@ -738,7 +741,8 @@ sub get_overview ($$$$){
     foreach my $prop (sort {$tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)} 
                       grep {  ref $tree->{$_} eq 'HASH' and not /^__/ }
                       keys %$tree) {
-        my @slaves = ("");
+        my @slaves;
+
         my $phys_tree = $tree->{$prop};
 	my $phys_open = $open;
 	my $dir = "";
@@ -749,6 +753,11 @@ sub get_overview ($$$$){
 	}
 
 	next unless $phys_tree->{host};
+	next if $phys_tree->{hide} and $phys_tree->{hide} eq 'yes';
+
+        if ($phys_tree->{nomasterpoll} eq 'no'){
+            @slaves  = ("");
+        };
 
 	if ($phys_tree->{host} =~ m|^/|){            # multi host syntax
             @slaves = split /\s+/, $phys_tree->{host};
@@ -756,6 +765,8 @@ sub get_overview ($$$$){
         elsif ($phys_tree->{slaves}){
             push @slaves, split /\s+/,$phys_tree->{slaves};       
         } 
+
+        next if 0 == @slaves;
 
         for (@$phys_open) {
             $dir .= "/$_";
@@ -963,15 +974,20 @@ sub get_detail ($$$$;$){
         return Smokeping::Graphs::get_multi_detail($cfg,$q,$tree,$open,$mode);
     }
 
+    # don't distinguish anymore ... tree is now phys_tree
     $tree = $phys_tree;
 
-    my @slaves = ("");
+    my @slaves;
+    if ($tree->{nomasterpoll} eq 'no'){
+        @slaves  = ("");
+    };
+
     if ($tree->{slaves} and $mode eq 's'){
         push @slaves, split /\s+/,$tree->{slaves};       
     };
  
-    return "" unless $tree->{host};
-    
+    return "" if not defined $tree->{host} or 0 == @slaves;
+
     my $file = $mode eq 'c' ? (split(/~/, $open->[-1]))[0] : $open->[-1];
     my @dirs = @{$phys_open};
     pop @dirs;
@@ -1973,11 +1989,11 @@ sub get_parser () {
     # the part of target section syntax that doesn't depend on the selected probe
     my $TARGETCOMMON; # predeclare self-referencing structures
     # the common variables
-    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee slaves parents) ];
+    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee slaves parents hide nomasterpoll) ];
     $TARGETCOMMON = 
       {
        _vars     => $TARGETCOMMONVARS,
-       _inherited=> [ qw (probe alerts alertee slaves) ],
+       _inherited=> [ qw (probe alerts alertee slaves nomasterpoll) ],
        _sections => [ "/$KEYD_RE/" ],
        _recursive=> [ "/$KEYD_RE/" ],
        _sub => sub {
@@ -2000,6 +2016,38 @@ DOC
                      _re => '([^\s,]+(,[^\s,]+)*)?',
                      _re_error => 'Comma separated list of alert names',
                     },
+       hide      => {
+                     _doc => <<DOC,
+Set the hide property to 'yes' to hide this host from the navigation menu
+and from search results. Note that if you set the hide property on a non
+leaf entry all subordinate entries will also disapear in the menu structure.
+If you know a direct link to a page it is still accessible. Pages which are
+hidden from the menu due to a parent being hidden will still show up in
+search results and in alternate hierarchies where they are below a non
+hidden parent.
+DOC
+                     _re => '(yes|no)',
+                     _default => 'no',
+                    },
+
+       nomasterpoll=> {
+                     _doc => <<DOC,
+Use this in a master/slave setup where the master must not poll a particular
+target. The master will now skip this entry in its polling cycle.  and from
+search results. Note that if you set the hide property on a non leaf entry
+all subordinate entries will also disapear in the menu structure. You can
+still access them via direct link or via an alternate hierarchy.
+
+If you have no master/slave setup this will have a similar effect to the
+hide property, except that the menu entry will still show up, but will not
+contain any graphs.
+
+DOC
+                     _re => '(yes|no)',
+                     _re_error => 'Only set this if you want to hide',
+                     _default => 'no',
+                    },
+
        host      => 
        {
         _doc => <<DOC,

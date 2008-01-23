@@ -1,4 +1,9 @@
-* Added filter function to interface. --tobi
+* Added new properties to target configuration
+  hide for hiding the target on the webinterface
+  nomasterpoll to exclude this target from polling on the master
+  -- tobi
+
+* Added filter/search  function to web interface. --tobi
 
 * Added support for alternate presentation hierarchies
   check Presentation->hierarchies and Target->parents --tobi

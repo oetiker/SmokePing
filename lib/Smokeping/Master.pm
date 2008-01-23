@@ -46,7 +46,8 @@ sub get_targets {
             $ok = 1 if $key eq 'host';
             $return{$key} = $trg->{$key};
         }
-    }    
+    }           
+    $trg->{nomasterpoll} = 'no'; # slaves poll always
     return ($ok ? \%return : undef);
 }
     
@@ -99,11 +100,9 @@ sub save_updates {
     for my $update (split /\n/, $updates){
         my ($name, $time, $updatestring) = split /\t/, $update;
         my $file = $cfg->{General}{datadir}."/${name}.slave_cache";
-        if ( ! -f $cfg->{General}{datadir}."/${name}.rrd" ){
+        if ( ${name} =~ m{(^|/)\.\.($|/)} ){
             warn "Skipping update for ${name}.slave_cache since ".
-                 "$cfg->{General}{datadir}/${name}.rrd  does not exist ".
-                 " in the local data structure. Make sure you run the ".
-                 "smokeping daemon. ($cfg->{General}{datadir})\n";
+                 "you seem to try todo some directory magic here. Don't!";
         } 
         elsif ( open (my $lock, '>>' , "$file.lock") ) {
             for (my $i = 10; $i > 0; $i--){
