@@ -155,6 +155,7 @@ smokeping-$(VERSION).tar.gz:
 	$(PERL) -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	svn export $(SVNREPO)/trunk/software smokeping-$(VERSION)
+	rm -rf smokeping-$(VERSION)/qooxdoo
 	(cd smokeping-$(VERSION) && $(MAKE) doc)
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
