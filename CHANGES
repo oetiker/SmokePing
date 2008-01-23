@@ -1,3 +1,5 @@
+* Integrated TCPPing Probe -- Norman Rasmussen
+
 * Added new properties to target configuration
   hide for hiding the target on the webinterface
   nomasterpoll to exclude this target from polling on the master
