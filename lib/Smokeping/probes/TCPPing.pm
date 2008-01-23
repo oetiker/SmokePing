@@ -1,21 +1,31 @@
 package Smokeping::probes::TCPPing;
 
-=head1 NAME
+=head1 301 Moved Permanently
 
-probes::TCPPing - TCPPing Probe for SmokePing
+This is a Smokeping probe module. Please use the command 
 
-=head1 SYNOPSIS
+C<smokeping -man Smokeping::probes::FPing>
 
- *** Probes ***
- + TCPPing
- binary = /usr/bin/tcpping
- forks = 10
+to view the documentation or the command
 
- *** Targets ***
- port = 80
+C<smokeping -makepod Smokeping::probes::FPing>
 
-=head1 DESCRIPTION
+to generate the POD document.
 
+=cut
+
+use strict;
+use base qw(Smokeping::probes::basefork);
+use IPC::Open3;
+use Symbol;
+use Carp;
+
+sub pod_hash {
+      return {
+              name => <<DOC,
+Smokeping::probes::TCPPing - TCPPing Probe for SmokePing
+DOC
+              description => <<DOC,
 Integrates TCPPing as a probe into smokeping. The variable B<binary> must
 point to your copy of the TCPPing program. If it is not installed on
 your system yet, you can get it from http://www.vdberg.org/~richard/tcpping.
@@ -39,24 +49,14 @@ responds with a SYN|ACK, the port is known to be open, and an RST is sent by
 the kernel tcptraceroute is running on to tear down the connection without completing 
 three-way handshake. This is the same half-open scanning technique that nmap(1) uses 
 when passed the -sS flag.
-
-=item forks
-
-The number of concurrent processes to be run. See probes::basefork(3pm)
-for details.
-
-=head1 AUTHOR
-
+DOC
+                authors => <<'DOC',
 Norman Rasmussen <norman@rasmussen.org>
 Patched for Smokeping 2.x compatibility by Anton Chernev <maznio@doom.bg>
+DOC
+        }
+}
 
-=cut
-
-use strict;
-use base qw(Smokeping::probes::basefork);
-use IPC::Open3;
-use Symbol;
-use Carp;
 
 sub new($$$)
 {
