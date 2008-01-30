@@ -21,38 +21,38 @@ qx.Class.define('Smokeping.Application',
     	       'SP', qx.core.Setting.get('Smokeping.resourceUri')
         	);
 
-  			// this will provide access to the server side of this app
-//			var rpc = new Smokeping.io.Rpc('http://localhost/~oetiker/smq/');
-    		var rpc = new Smokeping.io.Rpc('http://johan.oetiker.ch/~oetiker/smq/');
-            
-			var base_url = rpc.getBaseUrl();
+  			// if we run with a file:// url make sure 
+			// the app finds the smokeping service (smokeping.cgi)
+			Smokeping.Server.getInstance().setLocalUrl(
+				'http://localhost/~oetiker/smq/'
+			);
 
-            var prime = new qx.ui.layout.VerticalBoxLayout();
-            with(prime){
+            var base_layout = new qx.ui.layout.VerticalBoxLayout();
+            with(base_layout){
                 setPadding(8);
                 setLocation(0,0);
                 setWidth('100%');
                 setHeight('100%');
                 setSpacing(10);
             };            
-            prime.addToDocument();
+            base_layout.addToDocument();
 			var title = new qx.ui.basic.Atom(this.tr('Smokeping Viewer'));
 			with(title){
             	setTextColor('#b0b0b0');
             	setFont(qx.ui.core.Font.fromString('16px bold sans-serif'));
 			}
-			prime.add(title);
+			base_layout.add(title);
 
 		    var splitpane = new qx.ui.splitpane.HorizontalSplitPane(200, '1*');
 		    splitpane.setEdge(0);
 			splitpane.setHeight('1*');
 		    splitpane.setShowKnob(true);
-  		    prime.add(splitpane);
+  		    base_layout.add(splitpane);
 
- 		    var tree = new Smokeping.ui.TargetTree(rpc);
+ 		    var tree = new Smokeping.ui.TargetTree();
 	        splitpane.addLeft(tree);
 
-			var graphlist = new Smokeping.ui.GraphList(rpc.getBaseUrl());
+			var graphlist = new Smokeping.ui.GraphList();
 			splitpane.addRight(graphlist);
  
 

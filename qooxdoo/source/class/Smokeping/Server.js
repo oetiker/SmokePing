@@ -6,9 +6,10 @@
  * A smokeping specific rpc call which works 
  */
 
-qx.Class.define('Smokeping.io.Rpc', 
+qx.Class.define('Smokeping.Server', 
 {
     extend: qx.io.remote.Rpc,        
+	type:   "singleton",
 
     /*
     *****************************************************************************
@@ -25,25 +26,10 @@ qx.Class.define('Smokeping.io.Rpc',
         with(this){
 			base(arguments);
             setTimeout(7000000);
-            setUrl('jsonrpc.cgi');
+            setUrl('smokeping.cgi');
             setServiceName('Smokeping');
         }
-
-        var our_href = new String(document.location.href);
-        var last_slash = our_href.lastIndexOf("/");
-        this.__base_url = our_href.substring(0,last_slash+1);   
-
-		// look for services on the localhost if we access the
-        // application locally
-
-        if ( document.location.host === '' ) {
-			with(this){
-	            __base_url = local_url;
-            	setUrl(__base_url + 'jsonrpc.cgi');
-            	setCrossDomain(true);
-			}
-        }
-
+    
 		return this;
     },
 
@@ -74,7 +60,17 @@ qx.Class.define('Smokeping.io.Rpc',
 
         getBaseUrl: function(){
             return  this.__base_url;
-        }
+        },
+
+		setLocalUrl: function(local_url){
+			if ( document.location.host === '' ) {
+				with(this){
+	            	setUrl(local_url+'smokeping.cgi');
+    	        	setCrossDomain(true);
+				}
+	        }
+		}
+
     }
 });
  

@@ -50,7 +50,7 @@ APPLICATION_NAMESPACE = Smokeping
 # Files that will be copied from the source directory into the build
 # directory (space separated list). The default list is empty.
 #
-APPLICATION_FILES = index.html jsonrpc.cgi perl grapher.cgi
+APPLICATION_FILES = index.html smokeping.cgi perl
 # APPLICATION_BUILD_LOG_LEVEL = debug
 APPLICATION_BUILD_LOG_LEVEL = off
 

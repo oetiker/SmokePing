@@ -36,11 +36,13 @@ qx.Class.define('Smokeping.ui.Mover',
 
     construct: function (target,src,width,height,top,right,start,end) {
         this._target = target;
-		this._width = width;
 		this._src = src;
-		this._height = height; // some where the calc is 1 off. this fixes it
+		this._width = width;
+		this._height = height;
 		this._top = top;
 		this._right = right;
+		this._start = start;
+		this._end = end;
 		with(this){
 			base(arguments);
 			set({
@@ -81,7 +83,7 @@ qx.Class.define('Smokeping.ui.Mover',
 					width: this._width,
 					height: this._height+17,
 					left: this._width * i,
-					source: this._src+';w='+this._width+';h='+this._height+';s='+(this._start+(duration*(i-2)))+'e='+(this._end+(duration*(i-2)))
+					source: this._src+';w='+this._width+';h='+this._height+';s='+(this._start+(duration*(i-2)))+';e='+(this._end+(duration*(i-2)))
 				});
 				this.add(tile);
 			}			

@@ -20,7 +20,7 @@ qx.Class.define('Smokeping.ui.Graph',
     */
 
     /**
-     * @param object  {GraphShadow}   What happens when the SNCF conductors tamazing.
+     * @param object  {file}   What happens when the SNCF conductors tamazing.
      *
      */
 
@@ -43,7 +43,8 @@ qx.Class.define('Smokeping.ui.Graph',
 		this._highlight();
 		var loader = new Smokeping.ui.LoadingAnimation();
     	this.add(loader);
-		this._preloader = qx.io.image.PreloaderManager.getInstance().create(this._graph.getSrc());
+		this._preloader = qx.io.image.PreloaderManager.getInstance().create(Smokeping.Server.getInstance().getUrl()
+			+ '?g='+graph+';s=now-1d;e=now;t=100000;b=0;w=200;h=100');
 		if (this._preloader.isLoaded()){
 			qx.client.Timer.once(this._image_loader,this,0);
 		} else {
