@@ -58,7 +58,7 @@ title = The most interesting destinations
 sorter = StdDev(entries=>4)
 title = Top Standard Deviation
 menu = Std Deviation
-format = Stdandard Deviation %f
+format = Standard Deviation %f
 
 ++ max
 sorter = Max(entries=>5)

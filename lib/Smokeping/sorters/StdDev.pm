@@ -21,7 +21,7 @@ Call the sorter in the charts section of the config file
   sorter = StdDev(entries=>4)
   title = Top StdDev
   menu = Std Deviation
-  format = Stdandard Deviation %f
+  format = Standard Deviation %f
 
 =head1 COPYRIGHT
 
