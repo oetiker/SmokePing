@@ -624,11 +624,11 @@ sub target_menu($$$$;$){
         if ($tree->{$key}{__tree_link} and $tree->{$key}{__tree_link}{menu}){
     		$menu = $tree->{$key}{__tree_link}{menu};
     		$title = $tree->{$key}{__tree_link}{title};
-                next if $tree->{$key}{__tree_link}{hide} eq 'yes';
+                next if $tree->{$key}{__tree_link}{hide} and $tree->{$key}{__tree_link}{hide} eq 'yes';
 		} elsif ($tree->{$key}{menu}) {	
 	        $menu = $tree->{$key}{menu};
 	        $title = $tree->{$key}{title};
-                next if $tree->{$key}{hide} eq 'yes';
+                next if $tree->{$key}{hide} and $tree->{$key}{hide} eq 'yes';
         };
 
 		my $class = 'menuitem';
