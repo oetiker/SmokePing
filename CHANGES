@@ -1,3 +1,4 @@
+* Master should not generate alerts for nomasterpoll targets --tobi
 * Fixed div structure in hierarchy and filter form --tobi
 
 2008/1/23 -- released version 2.3.0
