@@ -1856,7 +1856,10 @@ sub update_rrds($$$$$$) {
         if ($prop eq 'host' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/|) { # skip multihost
             my %slave_test;
             my $slaveupdates;
-            my @updates = ([ "", time, $probeobj->rrdupdate_string($tree) ]);
+            my @updates;
+            if ($tree->{nomasterpoll} eq 'no'){
+                @updates = ([ "", time, $probeobj->rrdupdate_string($tree) ]);
+            }
             if ($tree->{slaves}){
                 %slave_test = ( map { $_,1 } split(/\s+/, $tree->{slaves}));
                 $slaveupdates = Smokeping::Master::get_slaveupdates($name);     
