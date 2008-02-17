@@ -3,6 +3,7 @@ use strict;
 use lib qw( perl );
 
 use CGI;
+use CGI::Util qw(expires);
 use CGI::Session;
 use Qooxdoo::JSONRPC;
 use lib qw(/home/oetiker/scratch/rrd-13dev/lib/perl);
@@ -24,15 +25,21 @@ my $session = new CGI::Session;
 # You can customise this harness here to handle cases before treating
 # the request as being JSON-RPC
 if ($cgi->param('g')){
-	my $graph = $cgi->param('g');
-	my $width = $cgi->param('w');
-	my $height = $cgi->param('h');
-	my $start = $cgi->param('s');
-	my $end = $cgi->param('e');
-	my $top = $cgi->param('t');	
-	my $bottom = $cgi->param('b');
-	warn "groesse: $width $height\n";
-	RRDs::graph("/tmp/$$.tmpgraph",
+    if (defined $ENV{HTTP_IF_MODIFIED_SINCE}){
+        # if the browser needs reassurance, give it!
+        print "Status: 304 Not Modified\n";
+        print "Last-Modified: $ENV{HTTP_IF_MODIFIED_SINCE}\n\n";
+        exit 0;
+    };
+    my $graph = $cgi->param('g');
+    my $width = $cgi->param('w');
+    my $height = $cgi->param('h');
+    my $start = $cgi->param('s');
+    my $end = $cgi->param('e');
+    my $top = $cgi->param('t');	
+    my $bottom = $cgi->param('b');
+    warn "groesse: $width $height\n";
+    RRDs::graph("/tmp/$$.tmpgraph",
 		    '--title'		=> "Demo ".$graph,
 	            '--vertical-label'	=> "Bytes/s",
 		    '--start'		=> $start,			
@@ -54,19 +61,21 @@ if ($cgi->param('g')){
 		    'LINE1:in#2020ff:Input',
 		    'CDEF:flip=LTIME,172800,%,86400,LT,in,UNKN,IF',
 		    'AREA:flip#00000088');
-	my $ERROR = RRDs::error();
-        die $ERROR if $ERROR;
-	if (open (my $fh,"</tmp/$$.tmpgraph")){
-	    local $/=undef;
-	    my $image = <$fh>;
-	    unlink "/tmp/$$.tmpgraph";
-	    close $fh;
-            print "Content-Type: image/png\n";
-	    print "Expires: Thu, 15 Apr 2010 20:00:00 GMT\n";
-	    print "Length: ".length($image)."\n";
-	    print "\n";
-	    print $image;
-	};
+    my $ERROR = RRDs::error();
+    die $ERROR if $ERROR;
+    if (open (my $fh,"</tmp/$$.tmpgraph")){
+        local $/=undef;
+        my $image = <$fh>;
+	unlink "/tmp/$$.tmpgraph";
+	close $fh;
+        print "Content-Type: image/png\n";
+        print "Expires: ".expires(3600,'http')."\n";
+        print "Last-Modified: ".expires(-3600,'http')."\n";
+        print "Cache-Control: Public\n";
+	print "Length: ".length($image)."\n";
+	print "\n";
+	print $image;
+    };
 } else {
 	Qooxdoo::JSONRPC::handle_request ($cgi, $session);
 }
