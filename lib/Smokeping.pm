@@ -600,15 +600,10 @@ sub target_menu($$$$;$){
     my $print;
     my $current =  shift @{$open} || "";
     my @hashes;
-    if (not defined $tree->{_order}){
-        foreach my $prop ( sort grep { ref $tree->{$_} eq 'HASH' and  not /^__/} keys %{$tree}) {
+    foreach my $prop (sort {$tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)} 
+                      grep {  ref $tree->{$_} eq 'HASH' and not /^__/ }
+                      keys %$tree) {
             push @hashes, $prop;
-        }
-    } else {
-        foreach my $prop (sort { $tree->{$a}{_order} <=> $tree->{$b}{_order}}
-                           grep { ref $tree->{$_} eq 'HASH' } keys %{$tree}) {
-            push @hashes, $prop;
-        }
     }
     return wantarray ? () : "" unless @hashes;
 
