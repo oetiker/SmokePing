@@ -68,7 +68,7 @@ calls the master to get its config or report its measurements it will tell
 the master its 'hostname'. This together with the shared secret is used to
 authenticate and identify who is who.
 
- *** slaves ****
+ *** Slaves ***
  secrets=/etc/smokeping/slavesecrets.conf 
 
  +slave1
@@ -86,7 +86,7 @@ anywhere in the tree.
 
 A slave will then get the appropriate configuration assigned by the server.
  
- *** targets ***
+ *** Targets ***
  slaves = slave1 slave2
  ...
  +dest1
