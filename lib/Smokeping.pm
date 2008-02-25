@@ -1468,9 +1468,9 @@ sub hierarchy_switcher($$){
 	    $print .= "<div id='hierarchy_popup'>";
 	    $print .= $q->popup_menu(-name=>'hierarchy',
 			             -onChange=>'hswitch.submit()',
-            		             -values=>['', sort map {ref $cfg->{Presentation}{hierarchies}{$_} eq 'HASH' 
+            		             -values=>[0, sort map {ref $cfg->{Presentation}{hierarchies}{$_} eq 'HASH' 
                                                  ? $_ : () } keys %{$cfg->{Presentation}{hierarchies}}],
-            		             -labels=>{''=>'Default Hierarchy',
+            		             -labels=>{0=>'Default Hierarchy',
 					       map {ref $cfg->{Presentation}{hierarchies}{$_} eq 'HASH' 
                                                     ? ($_ => $cfg->{Presentation}{hierarchies}{$_}{title} )
                                                     : () } keys %{$cfg->{Presentation}{hierarchies}}
@@ -1495,7 +1495,7 @@ sub display_webpage($$){
     my ($path,$slave) = split(/~/,$q->param('target') || '');
     my $hierarchy = $q->param('hierarchy');
     die "ERROR: unknown hierarchy $hierarchy\n" 
-	if not $cfg->{Presentation}{hierarchies} and $cfg->{Presentation}{hierarchies}{$hierarchy};
+	if $hierarchy and not $cfg->{Presentation}{hierarchies}{$hierarchy};
     my $open = [ (split /\./,$path||'') ];
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;
@@ -1521,7 +1521,7 @@ sub display_webpage($$){
     };
     if (not $charts){
        for (@$open) {
-         die "ERROR: Section '$_' does not exist (display webpage).\n" 
+         die "ERROR: Section '$_' does not exist (display webpage)."  # .(join "", map {"$_=$ENV{$_}"} keys %ENV)."\n"
                  unless exists $tree->{$_};
          last unless  ref $tree->{$_} eq 'HASH';
          $tree = $tree->{$_};
