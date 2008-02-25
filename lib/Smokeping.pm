@@ -973,7 +973,7 @@ sub get_detail ($$$$;$){
     $tree = $phys_tree;
 
     my @slaves;
-    if (not $tree->{nomasterpoll} or $tree->{nomasterpoll} eq 'no'){
+    if (not $tree->{nomasterpoll} or $tree->{nomasterpoll} eq 'no' or $mode eq 'a' or $mode eq 'n'){
         @slaves  = ("");
     };
 
