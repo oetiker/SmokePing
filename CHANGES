@@ -1,3 +1,8 @@
+2008/2/25 -- released version 2.3.2
+
+* make ajax mode work on IE again -- tobi
+* make rawlog mode work again --tobi
+* make ajax mode work for nomasterpol targets --tobi
 * fixe ordering of menu versus overview page --tobi
 
 2008/2/17 -- released version 2.3.1
