@@ -401,7 +401,7 @@ sub add_targets ($$$$){
         if (ref $tree->{$prop} eq 'HASH'){
             add_targets $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
-        if ($prop eq 'host' and $tree->{nomasterpoll} eq 'no' and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/| ) {           
+        if ($prop eq 'host' and ( not $tree->{nomasterpoll} or $tree->{nomasterpoll} eq 'no') and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/| ) {           
             if($tree->{host} =~ /^DYNAMIC/) {
                 $probeobj->add($tree,$name);
             } else {
@@ -750,7 +750,7 @@ sub get_overview ($$$$){
 	next unless $phys_tree->{host};
 	next if $phys_tree->{hide} and $phys_tree->{hide} eq 'yes';
 
-        if ($phys_tree->{nomasterpoll} eq 'no'){
+        if (not $phys_tree->{nomasterpoll} or $phys_tree->{nomasterpoll} eq 'no'){
             @slaves  = ("");
         };
 
@@ -973,7 +973,7 @@ sub get_detail ($$$$;$){
     $tree = $phys_tree;
 
     my @slaves;
-    if ($tree->{nomasterpoll} eq 'no'){
+    if (not $tree->{nomasterpoll} or $tree->{nomasterpoll} eq 'no'){
         @slaves  = ("");
     };
 
@@ -1852,7 +1852,7 @@ sub update_rrds($$$$$$) {
             my %slave_test;
             my $slaveupdates;
             my @updates;
-            if ($tree->{nomasterpoll} eq 'no'){
+            if (not $tree->{nomasterpoll} or $tree->{nomasterpoll} eq 'no'){
                 @updates = ([ "", time, $probeobj->rrdupdate_string($tree) ]);
             }
             if ($tree->{slaves}){
