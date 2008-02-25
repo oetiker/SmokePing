@@ -47,7 +47,7 @@ sub get_targets {
             $return{$key} = $trg->{$key};
         }
     }           
-    $trg->{nomasterpoll} = 'no'; # slaves poll always
+    $return{nomasterpoll} = 'no'; # slaves poll always
     return ($ok ? \%return : undef);
 }
     
