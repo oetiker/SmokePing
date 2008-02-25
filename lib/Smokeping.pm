@@ -4160,8 +4160,8 @@ KID:
         }
     }
     if (defined $myprobe) {
-        $offset = $probes->{$myprobe}->offset || 'random';
-        $step = $probes->{$myprobe}->step;
+        $offset = $probes->{$myprobe}->offset() || 'random';
+        $step = $probes->{$myprobe}->step();
         $0 .= " [$myprobe]" if $changeprocessnames;
     } else {
         $offset = $cfg->{General}{offset} || 'random';
