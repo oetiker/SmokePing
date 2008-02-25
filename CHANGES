@@ -1,3 +1,5 @@
+* slaves were not polling targets where nomasterpoll was set --tobi
+
 2008/2/25 -- released version 2.3.2
 
 * make ajax mode work on IE again -- tobi
