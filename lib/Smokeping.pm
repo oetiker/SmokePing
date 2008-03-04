@@ -3949,7 +3949,8 @@ sub main (;$) {
     GetOptions(\%opt, 'version', 'email', 'man:s','help','logfile=s','static-pages:s', 'debug-daemon',
                       'nosleep', 'makepod:s','debug','restart', 'filter=s', 'nodaemon|nodemon',
                       'config=s', 'check', 'gen-examples', 'reload', 
-                      'master-url=s','cache-dir=s','shared-secret=s','slave-name=s') or pod2usage(2);
+                      'master-url=s','cache-dir=s','shared-secret=s',
+                      'slave-name=s','pid-dir=s') or pod2usage(2);
     if($opt{version})  { print "$VERSION\n"; exit(0) };
     if(exists $opt{man}) {
         if ($opt{man}) {
@@ -3989,6 +3990,7 @@ sub main (;$) {
         $slave_cfg = {
             master_url => $opt{'master-url'},
             cache_dir => $opt{'cache-dir'},
+            pid_dir   => $opt{'pid-dir'} || $opt{'cache-dir'},
             shared_secret => $secret,
             slave_name => $opt{'slave-name'} || hostname(),
         };

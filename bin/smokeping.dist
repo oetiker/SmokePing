@@ -67,6 +67,9 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
 
  --cache-dir=s Directory for temporary data storage when running in slave mode.
 
+ --pid-dir=s Directory for the PID file when running in slave mode.
+             (optional, defaults to --cache-dir)
+
 =head1 DESCRIPTION
 
 The B<smokeping> tool is the commandline part of the SmokePing system. Its
