@@ -72,7 +72,7 @@ sub submit_results {
     my $data_dump = join("\n",@{$restore}) || "";
     my $ua = LWP::UserAgent->new(
         agent => 'smokeping-slave/1.0',
-        timeout => 10,
+        timeout => 60,
         env_proxy => 1 );
 
     my $response = $ua->post(

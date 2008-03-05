@@ -1,3 +1,6 @@
+* use separate slave cache and longer slave timeout. this
+  helps with slave congestion -- Phillip Moore  pdm yahoo-inc.com
+
 * add an optional --pid-dir option to specify the pid directory 
   when running as a slave. --niko
 * slaves were not polling targets where nomasterpoll was set --tobi

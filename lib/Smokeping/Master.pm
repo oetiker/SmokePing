@@ -97,16 +97,18 @@ sub save_updates {
     my $updates = shift;
     # name\ttime\tupdatestring
     # name\ttime\tupdatestring
+
     for my $update (split /\n/, $updates){
         my ($name, $time, $updatestring) = split /\t/, $update;
-        my $file = $cfg->{General}{datadir}."/${name}.slave_cache";
+        my $file = $cfg->{General}{datadir}."/${name}.${slave}.slave_cache";
         if ( ${name} =~ m{(^|/)\.\.($|/)} ){
-            warn "Skipping update for ${name}.slave_cache since ".
+            warn "Skipping update for ${name}.${slave}.slave_cache since ".
                  "you seem to try todo some directory magic here. Don't!";
         } 
         elsif ( open (my $lock, '>>' , "$file.lock") ) {
-            for (my $i = 10; $i > 0; $i--){
-                if ( flock $lock, LOCK_EX ){
+
+            for (my $i = 3; $i > 0; $i--){
+                if ( flock($lock, LOCK_EX) ){
                     my $existing = [];
 	            if ( -r $file ){
                         my $in = eval { retrieve $file };
@@ -116,12 +118,12 @@ sub save_updates {
 		            $existing = $in;
 			};
                     };
-                    push @{$existing}, [ $slave, $time, $updatestring];
+                    push @{$existing}, [ $slave, $time, $updatestring ];
                     nstore($existing, $file);		    
                     last;
                 } else {
-                    warn "Could not lock $file. Trying again for $i rounds.\n";
-                    sleep rand(3);
+                    warn "Could not lock $file ($!). Trying again for $i rounds.\n";
+                    sleep rand(2);
                 }
             }
             close $lock;
@@ -133,13 +135,15 @@ sub save_updates {
 
 =head3 get_slaveupdates
 
-Read in all updates provided by slaves and return an array reference.
+Read in all updates provided by the selected slave and return an array reference.
 
 =cut
 
 sub get_slaveupdates {
     my $name = shift;
-    my $file = $name.".slave_cache";
+    my $slave = shift;
+    my $file = $name . "." . $slave. ".slave_cache";
+    my @empty = ();
     my $data;
     if ( -r $file and open (my $lock, '>>', "$file.lock") ) {
         if ( flock $lock, LOCK_EX ){
@@ -147,7 +151,7 @@ sub get_slaveupdates {
             unlink $file;
             if ($@) { #error
                 warn "Loading $file: $@";  
-                return undef;
+                return @empty;
             }
         } else {
             warn "Could not lock $file. Will skip and try again in the next round. No harm done!\n";
@@ -155,7 +159,7 @@ sub get_slaveupdates {
         close $lock;        
         return $data;
     }
-    return;
+    return @empty;
 }
 
 
