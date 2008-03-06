@@ -143,7 +143,7 @@ sub get_slaveupdates {
     my $name = shift;
     my $slave = shift;
     my $file = $name . "." . $slave. ".slave_cache";
-    my @empty = ();
+    my $empty = [];
     my $data;
     if ( -r $file and open (my $lock, '>>', "$file.lock") ) {
         if ( flock $lock, LOCK_EX ){
@@ -151,7 +151,7 @@ sub get_slaveupdates {
             unlink $file;
             if ($@) { #error
                 warn "Loading $file: $@";  
-                return @empty;
+                return $empty;
             }
         } else {
             warn "Could not lock $file. Will skip and try again in the next round. No harm done!\n";
@@ -159,7 +159,7 @@ sub get_slaveupdates {
         close $lock;        
         return $data;
     }
-    return @empty;
+    return $empty;
 }
 
 

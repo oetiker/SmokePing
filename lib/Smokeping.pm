@@ -1856,7 +1856,8 @@ sub update_rrds($$$$$$) {
             if ($tree->{slaves}){
                 my @slaves = split(/\s+/, $tree->{slaves});
                 foreach my $slave (@slaves) {
-                    push @updates, Smokeping::Master::get_slaveupdates($name, $slave);
+	            my $lines = Smokeping::Master::get_slaveupdates($name, $slave);
+                    push @updates, @$lines;
                 } #foreach my $checkslave
             }
             for my $update (sort {$a->[1] <=> $b->[1]}  @updates){ # make sure we put the updates in chronological order in
