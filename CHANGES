@@ -1,3 +1,6 @@
+* make zooming work properly even for graphs generated with the
+  navigator form time range fields. -- tobi
+
 2008/3/10 -- released version 2.3.3
 
 * use separate slave cache and longer slave timeout. this

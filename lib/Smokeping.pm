@@ -939,8 +939,10 @@ sub parse_datetime($){
 	/^(\d+)$/ && do { my $value = $1; $value = time if $value > 2**32; return $value};
         /^\s*(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?\s*$/  && 
             return POSIX::mktime($6||0,$5||0,$4||0,$3,$2-1,$1-1900,0,0,-1);
-        /([ -:a-z0-9]+)/ && return $1;
+        /^now$/ && return time;
+        /([ -:a-z0-9]+)/ && return $1;     
     };
+    return time;
 }
         
 sub get_detail ($$$$;$){
@@ -1063,6 +1065,8 @@ sub get_detail ($$$$;$){
             $imghref =$cfg->{General}{imgurl}."/__navcache/".$serial;
         }
 
+	$q->param('epoch_start',parse_datetime($q->param('start')));
+	$q->param('epoch_end',parse_datetime($q->param('end')));
         @tasks = (["Navigator Graph".$name, parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
         my ($graphret,$xs,$ys) = RRDs::graph
           ("dummy", 
@@ -1337,12 +1341,11 @@ sub get_detail ($$$$;$){
 #           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
            $page .= qq|<IMG id="zoom" BORDER="0" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
 #           $page .= "</div>";
-
            $page .= $q->start_form(-method=>'POST', -id=>'range_form')
-              . "<p>Time range: "
-              . $q->hidden(-name=>'epoch_start',-id=>'epoch_start',-default=>$start)
+              . "<p>Time range: "		
+              . $q->hidden(-name=>'epoch_start',-id=>'epoch_start')
               . $q->hidden(-name=>'hierarchy',-id=>'hierarchy')
-              . $q->hidden(-name=>'epoch_end',-id=>'epoch_end',-default=>time())
+              . $q->hidden(-name=>'epoch_end',-id=>'epoch_end')
               . $q->hidden(-name=>'target',-id=>'target' )
               . $q->hidden(-name=>'displaymode',-default=>$mode )
               . $q->textfield(-name=>'start',-default=>$startstr)
