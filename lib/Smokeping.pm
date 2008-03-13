@@ -1338,7 +1338,7 @@ sub get_detail ($$$$;$){
            $page .= qq|<IMG id="zoom" BORDER="0" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
 #           $page .= "</div>";
 
-           $page .= $q->start_form(-method=>'GET', -id=>'range_form')
+           $page .= $q->start_form(-method=>'POST', -id=>'range_form')
               . "<p>Time range: "
               . $q->hidden(-name=>'epoch_start',-id=>'epoch_start',-default=>$start)
               . $q->hidden(-name=>'hierarchy',-id=>'hierarchy')
