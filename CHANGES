@@ -1,3 +1,5 @@
+* allow SSH probe to config rsa1 key -- Walery Kokarev
+
 * make zooming work properly even for graphs generated with the
   navigator form time range fields. -- tobi
 

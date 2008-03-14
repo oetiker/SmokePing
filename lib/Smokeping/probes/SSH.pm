@@ -130,7 +130,7 @@ sub targetvars {
         return $class->_makevars($class->SUPER::targetvars, {
            keytype => {
                _doc => "Type of key, used in ssh-keyscan -t I<keytype>",
-	       _re => "[dt]sa1*",
+	       _re => "[dr]sa1*",
                _example => 'dsa',
                _default => 'rsa',
            },
