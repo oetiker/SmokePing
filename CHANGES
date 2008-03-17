@@ -1,3 +1,6 @@
+* make sure when loading the sortercache that we only load info about
+  graphs presently in the config. --tobi
+
 * optionally precreate the directory structure under 'dyndir' if
   'precreateperms' is set --niko
 
