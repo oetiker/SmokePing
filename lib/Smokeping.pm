@@ -1859,7 +1859,7 @@ sub update_rrds($$$$$$) {
             if ($tree->{slaves}){
                 my @slaves = split(/\s+/, $tree->{slaves});
                 foreach my $slave (@slaves) {
-	            my $lines = Smokeping::Master::get_slaveupdates($name, $slave);
+	            my $lines = Smokeping::Master::get_slaveupdates($cfg, $name, $slave);
                     push @updates, @$lines;
                 } #foreach my $checkslave
             }
@@ -2488,7 +2488,9 @@ DOC
          %$DIRCHECK_SUB,
          _doc => <<DOC,
 The base directory where SmokePing keeps the files related to the DYNAMIC function.
-This directory must be writeable by the WWW server.
+This directory must be writeable by the WWW server. It is also used for temporary
+storage of slave polling results by the master in 
+L<the master/slave mode|smokeping_master_slave>.
 
 If this variable is not specified, the value of C<datadir> will be used instead.
 DOC

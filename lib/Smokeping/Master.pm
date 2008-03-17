@@ -89,7 +89,17 @@ database by the rrd daemon as the next round of updates is processed. This
 two stage process is chosen so that all results flow through the same code
 path in the daemon.
 
+The updates are stored in the directory configured as 'dyndir' in the 'General'
+configuration section, defaulting to the value of 'datadir' from the same section
+if 'dyndir' is not present.
+
 =cut
+
+sub slavedatadir ($) {
+    my $cfg = shift;
+    return $cfg->{General}{dyndir}  ||
+           $cfg->{General}{datadir};
+}
 
 sub save_updates {
     my $cfg = shift;
@@ -100,7 +110,7 @@ sub save_updates {
 
     for my $update (split /\n/, $updates){
         my ($name, $time, $updatestring) = split /\t/, $update;
-        my $file = $cfg->{General}{datadir}."/${name}.${slave}.slave_cache";
+        my $file = slavedatadir($cfg) ."/${name}.${slave}.slave_cache";
         if ( ${name} =~ m{(^|/)\.\.($|/)} ){
             warn "Skipping update for ${name}.${slave}.slave_cache since ".
                  "you seem to try todo some directory magic here. Don't!";
@@ -144,11 +154,17 @@ Read in all updates provided by the selected slave and return an array reference
 =cut
 
 sub get_slaveupdates {
+    my $cfg = shift;
     my $name = shift;
     my $slave = shift;
     my $file = $name . "." . $slave. ".slave_cache";
     my $empty = [];
     my $data;
+
+    my $datadir = $cfg->{General}{datadir};
+    my $dir = slavedatadir($cfg);
+    $file =~ s/^\Q$datadir\E/$dir/;
+
     my $fh;
     if ( open ($fh, '<', $file) ) {
         if ( flock $fh, LOCK_SH ){
