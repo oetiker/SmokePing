@@ -1467,8 +1467,19 @@ sub load_sortercache($){
         }
         my $data = Storable::retrieve("$_");
         for my $chart (keys %$data){
+            PATH:
             for my $path (keys %{$data->{$chart}}){
                 warn "Warning: Duplicate entry $chart/$path in sortercache\n" if defined $cache{$chart}{$path};
+                my $root = $cfg->{Targets};
+                for my $element (split /\//, $path){
+                    if (ref $root eq 'HASH' and defined $root->{$element}){
+                        $root = $root->{$element}
+                    }
+                    else {
+                        warn "Warning: Dropping $chart/$path from sortercache\n";
+                        next PATH;
+                    }
+                }                
                 $cache{$chart}{$path} = $data->{$chart}{$path}
             }
         }
