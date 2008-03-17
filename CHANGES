@@ -1,3 +1,6 @@
+* optionally precreate the directory structure under 'dyndir' if
+  'precreateperms' is set --niko
+
 * store the slave updates in 'dyndir', defaulting to 'datadir' --niko
 
 * change the slave update locking code so that reading works without

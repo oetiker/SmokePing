@@ -153,6 +153,21 @@ sub dyndir ($) {
     return $cfg->{General}{dyndir} || $cfg->{General}{datadir};
 }
 
+sub make_cgi_directories {
+    my $targets = shift;
+    my $dir = shift;
+    my $perms = shift;
+    while (my ($k, $v) = each %$targets) {
+        next if ref $v ne "HASH";
+        if ( ! -d "$dir/$k" ) {
+            my $saved = umask 0;
+            mkdir "$dir/$k", oct($perms);
+            umask $saved;
+        }
+        make_cgi_directories($targets->{$k}, "$dir/$k", $perms);
+    }
+}
+
 sub update_dynaddr ($$){
     my $cfg = shift;
     my $q = shift;
@@ -2404,7 +2419,7 @@ DOC
          [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
               smokemail cgiurl mailhost snpphost contact display_name
               syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
-              changecgiprogramname linkstyle) ],
+              changecgiprogramname linkstyle precreateperms ) ],
 
          _mandatory =>
          [ qw(owner imgcache imgurl datadir piddir
@@ -2527,6 +2542,20 @@ DOC
 Complete URL path of the SmokePing.cgi
 DOC
           
+         },
+         precreateperms =>
+         {
+            _re => '[0-7]+',
+            _re_error => 'please specify the permissions in octal',
+            _example => '2755',
+            _doc => <<DOC,
+If this variable is set, the Smokeping daemon will create its directory
+hierarchy under 'dyndir' (the CGI-writable tree) at startup with the
+specified directory permission bits. The value is interpreted as an
+octal value, eg. 775 for rwxrwxr-x etc.
+
+If unset, the directories will be created dynamically with umask 022.
+DOC
          },
      linkstyle =>
      {
@@ -3640,6 +3669,10 @@ sub load_cfg ($;$) {
         init_alerts $cfg if $cfg->{Alerts};
         add_targets $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};   
         init_target_tree $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir};
+        if (defined $cfg->{General}{precreateperms} && !$cgimode) {
+            make_cgi_directories($cfg->{Targets}, dyndir($cfg),
+                                 $cfg->{General}{precreateperms});
+        }
         #use Data::Dumper;
         #die Dumper $cfg->{__hierarchies};
     } else {
