@@ -5,7 +5,7 @@ use Storable qw(nstore dclone retrieve);
 use strict;
 use warnings;
 use Fcntl qw(:flock);
-use Digest::MD5 qw(hmac_md5_hex);
+use Digest::HMAC_MD5 qw(hmac_md5_hex);
 
 =head1 NAME
 
