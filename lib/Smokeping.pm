@@ -615,7 +615,7 @@ sub target_menu($$$$;$){
     my $print;
     my $current =  shift @{$open} || "";
     my @hashes;
-    foreach my $prop (sort {$tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)} 
+    foreach my $prop (sort {exists $tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)} 
                       grep {  ref $tree->{$_} eq 'HASH' and not /^__/ }
                       keys %$tree) {
             push @hashes, $prop;
@@ -748,7 +748,7 @@ sub get_overview ($$$$){
     if ( $RRDs::VERSION >= 1.199908 ){
             $date =~ s|:|\\:|g;
     }
-    foreach my $prop (sort {$tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)} 
+    foreach my $prop (sort {exists $tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)} 
                       grep {  ref $tree->{$_} eq 'HASH' and not /^__/ }
                       keys %$tree) {
         my @slaves;
