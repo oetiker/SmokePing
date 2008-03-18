@@ -8,7 +8,9 @@ use Digest::HMAC_MD5 qw(hmac_md5_hex);
 use LWP::UserAgent;
 use Safe;
 use Smokeping;
-
+# keep this in sync with the Slave.pm part
+# only update if you have to force a parallel upgrade
+my $PROTOCOL = "2";
 
 =head1 NAME
 
@@ -81,6 +83,7 @@ sub submit_results {
         Content => [
             slave => $slave_cfg->{slave_name},
             key  => hmac_md5_hex($data_dump,$slave_cfg->{shared_secret}),
+            protocol => $PROTOCOL,
             data => $data_dump,
             config_time => $cfg->{__last} || 0,
         ],
@@ -88,6 +91,13 @@ sub submit_results {
     if ($response->is_success){
         my $data = $response->content;
         my $key = $response->header('Key');
+        my $protocol = $response->header('Protocol') || '?';
+
+        if ($protocol ne $PROTOCOL){
+            warn "WARNING $slave_cfg->{master_url} sent data with protocol $protocol. Expected $PROTOCOL.";
+            return undef;
+        }
+
         if ($response->header('Content-Type') ne 'application/smokeping-config'){
             warn "$data\n" unless $data =~ /OK/;
             Smokeping::do_debuglog("Sent data to Server. Server said $data");

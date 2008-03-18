@@ -6,6 +6,9 @@ use strict;
 use warnings;
 use Fcntl qw(:flock);
 use Digest::HMAC_MD5 qw(hmac_md5_hex);
+# keep this in sync with the Slave.pm part
+# only update if you have to force a parallel upgrade
+my $PROTOCOL = "2";
 
 =head1 NAME
 
@@ -216,6 +219,13 @@ sub answer_slave {
         print "WARNING: No secret found for slave ${slave}\n";       
         return;
     }
+    my $protcol = $q->param('protocol') || '?';
+    if (not $protocol eq $PROTOCOL){
+        print "Content-Type: text/plain\n\n";
+        print "WARNING: I expected protocol $PROTOCOL and got $protocol from slave ${slave}. I will skip this.\n";
+        return;
+    }
+        
     my $key = $q->param('key');
     my $data = $q->param('data');
     my $config_time = $q->param('config_time');
@@ -237,6 +247,7 @@ sub answer_slave {
         my $config = extract_config $cfg, $slave;    
         if ($config){
             print "Content-Type: application/smokeping-config\n";
+            print "Protocol: $PROTOCOL\n";
             print "Key: ".hmac_md5_hex($config,$secret)."\n\n";
             print $config;
         } else {

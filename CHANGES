@@ -1,3 +1,7 @@
+* add protocol level master/slave protocol to control upgrades --tobi
+
+* fix ordering of menu entries again --tobi
+
 * bail out if the master/slave shared secret file is world-readable
   or writable --niko
 
