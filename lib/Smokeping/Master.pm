@@ -1,7 +1,7 @@
 # -*- perl -*-
 package Smokeping::Master;
 use Data::Dumper;
-use Storable qw(nstore_fd dclone fd_retrieve);
+use Storable qw(nstore dclone retrieve);
 use strict;
 use warnings;
 use Fcntl qw(:flock);
@@ -115,16 +115,13 @@ sub save_updates {
             warn "Skipping update for ${name}.${slave}.slave_cache since ".
                  "you seem to try todo some directory magic here. Don't!";
         } 
-        else {
+        elsif ( open (my $lock, '>>' , "$file.lock") ) {
 
             for (my $i = 3; $i > 0; $i--){
-                my $fh;
-                if ( open ($fh, '+>>' , $file) and flock($fh, LOCK_EX) ){
+                if ( flock($lock, LOCK_EX) ){
                     my $existing = [];
-                    next if ! -e $file; # the reader unlinked it from under us
-                    seek $fh, 0, 0;
-                    if ( -s _ ){
-                        my $in = eval { fd_retrieve $fh };
+	            if ( -r $file ){
+                        my $in = eval { retrieve $file };
                         if ($@) { #error
                             warn "Loading $file: $@";
                         } else {
@@ -132,17 +129,16 @@ sub save_updates {
 			};
                     };
                     push @{$existing}, [ $slave, $time, $updatestring ];
-                    nstore_fd($existing, $fh);		    
-                    flock($fh, LOCK_UN);
-                    close $fh;
+                    nstore($existing, $file);		    
                     last;
                 } else {
                     warn "Could not lock $file ($!). Trying again for $i rounds.\n";
                     sleep rand(2);
                 }
-                warn "Could not update $file, giving up for now.";
-                close $fh;
             }
+            close $lock;
+        } else {
+            warn "Could not update $file: $!";
         }
     }         
 };
@@ -165,12 +161,10 @@ sub get_slaveupdates {
     my $dir = slavedatadir($cfg);
     $file =~ s/^\Q$datadir\E/$dir/;
 
-    my $fh;
-    if ( open ($fh, '<', $file) ) {
-        if ( flock $fh, LOCK_SH ){
-            eval { $data = fd_retrieve $fh };
+    if ( -r $file and open (my $lock, '>>', "$file.lock") ) {
+        if ( flock $lock, LOCK_EX ){
+            eval { $data = retrieve $file };
             unlink $file;
-            flock $fh, LOCK_UN;
             if ($@) { #error
                 warn "Loading $file: $@";  
                 return $empty;
@@ -178,7 +172,7 @@ sub get_slaveupdates {
         } else {
             warn "Could not lock $file. Will skip and try again in the next round. No harm done!\n";
         }
-        close $fh;        
+        close $lock;        
         return $data;
     }
     return $empty;
