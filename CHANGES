@@ -1,3 +1,8 @@
+* Switch message hash generation to Digest::HMAC_MD5 (bundled) since this
+  prevents the extension attack. Note that this change requires that you
+  upgrade client and server in sync (you should do that anyway, but
+  especially because of this)! -- tobi
+
 * make sure when loading the sortercache that we only load info about
   graphs presently in the config. --tobi
 

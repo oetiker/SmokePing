@@ -5,7 +5,7 @@ use Storable qw(nstore dclone retrieve);
 use strict;
 use warnings;
 use Fcntl qw(:flock);
-use Digest::MD5 qw(md5_base64);
+use Digest::MD5 qw(hmac_md5_hex);
 
 =head1 NAME
 
@@ -225,7 +225,7 @@ sub answer_slave {
         return;
     }
     # lets make sure the we share a secret
-    if (md5_base64($secret.$data) eq $key){
+    if (hmac_md5_hex($data,$secret) eq $key){
         save_updates $cfg, $slave, $data;
     } else {
         print "Content-Type: text/plain\n\n";
@@ -237,7 +237,7 @@ sub answer_slave {
         my $config = extract_config $cfg, $slave;    
         if ($config){
             print "Content-Type: application/smokeping-config\n";
-            print "Key: ".md5_base64($secret.$config)."\n\n";
+            print "Key: ".hmac_md5_hex($config,$secret)."\n\n";
             print $config;
         } else {
             print "Content-Type: text/plain\n\n";

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Data::Dumper;
 use Storable qw(nstore retrieve);
-use Digest::MD5 qw(md5_base64);
+use Digest::HMAC_MD5 qw(hmac_md5_hex);
 use LWP::UserAgent;
 use Safe;
 use Smokeping;
@@ -80,7 +80,7 @@ sub submit_results {
         Content_Type => 'form-data',
         Content => [
             slave => $slave_cfg->{slave_name},
-            key  => md5_base64($slave_cfg->{shared_secret}.$data_dump),
+            key  => hmac_md5_hex($data_dump,$slave_cfg->{shared_secret}),
             data => $data_dump,
             config_time => $cfg->{__last} || 0,
         ],
@@ -93,7 +93,7 @@ sub submit_results {
             Smokeping::do_debuglog("Sent data to Server. Server said $data");
             return undef;
         };
-        if (md5_base64($slave_cfg->{shared_secret}.$data) ne $key){
+        if (hmac_md5_hex($data,$slave_cfg->{shared_secret}) ne $key){
             warn "WARNING $slave_cfg->{master_url} sent data with wrong key";
             return undef;
         }
