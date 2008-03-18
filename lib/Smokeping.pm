@@ -3347,6 +3347,11 @@ and the secret:
  slave1:secret1
  slave2:secret2
  ...
+
+Note that these secrets combined with a man-in-the-middle attack
+effectively give shell access to the corresponding slaves (see
+L<smokeping_master_slave>), so the file should be appropriately protected
+and the secrets should not be easily crackable.
 END_DOC
 
           },

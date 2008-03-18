@@ -1,3 +1,5 @@
+* add some security notes to the master/slave documentation --niko
+
 * Switch message hash generation to Digest::HMAC_MD5 (bundled) since this
   prevents the extension attack. Note that this change requires that you
   upgrade client and server in sync (you should do that anyway, but

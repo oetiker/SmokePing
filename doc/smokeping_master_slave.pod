@@ -33,9 +33,9 @@ of probing it connects to the master again to deliver the results.
 If the assignment for a slave changes, the master will tell the slave after
 the slave has delivered its results.
 
-The master and the slaves sign their messages by supplying an md5 hash of the
-message appended with a shared secret. Optionally the whole communication
-can run over ssl.
+The master and the slaves sign their messages by supplying an HMAC-MD5
+code (RFC 2104) of the message and a shared secret. Optionally the whole
+communication can run over ssl.
 
     [slave 1]     [slave 2]      [slave 3]
         |             |              |
@@ -118,6 +118,19 @@ F</tmp/smokeping.$USER.cache>.
  ./smokeping --master-url=http://smokeping/smokeping.cgi \
              --cache-dir=/var/smokeping/ \
              --shared-secret=/var/smokeping/secret.txt
+
+=head1 SECURITY CONSIDERATIONS
+
+The master effectively has full access to slave hosts as the user the
+slave smokeping instance is run as. The configuration is transferred as
+Perl code that is evaluated on the slave. While this is done inside a
+restricted C<Safe> compartment, there are various ways that a malicious
+master could use to embed arbitrary commands in the configuration and
+get them to run when the slave probes its targets.
+
+The strength of the shared secret is thus of paramount importance. Brute
+forcing the secret would enable a man-in-the-middle to inject a malicious
+new configuration and compromise the slave.
 
 =head1 COPYRIGHT
 
