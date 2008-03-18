@@ -219,7 +219,7 @@ sub answer_slave {
         print "WARNING: No secret found for slave ${slave}\n";       
         return;
     }
-    my $protcol = $q->param('protocol') || '?';
+    my $protocol = $q->param('protocol') || '?';
     if (not $protocol eq $PROTOCOL){
         print "Content-Type: text/plain\n\n";
         print "WARNING: I expected protocol $PROTOCOL and got $protocol from slave ${slave}. I will skip this.\n";
