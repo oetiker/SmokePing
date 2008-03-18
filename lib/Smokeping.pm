@@ -3339,7 +3339,12 @@ END_DOC
           _mandatory   => [ qw(secrets) ],
           _sections    => [ "/$KEYD_RE/" ],
           secrets => {              
-              %$FILECHECK_SUB,
+              _sub => sub {
+                 return "File '$_[0]' does not exist" unless -f $_[ 0 ];
+                 return "File '$_[0]' is world-readable or writable, refusing it" 
+                    if ((stat(_))[2] & 6);
+                 return undef;
+              },
               _doc => <<END_DOC,
 The slave secrets file contines one line per slave with the name of the slave followed by a colon
 and the secret:
@@ -4032,6 +4037,8 @@ sub main (;$) {
         die "ERROR: no shared-secret defined along with master-url\n" unless $opt{'shared-secret'};
         die "ERROR: no cache-dir defined along with master-url\n" unless $opt{'cache-dir'};
         die "ERROR: no cache-dir ($opt{'cache-dir'}): $!\n" unless -d $opt{'cache-dir'};
+        die "ERROR: the shared secret file ($opt{'shared-secret'}) is world-readable or writable"
+            if ((stat($opt{'shared-secret'}))[2] & 6);
         open my $fd, "<$opt{'shared-secret'}" or die "ERROR: opening $opt{'shared-secret'} $!\n";
         chomp(my $secret = <$fd>);
         close $fd;
