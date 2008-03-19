@@ -93,16 +93,16 @@ sub submit_results {
         my $key = $response->header('Key');
         my $protocol = $response->header('Protocol') || '?';
 
-        if ($protocol ne $PROTOCOL){
-            warn "WARNING $slave_cfg->{master_url} sent data with protocol $protocol. Expected $PROTOCOL.";
-            return undef;
-        }
-
         if ($response->header('Content-Type') ne 'application/smokeping-config'){
             warn "$data\n" unless $data =~ /OK/;
             Smokeping::do_debuglog("Sent data to Server. Server said $data");
             return undef;
         };
+
+        if ($protocol ne $PROTOCOL){
+            warn "WARNING $slave_cfg->{master_url} sent data with protocol $protocol. Expected $PROTOCOL.";
+            return undef;
+        }
         if (hmac_md5_hex($data,$slave_cfg->{shared_secret}) ne $key){
             warn "WARNING $slave_cfg->{master_url} sent data with wrong key";
             return undef;

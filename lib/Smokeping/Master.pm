@@ -269,7 +269,7 @@ sub answer_slave {
             return;
         }
     } else {
-        print "Content-Type: text/plain\nProtocol: $PROTOCOL\n\nOK\n";
+        print "Content-Type: text/plain\n\nOK\n";
     };       
     return;
 }   
