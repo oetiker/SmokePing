@@ -1,3 +1,6 @@
+* fix local variable override handling in connection with nomasterpoll
+  --niko
+
 * add protocol level master/slave protocol to control upgrades --tobi
 
 * fix ordering of menu entries again --tobi
@@ -35,6 +38,7 @@
 
 * add an optional --pid-dir option to specify the pid directory 
   when running as a slave. --niko
+
 * slaves were not polling targets where nomasterpoll was set --tobi
 
 2008/2/25 -- released version 2.3.2

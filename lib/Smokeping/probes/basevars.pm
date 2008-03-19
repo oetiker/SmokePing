@@ -69,6 +69,7 @@ sub add($$)
     my $self = shift;
     my $tree = shift;
     
+    $self->{target_count}++;
     $self->{targets}{$tree} = shift;
     $self->{vars}{$tree} = { %{$self->{properties}}, %$tree };
 }
@@ -84,7 +85,9 @@ sub targets {
 	for (@$addr) {
 		@{$copy{$_}} = @{$self->{addrlookup}{$_}} unless exists $copy{$_};
 		my $tree = pop @{$copy{$_}};
-		push @targets, { addr => $_, vars => $self->{vars}{$tree}, tree => $tree };
+        	my $vars = $self->{vars}{$tree};
+        	next if defined $vars->{nomasterpoll} and $vars->{nomasterpoll} eq "yes";
+        	push @targets, { addr => $_, vars => $vars, tree => $tree };
 	}
 	return \@targets;
 }

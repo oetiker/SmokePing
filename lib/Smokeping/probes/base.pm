@@ -74,6 +74,8 @@ sub add($$)
     my $self = shift;
     my $tree = shift;
     
+    $self->{target_count}++; # increment this anyway
+    return if defined $tree->{nomasterpoll} and $tree->{nomasterpoll} eq "yes";
     $self->{targets}{$tree} = shift;
 }
 
@@ -281,7 +283,7 @@ sub _pings {
 
 sub target_count {
 	my $self = shift;
-	return scalar keys %{$self->{targets}};
+	return $self->{target_count};
 }
 
 sub probevars {

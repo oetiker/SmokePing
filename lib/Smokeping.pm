@@ -416,7 +416,7 @@ sub add_targets ($$$$){
         if (ref $tree->{$prop} eq 'HASH'){
             add_targets $cfg, $probes, $tree->{$prop}, "$name/$prop";
         }
-        if ($prop eq 'host' and ( not $tree->{nomasterpoll} or $tree->{nomasterpoll} eq 'no') and check_filter($cfg,$name) and $tree->{$prop} !~ m|^/| ) {           
+        if ($prop eq 'host' and ( check_filter($cfg,$name) and $tree->{$prop} !~ m|^/| )) {
             if($tree->{host} =~ /^DYNAMIC/) {
                 $probeobj->add($tree,$name);
             } else {
@@ -2055,8 +2055,8 @@ DOC
        nomasterpoll=> {
                      _doc => <<DOC,
 Use this in a master/slave setup where the master must not poll a particular
-target. The master will now skip this entry in its polling cycle.  and from
-search results. Note that if you set the hide property on a non leaf entry
+target. The master will now skip this entry in its polling cycle.
+Note that if you set the hide property on a non leaf entry
 all subordinate entries will also disapear in the menu structure. You can
 still access them via direct link or via an alternate hierarchy.
 
@@ -2066,7 +2066,6 @@ contain any graphs.
 
 DOC
                      _re => '(yes|no)',
-                     _re_error => 'Only set this if you want to hide',
                      _default => 'no',
                     },
 
