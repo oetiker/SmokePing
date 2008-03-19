@@ -20,6 +20,9 @@
 
 * store the slave updates in 'dyndir', defaulting to 'datadir' --niko
 
+* change the slave update locking code so that reading works without
+  write access to the temporary storage file --niko
+
 * allow SSH probe to config rsa1 key -- Walery Kokarev
 
 * make zooming work properly even for graphs generated with the
