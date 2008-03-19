@@ -120,11 +120,15 @@ sub save_updates {
         } 
         else {
 
-            for (my $i = 3; $i > 0; $i--){
+            for (my $i = 2; $i >= 0; $i--){
                 my $fh;
                 if ( open ($fh, '+>>' , $file) and flock($fh, LOCK_EX) ){
                     my $existing = [];
-                    next if ! -e $file; # the reader unlinked it from under us
+                    if (! -e $file) { # the reader unlinked it from under us
+                        flock($fh, LOCK_UN);
+                        close $fh;
+                        next;
+                    }
                     seek $fh, 0, 0;
                     if ( -s _ ){
                         my $in = eval { fd_retrieve $fh };
@@ -139,9 +143,11 @@ sub save_updates {
                     flock($fh, LOCK_UN);
                     close $fh;
                     last;
-                } else {
-                    warn "Could not lock $file ($!). Trying again for $i rounds.\n";
+                } elsif ($i > 0) {
+                    warn "Could not lock $file ($!). Trying again $i more times.\n";
+                    close $fh;
                     sleep rand(2);
+                    next;
                 }
                 warn "Could not update $file, giving up for now.";
                 close $fh;
@@ -176,6 +182,7 @@ sub get_slaveupdates {
             flock $fh, LOCK_UN;
             if ($@) { #error
                 warn "Loading $file: $@";  
+                close $fh;
                 return $empty;
             }
         } else {
