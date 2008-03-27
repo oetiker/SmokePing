@@ -2954,10 +2954,13 @@ DOC
                 _re_error =>  "color must be defined with in rrggbb syntax",
                 _doc => "Paint the graph background in a special color when there is no data for this period because smokeping has not been running (#rrggbb)",
                         },
-         loss_background      => { _doc => 'should the graphs be shown with a background showing loss data for emphasis (yes/no)',
+         loss_background      => { _doc => <<EOF,
+Should the graphs be shown with a background showing loss data for emphasis (yes/no)?
+
+If this option is enabled, uptime data is no longer displayed in the graph background.
+EOF
                        _re  => '(yes|no)',
                        _re_error =>"this must either be 'yes' or 'no'",
-                       _doc => "If this option is enabled, uptime data is no longer displayed in the graph background.",
                                      },
          logarithmic      => { _doc => 'should the graphs be shown in a logarithmic scale (yes/no)',
                        _re  => '(yes|no)',
