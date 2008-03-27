@@ -283,6 +283,7 @@ sub _pings {
 
 sub target_count {
 	my $self = shift;
+	$self->{target_count} = 0 if !defined $self->{target_count};
 	return $self->{target_count};
 }
 
