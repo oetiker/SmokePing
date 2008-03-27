@@ -1413,7 +1413,7 @@ sub get_charts ($$$){
         for my $chart ( keys %charts ){
             $page .= "<h2>$cfg->{Presentation}{charts}{$chart}{title}</h2>\n";
             if (not defined $charts{$chart}[0]){
-                $page .= "<p>No targets retured by the sorter.</p>"
+                $page .= "<p>No targets returned by the sorter.</p>"
             } else {
                 my $tree = $cfg->{Targets};
                 my $chartentry = $charts{$chart}[0];
@@ -1431,7 +1431,7 @@ sub get_charts ($$$){
         my $chart = $open->[1];
         $page = "<h1>$cfg->{Presentation}{charts}{$chart}{title}</h1>\n";
         if (not defined $charts{$chart}[0]){
-                $page .= "<p>No targets retured by the sorter.</p>"
+                $page .= "<p>No targets returned by the sorter.</p>"
         } else {
           my $rank =1;
           for my $chartentry (@{$charts{$chart}}){
