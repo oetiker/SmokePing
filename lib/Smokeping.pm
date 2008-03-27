@@ -4060,7 +4060,7 @@ sub main (;$) {
             $cfg->{__probes} = $probes;
             add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
         } else {
-          die "ERROR: we did not get config form the master. Maybe we are not configured as a slave for any of the targets on the master ?\n";
+          die "ERROR: we did not get config from the master. Maybe we are not configured as a slave for any of the targets on the master ?\n";
         }
     } else {
         if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
