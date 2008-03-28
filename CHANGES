@@ -1,3 +1,6 @@
+* make slaves kill their old children off before forking new ones when
+  the configuration changes. Reported by David Behr. --niko
+
 2008/3/28 -- released version 2.3.4
 
 * fix 'loss_background' documentation. Reported by David Tomic. --niko

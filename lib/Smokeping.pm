@@ -3996,6 +3996,37 @@ sub start_probes {
         return $pid;
 }
 
+sub load_cfg_slave {
+        my %opt = %{$_[0]};
+        die "ERROR: no shared-secret defined along with master-url\n" unless $opt{'shared-secret'};
+        die "ERROR: no cache-dir defined along with master-url\n" unless $opt{'cache-dir'};
+        die "ERROR: no cache-dir ($opt{'cache-dir'}): $!\n" unless -d $opt{'cache-dir'};
+        die "ERROR: the shared secret file ($opt{'shared-secret'}) is world-readable or writable"
+            if ((stat($opt{'shared-secret'}))[2] & 6);
+        open my $fd, "<$opt{'shared-secret'}" or die "ERROR: opening $opt{'shared-secret'} $!\n";
+        chomp(my $secret = <$fd>);
+        close $fd;
+        my $slave_cfg = {
+            master_url => $opt{'master-url'},
+            cache_dir => $opt{'cache-dir'},
+            pid_dir   => $opt{'pid-dir'} || $opt{'cache-dir'},
+            shared_secret => $secret,
+            slave_name => $opt{'slave-name'} || hostname(),
+        };
+        # this should get us an initial  config set from the server
+        my $new_conf = Smokeping::Slave::submit_results($slave_cfg,{});
+        if ($new_conf){
+            $cfg=$new_conf;
+            $probes = undef;
+            $probes = load_probes $cfg;
+            $cfg->{__probes} = $probes;
+            add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
+        } else {
+          die "ERROR: we did not get config from the master. Maybe we are not configured as a slave for any of the targets on the master ?\n";
+        }
+        return $slave_cfg;
+}
+
 sub main (;$) {
     $cgimode = 0;
     umask 022;
@@ -4035,33 +4066,9 @@ sub main (;$) {
     initialize_debuglog if $opt{debug} or $opt{'debug-daemon'};
     my $slave_cfg;
     my $cfgfile = $opt{config} || $defaultcfg;
-    if (exists $opt{'master-url'}){     # ok we go slave-mode
-        die "ERROR: no shared-secret defined along with master-url\n" unless $opt{'shared-secret'};
-        die "ERROR: no cache-dir defined along with master-url\n" unless $opt{'cache-dir'};
-        die "ERROR: no cache-dir ($opt{'cache-dir'}): $!\n" unless -d $opt{'cache-dir'};
-        die "ERROR: the shared secret file ($opt{'shared-secret'}) is world-readable or writable"
-            if ((stat($opt{'shared-secret'}))[2] & 6);
-        open my $fd, "<$opt{'shared-secret'}" or die "ERROR: opening $opt{'shared-secret'} $!\n";
-        chomp(my $secret = <$fd>);
-        close $fd;
-        $slave_cfg = {
-            master_url => $opt{'master-url'},
-            cache_dir => $opt{'cache-dir'},
-            pid_dir   => $opt{'pid-dir'} || $opt{'cache-dir'},
-            shared_secret => $secret,
-            slave_name => $opt{'slave-name'} || hostname(),
-        };
-        # this should get us an initial  config set from the server
-        my $new_conf = Smokeping::Slave::submit_results($slave_cfg,$cfg);
-        if ($new_conf){
-            $cfg=$new_conf;
-            $probes = undef;
-            $probes = load_probes $cfg;
-            $cfg->{__probes} = $probes;
-            add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
-        } else {
-          die "ERROR: we did not get config from the master. Maybe we are not configured as a slave for any of the targets on the master ?\n";
-        }
+    my $slave_mode = exists $opt{'master-url'};
+    if ($slave_mode){     # ok we go slave-mode
+        $slave_cfg = load_cfg_slave(\%opt);
     } else {
         if(defined $opt{'check'}) { verify_cfg($cfgfile); exit 0; }
         if($opt{reload})  { 
@@ -4145,7 +4152,11 @@ RESTART:
                 $reloading = 1;
                 $gothup = 0;
                 my $oldprobes = $probes;
-                $reloading = 0, next unless reload_cfg($cfgfile);
+                if ($slave_mode) {
+                    load_cfg_slave(\%opt);
+                } else {
+                    $reloading = 0, next unless reload_cfg($cfgfile);
+                }
                 do_debuglog("Restarting probe processes " . join(",", keys %probepids) . ".");
                 kill SIGHUP, $_ for (keys %probepids);
                 my $i=0;
@@ -4259,15 +4270,19 @@ KID:
         my %sortercache;
         if ($opt{'master-url'}){            
             my $new_conf = Smokeping::Slave::submit_results $slave_cfg,$cfg,$myprobe,$probes;
-            if ($new_conf){
-                do_log('server has new config for me ... HUPing myself');                
-                $gothup = 1;
-                $cfg=$new_conf;
-                $probes = undef;
-                $probes = load_probes $cfg;
-                $cfg->{__probes} = $probes;
-                add_targets($cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir});
-                last;
+            if ($new_conf && !$gothup){
+                do_log('server has new config for me ... HUPing the parent');
+                kill_smoke $cfg->{General}{piddir}."/smokeping.pid", SIGHUP; 
+                # wait until the parent signals back if it didn't already
+                sleep if (!$gothup);
+                if (!$gothup) {
+                    do_log("Got an unexpected signal while waiting for SIGHUP, exiting");
+                    exit 1;
+                }
+                if (!$multiprocessmode) {
+                    load_cfg_slave(\%opt);
+                    last;
+                }
              }
         } else {
             update_rrds $cfg, $probes, $cfg->{Targets}, $cfg->{General}{datadir}, $myprobe, \%sortercache;
