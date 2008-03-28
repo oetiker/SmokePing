@@ -1,3 +1,5 @@
+2008/3/28 -- released version 2.3.4
+
 * fix 'loss_background' documentation. Reported by David Tomic. --niko
 
 * fix local variable override handling in connection with nomasterpoll
