@@ -148,6 +148,12 @@ killdoc:
 
 doc:    killdoc ref examples man html txt rename-man
 
+docdirs: 
+	for d in doc/Smokeping doc/examples doc/Smokeping/probes \
+	         doc/Smokeping/sorters doc/Smokeping/matchers; do \
+		[ -d $$d ] || mkdir -p $$d; \
+	done
+
 # patch first so Smokeping.pm is older than smokeping_config.pod in the tarball
 smokeping-$(VERSION).tar.gz:
 	$(PERL) -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
