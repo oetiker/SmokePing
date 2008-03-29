@@ -149,7 +149,7 @@ killdoc:
 doc:    killdoc ref examples man html txt rename-man
 
 docdirs: 
-	for d in doc/Smokeping doc/examples doc/Smokeping/probes \
+	for d in doc/Config doc/examples doc/Smokeping/probes \
 	         doc/Smokeping/sorters doc/Smokeping/matchers; do \
 		[ -d $$d ] || mkdir -p $$d; \
 	done
