@@ -1,3 +1,5 @@
+2008/3/29 -- released version 2.3.5
+
 * make slaves kill their old children off before forking new ones when
   the configuration changes. Reported by David Behr. --niko
 
