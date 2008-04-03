@@ -1298,7 +1298,7 @@ sub get_detail ($$$$;$){
                '--start',$realstart,
                ($end ne 'last' ? ('--end',$end) : ()),
                '--height',$cfg->{Presentation}{detail}{height},
-               '--width',,$cfg->{Presentation}{detail}{width},
+               '--width',$cfg->{Presentation}{detail}{width},
                '--title',$desc.$from,
                '--rigid','--upper-limit', $max->{$s}{$start},
                @log,
@@ -1310,7 +1310,7 @@ sub get_detail ($$$$;$){
                '--color', 'BACK#ffffff',
                '--color', 'CANVAS#ffffff',
                (map {"DEF:ping${_}=${rrd}:ping${_}:AVERAGE"} 1..$pings),
-               (map {"CDEF:cp${_}=ping${_},0,$max->{$s}{$start},LIMIT"} 1..$pings),
+               (map {"CDEF:cp${_}=ping${_},$max->{$s}{$start},LT,ping${_},INF,IF"} 1..$pings),
                ("DEF:loss=${rrd}:loss:AVERAGE"),
                @upargs,# draw the uptime bg color
                @lossargs, # draw the loss bg color
