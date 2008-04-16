@@ -1,3 +1,5 @@
+* the 'ralf' fix for cgi which is not able to read the secrets file. -- tobi
+
 * display "all the smoke" even when it gets cut at the top end of the graph
   --tobi
 

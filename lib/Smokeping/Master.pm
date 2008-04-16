@@ -210,8 +210,11 @@ sub get_secret {
             close $hand;
             return $1;
         }
-    } 
-    warn "WARNING: Opening $cfg->{Slaves}{secrets}: $!\n";    
+    } else { 
+        print "Content-Type: text/plain\n\n";
+        print "WARNING: Opening secrets file $cfg->{Slaves}{secrets}: $!\n";
+        return '__HORRIBLE_INLINE_SIGNALING__';
+    }
     return;
 }
 
@@ -227,6 +230,7 @@ sub answer_slave {
     my $q = shift;
     my $slave = $q->param('slave');
     my $secret = get_secret($cfg,$slave);
+    return if $secret eq '__HORRIBLE_INLINE_SIGNALING__';
     if (not $secret){
         print "Content-Type: text/plain\n\n";
         print "WARNING: No secret found for slave ${slave}\n";       
