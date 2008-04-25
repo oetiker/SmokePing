@@ -1378,7 +1378,7 @@ sub get_detail ($$$$;$){
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
                 $page .= "<br/>";
-                $page .= ( qq{<a href="?}.hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').$s.'">'
+                $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').$s.'">'
                       . qq{<IMG BORDER="0" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
                 $page .= "</div>";
             }
