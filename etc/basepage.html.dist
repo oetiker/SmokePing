@@ -42,7 +42,10 @@ a.menulinkactive {
         }
 
 	
-a.menulinkactive:hover,
+a.menulinkactive:hover {
+        color: #000000;
+}
+
 a.menulink:hover       {
         color: #e0e0ff;
         }
