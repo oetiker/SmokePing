@@ -1,3 +1,6 @@
+* add custom style for active menu link
+  -- tobi, patch by Daniel Rich drich employees.org
+
 * honour the 'linkstyle' variable when zooming
   -- niko, reported by Wolfgang Tremmel as Debian bug #476404
 

@@ -30,16 +30,23 @@
        }
        
 .menuactive {
-        background: #202040;
+        background: white;
        }
 
 a.menulink {
 	color: white;
 	}
+
+a.menulinkactive {
+        color: #1280d7;
+        }
+
 	
+a.menulinkactive:hover,
 a.menulink:hover       {
         color: #e0e0ff;
         }
+
 -->
 </STYLE>
 

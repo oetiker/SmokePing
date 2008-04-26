@@ -660,7 +660,11 @@ sub target_menu($$$$;$){
     	    $menu =~ s/ /&nbsp;/g;
         	my $menuadd ="";
 		    $menuadd = "&nbsp;" x (20 - length($menu)) if length($menu) < 20;
-	        $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="menulink" HREF="$path$key$suffix">$menu</a>$menuadd</td></tr>\n};
+               my $menuclass = "menulink";
+               if ($key eq $current and !@$open) {
+                   $menuclass = "menulinkactive";
+               }
+               $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="$menuclass" HREF="$path$key$suffix">$menu</a>$menuadd</td></tr>\n};
     	    if ($key eq $current){
         	    my $prline = target_menu $tree->{$key}, $open, "$path$key.",$filter, $suffix;
 	            $print .= qq{<tr><td class="$class">&nbsp;&nbsp;</td><td align="left">$prline</td></tr>}
