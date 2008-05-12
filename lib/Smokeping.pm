@@ -1967,7 +1967,8 @@ sub get_parser () {
     #     current 'probe' setting.
 
 
-    my $KEYD_RE = '[-_0-9a-zA-Z.]+';
+    my $KEYD_RE = '[-_0-9a-zA-Z]+';
+    my $KEYDD_RE = '[-_0-9a-zA-Z.]+';
     my $PROBE_RE = '[A-Z][a-zA-Z]+';
     my $e = "=";
     my %knownprobes; # the probes encountered so far
@@ -2200,8 +2201,8 @@ DOC
 If you want to have alerts for this target and all targets below it go to a particular address
 on top of the address already specified in the alert, you can add it here. This can be a comma separated list of items.
 DOC
-           slaves => {  _re => "(${KEYD_RE}(?:\\s+${KEYD_RE})*)?",
-                        _re_error => 'Use the format: slaves='.${KEYD_RE}.' [slave2]',
+           slaves => {  _re => "(${KEYDD_RE}(?:\\s+${KEYDD_RE})*)?",
+                        _re_error => 'Use the format: slaves='.${KEYDD_RE}.' [slave2]',
                         _doc => <<DOC },
 The slave names must match the slaves you have setup in the slaves section.
 DOC
@@ -3343,7 +3344,7 @@ slaves you are going to use.
 END_DOC
           _vars        => [ qw(secrets) ],
           _mandatory   => [ qw(secrets) ],
-          _sections    => [ "/$KEYD_RE/" ],
+          _sections    => [ "/$KEYDD_RE/" ],
           secrets => {              
               _sub => sub {
                  return "File '$_[0]' does not exist" unless -f $_[ 0 ];
