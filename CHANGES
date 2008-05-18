@@ -1,3 +1,6 @@
+* use localtime to construct the rawlog filename 
+  --tobi as reported by Kent Kuriyama
+
 * allow slave names to have . in them but not target sections. --tobi
 
 2008/4/26 -- released version 2.3.6

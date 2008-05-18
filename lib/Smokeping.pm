@@ -1896,7 +1896,7 @@ sub update_rrds($$$$$$) {
             for my $update (sort {$a->[1] <=> $b->[1]}  @updates){ # make sure we put the updates in chronological order in
                 my $s = $update->[0] ? "~".$update->[0] : "";
                 if ( $tree->{rawlog} ){
-                        my $file =  POSIX::strftime $tree->{rawlog},$update->[1];
+                        my $file =  POSIX::strftime $tree->{rawlog},localtime($update->[1]);
                     if (open LOG,">>$name$s.$file.csv"){
                             print LOG time,"\t",join("\t",split /:/,$update->[2]),"\n";
                                 close LOG;
