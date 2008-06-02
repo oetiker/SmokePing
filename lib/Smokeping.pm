@@ -631,16 +631,30 @@ sub target_menu($$$$;$){
 		my $menu = $key;
         my $title = $key;
         my $hide;
+        my $host;
+        my $menuextra;
         if ($tree->{$key}{__tree_link} and $tree->{$key}{__tree_link}{menu}){
     		$menu = $tree->{$key}{__tree_link}{menu};
     		$title = $tree->{$key}{__tree_link}{title};
-                next if $tree->{$key}{__tree_link}{hide} and $tree->{$key}{__tree_link}{hide} eq 'yes';
-		} elsif ($tree->{$key}{menu}) {	
+    		$host = $tree->{$key}{__tree_link}{host};
+            $menuextra = $tree->{$key}{__tree_link}{menuextra};
+            next if $tree->{$key}{__tree_link}{hide} and $tree->{$key}{__tree_link}{hide} eq 'yes';
+        } elsif ($tree->{$key}{menu}) {	
 	        $menu = $tree->{$key}{menu};
 	        $title = $tree->{$key}{title};
-                next if $tree->{$key}{hide} and $tree->{$key}{hide} eq 'yes';
+    		$host = $tree->{$key}{host};
+            $menuextra = $tree->{$key}{menuextra};
+            next if $tree->{$key}{hide} and $tree->{$key}{hide} eq 'yes';
         };
-
+        # no menuextra for multihost   
+        if (not $host or $host =~ m|^/|){
+            $menuextra = undef;
+        }
+        if ($menuextra){
+            $menuextra =~ s/##host##/$host/g;
+        } else {
+            $menuextra = '';
+        }
 		my $class = 'menuitem';
    	    if ($key eq $current ){
 			if ( @$open ) {
@@ -659,12 +673,13 @@ sub target_menu($$$$;$){
 		else {
     	    $menu =~ s/ /&nbsp;/g;
         	my $menuadd ="";
-		    $menuadd = "&nbsp;" x (20 - length($menu)) if length($menu) < 20;
+		    $menuadd = "&nbsp;" x (20 - length($menu.$menuextra)) if length($menu.$menuextra) < 20;
                my $menuclass = "menulink";
                if ($key eq $current and !@$open) {
                    $menuclass = "menulinkactive";
                }
-               $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="$menuclass" HREF="$path$key$suffix">$menu</a>$menuadd</td></tr>\n};
+                
+               $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="$menuclass" HREF="$path$key$suffix">$menu</a>$menuextra$menuadd</td></tr>\n};
     	    if ($key eq $current){
         	    my $prline = target_menu $tree->{$key}, $open, "$path$key.",$filter, $suffix;
 	            $print .= qq{<tr><td class="$class">&nbsp;&nbsp;</td><td align="left">$prline</td></tr>}
@@ -2016,11 +2031,11 @@ sub get_parser () {
     # the part of target section syntax that doesn't depend on the selected probe
     my $TARGETCOMMON; # predeclare self-referencing structures
     # the common variables
-    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee slaves parents hide nomasterpoll) ];
+    my $TARGETCOMMONVARS = [ qw (probe menu title alerts note email host remark rawlog alertee slaves menuextra parents hide nomasterpoll) ];
     $TARGETCOMMON = 
       {
        _vars     => $TARGETCOMMONVARS,
-       _inherited=> [ qw (probe alerts alertee slaves nomasterpoll) ],
+       _inherited=> [ qw (probe alerts alertee slaves menuextra nomasterpoll) ],
        _sections => [ "/$KEYD_RE/" ],
        _recursive=> [ "/$KEYD_RE/" ],
        _sub => sub {
@@ -2205,6 +2220,11 @@ DOC
                         _re_error => 'Use the format: slaves='.${KEYDD_RE}.' [slave2]',
                         _doc => <<DOC },
 The slave names must match the slaves you have setup in the slaves section.
+DOC
+           menuextra => { 
+                        _doc => <<DOC },
+A bit of html to append after the menu entry. You can embedd the name of the current host into it using C<##host##>.
+This entry does get inherited. Use this for example to add a link to your mtr service.
 DOC
            probe => {
                         _sub => sub {
@@ -3421,10 +3441,10 @@ END_DOC
 The Target Section defines the actual work of SmokePing. It contains a
 hierarchical list of hosts which mark the endpoints of the network
 connections the system should monitor. Each section can contain one host as
-well as other sections. By adding slaves you can measure the connectivity of
-an endpoint looking from several sources.
+well as other sections. By adding slaves you can measure the connection to
+an endpoint from multiple locations.
 DOC
-                   _vars       => [ qw(probe menu title remark alerts slaves parents) ],
+                   _vars       => [ qw(probe menu title remark alerts slaves menuextra parents) ],
                    _mandatory  => [ qw(probe menu title) ],
                    _order => 1,
                    _sections   => [ "/$KEYD_RE/" ],
@@ -3494,6 +3514,13 @@ DOC
 
                    remark => { _doc => <<DOC },
 An optional remark on the current section. It gets displayed on the webpage.
+DOC
+                   slaves => { _doc => <<DOC },
+List of slave servers. It gets inherited by all targets.
+DOC
+                   menuextra => { _doc => <<DOC },
+HTML String to be added to the end of each menu entry. The C<##host##> entry will be replaces by the
+host of the relevant section if there is one.
 DOC
 
            }
