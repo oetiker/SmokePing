@@ -1,20 +1,93 @@
-# German translations for PACKAGE package. ö
-# Copyright (C) 2007 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2007.
+# German translations for MTR Ajax Frontend.
+# Copyright (C) 2008 Tobias Oetiker
+#
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: MTR-AJAX-Frontend 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-17 12:18-0600\n"
-"PO-Revision-Date: 2007-10-19 09:30+0200\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"POT-Creation-Date: 2008-06-02 20:43+0200\n"
+"PO-Revision-Date: 2008-05-31 08:50+0200\n"
+"Last-Translator: oetiker <(null)>\n"
+"Language-Team: English <en@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: source/class/Mtr/Application.js:45
+msgid "MTR AJAX Frontend"
+msgstr "MTR Ajax Frontend"
+
+#: source/class/Mtr/ui/ActionButton.js:27 source/class/Mtr/ui/TraceTable.js:24
+msgid "Host"
+msgstr "Host"
+
+#: source/class/Mtr/ui/ActionButton.js:42
+msgid "Delay"
+msgstr "Abstand"
+
+#: source/class/Mtr/ui/ActionButton.js:55
+msgid "Rounds"
+msgstr "Runden"
+
+#: source/class/Mtr/ui/ActionButton.js:118
+#, fuzzy
+msgid "Starting"
+msgstr "Start"
+
+#: source/class/Mtr/ui/ActionButton.js:127
+#, fuzzy
+msgid "Stopping"
+msgstr "Stop"
+
+#: source/class/Mtr/ui/ActionButton.js:136
+msgid "Go"
+msgstr "Start"
+
+#: source/class/Mtr/ui/ActionButton.js:144
+msgid "Stop"
+msgstr "Stop"
+
+#: source/class/Mtr/ui/TraceTable.js:24
+msgid "Hop"
+msgstr "Schritt"
+
+#: source/class/Mtr/ui/TraceTable.js:24
+msgid "Ip"
+msgstr "Ip"
+
+#: source/class/Mtr/ui/TraceTable.js:25
+msgid "Last [ms]"
+msgstr "Letzte [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:25
+msgid "Loss [%]"
+msgstr "Loss [%]"
+
+#: source/class/Mtr/ui/TraceTable.js:25
+msgid "Sent [ms]"
+msgstr "Gesendet"
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "Avg [ms]"
+msgstr "ø [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "Best [ms]"
+msgstr "Best [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "StDev [ms]"
+msgstr "StdAbw [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "Worst [ms]"
+msgstr "Worst [ms]"
+
+#, fuzzy
+#~ msgid "Host:"
+#~ msgstr "GWP"
 
 #~ msgid "Start Date"
 #~ msgstr "Start-Datum"
@@ -57,17 +130,8 @@ msgstr ""
 #~ msgid "Snap"
 #~ msgstr "Sonntag"
 
-#~ msgid "Client"
-#~ msgstr "GWP"
-
-#~ msgid "Hostname"
-#~ msgstr "GWP"
-
 #~ msgid "Team"
 #~ msgstr "Team"
-
-#~ msgid "Ip"
-#~ msgstr "Ip"
 
 #~ msgid "User"
 #~ msgstr "Benutzer"
@@ -108,10 +172,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Data Set 2"
 #~ msgstr "Daten-Quelle"
-
-#, fuzzy
-#~ msgid "Start"
-#~ msgstr "Start"
 
 #~ msgid "End"
 #~ msgstr "Ende"

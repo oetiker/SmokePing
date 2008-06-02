@@ -7,10 +7,78 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-11-17 12:18-0600\n"
+"POT-Creation-Date: 2008-06-02 20:43+0200\n"
 "PO-Revision-Date: 2007-10-19 09:30+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ASCII\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: source/class/Mtr/Application.js:45
+msgid "MTR AJAX Frontend"
+msgstr ""
+
+#: source/class/Mtr/ui/ActionButton.js:27 source/class/Mtr/ui/TraceTable.js:24
+msgid "Host"
+msgstr ""
+
+#: source/class/Mtr/ui/ActionButton.js:42
+msgid "Delay"
+msgstr ""
+
+#: source/class/Mtr/ui/ActionButton.js:55
+msgid "Rounds"
+msgstr ""
+
+#: source/class/Mtr/ui/ActionButton.js:118
+msgid "Starting"
+msgstr ""
+
+#: source/class/Mtr/ui/ActionButton.js:127
+msgid "Stopping"
+msgstr ""
+
+#: source/class/Mtr/ui/ActionButton.js:136
+msgid "Go"
+msgstr ""
+
+#: source/class/Mtr/ui/ActionButton.js:144
+msgid "Stop"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:24
+msgid "Hop"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:24
+msgid "Ip"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:25
+msgid "Last [ms]"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:25
+msgid "Loss [%]"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:25
+msgid "Sent [ms]"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "Avg [ms]"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "Best [ms]"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "StDev [ms]"
+msgstr ""
+
+#: source/class/Mtr/ui/TraceTable.js:26
+msgid "Worst [ms]"
+msgstr ""
