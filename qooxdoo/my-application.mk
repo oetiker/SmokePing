@@ -5,7 +5,7 @@
 #  http://qooxdoo.org
 #
 #  Copyright:
-#    2006-2007 1&1 Internet AG, Germany, http://www.1and1.org
+#    2006-2008 1&1 Internet AG, Germany, http://www.1und1.de
 #
 #  License:
 #    LGPL: http://www.gnu.org/licenses/lgpl.html
@@ -100,7 +100,7 @@ endif
 
 #
 # Title used during the make process.
-# Default is the uppercase variant of your custom namespace.
+# Default is the uppercase variant of your normal title.
 #
 ifndef APPLICATION_MAKE_TITLE
   APPLICATION_MAKE_TITLE := $(shell echo $(APPLICATION_NAMESPACE) | tr "[:lower:]" "[:upper:]")
@@ -492,7 +492,7 @@ endif
 ifndef APPLICATION_PUBLISH_PATH
   APPLICATION_PUBLISH_PATH = ./publish
 endif
- 
+
 #
 # The folder that will contain a unit test appliction for your classes, defined
 # from the directory which contains the Makefile (if defined relatively). This
@@ -528,7 +528,6 @@ endif
 
 
 
-
 ################################################################################
 # OUTPUT OPTIONS
 ################################################################################
@@ -554,6 +553,23 @@ endif
 #
 ifndef APPLICATION_SCRIPT_FILENAME
   APPLICATION_SCRIPT_FILENAME = $(APPLICATION_NAMESPACE).js
+endif
+
+
+
+
+
+
+################################################################################
+# LINT OPTIONS
+################################################################################
+
+#
+# A list of valid global identifiers. These identifiers will not be reported
+# as errors.
+#
+ifndef LINT_ALLOWED_GLOBALS
+  LINT_ALLOWED_GLOBALS = 
 endif
 
 
@@ -618,7 +634,13 @@ ifndef APPLICATION_ADDITIONAL_BUILD_OPTIONS
   APPLICATION_ADDITIONAL_BUILD_OPTIONS =
 endif
 
-
+#
+# Additional params to pass to the xgettext call in exec-*-translation.
+# e.g. "--sort-by-file" or "--no-location --sort-output"
+#
+ifndef APPLICATION_ADDITIONAL_XGETTEXT_PARAMS
+  APPLICATION_ADDITIONAL_XGETTEXT_PARAMS = --sort-by-file --add-comments=TRANSLATION
+endif
 
 
 

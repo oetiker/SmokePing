@@ -35,7 +35,7 @@ export PATH:=/usr/pack/python-debian31-2.4.4-to/bin:$(PATH)
 # Please note that Windows users should always use relative paths.
 # It should end with the last directory. Please omit a trailing slash.
 #
-QOOXDOO_PATH = /usr/pack/qooxdoo-0.7.2-to
+QOOXDOO_PATH = /usr/pack/qooxdoo-0.7svn-to
 QOOXDOO_URI = ../qooxdoolink
 #QOOXDOO_URI = file:///Q:/$(QOOXDOO_PATH)
 
@@ -44,13 +44,13 @@ QOOXDOO_URI = ../qooxdoolink
 # Namespace of your application e.g. custom
 # Even complexer stuff is possible like: net.sf.custom
 #
-APPLICATION_NAMESPACE = Smokeping
+APPLICATION_NAMESPACE = Mtr
 
 #
 # Files that will be copied from the source directory into the build
 # directory (space separated list). The default list is empty.
 #
-APPLICATION_FILES = index.html smokeping.cgi perl
+APPLICATION_FILES = index.html mtr.cgi perl
 # APPLICATION_BUILD_LOG_LEVEL = debug
 APPLICATION_BUILD_LOG_LEVEL = off
 

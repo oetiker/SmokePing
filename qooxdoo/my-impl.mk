@@ -5,7 +5,7 @@
 #  http://qooxdoo.org
 #
 #  Copyright:
-#    2006-2007 1&1 Internet AG, Germany, http://www.1and1.org
+#    2006-2008 1&1 Internet AG, Germany, http://www.1und1.de
 #
 #  License:
 #    LGPL: http://www.gnu.org/licenses/lgpl.html
@@ -63,6 +63,7 @@ exec-distclean:
 
 	@echo "  * Cleaning up framework..."
 	@$(CMD_REMOVE) $(FRAMEWORK_CACHE_PATH)
+	@$(CMD_REMOVE) $(QOOXDOO_INCLUDE_CACHE)
 	@$(CMD_REMOVE) $(FRAMEWORK_SOURCE_PATH)/translation/messages.pot
 	@$(CMD_REMOVE) $(FRAMEWORK_SOURCE_PATH)/class/$(FRAMEWORK_NAMESPACE_PATH)/locale/data
 	@$(CMD_REMOVE) $(FRAMEWORK_SOURCE_PATH)/class/$(FRAMEWORK_NAMESPACE_PATH)/locale/translation
@@ -77,7 +78,6 @@ exec-distclean:
 #
 
 exec-script-source:
-	
 	$(SILENCE) $(CMD_GENERATOR) \
 	  $(COMPUTED_CLASS_PATH) \
 	  $(COMPUTED_CLASS_URI) \
@@ -88,7 +88,7 @@ exec-script-source:
 	  $(COMPUTED_TEMPLATE) \
 	  --generate-source-script \
 	  --source-script-file $(COMPUTED_SOURCE_SCRIPT_NAME)
-	
+
 
 exec-script-build:
 	$(SILENCE) $(CMD_GENERATOR) \
@@ -101,7 +101,7 @@ exec-script-build:
 	  --generate-compiled-script \
 	  --compiled-script-file $(COMPUTED_BUILD_SCRIPT_NAME) \
 	  $(APPLICATION_ADDITIONAL_SCRIPT_BUILD_OPTIONS)
-		
+
 
 exec-script-build-split:
 	# generate base profile
@@ -348,21 +348,22 @@ exec-application-translation:
 
 	@rm -f $(APPLICATION_SOURCE_PATH)/$(APPLICATION_TRANSLATION_FOLDERNAME)/messages.pot
 	@touch $(APPLICATION_SOURCE_PATH)/$(APPLICATION_TRANSLATION_FOLDERNAME)/messages.pot
+	@# the artificial 'for' loop assures that xgettext is never called with empty arguments
 	@for file in `find $(APPLICATION_SOURCE_PATH)/$(APPLICATION_CLASS_FOLDERNAME) -name "*.js"`; do \
-	  LC_ALL=C xgettext --language=Java --from-code=UTF-8 \
+	  eval LC_ALL=C xgettext --language=Java --from-code=UTF-8 \
 	  -kthis.trc -kthis.tr -kthis.marktr -kthis.trn:1,2 \
 	  -kself.trc -kself.tr -kself.marktr -kself.trn:1,2 \
 	  -kManager.trc -kManager.tr -kManager.marktr -kManager.trn:1,2 \
-	  --sort-by-file --add-comments=TRANSLATION \
-	  -o $(APPLICATION_SOURCE_PATH)/$(APPLICATION_TRANSLATION_FOLDERNAME)/messages.pot \
-	  `find $(APPLICATION_SOURCE_PATH)/$(APPLICATION_CLASS_FOLDERNAME) -name "*.js"` 2>&1 | grep -v warning; \
+	  $(APPLICATION_ADDITIONAL_XGETTEXT_PARAMS) \
+	  -o `printf "%s" $(APPLICATION_SOURCE_PATH)/$(APPLICATION_TRANSLATION_FOLDERNAME)`/messages.pot \
+	  `find $(APPLICATION_SOURCE_PATH)/$(APPLICATION_CLASS_FOLDERNAME) -name "*.js" -exec bash -c "printf '%s ' \"{}\"" \;` 2>&1 | grep -v warning; \
 	  break; done
 
 	@echo "  * Processing translations..."
 	@for LOC in $(COMPUTED_LOCALES); do \
 	  echo "    - Translation: $$LOC"; \
 	  if [ ! -r $(APPLICATION_SOURCE_PATH)/$(APPLICATION_TRANSLATION_FOLDERNAME)/$$LOC.po ]; then \
-  	    echo "      - Generating initial translation file..."; \
+ 	    echo "      - Generating initial translation file..."; \
 	    msginit --locale $$LOC --no-translator -i $(APPLICATION_SOURCE_PATH)/$(APPLICATION_TRANSLATION_FOLDERNAME)/messages.pot -o $(APPLICATION_SOURCE_PATH)/$(APPLICATION_TRANSLATION_FOLDERNAME)/$$LOC.po > /dev/null 2>&1; \
 	  else \
 	    echo "      - Merging translation file..."; \
@@ -417,9 +418,12 @@ exec-files-buildtool:
 	@$(CMD_LINE)
 	@echo "  * Copying files..."
 	@mkdir -p $(APPLICATION_BUILDTOOL_PATH)
-	@$(CMD_SYNC_OFFLINE) $(BUILDTOOL_DEPLOY_PATH)/* $(APPLICATION_BUILDTOOL_PATH); 
-	@mv $(APPLICATION_BUILDTOOL_PATH)/bin/startme.sh ./buildtool_start.sh
-	@mv $(APPLICATION_BUILDTOOL_PATH)/bin/startme.bat ./buildtool_start.bat
+	@$(CMD_SYNC_OFFLINE) $(BUILDTOOL_DEPLOY_PATH)/* $(APPLICATION_BUILDTOOL_PATH);
+	@mv $(APPLICATION_BUILDTOOL_PATH)/buildtool_start.sh ./buildtool_start.sh
+	@mv $(APPLICATION_BUILDTOOL_PATH)/buildtool_start.bat ./buildtool_start.bat
+
+
+
 
 
 #
@@ -460,10 +464,12 @@ exec-api-build:
 	  --use-setting $(APIVIEWER_NAMESPACE).resourceUri:resource/$(APIVIEWER_NAMESPACE_PATH) \
 	  --use-setting $(APIVIEWER_NAMESPACE).title:$(APPLICATION_API_TITLE)
 
+
+
 #
 # TestRunner/UnitTest targets
 #
- 
+
 exec-testrunner-build:
 	@# save old testrunner build contents
 	@( if [ -d $(TESTRUNNER_PATH)/build ]; then \
@@ -473,16 +479,18 @@ exec-testrunner-build:
 
 	@# make a specific testrunner build
 	@( cd $(TESTRUNNER_PATH); \
-          make -f Makefile.runner APPLICATION_ADDITIONAL_BUILD_OPTIONS='\
-                  --use-setting qx.testPageUri:html/tests.html \
-                  --use-setting qx.testNameSpace:$(APPLICATION_NAMESPACE)' \
-                build )
+	   $(MAKE) -s -f Makefile.runner APPLICATION_ADDITIONAL_BUILD_OPTIONS='\
+		   --use-setting qx.testPageUri:html/tests.html \
+		   --use-setting qx.testNameSpace:$(APPLICATION_NAMESPACE) \
+		   --use-setting testrunner.title:$(APPLICATION_API_TITLE)' \
+		 build )
 	$(SILENCE) $(CMD_DIR) $(APPLICATION_TEST_PATH)/script
 	$(SILENCE) $(CMD_DIR) $(APPLICATION_TEST_PATH)/html
 	$(SILENCE) $(CMD_DIR) $(APPLICATION_TEST_PATH)/resource
 	@cp -f $(TESTRUNNER_BUILD_PATH)/script/testrunner.js $(APPLICATION_TEST_PATH)/script
 	@cp -f $(TESTRUNNER_BUILD_PATH)/index.html $(APPLICATION_TEST_PATH)
 	@cp -f $(TESTRUNNER_SOURCE_PATH)/html/QooxdooTest.html $(APPLICATION_TEST_PATH)/html/tests.html
+	@cp -f $(TESTRUNNER_SOURCE_PATH)/html/QooxdooTest-source.html $(APPLICATION_TEST_PATH)/html/tests-source.html
 	@cp -Rf $(TESTRUNNER_BUILD_PATH)/resource $(APPLICATION_TEST_PATH)
 
 	@# restore old testrunner build contents
@@ -493,12 +501,40 @@ exec-testrunner-build:
 		    rm -fr $(TESTRUNNER_PATH)/build; \
 		 fi)
 
-
 exec-tests-build:
 	$(SILENCE) $(CMD_GENERATOR) \
+	  --class-path $(FRAMEWORK_SOURCE_PATH)/class \
+	  --class-path $(TESTRUNNER_SOURCE_PATH)/class \
+	  --class-path $(APPLICATION_SOURCE_PATH)/$(APPLICATION_CLASS_FOLDERNAME) \
+	  --include testrunner.TestLoader \
+	  --include $(APPLICATION_NAMESPACE).* \
+	  --include qx.theme.ClassicRoyale,qx.theme.classic.color.Royale,qx.theme.classic.Border,qx.theme.classic.font.Default,qx.theme.classic.Widget,qx.theme.classic.Appearance,qx.theme.icon.Nuvola \
+	  --add-require qx.log.Logger:qx.log.appender.Native \
+	  --resource-input $(FRAMEWORK_SOURCE_PATH)/resource \
+	  --resource-output $(APPLICATION_TEST_PATH)/resource/$(FRAMEWORK_NAMESPACE_PATH) \
+	  --resource-input $(TESTRUNNER_SOURCE_PATH)/resource \
+	  --resource-output $(APPLICATION_TEST_PATH)/resource/$(TESTRUNNER_NAMESPACE_PATH) \
+	  --resource-input $(APPLICATION_SOURCE_PATH)/resource \
+	  --resource-output $(APPLICATION_TEST_PATH)/resource/$(APPLICATION_NAMESPACE_PATH) \
+	  --use-setting qx.minLogLevel:700 \
+	  --use-setting qx.application:testrunner.TestLoader \
+	  --use-setting qx.theme:qx.theme.ClassicRoyale \
+	  --use-variant qx.debug:off \
+	  --copy-resources \
+	  --optimize-strings --optimize-variables \
+	  --generate-compiled-script \
+	  --compiled-script-file $(APPLICATION_TEST_PATH)/script/tests.js
+
+
+
+exec-tests-source:
+	$(SILENCE) $(CMD_GENERATOR) \
 	   --class-path $(FRAMEWORK_SOURCE_PATH)/class \
+	   --class-uri=../../$(FRAMEWORK_SOURCE_PATH)/class \
 	   --class-path $(TESTRUNNER_SOURCE_PATH)/class \
+	   --class-uri=../../$(TESTRUNNER_SOURCE_PATH)/class \
 	   --class-path $(APPLICATION_SOURCE_PATH)/class \
+	   --class-uri=../../$(APPLICATION_SOURCE_PATH)/class \
 	   --include testrunner.TestLoader \
 	   --include $(APPLICATION_NAMESPACE).* \
 	   --include qx.theme.ClassicRoyale,qx.theme.classic.color.Royale,qx.theme.classic.Border,qx.theme.classic.font.Default,qx.theme.classic.Widget,qx.theme.classic.Appearance,qx.theme.icon.Nuvola \
@@ -512,18 +548,18 @@ exec-tests-build:
 	   --use-setting qx.minLogLevel:700 \
 	   --use-setting qx.application:testrunner.TestLoader \
 	   --use-setting qx.theme:qx.theme.ClassicRoyale \
-	   --use-variant qx.debug:off \
 	   --copy-resources \
-	   --optimize-strings --optimize-variables \
-	   --generate-compiled-script \
-	   --compiled-script-file $(APPLICATION_TEST_PATH)/script/tests.js
+	   --generate-source-script \
+	   --source-script-file $(APPLICATION_TEST_PATH)/script/tests-source.js
+
+
 
 #
 # BuildTool targets
 #
 
 exec-buildtool-build:
-	@( cd $(BUILDTOOL_PATH); make deploy )
+	@( cd $(BUILDTOOL_PATH); $(MAKE) -s deploy )
 
 
 #
@@ -534,6 +570,15 @@ exec-download-contribs:
 		$(patsubst contrib://%, --contrib %, $(DOWNLOAD_CONTRIBS)) \
 		--contrib-cache "$(QOOXDOO_INCLUDE_CACHE)"
 
+
+#
+# lint targets
+#
+lint:
+	$(SILENCE) python -c "import sys; src=sys.argv[1]; print src.replace(\"--class-path\", \"\").replace(\",\", \" \")" "$(COMPUTED_CLASS_PATH)" | \
+		xargs find | \
+		grep "\.js\$$" | \
+		xargs $(CMD_LINT) -gqx -gqxsettings -gqxvariants -g$(APPLICATION_NAMESPACE) $(patsubst %,-g%,$(LINT_ALLOWED_GLOBALS))
 
 
 #
