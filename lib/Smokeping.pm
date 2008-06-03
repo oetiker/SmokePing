@@ -651,7 +651,7 @@ sub target_menu($$$$;$){
             $menuextra = undef;
         }
         if ($menuextra){
-            $menuextra =~ s/##host##/$host/g;
+            $menuextra =~ s/{HOST}/#$host/g;
         } else {
             $menuextra = '';
         }
@@ -2223,7 +2223,7 @@ The slave names must match the slaves you have setup in the slaves section.
 DOC
            menuextra => { 
                         _doc => <<DOC },
-A bit of html to append after the menu entry. You can embedd the name of the current host into it using C<##host##>.
+A bit of html to append after the menu entry. You can embedd the name of the current host into it using C<{HOST}>.
 This entry does get inherited. Use this for example to add a link to your mtr service.
 DOC
            probe => {
@@ -3393,7 +3393,7 @@ END_DOC
 How long should the master wait for its slave to answer?
 END_DOC
           },     
-          "/$KEYD_RE/" => {
+          "/$KEYDD_RE/" => {
               _vars => [ qw(display_name location color) ],
               _mandatory => [ qw(display_name color) ],
               _sections => [ qw(override) ],
@@ -3519,7 +3519,7 @@ DOC
 List of slave servers. It gets inherited by all targets.
 DOC
                    menuextra => { _doc => <<DOC },
-HTML String to be added to the end of each menu entry. The C<##host##> entry will be replaces by the
+HTML String to be added to the end of each menu entry. The C<{HOST}> entry will be replaces by the
 host of the relevant section if there is one.
 DOC
 
