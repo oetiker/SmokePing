@@ -9,7 +9,9 @@ sub GetAccessibility {
 
 sub launch {
      my $error = shift;
-     $SIG{CHLD} = \&REAPER;
+     my $rounds = shift;
+     my $delay = shift;
+     my $host = shift;
      defined(my $pid = fork) or do { $error->set_error(101,"Can't fork: $!");return $error};
      if ($pid){
         open my $x, ">/tmp/mtr_session.$pid" or do {
@@ -25,7 +27,10 @@ sub launch {
      open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
      setsid                  or die "Can't start a new session: $!";
      open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
-     exec @_;
+     for (my $i = 0; $i<$rounds;$i++){
+        system "traceroute","-I","-q","1",$host;
+        sleep $delay;
+     }
 }
 
 sub get_number {
@@ -64,7 +69,7 @@ sub method_run_mtr
         return $delay if ref $delay;
         my $rounds = get_number($error,$arg->{rounds});
         return $rounds if ref $rounds;
-        $handle = launch ($error,"mtr","-4","--raw","--report-cycles=$rounds","--interval=$delay",$arg->{host});
+        $handle = launch ($error,$rounds,$delay,$arg->{host});
         $point = 0;
     }
     return $point if ref $point;
@@ -87,22 +92,21 @@ sub method_run_mtr
         if (seek $fh, $point,0){
             my @array;
             while (<$fh>){
-                if (not /^[a-z]\s/){
-                    waitpid($handle,WNOHANG);
-                    if (/Name or service not known/){
-                        $error->set_error(108,"Unknown hostname.");
-                        return $error;
-                    }
+                waitpid($handle,WNOHANG);
+                if (/unknown host/){
+                    $error->set_error(108,"Unknown hostname.");
+                    return $error;
+                }
                     else {
                         $error->set_error(107,"ERROR: $_. See $data for more information.");
                         return $error;
                     }
                 }                        
                 last unless /\n$/; # stop when we find an incomplete line
+                /^\s*(\d+)\s+(\S+)\s+\((\S+?)\)\s+(\S+)\s+ms/ or next;
+                push @array, [$1,$2,$3,$4];
                 $point = tell($fh);
                 chomp;
-                my @line = split (/\s+/,$_);
-                push @array,\@line;
             };
             close $fh;
             unlink $data unless $again;

@@ -84,13 +84,14 @@ qx.Class.define('Mtr.ui.TraceTable',
                     }
                     self.__handle = retval['handle'];
                     var tableModel = self.__tableModel;
-                    var rowcount = tableModel.getRowCount();
                     var lines = retval['output'].length;
                     var data = self.__data;
                     for(var i=0;i<lines;i++){
-                        var cmd = retval['output'][i][0];
-                        var row = retval['output'][i][1];
-                        var value = retval['output'][i][2];
+                        var hop = retval['output'][i][0];
+                        var host = retval['output'][i][1];
+                        var ip = retval['output'][i][2];
+                        var rtt = retval['output'][i][3];
+                        for(var ii=hop;data[ii][0]<hop                        
                        if (rowcount <= row){
                             for (var ii=rowcount;rowcount <= row;rowcount++){
                                 data.push(self.__make_empty_row());
