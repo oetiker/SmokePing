@@ -40,8 +40,9 @@ qx.Class.define('Tr.ui.TraceTable',
 			});
         };
       	var tcm = this.getTableColumnModel();
-        
-        tcm.setDataCellRenderer(0, new Tr.ui.Cellrenderer(2));
+        this.__tcm = tcm;
+
+        //tcm.setDataCellRenderer(0, new Tr.ui.Cellrenderer(2));
         tcm.setDataCellRenderer(3, new Tr.ui.Cellrenderer(0,' %'));
         tcm.setDataCellRenderer(4, new Tr.ui.Cellrenderer(0));
         
@@ -56,8 +57,8 @@ qx.Class.define('Tr.ui.TraceTable',
         var resizeBehavior = tcm.getBehavior();
         // This uses the set() method to set all attriutes at once; uses flex
         resizeBehavior.set(0, { width:"2*"});
-        resizeBehavior.set(1, { width:"10*"});
-        resizeBehavior.set(2, { width:"6*"});
+        resizeBehavior.set(1, { width:"8*"});
+        resizeBehavior.set(2, { width:"4*"});
 
         for (var i=3;i<10;i++){
             resizeBehavior.set(i, { width:"2*"});
@@ -103,7 +104,7 @@ qx.Class.define('Tr.ui.TraceTable',
                         }
                         if (ii == max || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host) ){
                             if (ii < max){
-                                hop = data[ii][0] + 0.01;
+                                hop = data[ii][0] + 0.1;                                
                             }
                             data.splice(ii,0,self.__make_empty_row());
                             data[ii][0] = hop;

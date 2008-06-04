@@ -42,7 +42,7 @@ qx.Class.define('Tr.Application',
             top.set({
                 height: 'auto'
             });
-			var title = new qx.ui.basic.Atom(this.tr("Smokeping Traceroute Frontend"));
+			var title = new qx.ui.basic.Atom(this.tr("SmokeTraceroute"));
 			with(title){
             	setTextColor('#b0b0b0');
             	setFont(qx.ui.core.Font.fromString('20px bold sans-serif'));

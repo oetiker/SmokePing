@@ -44,7 +44,7 @@ qx.Class.define('Tr.ui.ActionButton',
             paddingLeft: 12
         });
         this.add(lab2);
-        var delay = new qx.ui.form.Spinner(1,5,60);
+        var delay = new qx.ui.form.Spinner(1,2,60);
         delay.set({
             border: 'dark-shadow'
         });
@@ -87,14 +87,14 @@ qx.Class.define('Tr.ui.ActionButton',
             });
         };                    
 
-        host.addEventListener('keyup',function(e){if(e.keyCode = 13){start_trace()}});
+        host.addEventListener('keyup',function(e){if(e.keyCode == 13){start_trace()}});
         button.addEventListener('execute', start_trace );
 
         var history = qx.client.History.getInstance();
         var history_action = function(event){
             var targ = event.getData();
             host.setValue(targ);
-            history.addToHistory(targ,'Smokeping Tracerout to '+targ);
+            history.addToHistory(targ,'SmokeTracerout to '+targ);
             start_trace();           
         }
         history.addEventListener('request', history_action);
@@ -103,7 +103,7 @@ qx.Class.define('Tr.ui.ActionButton',
         var initial_host = qx.client.History.getInstance().getState();
         if (initial_host){
             host.setValue(initial_host);
-            history.addToHistory(initial_host,'Smokeping Tracerout to '+initial_host);        
+            history.addToHistory(initial_host,'SmokeTracerout to '+initial_host);        
             // dispatch this task once all the initializations are done
             qx.client.Timer.once(start_trace,this,0);
         }        

@@ -1,6 +1,5 @@
-#!/usr/sepp/bin/perl-5.8.8 -w
+#!/usr/sepp/bin/speedy-5.8.8 -w
 use strict;
-$ENV{PATH}="/usr/pack/mtr-0.72-mo/amd64-debian-linux3.1/sbin";
 use lib qw( perl );
 
 use CGI;
@@ -8,7 +7,7 @@ use CGI::Util qw(expires);
 use CGI::Session;
 use Qooxdoo::JSONRPC;
 
-$Qooxdoo::JSONRPC::debug=1;
+#$Qooxdoo::JSONRPC::debug=1;
 
 # Change this space-separated list of directories to include
 # Qooxdoo::JSONRPC.pm and co-located Services
