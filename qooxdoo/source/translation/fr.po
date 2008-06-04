@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-05 01:00+0200\n"
+"POT-Creation-Date: 2008-06-05 01:21+0200\n"
 "PO-Revision-Date: 2007-10-19 09:30+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -28,23 +28,23 @@ msgstr ""
 msgid "Delay"
 msgstr ""
 
-#: source/class/Tr/ui/ActionButton.js:54
+#: source/class/Tr/ui/ActionButton.js:55
 msgid "Rounds"
 msgstr ""
 
-#: source/class/Tr/ui/ActionButton.js:122
+#: source/class/Tr/ui/ActionButton.js:126
 msgid "Starting"
 msgstr ""
 
-#: source/class/Tr/ui/ActionButton.js:131
+#: source/class/Tr/ui/ActionButton.js:135
 msgid "Stopping"
 msgstr ""
 
-#: source/class/Tr/ui/ActionButton.js:140
+#: source/class/Tr/ui/ActionButton.js:144
 msgid "Go"
 msgstr ""
 
-#: source/class/Tr/ui/ActionButton.js:148
+#: source/class/Tr/ui/ActionButton.js:152
 msgid "Stop"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgid "Loss [%]"
 msgstr ""
 
 #: source/class/Tr/ui/TraceTable.js:25
-msgid "Sent [ms]"
+msgid "Sent"
 msgstr ""
 
 #: source/class/Tr/ui/TraceTable.js:26

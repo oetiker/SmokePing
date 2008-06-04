@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTR-AJAX-Frontend 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-05 01:00+0200\n"
+"POT-Creation-Date: 2008-06-05 01:21+0200\n"
 "PO-Revision-Date: 2008-05-31 08:50+0200\n"
 "Last-Translator: oetiker <(null)>\n"
 "Language-Team: English <en@li.org>\n"
@@ -27,25 +27,25 @@ msgstr "Host"
 msgid "Delay"
 msgstr "Abstand"
 
-#: source/class/Tr/ui/ActionButton.js:54
+#: source/class/Tr/ui/ActionButton.js:55
 msgid "Rounds"
 msgstr "Runden"
 
-#: source/class/Tr/ui/ActionButton.js:122
+#: source/class/Tr/ui/ActionButton.js:126
 #, fuzzy
 msgid "Starting"
 msgstr "Start"
 
-#: source/class/Tr/ui/ActionButton.js:131
+#: source/class/Tr/ui/ActionButton.js:135
 #, fuzzy
 msgid "Stopping"
 msgstr "Stop"
 
-#: source/class/Tr/ui/ActionButton.js:140
+#: source/class/Tr/ui/ActionButton.js:144
 msgid "Go"
 msgstr "Start"
 
-#: source/class/Tr/ui/ActionButton.js:148
+#: source/class/Tr/ui/ActionButton.js:152
 msgid "Stop"
 msgstr "Stop"
 
@@ -66,7 +66,8 @@ msgid "Loss [%]"
 msgstr "Loss [%]"
 
 #: source/class/Tr/ui/TraceTable.js:25
-msgid "Sent [ms]"
+#, fuzzy
+msgid "Sent"
 msgstr "Gesendet"
 
 #: source/class/Tr/ui/TraceTable.js:26
