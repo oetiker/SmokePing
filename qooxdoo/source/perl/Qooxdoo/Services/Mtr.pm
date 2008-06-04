@@ -85,7 +85,7 @@ sub method_run_mtr
             # this is especially important when running with speedy of fastcgi
             waitpid($handle,WNOHANG);
             $again = kill(0, $handle);
-            usleep(1000*200) if $rounds;
+            usleep(1000*300) if $rounds;
 #           print STDERR "$again, $handle, $size, $point\n";
             $rounds ++;
         } while ($again and $point >= $size);
@@ -93,20 +93,26 @@ sub method_run_mtr
             my @array;
             while (<$fh>){
                 waitpid($handle,WNOHANG);
+                /^traceroute to/ && next;
                 if (/unknown host/){
                     $error->set_error(108,"Unknown hostname.");
                     return $error;
                 }
-                    else {
-                        $error->set_error(107,"ERROR: $_. See $data for more information.");
-                        return $error;
-                    }
-                }                        
                 last unless /\n$/; # stop when we find an incomplete line
-                /^\s*(\d+)\s+(\S+)\s+\((\S+?)\)\s+(\S+)\s+ms/ or next;
-                push @array, [$1,$2,$3,$4];
-                $point = tell($fh);
-                chomp;
+                if (/^\s*(\d+)\s+(\S+)\s+\((\S+?)\)\s+(\S+)\s+ms/){
+                    my ($hop,$host,$ip,$value) = ($1,$2,$3,$4);
+                    $value = undef unless $value =~ /^\d+(\.\d+)?$/;
+                    push @array, [$hop,$host,$ip,$value];
+                    $point = tell($fh);
+                }
+                elsif (/^\s*(\d+)\s+\*/){
+                    push @array, [$1,undef,undef,undef];
+                    $point = tell($fh);
+                }
+                else {
+                    $error->set_error(107,"ERROR: $_. See $data for more information.");
+                    return $error;
+                }
             };
             close $fh;
             unlink $data unless $again;

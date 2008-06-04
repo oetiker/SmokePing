@@ -40,7 +40,8 @@ qx.Class.define('Mtr.ui.TraceTable',
 			});
         };
       	var tcm = this.getTableColumnModel();
-
+        
+        tcm.setDataCellRenderer(0, new Mtr.ui.Cellrenderer(2));
         tcm.setDataCellRenderer(3, new Mtr.ui.Cellrenderer(0,' %'));
         tcm.setDataCellRenderer(4, new Mtr.ui.Cellrenderer(0));
         
@@ -54,12 +55,12 @@ qx.Class.define('Mtr.ui.TraceTable',
         // Obtain the behavior object to manipulate
         var resizeBehavior = tcm.getBehavior();
         // This uses the set() method to set all attriutes at once; uses flex
-        resizeBehavior.set(0, { width:"1*", minWidth:20, maxWidth:30  });
-        resizeBehavior.set(1, { width:"10*", minWidth:80, maxWidth:300 });
-        resizeBehavior.set(2, { width:"6*", minWidth:60, maxWidth:200 });
+        resizeBehavior.set(0, { width:"2*"});
+        resizeBehavior.set(1, { width:"10*"});
+        resizeBehavior.set(2, { width:"6*"});
 
         for (var i=3;i<10;i++){
-            resizeBehavior.set(i, { width:"2*", minWidth:40, maxWidth:100 });
+            resizeBehavior.set(i, { width:"2*"});
         }
         qx.event.message.Bus.subscribe('mtr.cmd',this.__handle_mtr,this);
     },
@@ -71,7 +72,7 @@ qx.Class.define('Mtr.ui.TraceTable',
     */
 	members: {
         __make_empty_row: function (){            
-            return ([undefined,'waiting for name','waiting for ip',0,0,undefined,undefined,undefined,undefined,undefined,0,0,0]);
+            return ([undefined,undefined,undefined,0,0,undefined,undefined,undefined,undefined,undefined,0,0,0]);
         },
         __handle_mtr: function(m){
             var self = this;
@@ -90,71 +91,50 @@ qx.Class.define('Mtr.ui.TraceTable',
                         var hop = retval['output'][i][0];
                         var host = retval['output'][i][1];
                         var ip = retval['output'][i][2];
-                        var rtt = retval['output'][i][3];
-                        for(var ii=hop;data[ii][0]<hop                        
-                       if (rowcount <= row){
-                            for (var ii=rowcount;rowcount <= row;rowcount++){
-                                data.push(self.__make_empty_row());
-                            };
-                        }; 
-                        var drow = data[row];
-                        drow[f_hop] = row+1;
-                        switch(cmd){
-                        case 'h':
-                            drow[f_ip] = value;
-                            break;
-                        case 'd':
-                            drow[f_host] = value;
-                            break; 
-                        case 'p':
-                            var snt = data[0][f_snt];
-                            if (row == 0) {
-                                snt++;
-                                for (ii=0;ii<rowcount;ii++){                                    
-                                    if (retval['again'] && snt > data[ii][f_cnt]){
-                                        data[ii][f_snt] = snt-1;
-                                    } else {
-                                        data[ii][f_snt] = snt;
-                                    }
-                                    data[ii][f_loss]=(1-data[ii][f_cnt]/data[ii][f_snt])*100;
-                                }
-                            }                            
-                            value = value/1000.0;
-                            drow[f_last] = value;
-
-                            var best = drow[f_best];
-                            if (best == undefined || best > value){
-                                drow[f_best] = value;     
+                        var value = retval['output'][i][3];
+                        var ii = 0;
+                        var max = data.length;
+                        while (ii < max && ( Math.floor(data[ii][0]) < hop || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host))){
+                            ii++;
+                        }
+                        if (ii == max || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host) ){
+                            if (ii < max){
+                                hop = data[ii][0] + 0.01;
                             }
+                            data.splice(ii,0,self.__make_empty_row());
+                            data[ii][0] = hop;
+                        }
 
-                            var worst = drow[f_worst]; 
-                            if (worst == undefined || worst < value){
-                                drow[f_worst] = value;     
-                            }
+                        var drow = data[ii];
+                        if (drow[f_host] == undefined){
+                            drow[f_host] = host;
+                        }
+                        if (drow[f_ip] == undefined){
+                            drow[f_ip] = ip;
+                        }
+                        drow[f_snt]++;
+                        drow[f_last] = value;
+                        var best = drow[f_best];
+                        if (best == undefined || best > value){
+                            drow[f_best] = value;     
+                        }
+                        var worst = drow[f_worst]; 
+                        if (worst == undefined || worst < value){
+                            drow[f_worst] = value;     
+                        }
                                 
-                            var cnt =  drow[f_cnt]+1;
 
-                            if (cnt > drow[f_snt]){
-                                drow[f_snt] = cnt;
-                            }
-
-                            drow[f_cnt] = cnt;
-
-                            drow[f_loss] = (1-cnt/drow[f_snt])*100;
-
-                            var sum =  drow[f_sum]+value;
-                            drow[f_sum] = sum;    
+                        if (value != undefined){
+                            drow[f_sum] += value;                            
+                            var sum = drow[f_sum];
+                            drow[f_cnt] ++;
+                            var cnt = drow[f_cnt];
                             var sqsum =  drow[f_sqsum]+value*value;
                             drow[f_sqsum] = sqsum;    
-
-                            drow[f_avg] = sum/cnt;
+                            drow[f_avg] = drow[f_sum]/drow[f_cnt];
                             drow[f_stdev] = Math.sqrt((cnt*sqsum-sum*sum)/(cnt*(cnt-1)))
-                            break;
-
-                        default:
-                            self.debug(row);
-                            break;
                         }
+                        drow[f_loss] = ((drow[f_snt]-drow[f_cnt])/drow[f_snt])*100;
                     } 
 
                     tableModel.setData(data);
@@ -197,7 +177,7 @@ qx.Class.define('Mtr.ui.TraceTable',
                 Mtr.Server.getInstance().callAsync(handle_returns,'stop_mtr',this.__handle);
                 break;
             case 'go':
-                this.__data = [this.__make_empty_row()];
+                this.__data = [];
                 this.__tableModel.setData(this.__data);
                 this.__delay = cmd['delay'];
                 for (var i=0;i<10;i++){
