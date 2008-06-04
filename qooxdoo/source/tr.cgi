@@ -1,6 +1,7 @@
 #!/usr/sepp/bin/speedy-5.8.8 -w
 use strict;
-use lib qw( perl );
+use lib qw(/home/oposs/smokeping/software/lib);
+use lib qw(perl);
 
 use CGI;
 use CGI::Util qw(expires);

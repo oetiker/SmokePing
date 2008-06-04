@@ -46,7 +46,8 @@ qx.Class.define('Tr.ui.ActionButton',
         this.add(lab2);
         var delay = new qx.ui.form.Spinner(1,2,60);
         delay.set({
-            border: 'dark-shadow'
+            border: 'dark-shadow',
+            width: 45
         });
         this.add(delay);
         this.__delay = delay;
@@ -59,7 +60,8 @@ qx.Class.define('Tr.ui.ActionButton',
         this.add(lab3);
         var rounds = new qx.ui.form.Spinner(1,20,200);
         rounds.set({
-            border: 'dark-shadow'
+            border: 'dark-shadow',
+            width: 45
         });
         this.add(rounds);
         this.__rounds = rounds;
@@ -68,7 +70,7 @@ qx.Class.define('Tr.ui.ActionButton',
         this.__button = button;
 		button.set({
             marginLeft: 10,
-            width: 50,
+            width: 60,
             height: 'auto',
             border: 'dark-shadow',
             padding: 2
@@ -87,14 +89,16 @@ qx.Class.define('Tr.ui.ActionButton',
             });
         };                    
 
-        host.addEventListener('keyup',function(e){if(e.keyCode == 13){start_trace()}});
+//      var self=this;
+//      host.addEventListener('keyup',function(e){if(e.getKeyIdentifier() == 'Enter'){start_trace()}});
+        host.addEventListener('execute',start_trace);
         button.addEventListener('execute', start_trace );
 
         var history = qx.client.History.getInstance();
         var history_action = function(event){
             var targ = event.getData();
             host.setValue(targ);
-            history.addToHistory(targ,'SmokeTracerout to '+targ);
+            history.addToHistory(targ,'SmokeTraceroute to '+targ);
             start_trace();           
         }
         history.addEventListener('request', history_action);
@@ -103,7 +107,7 @@ qx.Class.define('Tr.ui.ActionButton',
         var initial_host = qx.client.History.getInstance().getState();
         if (initial_host){
             host.setValue(initial_host);
-            history.addToHistory(initial_host,'SmokeTracerout to '+initial_host);        
+            history.addToHistory(initial_host,'SmokeTraceroute to '+initial_host);        
             // dispatch this task once all the initializations are done
             qx.client.Timer.once(start_trace,this,0);
         }        

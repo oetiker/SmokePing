@@ -22,7 +22,7 @@ qx.Class.define('Tr.ui.TraceTable',
         var tableModel = new qx.ui.table.model.Simple();
         this.__tableModel = tableModel;
         tableModel.setColumns([ this.tr("Hop"), this.tr("Host"),this.tr("Ip"), 
-                                this.tr("Loss [%]"), this.tr("Sent [ms]"), this.tr("Last [ms]"), //"; help syntax highliter
+                                this.tr("Loss [%]"), this.tr("Sent"), this.tr("Last [ms]"), //"; help syntax highliter
                                 this.tr("Avg [ms]"), this.tr("Best [ms]"), this.tr("Worst [ms]"), this.tr("StDev [ms]") ]);
         var custom = {
             tableColumnModel:  function(obj) {
@@ -57,11 +57,11 @@ qx.Class.define('Tr.ui.TraceTable',
         var resizeBehavior = tcm.getBehavior();
         // This uses the set() method to set all attriutes at once; uses flex
         resizeBehavior.set(0, { width:"2*"});
-        resizeBehavior.set(1, { width:"8*"});
-        resizeBehavior.set(2, { width:"4*"});
+        resizeBehavior.set(1, { width:"9*"});
+        resizeBehavior.set(2, { width:"5*"});
 
         for (var i=3;i<10;i++){
-            resizeBehavior.set(i, { width:"2*"});
+            resizeBehavior.set(i, { width:"3*"});
         }
         qx.event.message.Bus.subscribe('tr.cmd',this.__handle_tr,this);
     },
