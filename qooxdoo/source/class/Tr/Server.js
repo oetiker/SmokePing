@@ -1,12 +1,12 @@
 /* ************************************************************************
-#module(Mtr)
+#module(Tr)
 ************************************************************************ */
 
 /**
- * A Mtr specific rpc call which works 
+ * A Tr specific rpc call which works 
  */
 
-qx.Class.define('Mtr.Server', {
+qx.Class.define('Tr.Server', {
     extend: qx.io.remote.Rpc,        
 	type:   "singleton",
 
@@ -25,8 +25,8 @@ qx.Class.define('Mtr.Server', {
         with(this){
 			base(arguments);
             setTimeout(7000000);
-            setUrl('mtr.cgi');
-            setServiceName('Mtr');
+            setUrl('tr.cgi');
+            setServiceName('Tr');
            	setCrossDomain(true);
         }
     
@@ -65,7 +65,7 @@ qx.Class.define('Mtr.Server', {
 		setLocalUrl: function(local_url){
 			if ( document.location.host === '' ) {
 				with(this){
-	            	setUrl(local_url+'mtr.cgi');
+	            	setUrl(local_url+'tr.cgi');
 				}
 	        }
 		}

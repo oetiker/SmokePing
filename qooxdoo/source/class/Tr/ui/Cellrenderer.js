@@ -1,20 +1,20 @@
 /* ************************************************************************
 
-   Mtr Frontend
+   Tr Frontend
 
    Author:
      * Tobias Oetiker
 
 ************************************************************************ */
 /* ************************************************************************
-#module(Mtr)
+#module(Tr)
 ************************************************************************ */
 
 /**
  * A configurable cell renderre
  */
 
-qx.Class.define('Mtr.ui.Cellrenderer', 
+qx.Class.define('Tr.ui.Cellrenderer', 
 {
     extend: qx.ui.table.cellrenderer.Number,
     /**

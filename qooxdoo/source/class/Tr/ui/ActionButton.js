@@ -1,12 +1,12 @@
 /* ************************************************************************
-#module(Mtr)
+#module(Tr)
 ************************************************************************ */
 
 /**
- * a widget showing the Mtr graph overview
+ * a widget showing the Tr graph overview
  */
 
-qx.Class.define('Mtr.ui.ActionButton', 
+qx.Class.define('Tr.ui.ActionButton', 
 {
     extend: qx.ui.layout.HorizontalBoxLayout,        
 
@@ -38,7 +38,6 @@ qx.Class.define('Mtr.ui.ActionButton',
         });
         this.add(host);
         this.__host = host;
-
         var lab2 = new qx.ui.basic.Label(this.tr("Delay"));
         lab2.set({
             paddingRight: 6,
@@ -76,11 +75,11 @@ qx.Class.define('Mtr.ui.ActionButton',
         });
         this.add(button);
 
-   		qx.event.message.Bus.subscribe('mtr.status',this.__set_status,this);
-        qx.event.message.Bus.dispatch('mtr.status','stopped');
+   		qx.event.message.Bus.subscribe('tr.status',this.__set_status,this);
+        qx.event.message.Bus.dispatch('tr.status','stopped');
     
         var start_trace = function(event) {            
-            qx.event.message.Bus.dispatch('mtr.cmd',{
+            qx.event.message.Bus.dispatch('tr.cmd',{
                     action: button.getUserData('action'),
                     host:   host.getValue(),
                     delay:  delay.getValue(),
@@ -88,18 +87,23 @@ qx.Class.define('Mtr.ui.ActionButton',
             });
         };                    
 
+        host.addEventListener('keyup',function(e){if(e.keyCode = 13){start_trace()}});
         button.addEventListener('execute', start_trace );
 
+        var history = qx.client.History.getInstance();
         var history_action = function(event){
-            host.setValue(event.getData());            
+            var targ = event.getData();
+            host.setValue(targ);
+            history.addToHistory(targ,'Smokeping Tracerout to '+targ);
             start_trace();           
         }
-        qx.client.History.getInstance().addEventListener('request', history_action);
+        history.addEventListener('request', history_action);
 
         // if we got called with a host on the commandline
         var initial_host = qx.client.History.getInstance().getState();
         if (initial_host){
             host.setValue(initial_host);
+            history.addToHistory(initial_host,'Smokeping Tracerout to '+initial_host);        
             // dispatch this task once all the initializations are done
             qx.client.Timer.once(start_trace,this,0);
         }        

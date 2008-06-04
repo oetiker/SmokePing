@@ -1,12 +1,12 @@
 /* ************************************************************************
-#module(Mtr)
+#module(Tr)
 ************************************************************************ */
 
 /**
- * a widget showing the Mtr target tree
+ * a widget showing the Tr target tree
  */
 
-qx.Class.define('Mtr.ui.TraceTable', 
+qx.Class.define('Tr.ui.TraceTable', 
 {
     extend: qx.ui.table.Table,        
 
@@ -41,11 +41,11 @@ qx.Class.define('Mtr.ui.TraceTable',
         };
       	var tcm = this.getTableColumnModel();
         
-        tcm.setDataCellRenderer(0, new Mtr.ui.Cellrenderer(2));
-        tcm.setDataCellRenderer(3, new Mtr.ui.Cellrenderer(0,' %'));
-        tcm.setDataCellRenderer(4, new Mtr.ui.Cellrenderer(0));
+        tcm.setDataCellRenderer(0, new Tr.ui.Cellrenderer(2));
+        tcm.setDataCellRenderer(3, new Tr.ui.Cellrenderer(0,' %'));
+        tcm.setDataCellRenderer(4, new Tr.ui.Cellrenderer(0));
         
-        var render_ms = new Mtr.ui.Cellrenderer(1);
+        var render_ms = new Tr.ui.Cellrenderer(1);
 
         for (var i=5;i<10;i++){
             tcm.setDataCellRenderer(i, render_ms);
@@ -62,7 +62,7 @@ qx.Class.define('Mtr.ui.TraceTable',
         for (var i=3;i<10;i++){
             resizeBehavior.set(i, { width:"2*"});
         }
-        qx.event.message.Bus.subscribe('mtr.cmd',this.__handle_mtr,this);
+        qx.event.message.Bus.subscribe('tr.cmd',this.__handle_tr,this);
     },
 
     /*
@@ -74,14 +74,14 @@ qx.Class.define('Mtr.ui.TraceTable',
         __make_empty_row: function (){            
             return ([undefined,undefined,undefined,0,0,undefined,undefined,undefined,undefined,undefined,0,0,0]);
         },
-        __handle_mtr: function(m){
+        __handle_tr: function(m){
             var self = this;
             var f_hop = 0,f_host=1,f_ip=2,f_loss=3,f_snt=4,f_last=5,f_avg=6,f_best=7,f_worst=8,f_stdev=9,f_cnt=10,f_sum=11,f_sqsum=12;
             var fill_table;
             fill_table = function(retval,exc,id){
                 if (exc == null){ 
                     if ( self.__handle == undefined ) {
-                        qx.event.message.Bus.dispatch('mtr.status','started');
+                        qx.event.message.Bus.dispatch('tr.status','started');
                     }
                     self.__handle = retval['handle'];
                     var tableModel = self.__tableModel;
@@ -94,7 +94,11 @@ qx.Class.define('Mtr.ui.TraceTable',
                         var value = retval['output'][i][3];
                         var ii = 0;
                         var max = data.length;
-                        while (ii < max && ( Math.floor(data[ii][0]) < hop || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host))){
+                        while ( ii < max 
+                                && ( Math.floor(data[ii][0]) < hop 
+                                     || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host)
+                                   )
+                               ){
                             ii++;
                         }
                         if (ii == max || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host) ){
@@ -139,8 +143,8 @@ qx.Class.define('Mtr.ui.TraceTable',
 
                     tableModel.setData(data);
                     if (retval['again']){
-                        var next_round = function (){Mtr.Server.getInstance().callAsync(
-                                                     fill_table,'run_mtr',{ handle: retval['handle'],
+                        var next_round = function (){Tr.Server.getInstance().callAsync(
+                                                     fill_table,'run_tr',{ handle: retval['handle'],
                                                                             point:  retval['point']})};
                         qx.client.Timer.once(next_round,self,0);
                     } else
@@ -148,7 +152,7 @@ qx.Class.define('Mtr.ui.TraceTable',
                         for (var i=0;i<10;i++){
                             tableModel.setColumnSortable(i,true);
                         }
-                        qx.event.message.Bus.dispatch('mtr.status','stopped');
+                        qx.event.message.Bus.dispatch('tr.status','stopped');
                         self.__handle = undefined;
                     }
                 }
@@ -160,7 +164,7 @@ qx.Class.define('Mtr.ui.TraceTable',
                     for (var i=0;i<10;i++){
                         self.__tableModel.setColumnSortable(i,true);
                     }
-                    qx.event.message.Bus.dispatch('mtr.status','stopped');
+                    qx.event.message.Bus.dispatch('tr.status','stopped');
                 }				
             };
 
@@ -173,8 +177,8 @@ qx.Class.define('Mtr.ui.TraceTable',
             var cmd = m.getData();
             switch(cmd['action']){
             case 'stop':
-                qx.event.message.Bus.dispatch('mtr.status','stopping');
-                Mtr.Server.getInstance().callAsync(handle_returns,'stop_mtr',this.__handle);
+                qx.event.message.Bus.dispatch('tr.status','stopping');
+                Tr.Server.getInstance().callAsync(handle_returns,'stop_tr',this.__handle);
                 break;
             case 'go':
                 this.__data = [];
@@ -183,8 +187,8 @@ qx.Class.define('Mtr.ui.TraceTable',
                 for (var i=0;i<10;i++){
                     this.__tableModel.setColumnSortable(i,false);
                 }                
-                qx.event.message.Bus.dispatch('mtr.status','starting');
-                Mtr.Server.getInstance().callAsync(fill_table,'run_mtr',{host: cmd['host'], rounds: cmd['rounds'], delay: cmd['delay']});
+                qx.event.message.Bus.dispatch('tr.status','starting');
+                Tr.Server.getInstance().callAsync(fill_table,'run_tr',{host: cmd['host'], rounds: cmd['rounds'], delay: cmd['delay']});
                 break;
             default:
                 alert('Unknown Command '+cmd['action']);

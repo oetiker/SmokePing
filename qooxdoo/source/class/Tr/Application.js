@@ -1,12 +1,12 @@
 /* ************************************************************************
 
-#module(Mtr)
-#resource(Mtr.image:image)
-#embed(Mtr.image/*)
+#module(Tr)
+#resource(Tr.image:image)
+#embed(Tr.image/*)
 
 ************************************************************************ */
 
-qx.Class.define('Mtr.Application', 
+qx.Class.define('Tr.Application', 
 {
     extend: qx.application.Gui,
        
@@ -18,14 +18,14 @@ qx.Class.define('Mtr.Application',
             this.base(arguments);
 
 	        qx.io.Alias.getInstance().add(
-    	       'MT', qx.core.Setting.get('Mtr.resourceUri')
+    	       'MT', qx.core.Setting.get('Tr.resourceUri')
         	);
 
   			// if we run with a file:// url make sure 
-			// the app finds the Mtr service (Mtr.cgi)
+			// the app finds the Tr service (Tr.cgi)
 
-            Mtr.Server.getInstance().setLocalUrl(
-			    'http://johan.oetiker.ch/~oetiker/mtr/'
+            Tr.Server.getInstance().setLocalUrl(
+			    'http://johan.oetiker.ch/~oetiker/tr/'
             );
 
             var base_layout = new qx.ui.layout.VerticalBoxLayout();
@@ -42,23 +42,23 @@ qx.Class.define('Mtr.Application',
             top.set({
                 height: 'auto'
             });
-			var title = new qx.ui.basic.Atom(this.tr("MTR AJAX Frontend"));
+			var title = new qx.ui.basic.Atom(this.tr("Smokeping Traceroute Frontend"));
 			with(title){
             	setTextColor('#b0b0b0');
             	setFont(qx.ui.core.Font.fromString('20px bold sans-serif'));
 			}
 			top.add(title);
             top.add(new qx.ui.basic.HorizontalSpacer());
-            top.add(new Mtr.ui.ActionButton());
+            top.add(new Tr.ui.ActionButton());
             base_layout.add(top);
-			var trace = new Mtr.ui.TraceTable();
+			var trace = new Tr.ui.TraceTable();
             base_layout.add(trace);
         },
         
         close : function(e)
         {
             this.base(arguments);
-            // return "Mtr Web UI: "
+            // return "Tr Web UI: "
             //      + "Do you really want to close the application?";
         },
         
@@ -83,7 +83,7 @@ qx.Class.define('Mtr.Application',
     */
 
     settings : {
-			'Mtr.resourceUri' : './resource'
+			'Tr.resourceUri' : './resource'
 	}
 });
  

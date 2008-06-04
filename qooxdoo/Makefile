@@ -44,13 +44,13 @@ QOOXDOO_URI = ../qooxdoolink
 # Namespace of your application e.g. custom
 # Even complexer stuff is possible like: net.sf.custom
 #
-APPLICATION_NAMESPACE = Mtr
+APPLICATION_NAMESPACE = Tr
 
 #
 # Files that will be copied from the source directory into the build
 # directory (space separated list). The default list is empty.
 #
-APPLICATION_FILES = index.html mtr.cgi perl
+APPLICATION_FILES = index.html tr.cgi perl
 # APPLICATION_BUILD_LOG_LEVEL = debug
 APPLICATION_BUILD_LOG_LEVEL = off
 

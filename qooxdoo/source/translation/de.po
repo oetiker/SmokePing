@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTR-AJAX-Frontend 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-02 20:43+0200\n"
+"POT-Creation-Date: 2008-06-04 23:29+0200\n"
 "PO-Revision-Date: 2008-05-31 08:50+0200\n"
 "Last-Translator: oetiker <(null)>\n"
 "Language-Team: English <en@li.org>\n"
@@ -15,75 +15,79 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: source/class/Mtr/Application.js:45
-msgid "MTR AJAX Frontend"
-msgstr "MTR Ajax Frontend"
+#: source/class/Mtr/ui/TraceTable.js:24 source/class/Tr/ui/TraceTable.js:24
+msgid "Hop"
+msgstr "Schritt"
 
-#: source/class/Mtr/ui/ActionButton.js:27 source/class/Mtr/ui/TraceTable.js:24
+#: source/class/Mtr/ui/TraceTable.js:24 source/class/Tr/ui/ActionButton.js:27
+#: source/class/Tr/ui/TraceTable.js:24
 msgid "Host"
 msgstr "Host"
 
-#: source/class/Mtr/ui/ActionButton.js:42
+#: source/class/Mtr/ui/TraceTable.js:24 source/class/Tr/ui/TraceTable.js:24
+msgid "Ip"
+msgstr "Ip"
+
+#: source/class/Mtr/ui/TraceTable.js:25 source/class/Tr/ui/TraceTable.js:25
+msgid "Last [ms]"
+msgstr "Letzte [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:25 source/class/Tr/ui/TraceTable.js:25
+msgid "Loss [%]"
+msgstr "Loss [%]"
+
+#: source/class/Mtr/ui/TraceTable.js:25 source/class/Tr/ui/TraceTable.js:25
+msgid "Sent [ms]"
+msgstr "Gesendet"
+
+#: source/class/Mtr/ui/TraceTable.js:26 source/class/Tr/ui/TraceTable.js:26
+msgid "Avg [ms]"
+msgstr "ø [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:26 source/class/Tr/ui/TraceTable.js:26
+msgid "Best [ms]"
+msgstr "Best [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:26 source/class/Tr/ui/TraceTable.js:26
+msgid "StDev [ms]"
+msgstr "StdAbw [ms]"
+
+#: source/class/Mtr/ui/TraceTable.js:26 source/class/Tr/ui/TraceTable.js:26
+msgid "Worst [ms]"
+msgstr "Worst [ms]"
+
+#: source/class/Tr/Application.js:45
+msgid "Smokeping Traceroute Frontend"
+msgstr ""
+
+#: source/class/Tr/ui/ActionButton.js:41
 msgid "Delay"
 msgstr "Abstand"
 
-#: source/class/Mtr/ui/ActionButton.js:55
+#: source/class/Tr/ui/ActionButton.js:54
 msgid "Rounds"
 msgstr "Runden"
 
-#: source/class/Mtr/ui/ActionButton.js:118
+#: source/class/Tr/ui/ActionButton.js:122
 #, fuzzy
 msgid "Starting"
 msgstr "Start"
 
-#: source/class/Mtr/ui/ActionButton.js:127
+#: source/class/Tr/ui/ActionButton.js:131
 #, fuzzy
 msgid "Stopping"
 msgstr "Stop"
 
-#: source/class/Mtr/ui/ActionButton.js:136
+#: source/class/Tr/ui/ActionButton.js:140
 msgid "Go"
 msgstr "Start"
 
-#: source/class/Mtr/ui/ActionButton.js:144
+#: source/class/Tr/ui/ActionButton.js:148
 msgid "Stop"
 msgstr "Stop"
 
-#: source/class/Mtr/ui/TraceTable.js:24
-msgid "Hop"
-msgstr "Schritt"
-
-#: source/class/Mtr/ui/TraceTable.js:24
-msgid "Ip"
-msgstr "Ip"
-
-#: source/class/Mtr/ui/TraceTable.js:25
-msgid "Last [ms]"
-msgstr "Letzte [ms]"
-
-#: source/class/Mtr/ui/TraceTable.js:25
-msgid "Loss [%]"
-msgstr "Loss [%]"
-
-#: source/class/Mtr/ui/TraceTable.js:25
-msgid "Sent [ms]"
-msgstr "Gesendet"
-
-#: source/class/Mtr/ui/TraceTable.js:26
-msgid "Avg [ms]"
-msgstr "ø [ms]"
-
-#: source/class/Mtr/ui/TraceTable.js:26
-msgid "Best [ms]"
-msgstr "Best [ms]"
-
-#: source/class/Mtr/ui/TraceTable.js:26
-msgid "StDev [ms]"
-msgstr "StdAbw [ms]"
-
-#: source/class/Mtr/ui/TraceTable.js:26
-msgid "Worst [ms]"
-msgstr "Worst [ms]"
+#~ msgid "MTR AJAX Frontend"
+#~ msgstr "MTR Ajax Frontend"
 
 #, fuzzy
 #~ msgid "Host:"
