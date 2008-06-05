@@ -29,7 +29,7 @@ sub launch {
      open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
      for (my $i = 0; $i<$rounds;$i++){
         system "traceroute","-I","-q","1",$host;        
-        print "SLEEPING\n";
+#        print "SLEEPING\n";
         sleep $delay;
      }
 }
