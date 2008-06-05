@@ -660,14 +660,6 @@ sub target_menu($$$$;$){
    	            $class = 'menuactive';
             }
    	    };
-        if ($menuextra){
-            $menuextra =~ s/{HOST}/#$host/g;
-            $menuextra =~ s/{CLASS}/$class/g;
-            $menuextra = '&nbsp;'.$menuextra;
-        } else {
-            $menuextra = '';
-        }
-
 		if ($filter){
 			if (($menu and $menu =~ /$filter/i) or ($title and $title =~ /$filter/i)){
 				push @matches, ["$path$key$suffix",$menu,$class];
@@ -676,15 +668,22 @@ sub target_menu($$$$;$){
 		}
 		else {
     	    $menu =~ s/ /&nbsp;/g;
-        	my $menuadd ="";
-		    $menuadd = "&nbsp;" x (20 - length($menu.$menuextra)) if length($menu.$menuextra) < 20;
-               my $menuclass = "menulink";
-               if ($key eq $current and !@$open) {
-                   $menuclass = "menulinkactive";
-               }
-                
-               $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="$menuclass" HREF="$path$key$suffix">$menu</a>$menuextra$menuadd</td></tr>\n};
-    	    if ($key eq $current){
+            my $menuclass = "menulink";
+            if ($key eq $current and !@$open) {
+                 $menuclass = "menulinkactive";
+             }
+             if ($menuextra){
+                 $menuextra =~ s/{HOST}/#$host/g;
+                 $menuextra =~ s/{CLASS}/$menuclass/g;
+                 $menuextra = '&nbsp;'.$menuextra;
+             } else {
+                 $menuextra = '';
+             }
+
+          	 my $menuadd ="";
+		     $menuadd = "&nbsp;" x (20 - length($menu.$menuextra)) if length($menu.$menuextra) < 20;
+             $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="$menuclass" HREF="$path$key$suffix">$menu</a>$menuextra$menuadd</td></tr>\n};
+     	    if ($key eq $current){
         	    my $prline = target_menu $tree->{$key}, $open, "$path$key.",$filter, $suffix;
 	            $print .= qq{<tr><td class="$class">&nbsp;&nbsp;</td><td align="left">$prline</td></tr>}
    		           if $prline;
