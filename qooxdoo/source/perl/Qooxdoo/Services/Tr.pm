@@ -113,6 +113,7 @@ sub method_run_tr
                 elsif (/^SLEEPING/){
                     push @array, ['SLEEPING'];
                     $point = tell($fh);
+                }
                 else {
                     $error->set_error(107,"ERROR: $_. See $data for more information.");
                     return $error;
