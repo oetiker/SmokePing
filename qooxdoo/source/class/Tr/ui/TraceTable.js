@@ -88,8 +88,14 @@ qx.Class.define('Tr.ui.TraceTable',
                     var tableModel = self.__tableModel;
                     var lines = retval['output'].length;
                     var data = self.__data;
+                    var sleep = 0;
                     for(var i=0;i<lines;i++){
+                        sleep = 0;
                         var hop = retval['output'][i][0];
+                        if (hop == 'SLEEP'){
+                            sleep = self.__delay * 1000;
+                            continue;                            
+                        }
                         var host = retval['output'][i][1];
                         var ip = retval['output'][i][2];
                         var value = retval['output'][i][3];
@@ -147,7 +153,7 @@ qx.Class.define('Tr.ui.TraceTable',
                         var next_round = function (){Tr.Server.getInstance().callAsync(
                                                      fill_table,'run_tr',{ handle: retval['handle'],
                                                                             point:  retval['point']})};
-                        qx.client.Timer.once(next_round,self,0);
+                        qx.client.Timer.once(next_round,self,sleep);
                     } else
                     {
                         for (var i=0;i<10;i++){

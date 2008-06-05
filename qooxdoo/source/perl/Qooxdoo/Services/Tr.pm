@@ -28,7 +28,8 @@ sub launch {
      setsid                  or die "Can't start a new session: $!";
      open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
      for (my $i = 0; $i<$rounds;$i++){
-        system "traceroute","-I","-q","1",$host;
+        system "traceroute","-I","-q","1",$host;        
+        print "SLEEPING\n";
         sleep $delay;
      }
 }
@@ -109,6 +110,9 @@ sub method_run_tr
                     push @array, [$1,undef,undef,undef];
                     $point = tell($fh);
                 }
+                elsif (/^SLEEPING/){
+                    push @array, ['SLEEPING'];
+                    $point = tell($fh);
                 else {
                     $error->set_error(107,"ERROR: $_. See $data for more information.");
                     return $error;
@@ -120,7 +124,7 @@ sub method_run_tr
                 handle=>$handle,
                 point=>$point,
                 output=>\@array,
-                again=> $again,                                
+                again=> $again,
             }
         }
         else {

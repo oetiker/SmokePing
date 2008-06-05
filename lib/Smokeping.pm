@@ -650,11 +650,6 @@ sub target_menu($$$$;$){
         if (not $host or $host =~ m|^/|){
             $menuextra = undef;
         }
-        if ($menuextra){
-            $menuextra =~ s/{HOST}/#$host/g;
-        } else {
-            $menuextra = '';
-        }
 		my $class = 'menuitem';
    	    if ($key eq $current ){
 			if ( @$open ) {
@@ -663,6 +658,13 @@ sub target_menu($$$$;$){
    	            $class = 'menuactive';
             }
    	    };
+        if ($menuextra){
+            $menuextra =~ s/{HOST}/$host/g;
+            $menuextra =~ s/{CLASS}/$class/g;
+            $menuextra = '&nbsp;'.$menuextra;
+        } else {
+            $menuextra = '';
+        }
 
 		if ($filter){
 			if (($menu and $menu =~ /$filter/i) or ($title and $title =~ /$filter/i)){
@@ -2223,8 +2225,9 @@ The slave names must match the slaves you have setup in the slaves section.
 DOC
            menuextra => { 
                         _doc => <<DOC },
-A bit of html to append after the menu entry. You can embedd the name of the current host into it using C<{HOST}>.
-This entry does get inherited. Use this for example to add a link to your mtr service.
+HTML String to be added to the end of each menu entry. The C<{HOST}> entry will be replaced by the
+host property of the relevant section. The C<{CLASS}> entry will be replaced by the same
+class as the other tags in the manu line.
 DOC
            probe => {
                         _sub => sub {
@@ -3519,8 +3522,9 @@ DOC
 List of slave servers. It gets inherited by all targets.
 DOC
                    menuextra => { _doc => <<DOC },
-HTML String to be added to the end of each menu entry. The C<{HOST}> entry will be replaces by the
-host of the relevant section if there is one.
+HTML String to be added to the end of each menu entry. The C<{HOST}> entry will be replaced by the
+host property of the relevant section. The C<{CLASS}> entry will be replaced by the same
+class as the other tags in the manu line.
 DOC
 
            }
