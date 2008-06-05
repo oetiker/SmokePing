@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTR-AJAX-Frontend 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-05 01:21+0200\n"
+"POT-Creation-Date: 2008-06-05 17:17+0200\n"
 "PO-Revision-Date: 2008-05-31 08:50+0200\n"
 "Last-Translator: oetiker <(null)>\n"
 "Language-Team: English <en@li.org>\n"
@@ -19,33 +19,39 @@ msgstr ""
 msgid "SmokeTraceroute"
 msgstr ""
 
-#: source/class/Tr/ui/ActionButton.js:27 source/class/Tr/ui/TraceTable.js:24
+#: source/class/Tr/Application.js:56
+msgid ""
+"SmokeTrace is part of the SmokePing suite created by Tobi Oetiker, Copyright "
+"2008."
+msgstr ""
+
+#: source/class/Tr/ui/ActionButton.js:33 source/class/Tr/ui/TraceTable.js:24
 msgid "Host"
 msgstr "Host"
 
-#: source/class/Tr/ui/ActionButton.js:41
+#: source/class/Tr/ui/ActionButton.js:47
 msgid "Delay"
 msgstr "Abstand"
 
-#: source/class/Tr/ui/ActionButton.js:55
+#: source/class/Tr/ui/ActionButton.js:61
 msgid "Rounds"
 msgstr "Runden"
 
-#: source/class/Tr/ui/ActionButton.js:126
+#: source/class/Tr/ui/ActionButton.js:152
 #, fuzzy
 msgid "Starting"
 msgstr "Start"
 
-#: source/class/Tr/ui/ActionButton.js:135
+#: source/class/Tr/ui/ActionButton.js:163
 #, fuzzy
 msgid "Stopping"
 msgstr "Stop"
 
-#: source/class/Tr/ui/ActionButton.js:144
+#: source/class/Tr/ui/ActionButton.js:172
 msgid "Go"
 msgstr "Start"
 
-#: source/class/Tr/ui/ActionButton.js:152
+#: source/class/Tr/ui/ActionButton.js:180
 msgid "Stop"
 msgstr "Stop"
 

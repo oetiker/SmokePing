@@ -8,7 +8,7 @@
 
 qx.Class.define('Tr.ui.ActionButton', 
 {
-    extend: qx.ui.layout.HorizontalBoxLayout,        
+    extend: qx.ui.layout.VerticalBoxLayout,        
 
     /*
     *****************************************************************************
@@ -22,13 +22,19 @@ qx.Class.define('Tr.ui.ActionButton',
         this.set({
             height: 'auto',
             width: 'auto',
+            horizontalChildrenAlign: 'left'
+        });
+        var hbox = new  qx.ui.layout.HorizontalBoxLayout;
+        hbox.set({
+            height: 'auto',
+            width: 'auto',
             verticalChildrenAlign: 'middle'
         });
         var lab1 = new qx.ui.basic.Label(this.tr("Host"));
         lab1.set({
             paddingRight: 6
         });
-        this.add(lab1);
+        hbox.add(lab1);
         var host = new qx.ui.form.TextField();
         host.set({
             width: 200,
@@ -36,20 +42,20 @@ qx.Class.define('Tr.ui.ActionButton',
             border: 'dark-shadow',
             padding: 1
         });
-        this.add(host);
+        hbox.add(host);
         this.__host = host;
         var lab2 = new qx.ui.basic.Label(this.tr("Delay"));
         lab2.set({
             paddingRight: 6,
             paddingLeft: 12
         });
-        this.add(lab2);
+        hbox.add(lab2);
         var delay = new qx.ui.form.Spinner(1,2,60);
         delay.set({
             border: 'dark-shadow',
             width: 45
         });
-        this.add(delay);
+        hbox.add(delay);
         this.__delay = delay;
 
         var lab3 = new qx.ui.basic.Label(this.tr("Rounds"));
@@ -57,13 +63,13 @@ qx.Class.define('Tr.ui.ActionButton',
             paddingRight: 6,
             paddingLeft: 12
         });
-        this.add(lab3);
+        hbox.add(lab3);
         var rounds = new qx.ui.form.Spinner(1,20,200);
         rounds.set({
             border: 'dark-shadow',
             width: 45
         });
-        this.add(rounds);
+        hbox.add(rounds);
         this.__rounds = rounds;
 
         var button = new qx.ui.form.Button('');
@@ -75,7 +81,21 @@ qx.Class.define('Tr.ui.ActionButton',
             border: 'dark-shadow',
             padding: 2
         });
-        this.add(button);
+        hbox.add(button);
+        this.add(hbox);
+        var info = new qx.ui.basic.Atom();
+        info.set({
+            marginTop: 3,
+            padding: 3,
+            textColor: 'red',
+            width: '100%',
+            height: 'auto',
+            backgroundColor: '#f0f0f0',
+            visibility: false
+        });        
+   		qx.event.message.Bus.subscribe('tr.info',this.__set_info,this);
+        this.add(info);
+        this.__info = info;
 
    		qx.event.message.Bus.subscribe('tr.status',this.__set_status,this);
         qx.event.message.Bus.dispatch('tr.status','stopped');
@@ -114,6 +134,12 @@ qx.Class.define('Tr.ui.ActionButton',
     },
 
 	members: {
+        __set_info: function(e){
+            this.__info.set({
+                label: e.getData(),
+                visibility: true
+            });
+        },
 		__set_status: function(m){
             var host = this.__host;
             var rounds = this.__rounds;
@@ -124,6 +150,8 @@ qx.Class.define('Tr.ui.ActionButton',
                 case 'starting':
                     if (getUserData('action') == 'go') {
                         setLabel(this.tr("Starting"));
+                        this.__info.setVisibility(false);
+                        border: 'dark-shadow'          
         	    		setEnabled(false);
                         host.setEnabled(false);
                         rounds.setEnabled(false);

@@ -42,7 +42,7 @@ qx.Class.define('Tr.ui.TraceTable',
       	var tcm = this.getTableColumnModel();
         this.__tcm = tcm;
 
-        //tcm.setDataCellRenderer(0, new Tr.ui.Cellrenderer(2));
+        tcm.setDataCellRenderer(0, new Tr.ui.Cellrenderer(1));
         tcm.setDataCellRenderer(3, new Tr.ui.Cellrenderer(0,' %'));
         tcm.setDataCellRenderer(4, new Tr.ui.Cellrenderer(0));
         
@@ -75,6 +75,14 @@ qx.Class.define('Tr.ui.TraceTable',
         __make_empty_row: function (){            
             return ([undefined,undefined,undefined,0,0,undefined,undefined,undefined,undefined,undefined,0,0,0]);
         },
+        __stop_table: function (){
+            var tableModel = this.__tableModel;
+            for (var i=0;i<10;i++){
+                tableModel.setColumnSortable(i,true);
+            }
+            qx.event.message.Bus.dispatch('tr.status','stopped');
+            this.__handle = undefined;
+        },
         __handle_tr: function(m){
             var self = this;
             var f_hop = 0,f_host=1,f_ip=2,f_loss=3,f_snt=4,f_last=5,f_avg=6,f_best=7,f_worst=8,f_stdev=9,f_cnt=10,f_sum=11,f_sqsum=12;
@@ -93,49 +101,55 @@ qx.Class.define('Tr.ui.TraceTable',
                         sleep = 0;
                         var hop = retval['output'][i][0];
                         if (hop == 'SLEEP'){
-                            sleep = self.__delay * 1000;
+                            sleep = retval['output'][i][1];
                             continue;                            
-                        }
+                        } 
+                        else if (hop == 'INFO'){
+                            qx.event.message.Bus.dispatch('tr.info',retval['output'][i][1]);
+                            continue;
+                        }                        
                         var host = retval['output'][i][1];
                         var ip = retval['output'][i][2];
                         var value = retval['output'][i][3];
                         var ii = 0;
                         var max = data.length;
-                        while ( ii < max 
-                                && ( Math.floor(data[ii][0]) < hop 
-                                     || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host)
-                                   )
-                               ){
+                        while (true){
+                            if ( ii == max ) break;
+                            if ( Math.floor(data[ii][0]) > hop) break;
+                            if ( Math.floor(data[ii][0]) == hop ){
+                                if ( ip == undefined ) break;
+                                if ( ip == data[ii][2] ) break;
+                            }
                             ii++;
                         }
-                        if (ii == max || ( Math.floor(data[ii][0]) == hop && data[ii][1] != host) ){
-                            if (ii < max){
-                                hop = data[ii][0] + 0.1;                                
+                        if (ii == max || Math.floor(data[ii][0]) > hop ){
+                            if (ii > 0 &&  Math.floor(data[ii-1][0]) == hop ){
+                                hop = data[ii-1][0] + 0.1;                                
                             }
                             data.splice(ii,0,self.__make_empty_row());
                             data[ii][0] = hop;
                         }
 
                         var drow = data[ii];
-                        if (drow[f_host] == undefined){
+                        if (drow[f_host] == undefined && host != undefined){
                             drow[f_host] = host;
                         }
-                        if (drow[f_ip] == undefined){
+                        if (drow[f_ip] == undefined && ip != undefined){
                             drow[f_ip] = ip;
                         }
                         drow[f_snt]++;
                         drow[f_last] = value;
-                        var best = drow[f_best];
-                        if (best == undefined || best > value){
-                            drow[f_best] = value;     
-                        }
-                        var worst = drow[f_worst]; 
-                        if (worst == undefined || worst < value){
-                            drow[f_worst] = value;     
-                        }
                                 
 
                         if (value != undefined){
+                            var best = drow[f_best];
+                            if (best == undefined || best > value){
+                                drow[f_best] = value;     
+                           }
+                            var worst = drow[f_worst]; 
+                            if (worst == undefined || worst < value){
+                                drow[f_worst] = value;     
+                            }
                             drow[f_sum] += value;                            
                             var sum = drow[f_sum];
                             drow[f_cnt] ++;
@@ -154,29 +168,22 @@ qx.Class.define('Tr.ui.TraceTable',
                                                      fill_table,'run_tr',{ handle: retval['handle'],
                                                                             point:  retval['point']})};
                         qx.client.Timer.once(next_round,self,sleep);
-                    } else
-                    {
-                        for (var i=0;i<10;i++){
-                            tableModel.setColumnSortable(i,true);
-                        }
-                        qx.event.message.Bus.dispatch('tr.status','stopped');
-                        self.__handle = undefined;
+                    }
+                    else {
+                        self.__stop_table();
                     }
                 }
                 else {
                     alert(exc);   
-                    if (self.__handle){                     
-                        self.__handle = undefined;
-                    }
-                    for (var i=0;i<10;i++){
-                        self.__tableModel.setColumnSortable(i,true);
-                    }
-                    qx.event.message.Bus.dispatch('tr.status','stopped');
+                    self.__stop_table();
                 }				
             };
 
-            var handle_returns = function (data,exc,id){
-                if (exc != null){
+            var stop_handler = function (data,exc,id){
+                if (exc == null){
+                    qx.event.message.Bus.dispatch('tr.status','stopped');
+                }
+                else {
                    alert(exc);
                 }               
             };
@@ -185,7 +192,7 @@ qx.Class.define('Tr.ui.TraceTable',
             switch(cmd['action']){
             case 'stop':
                 qx.event.message.Bus.dispatch('tr.status','stopping');
-                Tr.Server.getInstance().callAsync(handle_returns,'stop_tr',this.__handle);
+                Tr.Server.getInstance().callAsync(stop_handler,'stop_tr',this.__handle);
                 break;
             case 'go':
                 this.__data = [];

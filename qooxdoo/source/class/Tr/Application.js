@@ -53,8 +53,9 @@ qx.Class.define('Tr.Application',
             base_layout.add(top);
 			var trace = new Tr.ui.TraceTable();
             base_layout.add(trace);
+            base_layout.add(new Tr.ui.Footer(this.tr("SmokeTrace is part of the SmokePing suite created by Tobi Oetiker, Copyright 2008."),'http://oss.oetiker.ch/smokeping'));   
         },
-        
+            
         close : function(e)
         {
             this.base(arguments);

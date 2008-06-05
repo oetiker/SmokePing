@@ -2,7 +2,7 @@ package Qooxdoo::Services::Tr;
 use strict;
 use POSIX qw(setsid :sys_wait_h);
 use Time::HiRes qw(usleep);
-
+use Socket;
 sub GetAccessibility {
         return "public";
 }
@@ -28,9 +28,13 @@ sub launch {
      setsid                  or die "Can't start a new session: $!";
      open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
      for (my $i = 0; $i<$rounds;$i++){
-        system "traceroute","-I","-q","1",$host;        
-#        print "SLEEPING\n";
-        sleep $delay;
+         my $start = time;
+         system "traceroute","-I","-q","1",$host;        
+         my $wait = $delay - (time - $start);
+         if ($wait > 0){
+             print "SLEEP $wait\n";
+             sleep $wait;
+         }
      }
      exit 0;
 }
@@ -55,9 +59,12 @@ sub method_stop_tr {
     return $handle if ref $handle;
     my $data = "/tmp/tr_session.".$handle;
     if (-r $data){
-           warn "Sending kill $handle";
-           kill('KILL',$handle);
+        warn "Sending kill $handle";
+        if (kill('KILL',$handle)){
+            waitpid($handle,0);
+        }
     }            
+    return 'ok';
 }
 
 sub method_run_tr
@@ -66,12 +73,21 @@ sub method_run_tr
     my $arg = shift;
     my $handle = get_number($error,$arg->{handle});
     my $point = get_number($error,$arg->{point});
+    my @array;
     if ($arg->{host}){
+        my $host = $arg->{host};
+        if ( my @addresses = gethostbyname($host) ){
+             @addresses = map { inet_ntoa($_) } @addresses[4 .. $#addresses];        
+             if ($#addresses > 1){                
+                 $host = $addresses[rand($#addresses)];
+                 push @array, ['INFO',"Found $#addresses addresses for $arg->{host}. Using $host."];
+             }
+        }
         my $delay = get_number($error,$arg->{delay});
         return $delay if ref $delay;
         my $rounds = get_number($error,$arg->{rounds});
         return $rounds if ref $rounds;
-        $handle = launch ($error,$rounds,$delay,$arg->{host});
+        $handle = launch ($error,$rounds,$delay,$host);
         $point = 0;
     }
     return $point if ref $point;
@@ -92,33 +108,27 @@ sub method_run_tr
             $rounds ++;
         } while ($again and $point >= $size);
         if (seek $fh, $point,0){
-            my @array;
             while (<$fh>){
                 waitpid($handle,WNOHANG);
                 /^traceroute to/ && next;
-                if (/unknown host/){
-                    $error->set_error(108,"Unknown hostname.");
-                    return $error;
-                }
                 last unless /\n$/; # stop when we find an incomplete line
+                chomp;
                 if (/^\s*(\d+)\s+(\S+)\s+\((\S+?)\)\s+(\S+)\s+ms/){
                     my ($hop,$host,$ip,$value) = ($1,$2,$3,$4);
                     $value = undef unless $value =~ /^\d+(\.\d+)?$/;
                     push @array, [$hop,$host,$ip,$value];
-                    $point = tell($fh);
                 }
                 elsif (/^\s*(\d+)\s+\*/){
                     push @array, [$1,undef,undef,undef];
-                    $point = tell($fh);
                 }
-                elsif (/^SLEEPING/){
-                    push @array, ['SLEEPING'];
-                    $point = tell($fh);
+                elsif (/^SLEEP\s+(\d+)/){
+                    push @array, ['SLEEP',$1];
                 }
                 else {
-                    $error->set_error(107,"ERROR: $_. See $data for more information.");
-                    return $error;
+                    s/traceroute:\s*//g;
+                    push @array, ['INFO',$_];
                 }
+                $point = tell($fh);
             };
             close $fh;
             unlink $data unless $again;
