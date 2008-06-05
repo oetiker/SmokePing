@@ -32,6 +32,7 @@ sub launch {
 #        print "SLEEPING\n";
         sleep $delay;
      }
+     exit 0;
 }
 
 sub get_number {
