@@ -645,11 +645,13 @@ sub target_menu($$$$;$){
     		$host = $tree->{$key}{host};
             $menuextra = $tree->{$key}{menuextra};
             next if $tree->{$key}{hide} and $tree->{$key}{hide} eq 'yes';
-        };
+        }
+
         # no menuextra for multihost   
         if (not $host or $host =~ m|^/|){
             $menuextra = undef;
         }
+
 		my $class = 'menuitem';
    	    if ($key eq $current ){
 			if ( @$open ) {
@@ -659,7 +661,7 @@ sub target_menu($$$$;$){
             }
    	    };
         if ($menuextra){
-            $menuextra =~ s/{HOST}/$host/g;
+            $menuextra =~ s/{HOST}/#$host/g;
             $menuextra =~ s/{CLASS}/$class/g;
             $menuextra = '&nbsp;'.$menuextra;
         } else {
