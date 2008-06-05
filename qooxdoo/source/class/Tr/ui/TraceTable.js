@@ -167,7 +167,7 @@ qx.Class.define('Tr.ui.TraceTable',
                         var next_round = function (){Tr.Server.getInstance().callAsync(
                                                      fill_table,'run_tr',{ handle: retval['handle'],
                                                                             point:  retval['point']})};
-                        qx.client.Timer.once(next_round,self,sleep);
+                        qx.client.Timer.once(next_round,self,sleep*1000);
                     }
                     else {
                         self.__stop_table();

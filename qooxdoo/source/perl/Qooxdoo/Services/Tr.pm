@@ -22,6 +22,8 @@ sub launch {
         return $pid;
      }
      chdir '/'               or die "Can't chdir to /: $!";
+
+     $|++; # unbuffer
      open STDOUT, ">>/tmp/tr_session.$$"
                              or die "Can't write to /tmp/tr_session.$$: $!";
      open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
@@ -31,7 +33,7 @@ sub launch {
          my $start = time;
          system "traceroute","-I","-q","1",$host;        
          my $wait = $delay - (time - $start);
-         if ($wait > 0){
+         if ($wait > 0 and $i+1< $rounds){
              print "SLEEP $wait\n";
              sleep $wait;
          }
@@ -109,6 +111,7 @@ sub method_run_tr
         } while ($again and $point >= $size);
         if (seek $fh, $point,0){
             while (<$fh>){
+#                print STDERR $_;
                 waitpid($handle,WNOHANG);
                 /^traceroute to/ && next;
                 last unless /\n$/; # stop when we find an incomplete line
