@@ -1,0 +1,80 @@
+=head1 NAME
+
+SmokeTraceroute - Ajax based Traceroute for Smokeping
+
+=head1 DESCRIPTION
+
+SmokeTraceoute is an browser based traceroute application written in the
+Qooxdoo. You can easily activate it in your Smokeping setup, to allow
+users to traceroute smokeping targets directly from the master host.
+
+=head1 SETUP
+
+To activate SmokeTraceroute you just have to copy a few files:
+
+=over
+
+=item 1.
+
+Copy F<htdocs/script/Tr.js> to your smokeping web directory.
+
+=item 2.
+
+Copy and edit F<htdocs/tr.html> to your smokeping web directory. Make
+sure the path to F<Tr.js> is correct.
+
+=item 3.
+
+Copy F<htdocs/resource> into the directory where you put F<tr.html>.
+
+=item 4.
+
+Copy and edit F<htdocs/tr.cgi.dist> to the directory where you put
+F<tr.html> and change its name to F<tr.cgi>. Make sure F<tr.cgi> to adjust
+the F<use lib> line to point to the smokeping per lib directory, as you did
+with F<smokeping.cgi>. Make sure the webserver actually executes the
+F<tr.cgi> script.
+
+=item 5.
+
+Edit your config file and add the line:
+
+ menuextra = <a target='_blank' href='tr.html{HOST}' class='{CLASS}' \
+    onclick="window.open(this.href,this.target, \
+    'width=800,height=500,toolbar=no,location=no,status=no,scrollbars=no'); \
+    return false;">*</a>
+
+to your F<*** Targets ***> section. It will make a '*' appear next to each
+host name, and when you click on it, the traceroute window will open.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008 by Tobias Oetiker. All rights reserverd.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+02139, USA.
+
+=head1 AUTHOR
+
+Tobi Oetiker  E<lt>tobi@oetiker.chE<gt>
+
+=cut
+
