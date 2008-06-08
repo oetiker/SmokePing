@@ -32,6 +32,9 @@ your system yet, you can get it from L<http://www.fping.com/>.
   
 The (optional) B<packetsize> option lets you configure the packetsize for the pings sent.
 
+In B<blazemode>, FPing sends one more ping than requested, and discards
+the first RTT value returned as it's likely to be an outlier.
+
 The FPing manpage has the following to say on this topic:
 
 Number of bytes of ping data to send.  The minimum size (normally 12) allows
@@ -41,6 +44,8 @@ timestamp).  The reported received data size includes the IP header
 40 bytes.  Default is 56, as in ping. Maximum is the theoretical maximum IP
 datagram size (64K), though most systems limit this to a smaller,
 system-dependent number.
+
+
 DOC
 		authors => <<'DOC',
 Tobias Oetiker <tobi@oetiker.ch>
@@ -118,10 +123,14 @@ sub ping ($){
        do_log("WARNING: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.");
     }
     push @params, "-S$self->{properties}{sourceaddress}" if $self->{properties}{sourceaddress} and $self->{enable}{S};
-            
+
+    my $pings =  $self->pings;
+    if (($self->{properties}{blazemode} || '') eq 'true'){
+        $pings++;
+    }
     my @cmd = (
                     $self->binary,
-                    '-C', $self->pings, '-q','-B1','-r1',
+                    '-C', $pings, '-q','-B1','-r1',
 		    @params,
                     @{$self->addresses});
     $self->do_debug("Executing @cmd");
@@ -134,7 +143,9 @@ sub ping ($){
         my @times = split /\s+/;
         my $ip = shift @times;
         next unless ':' eq shift @times; #drop the colon
-        
+        if (($self->{properties}{blazemode} || '') eq 'true'){     
+             shift @times;
+        }
         @times = map {sprintf "%.10e", $_ / $self->{pingfactor}} sort {$a <=> $b} grep /^\d/, @times;
         map { $self->{rtts}{$_} = [@times] } @{$self->{addrlookup}{$ip}} ;
     }
@@ -169,6 +180,12 @@ sub probevars {
 				return undef;
 			},
 			_doc => "The ping packet size (in the range of 12-64000 bytes).",
+
+		},
+		blazemode => {
+			_re => '(true|false)',
+			_example => 'true',
+			_doc => "Send an extra ping and then discarge the first answer since the first is bound to be an outliner.",
 
 		},
 		timeout => {
