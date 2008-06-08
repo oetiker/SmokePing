@@ -1,3 +1,6 @@
+* fixed FPing regression created in r680 it broke the proper handling of old
+  version of fping. Found by  Celedonio Miranda Torresano -- tobi
+
 * first cut at mtr integration ... added new menuextra config item
   to build mtr links. -- tobi
 

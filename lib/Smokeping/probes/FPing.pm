@@ -66,9 +66,9 @@ sub new($$$)
             if $return =~ m/only.+root/;
 
         if ($return =~ m/bytes, ([0-9.]+)\sms\s+.*\n.*\n.*:\s+([0-9.]+)/ and $1 > 0){
-            $self->{pingfactor} = 1000 * $1/$2;
+            $self->{pingfactor} = 1000 * $2/$1;
             if ($1 != $2){
-                warn "### fping seems to report in ", $1/$2, " milliseconds (old version?)";
+                warn "### fping seems to report in ", $2/$1, " milliseconds (old version?)";
             }
         } else {
             $self->{pingfactor} = 1000; # Gives us a good-guess default
