@@ -1,3 +1,5 @@
+* fix for telneJunOSPing by Christian Hahn -- tobi
+
 * fixed FPing regression created in r680 it broke the proper handling of old
   version of fping. Found by  Celedonio Miranda Torresano -- tobi
 

@@ -148,7 +148,7 @@ sub pingone ($$){
 #     print OUTF "target => $dest\nsource => $source\nuser => $login\n";
      my $ok = $telnet->open(Host => $source,
                    Port => $port);
-     print OUTF "Connection is a $ok\n";
+    # print OUTF "Connection is a $ok\n";
 
     #Authenticate
      $telnet->waitfor('/(ogin):.*$/');
@@ -160,16 +160,20 @@ sub pingone ($$){
      $telnet->waitfor('/[\@\w\-\.]+[>#][ ]*$/');
      $telnet->print("set cli screen-length 0");
      $telnet->waitfor('/[\@\w\-\.]+[>#][ ]*$/');
-     @output = $telnet->cmd("ping $dest count $pings size $bytes source $psource");
+     if ( $psource ) {
+         @output = $telnet->cmd("ping $dest count $pings size $bytes source $psource");
+     } else {
+         @output = $telnet->cmd("ping $dest count $pings size $bytes");
+     }
      $telnet->print("quit");
      $telnet->close;
-     print OUTF "closed Telnet connection\n";
+     # print OUTF "closed Telnet connection\n";
 
     my @times = ();
     while (@output) {
 	my $outputline = shift @output;
 	chomp($outputline);
-	print OUTF "$outputline\n";
+	# print OUTF "$outputline\n";
         $outputline =~ /^\d+ bytes from $dest: icmp_seq=\d+ ttl=\d+ time=(\d+\.\d+) ms$/ && push(@times,$1);
 	#print OUTF "$outputline => $1\n";
     }
