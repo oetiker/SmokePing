@@ -1,6 +1,6 @@
 =head1 NAME
 
-SmokeTraceroute - Ajax based Traceroute for Smokeping
+SmokeTrace - Ajax based Traceroute for Smokeping
 
 =head1 DESCRIPTION
 
@@ -10,7 +10,7 @@ users to traceroute smokeping targets directly from the master host.
 
 =head1 SETUP
 
-To activate SmokeTraceroute you just have to copy a few files:
+To activate SmokeTrace you just have to copy a few files:
 
 =over
 
@@ -45,7 +45,7 @@ Edit your config file and add the line:
     return false;">*</a>
 
 to your F<*** Targets ***> section. It will make a '*' appear next to each
-host name, and when you click on it, the traceroute window will open.
+host name, and when you click on it, the SmokeTrace window will open.
 
 =back
 

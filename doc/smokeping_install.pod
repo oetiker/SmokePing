@@ -212,9 +212,12 @@ your F</etc/init.d> tree. Check out L<smokeping> for further information.
 
 When you can now also open the smokeping.cgi webpage to look at your data.
 
+If you want to add traceroute ability to your smokeping setup, check out the
+L<smoketrace> manual page.
+
 =head1 COPYRIGHT
 
-Copyright (c) 2001, 2005 by Tobias Oetiker. All right reserved.
+Copyright (c) 2001, 2008 by Tobias Oetiker. All right reserved.
 
 =head1 LICENSE
 
