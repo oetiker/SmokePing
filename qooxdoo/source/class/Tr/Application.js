@@ -34,7 +34,7 @@ qx.Class.define('Tr.Application',
                 setLocation(0,0);
                 setWidth('100%');
                 setHeight('100%');
-                setSpacing(10);
+                setSpacing(2);
                 setBackgroundColor('white');
             };            
             base_layout.addToDocument();
@@ -42,7 +42,7 @@ qx.Class.define('Tr.Application',
             top.set({
                 height: 'auto'
             });
-			var title = new qx.ui.basic.Atom(this.tr("SmokeTraceroute"));
+			var title = new qx.ui.basic.Atom(this.tr("SmokeTrace"));
 			with(title){
             	setTextColor('#b0b0b0');
             	setFont(qx.ui.core.Font.fromString('20px bold sans-serif'));
