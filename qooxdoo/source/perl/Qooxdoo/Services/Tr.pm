@@ -23,7 +23,7 @@ sub launch {
      }
      chdir '/'               or die "Can't chdir to /: $!";
 
-     $|++; # unbuffer
+#     $|++; # unbuffer
      open STDOUT, ">>/tmp/tr_session.$$"
                              or die "Can't write to /tmp/tr_session.$$: $!";
      open STDIN, '/dev/null' or die "Can't read /dev/null: $!";
@@ -109,13 +109,11 @@ sub method_run_tr
 #           print STDERR "$again, $handle, $size, $point\n";
             $rounds ++;
         } while ($again and $point >= $size);
+	print STDERR "$point > $size\n";
         if (seek $fh, $point,0){
             while (<$fh>){
-#                print STDERR $_;
-                waitpid($handle,WNOHANG);
-                /^traceroute to/ && next;
-                last unless /\n$/; # stop when we find an incomplete line
-                chomp;
+                #print STDERR ">$_<";
+		next if /^\s*$/ or /traceroute to/;
                 if (/^\s*(\d+)\s+(\S+)\s+\((\S+?)\)\s+(\S+)\s+ms/){
                     my ($hop,$host,$ip,$value) = ($1,$2,$3,$4);
                     $value = undef unless $value =~ /^\d+(\.\d+)?$/;
@@ -127,9 +125,11 @@ sub method_run_tr
                 elsif (/^SLEEP\s+(\d+)/){
                     push @array, ['SLEEP',$1];
                 }
-                else {
-                    s/traceroute:\s*//g;
+                elsif (s/traceroute:\s*//g or /\n$/){
                     push @array, ['INFO',$_];
+                }
+		else {
+	            last;
                 }
                 $point = tell($fh);
             };
