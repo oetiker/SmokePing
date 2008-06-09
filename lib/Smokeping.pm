@@ -72,6 +72,10 @@ sub dummyCGI::param {
     return wantarray ? () : "";
 }
 
+sub dummyCGI::script_name {
+    return wantarray ? () : "";
+}
+
 sub load_probes ($){
     my $cfg = shift;
     my %prbs;
