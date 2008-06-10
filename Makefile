@@ -173,6 +173,8 @@ smokeping-$(VERSION).tar.gz:
 	cp -rp build/script htdocs
 	cp -rp build/resource htdocs
 	cp -rp build/perl/* lib
+	make clean
+	rm -rf build
 	cd ..
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
