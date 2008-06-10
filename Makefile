@@ -167,12 +167,12 @@ smokeping-$(VERSION).tar.gz:
 	rm -rf  smokeping-$(VERSION)/qooxdoo/source/perl/Qooxdoo/Services/Smokeping.pm 
 	(cd smokeping-$(VERSION) && $(MAKE) doc)
 	(cd smokeping-$(VERSION)/qooxdoo && $(MAKE) build)
-	cd smokeping-$(VERSION)
-	cp build/tr.cgi htdocs/tr.cgi.dist
-	cp build/index.html htdocs/tr.html
-	cp -rp build/script htdocs
-	cp -rp build/resource htdocs
-	cp -rp build/perl/* lib
+	cd smokeping-$(VERSION)/qooxdoo
+	cp build/tr.cgi ../../htdocs/tr.cgi.dist
+	cp build/index.html ../../htdocs/tr.html
+	cp -rp build/script ../../htdocs
+	cp -rp build/resource ../../htdocs
+	cp -rp build/perl/* ../../lib
 	make clean
 	rm -rf build
 	cd ..
