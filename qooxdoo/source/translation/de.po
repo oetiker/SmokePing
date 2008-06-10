@@ -1,10 +1,10 @@
-# German translations for MTR Ajax Frontend.
+# German translations for SmokeTrace.
 # Copyright (C) 2008 Tobias Oetiker
 #
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: MTR-AJAX-Frontend 1.0\n"
+"Project-Id-Version: SmokeTrace 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-06-09 00:22+0200\n"
 "PO-Revision-Date: 2008-05-31 08:50+0200\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid ""
 "SmokeTrace is part of the SmokePing suite created by Tobi Oetiker, Copyright "
 "2008."
-msgstr ""
+msgstr "SmokeTrace ist Teil der SmokePing Suite, einem Produkt von Tobi Oetiker, Copiright 2008."
 
 #: source/class/Tr/ui/ActionButton.js:33 source/class/Tr/ui/TraceTable.js:24
 msgid "Host"
@@ -31,7 +31,7 @@ msgstr "Host"
 
 #: source/class/Tr/ui/ActionButton.js:47
 msgid "Delay"
-msgstr "Abstand"
+msgstr "Verz."
 
 #: source/class/Tr/ui/ActionButton.js:61
 msgid "Rounds"
@@ -40,12 +40,12 @@ msgstr "Runden"
 #: source/class/Tr/ui/ActionButton.js:152
 #, fuzzy
 msgid "Starting"
-msgstr "Start"
+msgstr "Startet"
 
 #: source/class/Tr/ui/ActionButton.js:163
 #, fuzzy
 msgid "Stopping"
-msgstr "Stop"
+msgstr "Stopt"
 
 #: source/class/Tr/ui/ActionButton.js:172
 msgid "Go"
@@ -57,7 +57,7 @@ msgstr "Stop"
 
 #: source/class/Tr/ui/TraceTable.js:24
 msgid "Hop"
-msgstr "Schritt"
+msgstr "Sprung"
 
 #: source/class/Tr/ui/TraceTable.js:24
 msgid "Ip"
@@ -69,7 +69,7 @@ msgstr "Letzte [ms]"
 
 #: source/class/Tr/ui/TraceTable.js:25
 msgid "Loss [%]"
-msgstr "Loss [%]"
+msgstr "Verlust [%]"
 
 #: source/class/Tr/ui/TraceTable.js:25
 #, fuzzy
@@ -78,11 +78,11 @@ msgstr "Gesendet"
 
 #: source/class/Tr/ui/TraceTable.js:26
 msgid "Avg [ms]"
-msgstr "ø [ms]"
+msgstr "Durch [ms]"
 
 #: source/class/Tr/ui/TraceTable.js:26
 msgid "Best [ms]"
-msgstr "Best [ms]"
+msgstr "Oben [ms]"
 
 #: source/class/Tr/ui/TraceTable.js:26
 msgid "StDev [ms]"
@@ -90,200 +90,5 @@ msgstr "StdAbw [ms]"
 
 #: source/class/Tr/ui/TraceTable.js:26
 msgid "Worst [ms]"
-msgstr "Worst [ms]"
+msgstr "Unten [ms]"
 
-#~ msgid "MTR AJAX Frontend"
-#~ msgstr "MTR Ajax Frontend"
-
-#, fuzzy
-#~ msgid "Host:"
-#~ msgstr "GWP"
-
-#~ msgid "Start Date"
-#~ msgstr "Start-Datum"
-
-#, fuzzy
-#~ msgid "Time"
-#~ msgstr "Titel"
-
-#~ msgid "End Date"
-#~ msgstr "End-Datum"
-
-#~ msgid "Location"
-#~ msgstr "Standort"
-
-#~ msgid "Data Source"
-#~ msgstr "Daten-Quelle"
-
-#~ msgid "Data Massage"
-#~ msgstr "Daten Massage"
-
-#~ msgid "Location/Client"
-#~ msgstr "Standort/GWP"
-
-#~ msgid "Data Filter"
-#~ msgstr "Daten-Filter"
-
-#~ msgid "Y axis"
-#~ msgstr "Y-Achse"
-
-#~ msgid "Plot Data"
-#~ msgstr "Grafik erzeugen"
-
-#~ msgid "Open in Excel"
-#~ msgstr "Oeffne in Excel"
-
-#~ msgid "Please make sure all entries in the form are valid!"
-#~ msgstr "Alle Felder müssen gültige Werte enhalten!"
-
-#, fuzzy
-#~ msgid "Snap"
-#~ msgstr "Sonntag"
-
-#~ msgid "Team"
-#~ msgstr "Team"
-
-#~ msgid "User"
-#~ msgstr "Benutzer"
-
-#~ msgid "CPV"
-#~ msgstr "CPV"
-
-#~ msgid "Last Update"
-#~ msgstr "Letztes Update"
-
-#~ msgid "Low"
-#~ msgstr "Tief"
-
-#~ msgid "Filter out values lower than this"
-#~ msgstr "Keine Werte tiefer als dieser"
-
-#~ msgid "High"
-#~ msgstr "Hoch"
-
-#, fuzzy
-#~ msgid "Filter out values higher than this"
-#~ msgstr "Keine Werte höher als dieser"
-
-#, fuzzy
-#~ msgid "Data Set 1"
-#~ msgstr "Daten-Quelle"
-
-#~ msgid "Name"
-#~ msgstr "Name"
-
-#, fuzzy
-#~ msgid "Title"
-#~ msgstr "Titel"
-
-#~ msgid "Unit"
-#~ msgstr "Einheit"
-
-#, fuzzy
-#~ msgid "Data Set 2"
-#~ msgstr "Daten-Quelle"
-
-#~ msgid "End"
-#~ msgstr "Ende"
-
-#~ msgid "From"
-#~ msgstr "Von"
-
-#~ msgid "To"
-#~ msgstr "bis"
-
-#, fuzzy
-#~ msgid "Time filter: Use only data in the specified time range"
-#~ msgstr "Zeitfilter: Verwende nur Daten für den angegebenen Zeitraum"
-
-#~ msgid "DOW"
-#~ msgstr "Wochentag"
-
-#, fuzzy
-#~ msgid "Weekday filter: Use only data for the selected weekday"
-#~ msgstr "Wochentag: Verwende nur Daten fuer den ausgewaehlten Wochentag"
-
-#~ msgid "Monday"
-#~ msgstr "Montag"
-
-#~ msgid "Tuesday"
-#~ msgstr "Dienstag"
-
-#~ msgid "Wednesday"
-#~ msgstr "Mittwoch"
-
-#~ msgid "Thursday"
-#~ msgstr "Donnerstag"
-
-#~ msgid "Friday"
-#~ msgstr "Freitag"
-
-#~ msgid "Saturday"
-#~ msgstr "Samstag"
-
-#~ msgid "Sunday"
-#~ msgstr "Sonntag"
-
-#~ msgid "Start value for y-axis"
-#~ msgstr "Startwert für die y-Achse"
-
-#~ msgid "End value for y-axis"
-#~ msgstr "Endwert für die y-Achse"
-
-#~ msgid "Merge"
-#~ msgstr "Ueberlagern"
-
-#, fuzzy
-#~ msgid "day"
-#~ msgstr "Tag"
-
-#~ msgid "1 week"
-#~ msgstr "1 Woche"
-
-#~ msgid "2 weeks"
-#~ msgstr "2 Wochen"
-
-#~ msgid "3 weeks"
-#~ msgstr "3 Wochen"
-
-#~ msgid "4 weeks"
-#~ msgstr "4 Wochen"
-
-#~ msgid "Contents"
-#~ msgstr "Inhalt"
-
-#~ msgid "Scale"
-#~ msgstr "Skalierung"
-
-#~ msgid "Time series"
-#~ msgstr "Zeitreihe"
-
-#~ msgid "Histogram"
-#~ msgstr "Histogramm"
-
-#~ msgid "Bins"
-#~ msgstr "Zeitbereiche"
-
-#, fuzzy
-#~ msgid "Bin data (for mean/median and histograms)"
-#~ msgstr ""
-#~ "Anzahl der Zeitbereiche für die Berechnung\n"
-#~ "von Durchschnitts/Median-Werten und Histogrammen"
-
-#, fuzzy
-#~ msgid "Message:"
-#~ msgstr "Ueberlagern"
-
-#, fuzzy
-#~ msgid "Fetch Data"
-#~ msgstr "Grafik erzeugen"
-
-#~ msgid "Graph Window"
-#~ msgstr "Grafik Fenster"
-
-#, fuzzy
-#~ msgid "Choose language"
-#~ msgstr "Sprachauswahl: "
-
-#~ msgid "Data"
-#~ msgstr "Daten"
