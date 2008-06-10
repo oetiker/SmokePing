@@ -109,7 +109,7 @@ sub method_run_tr
 #           print STDERR "$again, $handle, $size, $point\n";
             $rounds ++;
         } while ($again and $point >= $size);
-	print STDERR "$point > $size\n";
+	# print STDERR "$point > $size\n";
         if (seek $fh, $point,0){
             while (<$fh>){
                 #print STDERR ">$_<";
