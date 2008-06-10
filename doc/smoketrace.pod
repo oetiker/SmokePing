@@ -16,24 +16,24 @@ To activate SmokeTrace you just have to copy a few files:
 
 =item 1.
 
-Copy F<htdocs/script/Tr.js> to your smokeping web directory.
+Copy C<htdocs/script/Tr.js> to your smokeping web directory.
 
 =item 2.
 
-Copy and edit F<htdocs/tr.html> to your smokeping web directory. Make
-sure the path to F<Tr.js> is correct.
+Copy and edit C<htdocs/tr.html> to your smokeping web directory. Make
+sure the path to C<Tr.js> is correct.
 
 =item 3.
 
-Copy F<htdocs/resource> into the directory where you put F<tr.html>.
+Copy C<htdocs/resource> into the directory where you put C<tr.html>.
 
 =item 4.
 
-Copy and edit F<htdocs/tr.cgi.dist> to the directory where you put
-F<tr.html> and change its name to F<tr.cgi>. Make sure F<tr.cgi> to adjust
-the F<use lib> line to point to the smokeping per lib directory, as you did
-with F<smokeping.cgi>. Make sure the webserver actually executes the
-F<tr.cgi> script.
+Copy F<htdocs/tr.cgi.dist> to the directory where you put
+C<tr.html>. Change its name to C<tr.cgi>. Edit C<tr.cgi> to adjust
+the C<use lib> line, to point to the smokeping perl library directory, as you did
+with C<smokeping.cgi>. Make sure the webserver actually executes the
+C<tr.cgi> script.
 
 =item 5.
 
@@ -44,7 +44,7 @@ Edit your config file and add the line:
     'width=800,height=500,toolbar=no,location=no,status=no,scrollbars=no'); \
     return false;">*</a>
 
-to your F<*** Targets ***> section. It will make a '*' appear next to each
+to your C<*** Targets ***> section. It will make a C<*> appear next to each
 host name, and when you click on it, the SmokeTrace window will open.
 
 =back
