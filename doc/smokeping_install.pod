@@ -212,6 +212,8 @@ your F</etc/init.d> tree. Check out L<smokeping> for further information.
 
 When you can now also open the smokeping.cgi webpage to look at your data.
 
+=head2 Adding SmokeTrace online Traceroute ability
+
 If you want to add traceroute ability to your smokeping setup, check out the
 L<smoketrace> manual page.
 

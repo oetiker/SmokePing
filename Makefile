@@ -175,7 +175,7 @@ smokeping-$(VERSION).tar.gz:
 	cp -rp build/perl/* ../lib;\
 	make clean; \
 	rm -rf build)
-	$(PERL) -i~ -p -e 's/VERSION/$(VERSION)/' smokeping-$(VERSION)/htdocs/script/Tr.js
+	$(PERL) -i -p -e 's/VERSION/$(VERSION)/' smokeping-$(VERSION)/htdocs/script/Tr.js
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 
