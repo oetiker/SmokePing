@@ -1,12 +1,12 @@
 SHELL = /bin/sh
-VERSION := 2.3.6
+VERSION := 2.4.0
 SVNREPO = svn://svn.oetiker.ch/smokeping
 ############ A is for features
 ############ B is for bugfixes
 ############ V.AAABBB
 ############ 2.000001
 ############ 2.000002
-NUMVERSION = 2.003006
+NUMVERSION = 2.004000
 IGNORE = ~|CVS|var/|smokeping-$(VERSION)/smokeping-$(VERSION)|cvsignore|rej|orig|DEAD|pod2htm[di]\.tmp|\.svn|tar\.gz|DEADJOE|svn-commit\.tmp
 GROFF = groff
 PERL = perl-5.8.8
@@ -163,6 +163,12 @@ smokeping-$(VERSION).tar.gz:
 	svn export $(SVNREPO)/trunk/software smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)/qooxdoo
 	(cd smokeping-$(VERSION) && $(MAKE) doc)
+	(cd smokeping-$(VERSION)/qooxdoo && $(MAKE) build; \
+		cp build/tr.cgi ../htdocs/tr.cgi.dist; \
+		cp build/index.html ../htdocs/tr.html; \
+		cp -rp build/script ../htdocs; \
+		cp -rp build/resource ../htdocs;\
+		cp -rp build/perl/* ../lib/)
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 

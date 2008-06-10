@@ -1,3 +1,5 @@
+2008/6/10 -- released version 2.4.0
+
 * building a --static version of the smokeping page is broken. Make
   it a little less broken by providing a dummyCGI->script_name method.
   --tobi
