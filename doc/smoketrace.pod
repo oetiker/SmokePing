@@ -10,30 +10,48 @@ users to traceroute smokeping targets directly from the master host.
 
 =head1 SETUP
 
-To activate SmokeTrace you just have to copy a few files:
+To activate SmokeTrace you have to copy a few files to your webserver.
 
 =over
 
 =item 1.
 
-Copy C<htdocs/script/Tr.js> to your smokeping web directory.
+Make sure your webserver can execute cgi files outside the cgi-bin
+directory. Maybe it is enough to create a F<.htaccess> file with the
+following contents into the smokeping web directory ($web).
+
+ AddHandler cgi-script cgi
+ Options ExecCGI
 
 =item 2.
 
-Copy and edit C<htdocs/tr.html> to your smokeping web directory. Make
-sure the path to C<Tr.js> is correct.
+Copy C<htdocs/script/Tr.js> to your smokeping web directory (NOT the cgi-bin
+directory!).
+
+ mkdir $web/script
+ cp $src/htdocs/script/Tr.js $web/script/
+
+=item 2.
+
+Copy C<htdocs/tr.html> to your smokeping web directory (NOT cgi-bin). Make
+sure the path, pointing to C<Tr.js> is correct.
+
+ cp $src/htdocs/tr.html $web/
 
 =item 3.
 
-Copy C<htdocs/resource> into the directory where you put C<tr.html>.
+Copy C<htdocs/resource> into the directory where you put C<tr.html>
+
+ cp -r $src/htdocs/resource $web/ 
 
 =item 4.
 
-Copy F<htdocs/tr.cgi.dist> to the directory where you put
-C<tr.html>. Change its name to C<tr.cgi>. Edit C<tr.cgi> to adjust
-the C<use lib> line, to point to the smokeping perl library directory, as you did
-with C<smokeping.cgi>. Make sure the webserver actually executes the
-C<tr.cgi> script.
+Copy F<htdocs/tr.cgi.dist> to the directory where you put C<tr.html>. Change
+its name to C<tr.cgi>. Edit C<tr.cgi> to adjust the C<use lib> line, to
+point to the smokeping perl library directory, as you did with
+C<smokeping.cgi> and the smokeping daemon.
+  
+ cp $src/htdocs/tr.cgi.dist $web/tr.cgi 
 
 =item 5.
 
@@ -47,7 +65,13 @@ Edit your config file and add the line:
 to your C<*** Targets ***> section. It will make a C<*> appear next to each
 host name, and when you click on it, the SmokeTrace window will open.
 
+Note that the C<href> atribut must point to the directory where you put the
+C<tr.html> file.
+
 =back
+
+Not you should be all set. Try calling C<tr.cgi> from your webbrowser. You
+should get some error message about not having sent a JSON request.
 
 =head1 COPYRIGHT
 
