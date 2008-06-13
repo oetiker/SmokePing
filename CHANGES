@@ -1,3 +1,7 @@
+2008/6/13 -- released version 2.4.1
+
+* fixed js packaging error ...  s/VERSION/x/ was a bad idea
+
 2008/6/10 -- released version 2.4.0
 
 * building a --static version of the smokeping page is broken. Make

@@ -118,7 +118,7 @@ qx.Class.define('Tr.ui.ActionButton',
         var history_action = function(event){
             var targ = event.getData();
             host.setValue(targ);
-            history.addToHistory(targ,'SmokeTraceroute to '+targ);
+            history.addToHistory(targ,'SmokeTrace to '+targ);
             start_trace();           
         }
         history.addEventListener('request', history_action);
@@ -127,7 +127,7 @@ qx.Class.define('Tr.ui.ActionButton',
         var initial_host = qx.client.History.getInstance().getState();
         if (initial_host){
             host.setValue(initial_host);
-            history.addToHistory(initial_host,'SmokeTraceroute to '+initial_host);        
+            history.addToHistory(initial_host,'SmokeTrace to '+initial_host);        
             // dispatch this task once all the initializations are done
             qx.client.Timer.once(start_trace,this,0);
         }        

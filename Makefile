@@ -1,5 +1,5 @@
 SHELL = /bin/sh
-VERSION := 2.4.0
+VERSION := 2.4.1
 SVNREPO = svn://svn.oetiker.ch/smokeping
 ############ A is for features
 ############ B is for bugfixes
@@ -175,7 +175,7 @@ smokeping-$(VERSION).tar.gz:
 	cp -rp build/perl/* ../lib;\
 	make clean; \
 	rm -rf build)
-	$(PERL) -i -p -e 's/VERSION/$(VERSION)/' smokeping-$(VERSION)/htdocs/script/Tr.js
+	$(PERL) -i -p -e 's/SmokeTrace VERSION/SmokeTrace $(VERSION)/' smokeping-$(VERSION)/htdocs/script/Tr.js
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 
