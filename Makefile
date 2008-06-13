@@ -159,6 +159,7 @@ smokeping-$(VERSION).tar.gz:
 	$(PERL) -i~ -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
 	$(PERL) -i~ -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
 	$(PERL) -i~ -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
+	$(PERL) -i~ -p -e "s/Atom\('SmokeTrace \S+?'/Atom('SmokeTrace "$(VERSION)"')/" qooxdoo/source/class/Tr/Application.js 
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	svn export $(SVNREPO)/trunk/software smokeping-$(VERSION)
 	rm -rf  smokeping-$(VERSION)/qooxdoo/source/class/Smokeping
@@ -175,7 +176,6 @@ smokeping-$(VERSION).tar.gz:
 	cp -rp build/perl/* ../lib;\
 	make clean; \
 	rm -rf build)
-	$(PERL) -i -p -e 's/SmokeTrace VERSION/SmokeTrace $(VERSION)/' smokeping-$(VERSION)/htdocs/script/Tr.js
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 
