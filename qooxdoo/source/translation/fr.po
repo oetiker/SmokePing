@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-06-10 08:33+0200\n"
+"POT-Creation-Date: 2008-06-13 14:27+0200\n"
 "PO-Revision-Date: 2008-06-10 08:33+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -15,10 +15,6 @@ msgstr ""
 "Content-Type: text/plain; charset=ASCII\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: source/class/Tr/Application.js:45
-msgid "SmokeTrace"
-msgstr ""
 
 #: source/class/Tr/Application.js:56
 msgid ""
