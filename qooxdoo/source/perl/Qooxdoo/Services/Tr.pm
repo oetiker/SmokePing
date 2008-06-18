@@ -1,6 +1,6 @@
 package Qooxdoo::Services::Tr;
 use strict;
-use POSIX qw(setsid :sys_wait_h);
+use POSIX qw(setsid);
 use Time::HiRes qw(usleep);
 use Socket;
 sub GetAccessibility {
@@ -103,7 +103,8 @@ sub method_run_tr
             $size = -s $fh;
             # make sure we reap any zombi instances of tr
             # this is especially important when running with speedy of fastcgi
-            waitpid($handle,WNOHANG);
+            # 1 = WNOHANG
+            waitpid($handle,1);
             $again = kill(0, $handle);
             usleep(1000*300) if $rounds;
 #           print STDERR "$again, $handle, $size, $point\n";
