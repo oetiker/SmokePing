@@ -1548,6 +1548,11 @@ sub display_webpage($$){
     my $cfg = shift;
     my $q = shift;
     my ($path,$slave) = split(/~/,$q->param('target') || '');
+    if ($slave and $slave ~= /(\S+)/){
+        die "ERROR: slave '$slave' is not defined in the '*** Slaves ***' section!\n"
+            unless defined $cfg->{Slaves}{$slave};
+        $slave = $1;
+    }
     my $hierarchy = $q->param('hierarchy');
     die "ERROR: unknown hierarchy $hierarchy\n" 
 	if $hierarchy and not $cfg->{Presentation}{hierarchies}{$hierarchy};
