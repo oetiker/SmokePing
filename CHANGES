@@ -1,3 +1,7 @@
+* kill taint error in Smokeping.pm -- tobi
+
+* better master/slave secrets documentation -- tobi
+
 * do not load :sys_wait_h from POSIX perl module since this seems to
   be missing in some linux distros and we can do alright without I think.
 

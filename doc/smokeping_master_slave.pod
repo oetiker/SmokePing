@@ -108,6 +108,12 @@ create the following files:
  dest3~slave1.rrd
  dest3~slave2.rrd
 
+The F<slavesecrets.conf> file contains a colon separated list of hostnames
+and secrets.
+
+ host1:secret1
+ host2:secret2
+
 =head2 Slave Configuration
 
 A smokeping slave setup has no configuration file. It just needs to know
@@ -118,6 +124,9 @@ F</tmp/smokeping.$USER.cache>.
  ./smokeping --master-url=http://smokeping/smokeping.cgi \
              --cache-dir=/var/smokeping/ \
              --shared-secret=/var/smokeping/secret.txt
+
+The F<secret.txt> file contains a single word, the secret of this slave. It
+is NOT the same as the F<slavesecrets.conf> file the master uses.
 
 =head1 SECURITY CONSIDERATIONS
 
