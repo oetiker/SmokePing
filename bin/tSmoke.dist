@@ -54,7 +54,7 @@ use warnings;
 use lib qw(lib);
 use lib qw(/usr/local/rrdtool-1.0.39/lib/perl);
 
-use Smokeping 2.004000;
+use Smokeping 2.004002;
 use Net::SMTP;
 use Getopt::Long;
 use Pod::Usage;

@@ -9,7 +9,7 @@ use lib qw(/home/oetiker/checkouts/smokeping/trunk/software/lib);
 
 use CGI::Carp qw(fatalsToBrowser);
 
-use Smokeping 2.004000;
+use Smokeping 2.004002;
 
 Smokeping::cgi("/home/oetiker/checkouts/smokeping/trunk/software/etc/config.dist");
 
