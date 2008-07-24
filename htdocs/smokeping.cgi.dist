@@ -1,13 +1,17 @@
-#!/usr/sepp/bin/speedy -w
+#!/usr/bin/speedy
 # -*-perl-*-
 
-use lib qw(/usr/pack/rrdtool-1.0.33-to/lib/perl);
-use lib qw(/home/oetiker/data/projects/AADJ-smokeping/dist/lib);
+use strict;
+use warnings;
+
+use lib qw(/usr/pack/rrdtool-1.3.0-rp/lib/perl);
+use lib qw(/home/oetiker/checkouts/smokeping/trunk/software/lib);
+
 use CGI::Carp qw(fatalsToBrowser);
 
 use Smokeping 2.004000;
 
-Smokeping::cgi("/home/oetiker/data/projects/AADJ-smokeping/dist/etc/config");
+Smokeping::cgi("/home/oetiker/checkouts/smokeping/trunk/software/etc/config.dist");
 
 =head1 NAME
 

@@ -1547,12 +1547,12 @@ sub hierarchy_switcher($$){
 sub display_webpage($$){
     my $cfg = shift;
     my $q = shift;
-    my $trag = '';
+    my $targ = '';
     if ( $q->param('target') and $q->param('target') !~ /\.\./ and $q->param('target') =~ /(\S+)/){
         $targ = $1;
     }
     my ($path,$slave) = split(/~/,$targ);
-    if ($slave and $slave ~= /(\S+)/){
+    if ($slave and $slave =~ /(\S+)/){
         die "ERROR: slave '$slave' is not defined in the '*** Slaves ***' section!\n"
             unless defined $cfg->{Slaves}{$slave};
         $slave = $1;

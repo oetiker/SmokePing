@@ -112,7 +112,10 @@ secrets=/home/oetiker/checkouts/smokeping/trunk/software/etc/smokeping_secrets.d
 +boomer
 display_name=boomer
 color=0000ff
+
 +slave2
+display_name=another
+color=00ff00
 
 *** Targets ***
 

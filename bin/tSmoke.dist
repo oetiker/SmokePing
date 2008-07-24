@@ -43,6 +43,7 @@
 # Tobias Oetiker, or course, the author of Smokeping, RRDTool and MRTG
 #
 use strict;
+use warnings;
 
 # We need to use
 # -- Smokeping libraries
@@ -51,7 +52,7 @@ use strict;
 #
 # Point the lib variables to your implementation
 use lib qw(lib);
-use lib "/usr/local/rrdtool-1.0.39/lib/perl";
+use lib qw(/usr/local/rrdtool-1.0.39/lib/perl);
 
 use Smokeping 2.004000;
 use Net::SMTP;

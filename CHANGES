@@ -1,9 +1,13 @@
+2008/7/24 -- released version 2.4.2
+
+* added strict to both wrappers and fixed some followup errors -- tobi
+
 * kill taint error in Smokeping.pm -- tobi
 
 * better master/slave secrets documentation -- tobi
 
 * do not load :sys_wait_h from POSIX perl module since this seems to
-  be missing in some linux distros and we can do alright without I think.
+  be missing in some linux distros and we can do alright without.
 
 2008/6/13 -- released version 2.4.1
 
