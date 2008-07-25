@@ -1,3 +1,5 @@
+* set sig child to IGNORE for automatic reaping of zombies -- tobi
+
 2008/7/24 -- released version 2.4.2
 
 * added strict to both wrappers and fixed some followup errors -- tobi

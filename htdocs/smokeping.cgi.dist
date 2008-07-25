@@ -7,6 +7,9 @@ use warnings;
 use lib qw(/usr/pack/rrdtool-1.3.0-rp/lib/perl);
 use lib qw(/home/oetiker/checkouts/smokeping/trunk/software/lib);
 
+# don't bother with zombies
+$SIG{CHLD} = 'IGNORE';
+
 use CGI::Carp qw(fatalsToBrowser);
 
 use Smokeping 2.004002;

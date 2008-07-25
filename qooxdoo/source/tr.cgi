@@ -8,6 +8,9 @@ use CGI::Util qw(expires);
 use CGI::Session;
 use Qooxdoo::JSONRPC;
 
+# don't bother with zombies
+$SIG{CHLD} = 'IGNORE';
+
 #$Qooxdoo::JSONRPC::debug=1;
 
 # Change this space-separated list of directories to include
