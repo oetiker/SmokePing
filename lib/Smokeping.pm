@@ -1326,7 +1326,8 @@ sub get_detail ($$$$;$){
                '--height',$cfg->{Presentation}{detail}{height},
                '--width',$cfg->{Presentation}{detail}{width},
                '--title',$desc.$from,
-               '--rigid','--upper-limit', $max->{$s}{$start},
+               '--rigid',
+               '--upper-limit', $max->{$s}{$start},
                @log,
                '--lower-limit',(@log ? ($max->{$s}{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
                '--vertical-label',$ProbeUnit,
@@ -3721,7 +3722,8 @@ sub load_cfg ($;$) {
     my $cfmod = (stat $cfgfile)[9] || die "ERROR: calling stat on $cfgfile: $!\n";
     # when running under speedy this will prevent reloading on every run
     # if cfgfile has been modified we will still run.
-    if (not defined $cfg or not defined $probes or $cfg->{__last} < $cfmod ){
+    if (not defined $cfg or not defined $probes # or $cfg->{__last} < $cfmod
+        ){
         $cfg = undef;
         my $parser = get_parser;
         $cfg = get_config $parser, $cfgfile;       
@@ -3844,9 +3846,10 @@ POD
 
 }
 sub cgi ($) {
+    my $cfgfile = shift;
     $cgimode = 'yes';
     umask 022;
-    load_cfg shift;
+    load_cfg $cfgfile;
     my $q=new CGI;
     initialize_cgilog();
     if ($q->param(-name=>'slave')) { # a slave is calling in
@@ -3863,6 +3866,10 @@ sub cgi ($) {
         if (not $q->param('displaymode') or $q->param('displaymode') ne 'a'){ #in ayax mode we do not issue a header YET
         }
         display_webpage $cfg,$q;
+    }
+    if ((stat $cfgfile)[9] > $cfg->{__last}){
+        # we die if the cfgfile is newer than our in memory copy
+        kill -9, $$;
     }
 }
 
