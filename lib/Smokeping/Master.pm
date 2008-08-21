@@ -110,9 +110,12 @@ sub save_updates {
     my $updates = shift;
     # name\ttime\tupdatestring
     # name\ttime\tupdatestring
-
+    my %u;
     for my $update (split /\n/, $updates){
         my ($name, $time, $updatestring) = split /\t/, $update;
+        push @{$u{$name}}, [$time,$updatestring];
+    }
+    for my $name (keys %u){
         my $file = slavedatadir($cfg) ."/${name}.${slave}.slave_cache";
         if ( ${name} =~ m{(^|/)\.\.($|/)} ){
             warn "Skipping update for ${name}.${slave}.slave_cache since ".
@@ -138,7 +141,10 @@ sub save_updates {
 		            $existing = $in;
 			};
                     };
-                    push @{$existing}, [ $slave, $time, $updatestring ];
+                    map {
+                         push @{$existing}, [ $slave, $_->[0], $_->[1] ];
+                    } @{$u{$name}};
+
                     nstore_fd($existing, $fh);		    
                     flock($fh, LOCK_UN);
                     close $fh;
