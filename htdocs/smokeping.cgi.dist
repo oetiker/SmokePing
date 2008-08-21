@@ -1,4 +1,5 @@
-#!/usr/bin/speedy
+#!/usr/bin/speedy -w --  -r100 -t30 -M5 -gSmokePing
+
 # -*-perl-*-
 
 use strict;
