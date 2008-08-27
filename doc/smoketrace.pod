@@ -31,20 +31,20 @@ directory!).
  mkdir $web/script
  cp $src/htdocs/script/Tr.js $web/script/
 
-=item 2.
+=item 3.
 
 Copy C<htdocs/tr.html> to your smokeping web directory (NOT cgi-bin). Make
 sure the path, pointing to C<Tr.js> is correct.
 
  cp $src/htdocs/tr.html $web/
 
-=item 3.
+=item 4.
 
 Copy C<htdocs/resource> into the directory where you put C<tr.html>
 
  cp -r $src/htdocs/resource $web/ 
 
-=item 4.
+=item 5.
 
 Copy F<htdocs/tr.cgi.dist> to the directory where you put C<tr.html>. Change
 its name to C<tr.cgi>. Edit C<tr.cgi> to adjust the C<use lib> line, to
@@ -53,7 +53,7 @@ C<smokeping.cgi> and the smokeping daemon.
   
  cp $src/htdocs/tr.cgi.dist $web/tr.cgi 
 
-=item 5.
+=item 6.
 
 Edit your config file and add the line:
 
