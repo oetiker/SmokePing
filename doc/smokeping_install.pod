@@ -203,9 +203,18 @@ If you are going to use the B<DYNAMIC> IP support, customize the contents of thi
 
 =back
 
-Now you are ready to start smokeping:
+=head2 Starting the Smokeping Daemon
 
- ./bin/smokeping
+With all the scaffolding in place, you can now launch the smokeping daemon and send
+have it gather data for you. First you may want to run it in debug mode to see what
+it is doing
+
+ ./bin/smokeping --debug
+
+once all is well, start it up as a deamon. I would recomend to enable the logfile
+option so that you can see if it runs into trouble.
+
+ ./bin/smokeping --logfile=smoke.log
 
 Once the system works, you may want to put a SmokePing startup script into
 your F</etc/init.d> tree. Check out L<smokeping> for further information.
