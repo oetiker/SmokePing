@@ -1,3 +1,14 @@
+* let cgi processes die on config change this provides for smoother
+  behaviour than a horde of instances going for a cfg reload. --tobi
+
+* tune speedy parameters for a more reasonable behaviour --tobi
+
+* rewrite storing of multiple slave updates for better performance --tobi
+
+* fix bug in storage of slave updatesL: when the local smokeping daemon
+  running only the first update could be read back, the others were hidden
+  in the storeable. --tobi
+
 * set sig child to IGNORE for automatic reaping of zombies -- tobi
 
 2008/7/24 -- released version 2.4.2
