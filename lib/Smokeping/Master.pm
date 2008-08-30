@@ -113,51 +113,48 @@ sub save_updates {
     my %u;
     for my $update (split /\n/, $updates){
         my ($name, $time, $updatestring) = split /\t/, $update;
-        push @{$u{$name}}, [$time,$updatestring];
-    }
-    for my $name (keys %u){
-        my $file = slavedatadir($cfg) ."/${name}.${slave}.slave_cache";
         if ( ${name} =~ m{(^|/)\.\.($|/)} ){
             warn "Skipping update for ${name}.${slave}.slave_cache since ".
                  "you seem to try todo some directory magic here. Don't!";
-        } 
-        else {
-
-            for (my $i = 2; $i >= 0; $i--){
-                my $fh;
-                if ( open ($fh, '+>>' , $file) and flock($fh, LOCK_EX) ){
-                    my $existing = [];
-                    if (! -e $file) { # the reader unlinked it from under us
-                        flock($fh, LOCK_UN);
-                        close $fh;
-                        next;
-                    }
-                    seek $fh, 0, 0;
-                    if ( -s _ ){
-                        my $in = eval { fd_retrieve $fh };
-                        if ($@) { #error
-                            warn "Loading $file: $@";
-                        } else {
-		            $existing = $in;
-			};
-                    };
-                    map {
-                         push @{$existing}, [ $slave, $_->[0], $_->[1] ];
-                    } @{$u{$name}};
-
-                    nstore_fd($existing, $fh);		    
+        } else {
+            push @{$u{$name}}, [$time,$updatestring];
+        }
+    }
+    for my $name (sort keys %u){
+        my $file = slavedatadir($cfg) ."/${name}.${slave}.slave_cache";
+        for (my $i = 2; $i >= 0; $i--){
+            my $fh;
+            if ( open ($fh, '+>>' , $file) and flock($fh, LOCK_EX) ){
+                my $existing = [];
+                if (! -e $file) { # the reader unlinked it from under us
                     flock($fh, LOCK_UN);
                     close $fh;
-                    last;
-                } elsif ($i > 0) {
-                    warn "Could not lock $file ($!). Trying again $i more times.\n";
-                    close $fh;
-                    sleep rand(2);
                     next;
                 }
-                warn "Could not update $file, giving up for now.";
+                seek $fh, 0, 0;
+                if ( -s _ ){
+                    my $in = eval { fd_retrieve $fh };
+                    if ($@) { #error
+                        warn "Loading $file: $@";
+                    } else {
+                        $existing = $in;
+    			    };
+                };
+                map {
+                    push @{$existing}, [ $slave, $_->[0], $_->[1] ];
+                } @{$u{$name}};
+
+                nstore_fd($existing, $fh);		    
+                flock($fh, LOCK_UN);
                 close $fh;
+                last;
+            } elsif ($i > 0) {
+                warn "Could not lock $file ($!). Trying again $i more times.\n";
+                sleep rand(2);
+                next;
             }
+            warn "Could not update $file, giving up for now.";
+            close $fh;
         }
     }         
 };
