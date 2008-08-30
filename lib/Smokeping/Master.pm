@@ -143,7 +143,7 @@ sub save_updates {
                 map {
                     push @{$existing}, [ $slave, $_->[0], $_->[1] ];
                 } @{$u{$name}};
-
+                seek $fh, 0, 0;
                 nstore_fd($existing, $fh);		    
                 flock($fh, LOCK_UN);
                 close $fh;
