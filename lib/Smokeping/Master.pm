@@ -1,7 +1,7 @@
 # -*- perl -*-
 package Smokeping::Master;
 use Data::Dumper;
-use Storable qw(nstore_fd dclone fd_retrieve);
+use Storable qw(nstore dclone fd_retrieve);
 use strict;
 use warnings;
 use Fcntl qw(:flock);
@@ -143,8 +143,8 @@ sub save_updates {
                 map {
                     push @{$existing}, [ $slave, $_->[0], $_->[1] ];
                 } @{$u{$name}};
-                seek $fh, 0, 0;
-                nstore_fd($existing, $fh);		    
+                nstore($existing, $file.$$);               
+               rename $file.$$,$file;
                 flock($fh, LOCK_UN);
                 close $fh;
                 last;
