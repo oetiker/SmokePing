@@ -2,10 +2,11 @@
 ######################################################################
 ### SNMP Request/Response Handling
 ######################################################################
-### Copyright (c) 1995-2002, Simon Leinen.
+### Copyright (c) 1995-2008, Simon Leinen.
 ###
 ### This program is free software; you can redistribute it under the
-### "Artistic License" included in this distribution (file "Artistic").
+### "Artistic License 2.0" included in this distribution
+### (file "Artistic").
 ######################################################################
 ### The abstract class SNMP_Session defines objects that can be used
 ### to communicate with SNMP entities.  It has methods to send
@@ -20,7 +21,7 @@
 ### Contributions and fixes by:
 ###
 ### Matthew Trunnell <matter@media.mit.edu>
-### Tobias Oetiker <oetiker@ee.ethz.ch>
+### Tobias Oetiker <tobi@oetiker.ch>
 ### Heine Peters <peters@dkrz.de>
 ### Daniel L. Needles <dan_needles@INS.COM>
 ### Mike Mitchell <mcm@unx.sas.com>
@@ -35,6 +36,10 @@
 ### Valerio Bontempi <v.bontempi@inwind.it>: IPv6 support
 ### Lorenzo Colitti <lorenzo@colitti.com>: IPv6 support
 ### Philippe Simonet <Philippe.Simonet@swisscom.com>: Export avoid...
+### Luc Pauwels <Luc.Pauwels@xalasys.com>: use_16bit_request_ids
+### Andrew Cornford-Matheson <andrew.matheson@corenetworks.com>: inform
+### Gerry Dalton <gerry.dalton@consolidated.com>: strict subs bug
+### Mike Fischer <mlf2@tampabay.rr.com>: pass MSG_DONTWAIT to recv()
 ######################################################################
 
 package SNMP_Session;		
@@ -45,9 +50,10 @@ use strict;
 use Exporter;
 use vars qw(@ISA $VERSION @EXPORT $errmsg
 	    $suppress_warnings
-	    $default_avoid_negative_request_ids);
+	    $default_avoid_negative_request_ids
+	    $default_use_16bit_request_ids);
 use Socket;
-use BER '0.95';
+use BER '1.05';
 use Carp;
 
 sub map_table ($$$ );
@@ -56,7 +62,7 @@ sub map_table_start_end ($$$$$$);
 sub index_compare ($$);
 sub oid_diff ($$);
 
-$VERSION = '0.98';
+$VERSION = '1.12';
 
 @ISA = qw(Exporter);
 
@@ -107,6 +113,13 @@ my $default_max_repetitions = 12;
 ###
 $SNMP_Session::default_avoid_negative_request_ids = 0;
 
+### Default value for "use_16bit_request_ids".
+###
+### Set this to non-zero if you have agents that use 16bit request IDs,
+### and don't forget to complain to your agent vendor.
+###
+$SNMP_Session::default_use_16bit_request_ids = 0;
+
 ### Whether all SNMP_Session objects should share a single UDP socket.
 ###
 $SNMP_Session::recycle_socket = 0;
@@ -120,16 +133,24 @@ $SNMP_Session::recycle_socket = 0;
 ### but this function is only available in recent versions of Socket.pm.
 my $ipv6_addr_len;
 
+### Flags to be passed to recv() when non-blocking behavior is
+### desired.  On most POSIX-like systems this will be set to
+### MSG_DONTWAIT, on other systems we leave it at zero.
+###
+my $dont_wait_flags;
+
 BEGIN {
     $ipv6_addr_len = undef;
     $SNMP_Session::ipv6available = 0;
+    $dont_wait_flags = 0;
 
-    if (eval {require Socket6;} &&
-	eval {require IO::Socket::INET6; IO::Socket::INET6->VERSION("1.26");}) {
+    if (eval {local $SIG{__DIE__};require Socket6;} &&
+       eval {local $SIG{__DIE__};require IO::Socket::INET6; IO::Socket::INET6->VERSION("1.26");}) {
 	import Socket6;
 	$ipv6_addr_len = length(pack_sockaddr_in6(161, inet_pton(AF_INET6(), "::1")));
 	$SNMP_Session::ipv6available = 1;
     }
+    eval 'local $SIG{__DIE__};local $SIG{__WARN__};$dont_wait_flags = MSG_DONTWAIT();';
 }
 
 my $the_socket;
@@ -137,14 +158,14 @@ my $the_socket;
 $SNMP_Session::errmsg = '';
 $SNMP_Session::suppress_warnings = 0;
 
-sub get_request      { 0 | context_flag };
-sub getnext_request  { 1 | context_flag };
-sub get_response     { 2 | context_flag };
-sub set_request      { 3 | context_flag };
-sub trap_request     { 4 | context_flag };
-sub getbulk_request  { 5 | context_flag };
-sub inform_request   { 6 | context_flag };
-sub trap2_request    { 7 | context_flag };
+sub get_request      { 0 | context_flag () };
+sub getnext_request  { 1 | context_flag () };
+sub get_response     { 2 | context_flag () };
+sub set_request      { 3 | context_flag () };
+sub trap_request     { 4 | context_flag () };
+sub getbulk_request  { 5 | context_flag () };
+sub inform_request   { 6 | context_flag () };
+sub trap2_request    { 7 | context_flag () };
 
 sub standard_udp_port { 161 };
 
@@ -180,10 +201,11 @@ sub encode_request_3 ($$$@) {
     local($_);
 
     $this->{request_id} = ($this->{request_id} == 0x7fffffff)
-	? ($this->{avoid_negative_request_ids}
-	   ? 0x00000000
-	   : -0x80000000)
-	: $this->{request_id}+1;
+	? -0x80000000 : $this->{request_id}+1;
+    $this->{request_id} += 0x80000000
+	if ($this->{avoid_negative_request_ids} && $this->{request_id} < 0);
+    $this->{request_id} &= 0x0000ffff
+	if ($this->{use_16bit_request_ids});
     foreach $_ (@{$encoded_oids_or_pairs}) {
       if (ref ($_) eq 'ARRAY') {
 	$_ = &encode_sequence ($_->[0], $_->[1])
@@ -267,14 +289,18 @@ sub decode_trap_request ($$) {
      $bindings)
 	= decode_by_template ($trap, "%{%i%s%*{%O%A%i%i%u%{%@",
 			    trap_request);
-    if (! defined ($snmp_version)) {
+    if (!defined $snmp_version) {
 	($snmp_version, $community,
 	 $request_id, $error_status, $error_index,
 	 $bindings)
 	    = decode_by_template ($trap, "%{%i%s%*{%i%i%i%{%@",
 				  trap2_request);
-	return $this->error_return ("v2 trap request contained errorStatus/errorIndex "
-		      .$error_status."/".$error_index)
+	if (!defined $snmp_version) {
+	    ($snmp_version, $community,$request_id, $error_status, $error_index, $bindings)
+		= decode_by_template ($trap, "%{%i%s%*{%i%i%i%{%@", inform_request);
+	}
+	return $this->error_return ("v2 trap/inform request contained errorStatus/errorIndex "
+				    .$error_status."/".$error_index)
 	    if defined $error_status && defined $error_index
 	    && ($error_status != 0 || $error_index != 0);
     }
@@ -367,14 +393,13 @@ sub request_response_5 ($$$$$) {
 	    if (defined $this->{'capture_buffer'}
 		and ref $this->{'capture_buffer'} eq 'ARRAY');
 	#
-	
       wait_for_response:
 	($nfound, $timeleft) = $this->wait_for_response($timeleft);
 	if ($nfound > 0) {
 	    my($response_length);
 
 	    $response_length
-		= $this->receive_response_3 ($response_tag, $oids, $errorp);
+		= $this->receive_response_3 ($response_tag, $oids, $errorp, 1);
 	    if ($response_length) {
 		# IlvJa
 		# Add response pdu to capture_buffer
@@ -384,8 +409,6 @@ sub request_response_5 ($$$$$) {
 		      if (defined $this->{'capture_buffer'}
 			  and ref $this->{'capture_buffer'} eq 'ARRAY');
 		#
-		
-
 		return $response_length;
 	    } elsif (defined ($response_length)) {
 		goto wait_for_response;
@@ -407,7 +430,6 @@ sub request_response_5 ($$$$$) {
 	if (defined $this->{'capture_buffer'}
 	    and ref $this->{'capture_buffer'} eq 'ARRAY');
     #
-
     $this->error ("no response received");
 }
 
@@ -667,11 +689,8 @@ sub open {
 	   'sockfamily' => $sockfamily,
 	   'max_pdu_len' => $max_pdu_len,
 	   'pdu_buffer' => '\0' x $max_pdu_len,
-	   'request_id' =>
-	       $SNMP_Session::default_avoid_negative_request_ids
-	       ? (int (rand 0x8000) << 16) + int (rand 0x10000)
-	       : (int (rand 0x10000) << 16) + int (rand 0x10000)
-	       - 0x80000000,
+	   'request_id' => (int (rand 0x10000) << 16)
+	       + int (rand 0x10000) - 0x80000000,
 	   'timeout' => $default_timeout,
 	   'retries' => $default_retries,
 	   'backoff' => $default_backoff,
@@ -683,6 +702,7 @@ sub open {
 	   'lenient_source_address_matching' => 1,
 	   'lenient_source_port_matching' => 1,
 	   'avoid_negative_request_ids' => $SNMP_Session::default_avoid_negative_request_ids,
+	   'use_16bit_request_ids' => $SNMP_Session::default_use_16bit_request_ids,
 	   'capture_buffer' => undef,
 	  };
 }
@@ -817,9 +837,11 @@ sub sa_equal_p ($$$) {
 }
 
 sub receive_response_3 {
-    my ($this, $response_tag, $oids, $errorp) = @_;
+    my ($this, $response_tag, $oids, $errorp, $dont_block_p) = @_;
     my ($remote_addr);
-    $remote_addr = recv ($this->sock,$this->{'pdu_buffer'},$this->max_pdu_len,0);
+    my $flags = 0;
+    $flags = $dont_wait_flags if defined $dont_block_p and $dont_block_p;
+    $remote_addr = recv ($this->sock,$this->{'pdu_buffer'},$this->max_pdu_len,$flags);
     return $this->error ("receiving response PDU: $!")
 	unless defined $remote_addr;
     return $this->error ("short (".length $this->{'pdu_buffer'}
@@ -1075,7 +1097,9 @@ sub map_table_start_end ($$$$$$) {
 		}
 		($base_index = undef), last
 		    if !defined $min_index;
-		last if defined $end && index_compare ($min_index, $end) >= 0;
+		last
+		    if defined $end
+		    and SNMP_Session::index_compare ($min_index, $end) >= 0;
 		&$mapfn ($min_index, @collected_values);
 		++$call_counter;
 		$base_index = $min_index;
@@ -1084,7 +1108,9 @@ sub map_table_start_end ($$$$$$) {
 	    return undef;
 	}
 	last if !defined $base_index;
-	last if defined $end and index_compare ($base_index, $end) >= 0;
+	last
+	    if defined $end
+	    and SNMP_Session::index_compare ($base_index, $end) >= 0;
     }
     $call_counter;
 }
