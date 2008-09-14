@@ -34,7 +34,7 @@ your system yet, you should install openssh >= 3.8p1
 The Probe asks the given host n-times for it's public key, where n is
 the amount specified in the config File.
 
-As part of the initialization, the probe asks localhost for it's public key
+As part of the initialization, the probe asks 127.0.0.1 for it's public key
 and tries to parse the output. Make sure you have SSH running on the
 localhost as well.
 DOC
@@ -55,7 +55,7 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        my $call = "$self->{properties}{binary} -t dsa,rsa,rsa1 localhost";
+        my $call = "$self->{properties}{binary} -t dsa,rsa,rsa1 127.0.0.1";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
             print "### parsing ssh-keyscan output...OK\n";
