@@ -51,7 +51,7 @@ three-way handshake. This is the same half-open scanning technique that nmap(1) 
 when passed the -sS flag.
 DOC
                 authors => <<'DOC',
-Norman Rasmussen <norman@rasmussen.org>
+Norman Rasmussen <norman@rasmussen.co.za>
 Patched for Smokeping 2.x compatibility by Anton Chernev <maznio@doom.bg>
 DOC
         }
