@@ -20,36 +20,39 @@
  * i.e. using deeper namespaces and a corresponding file structure within the 
  * <tt>test</tt> folder.
  */
-qx.Class.define("tr.test.DemoTest",
-{
-  extend : qx.dev.unit.TestCase,
+qx.Class.define("tr.test.DemoTest", {
+    extend : qx.dev.unit.TestCase,
 
-  members :
-  {
-    /*
-    ---------------------------------------------------------------------------
-      TESTS
-    ---------------------------------------------------------------------------
-    */
-  
-    /**
-     * Here are some simple tests
-     */
-    testSimple : function()
-    {
-      this.assertEquals(4, 3+1, "This should never fail!");
-      this.assertFalse(false, "Can false be true?!");
-    },
+    members : {
+        /*
+            ---------------------------------------------------------------------------
+              TESTS
+            ---------------------------------------------------------------------------
+            */
 
-    /**
-     * Here are some more advanced tests
-     */
-    testAdvanced: function () 
-    {
-      var a = 3;
-      var b = a;
-      this.assertIdentical(a, b, "A rose by any other name is still a rose");
-      this.assertInRange(3, 1, 10, "You must be kidding, 3 can never be outside [1,10]!");
+        /**
+         * Here are some simple tests
+         *
+         * @type member
+         * @return {void} 
+         */
+        testSimple : function() {
+            this.assertEquals(4, 3 + 1, "This should never fail!");
+            this.assertFalse(false, "Can false be true?!");
+        },
+
+
+        /**
+         * Here are some more advanced tests
+         *
+         * @type member
+         * @return {void} 
+         */
+        testAdvanced : function() {
+            var a = 3;
+            var b = a;
+            this.assertIdentical(a, b, "A rose by any other name is still a rose");
+            this.assertInRange(3, 1, 10, "You must be kidding, 3 can never be outside [1,10]!");
+        }
     }
-  }
 });

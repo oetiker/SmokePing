@@ -25,7 +25,7 @@
 import sys, os, subprocess
 
 CMD_PYTHON = 'python'
-QOOXDOO_PATH = '../../../../../../../usr/pack/qooxdoo-0.8svn-to/frontend'
+QOOXDOO_PATH = '../../../../../../../../../../usr/pack/qooxdoo-0.8svn-to/frontend'
 REAL_GENERATOR = os.path.normpath(
                     os.path.join(os.path.abspath(os.path.dirname(sys.argv[0])),
                                  QOOXDOO_PATH, 'tool', 'bin', 'generator.py'))
@@ -36,7 +36,16 @@ argList = []
 argList.append(CMD_PYTHON)
 argList.append(REAL_GENERATOR)
 argList.extend(sys.argv[1:])
-if sys.platform != "win32":
+if sys.platform == "win32":
+    argList1=[]
+    for arg in argList:
+        if arg.find(' ')>-1:
+            argList1.append('"%s"' % arg)
+        else:
+            argList1.append(arg)
+    argList = argList1
+else:
     argList = ['"%s"' % x for x in argList]  # quote argv elements
+    
 cmd = " ".join(argList)
 subprocess.call(cmd, shell=True)
