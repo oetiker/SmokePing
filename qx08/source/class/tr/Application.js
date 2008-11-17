@@ -1,18 +1,13 @@
 /* ************************************************************************
+   Copyright: 2008, OETIKER+PARTNER AG
+   License: GPL
+   Authors: Tobias Oetiker
+   $Id: $
+* ************************************************************************ */
 
-   Copyright: OETIKER+PARTNER AG
-
-   License: Gnu GPL Verrsion 3
-
-   Authors: Tobias Oetiker <tobi@oetiker.ch>
-
-************************************************************************ */
-
-/* ************************************************************************
-
+/*
 #asset(tr/*)
-
-************************************************************************ */
+*/
 
 /**
  * This is the main application class of your custom application "qx08"
@@ -26,7 +21,7 @@ qx.Class.define("tr.Application", {
          * during startup of the application
          *
          * @type member
-         * @return {void} 
+         * @return {void}
          */
         main : function() {
             // Call super class
@@ -34,19 +29,37 @@ qx.Class.define("tr.Application", {
 
             // Enable logging in debug variant
             if (qx.core.Variant.isSet("qx.debug", "on")) {
-                // support native logging capabilities, e.g. Firebug for Firefox
                 qx.log.appender.Native;
-
-                // support additional cross-browser console. Press F7 to toggle visibility
                 qx.log.appender.Console;
             }
 
             // if we run with a file:// url make sure
             // the app finds the Tr service (tr.cgi)
-            tr.Server.getInstance().setLocalUrl('http://localhosth/~oetiker/tr/');
+            tr.Server.getInstance().setLocalUrl('http://localhost/~oetiker/tr/');
+
+            this.getRoot().add(new tr.ui.CopyBuffer(), {
+                left : 0,
+                top  : 0
+            });
+
+            this.getRoot().add(new tr.ui.Error(), {
+                left : 0,
+                top  : 0
+            });
+
+            this.getRoot().add(new tr.ui.Config(), {
+                left : 0,
+                top  : 0
+            });
+
+            this.getRoot().add(new tr.ui.Link('SmokeTrace 2.4.2', 'http://oss.oetiker.ch/smokeping/', '#b0b0b0', '17px bold sans-serif'), {
+                right : 7,
+                top   : 5
+            });
 
             // Document is the application root
             var root = new qx.ui.container.Composite(new qx.ui.layout.VBox());
+            root.setPadding(5);
 
             this.getRoot().add(root, {
                 left   : 0,
@@ -55,40 +68,58 @@ qx.Class.define("tr.Application", {
                 bottom : 0
             });
 
-            root.set({ margin : 10 });
-            var top = new qx.ui.container.Composite(new qx.ui.layout.HBox().set({ alignY : 'top' }));
-            var title = new tr.ui.Link('SmokeTrace 2.4.2', 'http://oss.oetiker.ch/smokeping/', '#b0b0b0', '20px bold sans-serif');
-
-            top.add(title);
-            top.add(new qx.ui.core.Spacer(), { flex : 1 });
-            top.add(new tr.ui.ActionButton());
-            root.add(top);
-
-            var trace = new tr.ui.TraceTable();
-            root.add(trace, { flex : 1 });
+            var tabs = new qx.ui.tabview.TabView();
+            root.add(tabs, { flex : 1 });
 
             root.add(new tr.ui.Footer(this.tr("SmokeTrace is part of the of the SmokePing suite created by Tobi Oetiker, Copyright 2008."), 'http://oss.oetiker.ch/smokeping/'));
 
-            var cfgwin = new tr.ui.Config();
+            tabs.add(new tr.ui.TraceTab());
+            this.__handles = {};
+            qx.event.message.Bus.subscribe('add_handle',this.__add_handle,this);
+        },
 
-            this.getRoot().add(cfgwin, {
-                left : 30,
-                top  : 30
-            });
+        __handles: null,
+        __handle_count: 0,
 
-            qx.event.message.Bus.subscribe('tr.config', function(e) {
-                switch(e.getData())
-                {
-                    case 'open':
-                        cfgwin.open();
-                        break;
-
-                    case 'cancel':
-                        case 'ok':
-                            cfgwin.close();
-                            break;
+        __add_handle: function(m){
+            var handle = m.getData();
+            this.__handles[handle]=0;
+            if (this.__handle_count == 0){
+               this.__run_poller();
+            }
+        },
+        __run_poller: function(){        
+            var that = this;
+            tr.Server.getInstance().callAsync(
+                function(ret,exc,id){that.__process_input(ret,exc,id);},'poll',this.__handles
+            );
+        },
+        __process_input: function(ret,exc,id){
+            if (exc == null) {
+                for (var hand in ret){
+                    this.info('got '+hand);
+                    if (hand == 'handles'){
+                        this.__handles = ret[hand];
                     }
-                });
+                    if (ret[hand]['data']){
+                        qx.event.message.Bus.dispatch(hand+'::data', ret[hand]['data']);
+                    }
+                    if (ret[hand]['type']){
+                        qx.event.message.Bus.dispatch(hand+'::status', {type : ret[hand]['type'],
+                                                                        msg  : ret[hand]['msg']  });
+                    }
+                };
+            }
+            else {
+                qx.event.message.Bus.dispatch('error', [ this.tr("Server Error"), '' + exc ]);
+            }
+            this.__handle_count = 0;
+            for(var i in this.__handles){
+                this.__handle_count ++;
+            };
+            if (this.__hanlde_count > 0){
+                qx.event.Timer.once(this.__run_poller,this,this.__interval);
             }
         }
-    });
+    }
+});

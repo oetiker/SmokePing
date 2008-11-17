@@ -19,12 +19,12 @@ qx.Class.define('tr.ui.Cellrenderer', {
 
 
     /**
-                * Format a number with a configurable number of fraction digits
-                * and add optional pre and postfix.
-                * @param digits {Integer} how many digits should there be. Default is 0.
-                * @param prefix {String} optional prefix.
-                * @param postfix {String} optional postfix.
-                */
+                                            * Format a number with a configurable number of fraction digits
+                                            * and add optional pre and postfix.
+                                            * @param digits {Integer} how many digits should there be. Default is 0.
+                                            * @param prefix {String} optional prefix.
+                                            * @param postfix {String} optional postfix.
+                                            */
     construct : function(digits, postfix, prefix) {
         if (digits == undefined) {
             digits = 0;

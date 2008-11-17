@@ -12,17 +12,17 @@ qx.Class.define('tr.ui.Link', {
 
 
     /*
-            *****************************************************************************
-               CONSTRUCTOR
-            *****************************************************************************
-            */
+                                    *****************************************************************************
+                                       CONSTRUCTOR
+                                    *****************************************************************************
+                                    */
 
     /**
-             * @param text {String} Initial label
-             * @param url  {String} Where to link to
-             * @param color {String} Hex Color for the text
-             * @param font {String} Font from string representation
-             */
+                                     * @param text {String} Initial label
+                                     * @param url  {String} Where to link to
+                                     * @param color {String} Hex Color for the text
+                                     * @param font {String} Font from string representation
+                                     */
     construct : function(text, url, color, font) {
         this.base(arguments, text);
 

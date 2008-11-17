@@ -11,15 +11,6 @@
 qx.Class.define('tr.ui.Config', {
     extend : qx.ui.window.Window,
 
-
-
-
-    /*
-       *****************************************************************************
-       CONSTRUCTOR
-       *****************************************************************************
-       */
-
     construct : function() {
         this.base(arguments, this.tr("Traceroute Configuration"));
         var layout = new qx.ui.layout.Grid(3, 5);
@@ -39,87 +30,114 @@ qx.Class.define('tr.ui.Config', {
             showMinimize  : false
         });
 
-        var self = this;
+        var that = this;
 
         var create_config = function(retval, exc, id) {
             if (exc == null) {
-                self.__create_config(retval);
+                that.__create_config(retval);
             } else {
-                self.error(exc);
+                qx.event.message.Bus.dispatch('error', [ that.tr("Server Error"), '' + exc ]);
             }
         };
 
         tr.Server.getInstance().callAsync(create_config, 'get_config');
+
+        qx.event.message.Bus.subscribe('config', function(e) {
+            this.__task = e.getData();
+            this.__seed();
+            this.center();
+            this.open();
+        },
+        this);
     },
 
     members : {
+        __task : null,
+        __setters : null,
+
+
+        /**
+         * Load configuration values into dialog. If no values are provided,
+         * the default values get loaded.
+         *
+         * @type member
+         * @return {void}
+         */
+        __seed : function() {
+            for (var key in this.__setters) {
+                this.info(key+': '+this.__task[key])
+                this.__setters[key](this.__task[key]);
+            }
+        },
+
+
         /**
          * TODOC
          *
          * @type member
          * @param data {var} TODOC
-         * @return {void} 
+         * @return {void}
          */
         __create_config : function(data) {
             var entries = data.length;
             var status = {};
-            var setdef = {};
+            var setters = {};
+            this.__setters = setters;
+
             var r = 0;
-            var self = this;
+            var that = this;
 
-            for (var k=0; k<entries; k+=2) {
-                (function() {* // force local scoping
-                    var v = k + 1;
-
+            for (var k=0; k<entries; k++) {
+                (function() {
                     for (var check in
                     {
                         'default' : 0,
                         'label'   : 0,
                         'type'    : 0
                     }) {
-                        if (data[v][check] == undefined) {
-                            self.debug('Skipping ' + data[k] + ' since there is no ' + check);
-                            return ;* // we are inside a function, so we return instead of continue
+                        if (data[k][check] == undefined) {
+                            that.debug('Skipping ' + data[k] + ' since there is no ' + check);
+                            // exit from function is like 'next'
+                            return;
                         }
                     }
 
-                    var def = data[v]['default'];
+                    var def = data[k]['default'];
                     var widget;
                     var pick;
                     var items;
-                    var check;
                     var c;
 
-                    self.add(new qx.ui.basic.Label(data[v]['label']).set({ marginRight : 5 }), {
+                    that.add(new qx.ui.basic.Label(data[k]['label']).set({ marginRight : 5 }), {
                         row    : r,
                         column : 0
                     });
 
-                    switch(data[v]['type'])
+                    switch(data[k]['type'])
                     {
                         case 'spinner':
-                            widget = new qx.ui.form.Spinner(data[v]['min'], def, data[v]['max']);
-                            status[data[k]] = function() {
+                            widget = new qx.ui.form.Spinner(data[k]['min'], def, data[k]['max']);
+                            status[data[k]['key']] = function() {
                                 return widget.getValue();
                             };
 
-                            setdef[data[k]] = function() {
-                                widget.setValue(def);
+                            setters[data[k]['key']] = function(value) {
+                                widget.setValue(value == undefined ? def : value);
                             };
 
                             break;
 
                         case 'select':
                             widget = new qx.ui.form.SelectBox();
-                            status[data[k]] = function() {
+                            status[data[k]['key']] = function() {
                                 return widget.getValue();
                             };
 
-                            setdef[data[k]] = function() {
-                                widget.setValue(def);
+                            setters[data[k]['key']] = function(value) {
+                                widget.setValue(value == undefined ? def : value);
                             };
 
-                            pick = data[v]['pick'];
+                            pick = data[k]['pick'];
                             items = pick.length;
 
                             for (c=0; c<items; c+=2) {
@@ -130,45 +148,37 @@ qx.Class.define('tr.ui.Config', {
 
                         case 'boolean':
                             widget = new qx.ui.form.CheckBox();
-                            status[data[k]] = function() {
+                            status[data[k]['key']] = function() {
                                 return widget.getChecked();
                             };
 
-                            setdef[data[k]] = function() {
-                                widget.setChecked(def > 0);
+                            setters[data[k]['key']] = function(value) {
+                                widget.setChecked(value == undefined ? def > 0 : value > 0);
                             };
 
                             break;
                     }
 
-                    self.add(widget, {
+                    that.add(widget, {
                         row    : r,
                         column : 1
                     });
 
                     r++;
                 })();
-
-            }* // this is the rest of the scoping trick
-
-            for (var key in setdef) {
-                setdef[key]();
             }
 
             var ok = new qx.ui.form.Button(this.tr("Apply")).set({
                 marginTop  : 10,
-                marginLeft : 20
+                marginLeft : 40
             });
 
             ok.addListener('execute', function(e) {
-                var config = {};
-
                 for (var key in status) {
-                    config[key] = status[key]();
+                    that.__task[key] = status[key]();
                 }
 
-                self.close();
-                qx.event.message.Bus.dispatch('tr.setup', config);
+                that.close();
             });
 
             this.add(ok, {
@@ -178,12 +188,12 @@ qx.Class.define('tr.ui.Config', {
 
             var cancel = new qx.ui.form.Button(this.tr("Reset")).set({
                 marginTop   : 10,
-                marginRight : 20
+                marginRight : 30
             });
 
             cancel.addListener('execute', function(e) {
-                for (var key in setdef) {
-                    setdef[key]();
+                for (var key in setters) {
+                    setters[key]();
                 }
             });
 
