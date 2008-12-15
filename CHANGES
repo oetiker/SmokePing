@@ -1,3 +1,8 @@
+* new matcher:  ExpLoss.pm matcher.
+  It produces an exponential weighted average and supports RMON-like
+  thresholds to obtain stable node status detection. -- Veniamin Konoplev V.Konoplev rssi.ru
+
+
 * let cgi processes die on config change this provides for smoother
   behaviour than a horde of instances going for a cfg reload. --tobi
 
