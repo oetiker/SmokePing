@@ -1,32 +1,31 @@
 package Smokeping::matchers::ExpLoss;
-
 =head1 NAME
 
 Smokeping::matchers::ExpLoss - exponential weighting matcher for packet loss
-wirh RMON-like thresholds
+with RMON-like thresholds
 
 =head1 DESCRIPTION
 
-Match against exponential weighted average of last samples. Two thresholds
-- rising and falling - produce hysteresis loop like in RMON alert subsystem.
-If the "average" reaches "rising" threshold, matcher go to the "match" state
-and hold It until the "average" drop under the "falling" threshold.
+Match against exponential weighted average of last samples, thus new values 
+are more valuable as old ones. Two thresholds - rising and falling - produce 
+hysteresis loop like in RMON alert subsystem. If the average reaches the 
+"rising" threshold, matcher go to the "match" state and hold It until the 
+average drops under the "falling" threshold.
 
 Call the matcher with the following sequence:
 
  type = matcher
- edgetrigger = yes
  pattern =  CheckLoss(hist => <hist>, rising=><rising> \
-                     [,falling => <falling>] [,start=><stat>] [,fast=><fast>])
+                     [,falling => <falling>] [,skip=><stat>] [,fast=><fast>])
 
 Arguments:
  hist    - number of samples to weight against; weight will be disposed with
            exponetial decreasing manner from newest to oldest, so that the
-          oldest sample would have 1% significance;
+           oldest sample would have 1% significance;
  rising  - rising threshold for packet loss, 0-100%
  falling - falling threshold for packet loss, default is <rising>
- start   - wait <start> number of sample before "fire" alerts.
- fast    - use <fast> samples for fast transition: if values of last <fast>
+ skip    - skip <skip> number of samples after startup before "fire" alerts.
+ fast    - use <fast> samples for fast transition: if the values of last <fast>
            samples more then <rising> - take "match" state, if less then
            <falling> - take "no match" state.
 
@@ -73,7 +72,7 @@ sub new(@) {
     my $rules = {
         hist => '\d+',
         rising => '\d+(\.\d+)?',
-        falling => '\d+(\.\d+)?',
+	falling => '\d+(\.\d+)?',
         skip => '\d+',
         fast => '\d+',
     };
@@ -106,7 +105,7 @@ sub Test($$) {
     my $alfa = 1-0.01**(1/$hist);
 
     my $rising = $self->{param}{rising};
-    my $falling = $self->{param}{falling};
+    my $falling = (defined $self->{param}{falling} || $rising);
 
     my $result = 0; # initialize the filter as zero;
     my $loss;
@@ -142,10 +141,10 @@ sub Test($$) {
 
     # some debug stuff
     if (0) {
-        my $d = localtime(time);
+        my $d = `date`;
         chomp $d;
         my $array = join ":", @{ $data->{loss}}; 
-        system "echo $d $data->{target} $array $result. >> /tmp/matcher.log" if $rising == 0;
+        `echo $d $data->{target} $array $result. >> /tmp/matcher.log` if $rising == 0;
     }
     return $res;
 }
