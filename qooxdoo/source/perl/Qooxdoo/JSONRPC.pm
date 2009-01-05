@@ -85,6 +85,8 @@ sub handle_request
 
     my $error = new Qooxdoo::JSONRPC::error ($json);
 
+    $error->set_session($session);
+
     my $script_transport_id = ScriptTransport_NotInUse;
 
     #----------------------------------------------------------------------
@@ -251,7 +253,7 @@ sub handle_request
 
         $@ = '';
         $accessibility = eval $accessibility_method . 
-            '($method, $accessibility)';
+            '($method, $accessibility,$session)';
 
         if ($@)
         {
@@ -290,7 +292,7 @@ sub handle_request
         $requestUriDomain .= ":" . $cgi->server_port 
             if $cgi->server_port != ($is_https ? 443 : 80);
 
-        if ($cgi->referer !~ m|^(https?://[^/]*)|)
+        if ($cgi->referer and $cgi->referer !~ m|^(https?://[^/]*)|)
         {
             $error->set_error (JsonRpcError_PermissionDenied,
                                "Permission denied");
@@ -536,6 +538,14 @@ sub set_id
     my $id     = shift;
 
     $self->{id} = $id;
+}
+
+sub set_session
+{
+    my $self    = shift;
+    my $session = shift;
+
+    $self->{session} = $session;
 }
 
 sub set_script_transport_id

@@ -3,15 +3,89 @@ use strict;
 use POSIX qw(setsid);
 use Time::HiRes qw(usleep);
 use Socket;
+
+my $variant = 'butskoy';
+my $config = {
+    # Modern traceroute for Linux, version 2.0.9, Nov 19 2007
+    # Copyright (c) 2006  Dmitry Butskoy,   License: GPL
+    butskoy => [
+            -q => {
+                arg => 1,
+                type => 'static',
+            },
+            0  => {
+                arg => 'HOST',
+                type => 'intern',
+            },
+            1  => {
+                label => 'Packetlength',
+                type => 'spinner',
+                min => 0,
+                max => 1024,
+                def => 53,
+            },
+            -M => {
+                label   => 'Traceroute Method',
+                type    => 'select',
+                pick    => [
+                    default => 'Classic UDP',
+                    icmp    => 'ICMP ECHO',
+                    tcp     => 'TCP Syn',
+                    udp     => 'UDP to port 53',
+                    udplite => 'UDPLITE Datagram',
+                ],
+                default => 'icmp',
+            },
+            -F => {
+              label     => 'Do not Fragment',
+              type      => 'boolean',
+              default   => 0,
+            },
+    ],
+    # Version 1.4a12
+    lbl => [
+            -q => {
+                arg => 1,
+                type => 'static',
+            },
+            0  => {
+                arg => 'HOST',
+                type => 'intern',
+            },
+            1  => {
+                label => 'Packetlength',
+                type => 'spinner',
+                min => 0,
+                max => 1024,
+                def => 53,
+            },
+            -I => {
+              label   => 'Use ICMP ECHO',
+              widget  => 'boolean',
+              default => 1,
+            }
+    ]
+};
+
 sub GetAccessibility {
-        return "public";
+     my $method = shift;
+     my $access = shift;
+     my $session = shift;
+#     if ($method eq 'auth' or $session->param('authenticated') eq 'yes'){
+        return 'public';
+#     }
+#     else {
+#         return 'fail';
+#     }
 }
 
 sub launch {
      my $error = shift;
-     my $rounds = shift;
-     my $delay = shift;
      my $host = shift;
+     my $cfg = shift;
+     my $delay = $cfg->{delay} || 1;
+     my $rounds = $cfg->{rounds} || 1;
+
      defined(my $pid = fork) or do { $error->set_error(101,"Can't fork: $!");return $error};
      if ($pid){
         open my $x, ">/tmp/tr_session.$pid" or do {
@@ -31,7 +105,7 @@ sub launch {
      open STDERR, '>&STDOUT' or die "Can't dup stdout: $!";
      for (my $i = 0; $i<$rounds;$i++){
          my $start = time;
-         system "traceroute","-I","-q","1",$host;        
+         system "traceroute",@{$config->{$variant}{arguments}},$host;        
          my $wait = $delay - (time - $start);
          if ($wait > 0 and $i+1< $rounds){
              print "SLEEP $wait\n";
@@ -153,6 +227,28 @@ sub method_run_tr
         return $error;
     }
 }
+
+sub method_auth {
+    my $error = shift;
+    my $user = shift;
+    my $password = shift;
+    my $session = $error->{session};
+    if ($user eq 'tobi' and $password eq 'robi'){
+        $session->param('authenticated','yes');
+    }    
+}   
+
+sub method_get_config {
+    my $error = shift;
+    my @list;
+    for (my $i=0;defined $config->{$variant}[$i]; $i+=2){
+        next if not defined $config->{$variant}[$i+1]{label};
+        push @list, $config->{$variant}[$i],$config->{$variant}[$i+1];
+    };
+    return \@list;
+}
+ 
+                
 
 1;
 
