@@ -1,3 +1,6 @@
+* smokeinfo: new tool to extract numeric data from a smokeping installation
+  creation sponsored by Swisscom Hospitality -- tobi
+
 * new matcher:  ExpLoss.pm matcher.
   It produces an exponential weighted average and supports RMON-like
   thresholds to obtain stable node status detection. -- Veniamin Konoplev V.Konoplev rssi.ru
