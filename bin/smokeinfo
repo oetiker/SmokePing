@@ -72,6 +72,24 @@ B<smokeinfo> path/to/config.cfg [I<options>]
 SmokeInfo is a simple frontend to the L<Smokeping::Info> module. It provides
 access to numeric data stored in the rrd files.
 
+=head2 Examples
+
+Get all data all nodes
+
+ smokeinfo etc/config 
+
+Only show nodes directly under /Customers
+
+ smokeinfo --filter=/Customers/ etc/config
+
+Show all nodes under /Customers
+
+ smokeinfo --mode=recursive --filter=/Customers/ etc/config
+
+Show all nodes with '_wlan_' in the name
+
+ smokeinfo --mode=regexp --filter=_wlan_ etc/config
+
 =head1 COPYRIGHT
 
 Copyright (c) 2009 by OETIKER+PARTNER AG. All rights reserved.
