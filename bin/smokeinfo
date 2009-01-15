@@ -31,7 +31,7 @@ sub main()
     print "\n";
     for my $node (@$nodes) {
         my $data = $si->stat_node($node,'end-24h','now');
-	print join $opt{separator},$node->{path},map {sprintf($opt{format},$data->{$_})} @rows;
+	print join $opt{separator},$node->{path},map {defined $data->{$_} ? sprintf($opt{format},$data->{$_}) : '?'} @rows;
 	print "\n";
     }
 }

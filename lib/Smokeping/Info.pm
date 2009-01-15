@@ -26,15 +26,15 @@ sub __flatten_targets {
     my $probes = shift;
     my $root = shift;
     my $prefix = shift;
-    my @paths;
+    my @paths;    
     for my $target ( sort {$root->{$a}{_order} <=> $root->{$b}{_order}} 
-                     grep { ref $root->{$_} eq 'HASH' }  keys %$root ) {
+                     grep { ref $root->{$_} eq 'HASH' }  keys %$root ) {        
         push @paths,  __flatten_targets($probes,$root->{$target},$prefix.'/'.$target);
     };
     if (exists $root->{host} and not $root->{host} =~ m|/|){
         my $probe = $probes->{$root->{probe}};
         my $pings = $probe->_pings($root);
-        if (not $root->{nomasterpoll}) {
+        if (not $root->{nomasterpoll} or $root->{nomasterpoll} eq 'no') {
             push @paths, { path => $prefix, pings=>$pings };
         };
         if ($root->{slaves}) {
@@ -61,7 +61,6 @@ sub fetch_nodes {
 
     my $cfg = $self->{cfg_hash};
     my @flat = __flatten_targets($self->{probe_hash},$cfg->{Targets},'');
-
     my $rx = qr{.*};
     if ( defined $args{pattern} ) {
         if ( $args{mode} eq 'recursive' ) {
@@ -110,11 +109,12 @@ sub stat_node {
       'VDEF:median_now=median_avg,LAST',
       'PRINT:median_now:%.8le'
     );
-    if (my $ERROR = RRDs::error()){
-	croak "$path->{$path}: $ERROR";
-    }
     my %data;
-    @data{qw(loss_avg loss_max loss_now med_avg med_min med_max med_now)} = @$graphret;
+    if (my $ERROR = RRDs::error()){
+    	carp "$path->{path}: $ERROR";
+    } else {
+        @data{qw(loss_avg loss_max loss_now med_avg med_min med_max med_now)} = @$graphret;
+    }
     return \%data;
 };
 1;
@@ -138,22 +138,22 @@ functionality containd in here.
 
  my $hash_ref = $si->stat_node(path,start,end);
 
-=head2 IMPLEMENTATION
+=head1 IMPLEMENTATION
 
-=head3 new(path)
+=head2 new(path)
 
 Create a new Smokeping::Info instance. Instantiating Smokeping::Info entails
 reading the configuration file. This is a compte heavy procedure. So you may
 want to use a single info object to handle multiple requests.
 
-=head3 fetch_nodes(pattern=>'/...',mode=>{recursive|regexp})
+=head2 fetch_nodes(pattern=>'/...',mode=>{recursive|regexp})
 
 The fetch_nodes method will find all nodes sitting in the given pattern
 (absolute path) including the path itself. By setting the recursive mode,
 all rrd files in paths below will be returned as well. In regexp mode, all
 rrd paths matching the given expression will be returned.
 
-=head3 stat_node(node,start,end)
+=head2 stat_node(node,start,end)
 
 Return a hash pointer to statistics based on the data stored in the given
 rrd path.
