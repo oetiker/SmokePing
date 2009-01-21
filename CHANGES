@@ -1,3 +1,5 @@
+* fix broken FPing.pm error message call -- tobi
+
 * smokeinfo: new tool to extract numeric data from a smokeping installation
   creation sponsored by Swisscom Hospitality -- tobi
 
