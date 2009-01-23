@@ -3620,7 +3620,7 @@ sub daemonize_me ($) {
         open STDERR, '>/dev/null' or die "ERROR: Redirecting STDERR to /dev/null: $!";
         # send warnings and die messages to log
         $SIG{__WARN__} = sub { do_log ((shift)."\n") };
-        $SIG{__DIE__} = sub { do_log ((shift)."\n"); }; 
+        $SIG{__DIE__} = sub { return if $^S; do_log ((shift)."\n"); exit 1 }; 
     }
 }
 
