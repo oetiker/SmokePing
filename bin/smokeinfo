@@ -14,7 +14,7 @@ my $Revision = $1;
 sub main()
 {
     # parse options
-    my %opt = (mode=>'plain',filter=>'.*',separator=>';',format=>'%le',start=>'end-24h');
+    my %opt = (mode=>'plain',separator=>';',format=>'%le',start=>'end-24h');
 
     GetOptions(\%opt, 'help|h', 'man', 'version', 'noaction|no-action|n','no-head',
         'start=s','end=s','filter=s','mode=s','separator=s','format=s') or exit(1);
