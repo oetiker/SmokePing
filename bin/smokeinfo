@@ -14,10 +14,10 @@ my $Revision = $1;
 sub main()
 {
     # parse options
-    my %opt = (mode=>'plain',filter=>undef,separator=>';',format=>'%le',start=>'end-24h');
+    my %opt = (mode=>'plain',filter=>'.*',separator=>';',format=>'%le',start=>'end-24h');
 
     GetOptions(\%opt, 'help|h', 'man', 'version', 'noaction|no-action|n','no-head',
-        'start=s','end=s','pattern=s','mode=s','separator=s','format=s') or exit(1);
+        'start=s','end=s','filter=s','mode=s','separator=s','format=s') or exit(1);
     if($opt{help})     { pod2usage(1) }
     if($opt{man})      { pod2usage(-exitstatus => 0, -verbose => 2) }
     if($opt{version})  { print "smokeinfo $Revision\n"; exit(0) }
