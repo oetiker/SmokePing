@@ -1,3 +1,6 @@
+* help --static to work a bit better by fixing the dummy script_name
+  implementation -- tobi
+
 * disable __DIE__ handler inside evals -- tobi
 
 * fix broken FPing.pm error message call -- tobi

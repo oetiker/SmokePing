@@ -73,7 +73,7 @@ sub dummyCGI::param {
 }
 
 sub dummyCGI::script_name {
-    return wantarray ? () : "";
+    return "sorry_no_script_name_when_running_offline";
 }
 
 sub load_probes ($){
