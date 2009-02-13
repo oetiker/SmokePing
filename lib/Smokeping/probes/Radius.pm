@@ -130,6 +130,11 @@ sub pingone {
 
 	my $timeout = $vars->{timeout};
 
+       my $allowreject = $vars->{allowreject};
+       $self->do_debug("$host: radius allowreject is $allowreject");
+       $allowreject=(defined($allowreject)
+               and $allowreject eq "true");
+
 	$self->do_log("Missing RADIUS secret for $host"), return 
 		unless defined $secret;
 
@@ -172,6 +177,7 @@ sub pingone {
 			$result = $c;
 			$result = "OK" if $c == &ACCESS_ACCEPT;
 			$result = "fail" if $c == &ACCESS_REJECT;
+                       $result = "fail-OK" if $c == &ACCESS_REJECT and $allowreject;
 		} else {
 			if (defined $r->get_error) {
 				$result = "error: " . $r->strerror;
@@ -181,7 +187,12 @@ sub pingone {
 		}
 		$elapsed = $end - $start;
 		$self->do_debug("$host: radius query $_: $result, $elapsed");
-		push @times, $elapsed if (defined $c and $c == &ACCESS_ACCEPT);
+               if (defined $c) {
+                       if ( $c == &ACCESS_ACCEPT or
+                               ($c == &ACCESS_REJECT and $allowreject) ) {
+                               push @times, $elapsed;
+                       }
+               }
 	}
 	return sort { $a <=> $b } @times;
 }
@@ -242,6 +253,11 @@ sub targetvars {
 			_re => '\d+',
 			_example => 1645,
 		},
+               allowreject => {
+                       _doc => 'Treat "reject" responses as OK',
+                       _re => '(true|false)',
+                       _example => 'true',
+               },
 	});
 }
 

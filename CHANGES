@@ -1,3 +1,7 @@
+* the Radius probe now has an 'allowreject' variable that makes it treat
+  rejected RADIUS authentications as OK. 
+  Patch by Jeremy Laidman <jlaidman *rebel-it.com.au> --niko
+
 * help --static to work a bit better by fixing the dummy script_name
   implementation -- tobi
 
