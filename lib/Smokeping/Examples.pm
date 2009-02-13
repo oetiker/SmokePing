@@ -441,7 +441,7 @@ binary = /usr/bin/curl
 step = 60
 
 # a default for this target-specific variable
-urlformat = http://%host/
+urlformat = http://%host%/
 DOC
 	probedoc => <<DOC,
 This example explains the difference between probe- and target-specific

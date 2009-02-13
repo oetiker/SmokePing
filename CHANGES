@@ -1,3 +1,6 @@
+* fix a typo in configuration example 4, spotted by Guglielmo Bondioni
+  <guglielmo.bondioni *gmail.com> --niko
+
 * the Radius probe now has an 'allowreject' variable that makes it treat
   rejected RADIUS authentications as OK. 
   Patch by Jeremy Laidman <jlaidman *rebel-it.com.au> --niko
