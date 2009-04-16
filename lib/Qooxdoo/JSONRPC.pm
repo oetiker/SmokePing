@@ -28,6 +28,10 @@ use JSON;
 # Enabling debugging will log information in the apache logs, and in
 # some cases provide more information in error responses
 $Qooxdoo::JSONRPC::debug = 0;
+# By default methods are located in the Qooxdoo/Services directory
+$Qooxdoo::JSONRPC::service_path = 'Qooxdoo::Services';
+# By default methods have to be prefixed by 'method_'
+$Qooxdoo::JSONRPC::method_prefix = 'method_';
 
 ##############################################################################
 
@@ -72,10 +76,10 @@ sub handle_request
 
     my $session_id = $session->id ();
 
-    print STDERR "Session id: $session_id\n" 
+    print STDERR "Session id: $session_id\n"
 	if $Qooxdoo::JSONRPC::debug;
 
-    print $session->header;
+    print $session->header(-charset=>'UTF-8');
 
     # 'selfconvert' is enabled for date conversion. Ideally we also want
     # 'convblessed', but this then disabled 'selfconvert'.
@@ -127,7 +131,6 @@ sub handle_request
         $error->set_script_transport_id ($script_transport_id);
 
         $input = $cgi->param ('_ScriptTransport_data');
-            
     }
     else
     {
@@ -209,7 +212,7 @@ sub handle_request
 
     # Generate the name of the module corresponding to the Service
 
-    my $module = join ('::', ('Qooxdoo', 'Services', @service_components));
+    my $module = join ('::', ($Qooxdoo::JSONRPC::service_path, @service_components));
 
     # Attempt to load the module
 
@@ -235,7 +238,6 @@ sub handle_request
                                "Service '$module' not found");
         }
         $error->send_and_exit;
-        
     }
 
     #----------------------------------------------------------------------
@@ -247,7 +249,7 @@ sub handle_request
     my $accessibility = defaultAccessibility;
 
     my $accessibility_method = "${module}::GetAccessibility";
-    
+
     if (defined $accessibility_method)
     {
         print STDERR "Module $module has GetAccessibility\n"
@@ -260,7 +262,7 @@ sub handle_request
         if ($@)
         {
             print STDERR "$@\n" if $Qooxdoo::JSONRPC::debug;
-            
+
             $error->set_error (JsonRpcError_Unknown,
                                $@);
             $error->send_and_exit;
@@ -310,12 +312,12 @@ sub handle_request
                                "Permission denied");
             $error->send_and_exit;
         }
-        
+
         if (!defined $session->param ('session_referer_domain'))
         {
             $session->param ('session_referer_domain', $refererDomain);
         }
-            
+
     }
     elsif ($accessibility eq Accessibility_Session)
     {
@@ -358,8 +360,8 @@ sub handle_request
 
     # Generate the name of the function to call and check it exists
 
-    my $package_method = "${module}::method_${method}";
-    
+    my $package_method = ${module}.'::'.$Qooxdoo::JSONRPC::method_prefix.$method;
+
     unless (defined &$package_method)
     {
         $error->set_error (JsonRpcError_MethodNotFound,
@@ -410,7 +412,6 @@ sub handle_request
         $error->set_error (JsonRpcError_Unknown,
                            $@);
         $error->send_and_exit;
-        
     }
 
     # (I've had to assume this behaviour based on the test results)
@@ -812,7 +813,7 @@ sub blessed_date
                    $millisecond);
 }
 
-
+__END__
 
 ##############################################################################
 
@@ -822,10 +823,102 @@ Qooxdoo::JSONRPC.pm - A Perl implementation of JSON-RPC for Qooxdoo
 
 =head1 SYNOPSIS
 
-RPC-JSON is a straightforward Remote Procedure Call mechanism, primarily
-targeted at Javascript clients, and hence ideal for Qooxdoo.
+The cgi/fcgi script
 
-Services may be implemented in any language provided they provide a
+ #!/usr/bin/perl -w
+ use strict;
+ use CGI;
+ use CGI::Session::Driver::file;
+ # make sure session files do not clash
+ $CGI::Session::Driver::file::FileName =
+    ($ENV{USER}||'').$0.'%s.session';
+
+ use Qooxdoo::JSONRPC;
+
+ # talk about what we do in the apache error log
+ #$Qooxdoo::JSONRPC::debug = 0;
+
+ # By default methods are located in Qooxdoo/Services
+ #$Qooxdoo::JSONRPC::service_path = 'Qooxdoo::Services';
+
+ # By default methods have to be prefixed by 'method_'
+ #$Qooxdoo::JSONRPC::method_prefix = 'method_';
+
+ my $cgi = new CGI;
+ my $session = new CGI::Session;
+ Qooxdoo::JSONRPC::handle_request ($cgi, $session);
+
+ # or if you load CGI::Fast you can easily create a
+ # fastcgi aware version
+ #while (my $cgi = new CGI::Fast) {
+ #   my $session = new CGI::Session;
+ #   Qooxdoo::JSONRPC::handle_request ($cgi, $session);
+ #}
+
+Along with the cgi wrapper setup a service module the example
+below shows how to handle logins on the server side.
+
+ package Qooxdoo::Services::Demo;
+ use strict;
+
+ sub GetAccessibility {
+     # name of method about to be called
+     my $method = shift;
+     # access level based on connection
+     my $access = shift;
+     # session handle
+     my $session = shift;
+     if ($method eq 'login'
+        or $method eq 'logoff'
+        or $session->param('authenticated')||'' eq 'yes'){
+       return 'public'; # grant everyone access
+     }
+     else {
+        return 'fail'; #deny access
+     }
+ }
+
+ sub method_login {
+     my $error = shift;
+     my $session = $error->{session};
+     my @args = @_;
+     # if login ok
+     $session->param('authenticated','yes');
+     $session->flush();
+     return 1;
+     # if login is not ok
+     $error->set_error(101,'Login faild');
+     return $error;
+ }
+
+ sub method_logout {
+    my $error = shift;
+    my $session = $error->{session};
+    $session->delete();
+    $session->flush();
+    return 1;
+ }
+
+ sub method_fun {
+    my $error = shift;
+    my $session = $error->{session};
+    my $arg_a = shift;
+    my $arg_b = shift;
+    # do something
+    return $pointer_to_data;
+ }
+
+ 1;
+
+=head1 DESCRIPTION
+
+RPC-JSON is a straightforward Remote Procedure Call mechanism, primarily
+targeted at Javascript clients, and hence ideal for Qooxdoo. This module
+implements the server side handling of RPC request in perl.
+
+=head2 JSON RPC Basics
+
+JSON-RPC Services may be implemented in any language provided they provide a
 conformant implementation. This module uses the CGI module to parse
 HTTP headers, and the JSON module to manipulate the JSON body.
 
@@ -840,7 +933,9 @@ server->client:
    {"id":1,"result":"Client said: [Hello]"}
 
 Here the service 'qooxdoo.test' is requested to run a method called
-'echo' with an argument 'Hello'. This Perl implementation will locate
+'echo' with an argument 'Hello'. 
+
+This Perl implementation will locate
 a module called Qooxdoo::Services::qooxdoo::test (corresponding to
 Qooxoo/Services/qooxdoo/test.pm in Perl's library path). It will
 then execute the function Qooxdoo::Services::qooxdoo::test::echo
@@ -865,21 +960,21 @@ response is formatted something like:
 
 There are 4 error origins:
 
-=over 4
+=over
 
-=item * JsonRpcError_Origin_Server 1
+=item JsonRpcError_Origin_Server 1
 
 The error occurred within the server.
 
-=item * JsonRpcError_Origin_Application 2
+=item JsonRpcError_Origin_Application 2
 
 The error occurred within the application.
 
-=item * JsonRpcError_Origin_Transport 3
+=item JsonRpcError_Origin_Transport 3
 
 The error occurred somewhere in the communication (not raised in this module).
 
-=item * JsonRpcError_Origin_Client 4
+=item JsonRpcError_Origin_Client 4
 
 The error occurred in the client (not raised in this module).
 
@@ -887,78 +982,91 @@ The error occurred in the client (not raised in this module).
 
 For Server errors, there are also some predefined error codes.
 
-=over 4
+=over
 
-=item * JsonRpcError_Unknown 0
+=item JsonRpcError_Unknown 0
 
 The cause of the error was not known.
 
-=item * JsonRpcError_IllegalService 1
+=item JsonRpcError_IllegalService 1
 
 The Service name was not valid, typically due to a bad character in the name.
 
-=item * JsonRpcError_ServiceNotFound 2
+=item JsonRpcError_ServiceNotFound 2
 
 The Service was not found. In this implementation this means that the
 module containing the Service could not be found in the library path.
 
-=item * JsonRpcError_ClassNotFound 3
+=item JsonRpcError_ClassNotFound 3
 
 This means the class could not be found with, is not actually raised
 by this implementation.
 
-=item * JsonRpcError_MethodNotFound 4
+=item JsonRpcError_MethodNotFound 4
 
 The method could not be found. This is raised if a function cannot be
 found with the method name in the requested package namespace.
 
 Note: In Perl, modules (files containing functionality) and packages
 (namespaces) are closely knitted together, but there need not be a
-one-for-one correspondence -- packages can be shared across multiple
+one-to-one correspondence -- packages can be shared across multiple
 modules, or a module can use multiple packages. This module assumes a
-one-for-one correspondence by looking for the method in the same
+one-to-one correspondence by looking for the method in the same
 namespace as the module name.
 
-=item * JsonRpcError_ParameterMismatch 5
+=item JsonRpcError_ParameterMismatch 5
 
 This is typically raised by individual methods when they do not
 receive the parameters they are expecting.
 
-=item * JsonRpcError_PermissionDenied 6
+=item JsonRpcError_PermissionDenied 6
 
 Again, this error is raised by individual methods. Remember that RPC
 calls need to be as secure as the rest of your application!
 
 =back
 
-There is also some infrastructure to allow access control on methods
-depending on the relationship of the referer. Have a look at test.pm
-to see how this can be done by defining C<GetAccessibility> which
-returns one of the following for a supplied method name:
+=head2 Access Control
 
-=over 4
+There is also some infrastructure to implement access control. Before
+each method call, the C<GetAccessibility> method of the service is
+called. Depending on the response from C<GetAccessibility> the actual
+method will be called, or an error is returned to the remote caller.
+The example in the synopys shows how to use that for implementing an
+actuall authentication process.
 
-=item * Accessibility_Public ("public")
+C<GetAccessibility> must return the following access levels
+
+=over
+
+=item Accessibility_Public ("public")
 
 The method may be called from any session, and without any checking of
 who the Referer is.
 
-=item * Accessibility_Domain ("domain")
+=item Accessibility_Domain ("domain")
 
 The method may only be called by a script obtained via a web page
 loaded from this server.  The Referer must match the request URI,
 through the domain part.
 
-=item * Accessibility_Session ("session")
+=item Accessibility_Session ("session")
 
 The Referer must match the Referer of the very first RPC request
 issued during the session.
 
-=item * Accessibility_Fail ("fail")
+=item Accessibility_Fail ("fail")
 
 Access is denied
 
 =back
+
+=head2 Persistant Data in the Session module
+
+Methods get access to the session as a parameter of the error object.
+Session allows to easily store persistant data in methods. Since
+the session module writes all parameters in one go, this can
+result in a race condition when two instances store data.
 
 =head1 AUTHOR
 
