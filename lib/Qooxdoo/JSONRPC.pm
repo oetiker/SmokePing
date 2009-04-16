@@ -79,7 +79,7 @@ sub handle_request
     print STDERR "Session id: $session_id\n"
 	if $Qooxdoo::JSONRPC::debug;
 
-    print $session->header(-charset=>'UTF-8');
+    print $session->header(-charset=>'utf-8');
 
     # 'selfconvert' is enabled for date conversion. Ideally we also want
     # 'convblessed', but this then disabled 'selfconvert'.
