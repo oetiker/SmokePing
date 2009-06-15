@@ -1,3 +1,6 @@
+* fixed url in alert  messages triggered from slaves. as reported by Nathan
+  Long --tobi
+
 * fix a typo in configuration example 4, spotted by Guglielmo Bondioni
   <guglielmo.bondioni *gmail.com> --niko
 
