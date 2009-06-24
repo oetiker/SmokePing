@@ -6,15 +6,18 @@ package Qooxdoo::JSONRPC;
 #
 # Copyright:
 #   2006-2007 Nick Glencross
+#   2008-2009 Tobi Oetiker
 #
 # License:
 #   LGPL: http://www.gnu.org/licenses/lgpl.html
 #   EPL: http://www.eclipse.org/org/documents/epl-v10.php
-#   See the LICENSE file in the project's top-level directory for details.
+#  This software, the Qooxdoo RPC Perl backend, is licensed under the same
+#  terms as Qooxdoo itself, as included in `LICENSE.Qooxdoo'
 #
 # Authors:
 #  * Nick Glencross
-
+#  * Tobi Oetiker
+#
 # The JSON-RPC implementation.
 # Use perldoc on this file to view documentation
 
@@ -813,6 +816,8 @@ sub blessed_date
                    $millisecond);
 }
 
+1;
+
 __END__
 
 ##############################################################################
@@ -924,11 +929,11 @@ HTTP headers, and the JSON module to manipulate the JSON body.
 
 A simple, but typical exchange might be:
 
-client->server:
+ client->server:
 
    {"service":"qooxdoo.test","method":"echo","id":1,"params":["Hello"],"server_data":null}
 
-server->client:
+ server->client:
 
    {"id":1,"result":"Client said: [Hello]"}
 
@@ -942,7 +947,7 @@ then execute the function Qooxdoo::Services::qooxdoo::test::echo
 with the supplied arguments.
 
 The function will receive the error object as the first argument, and
-subsequent arguments are supplied by the remote call. Your method call
+subsequent arguments as supplied by the remote call. Your method call
 would therefore start with something equivalent to:
 
     my $error  = shift;
@@ -1032,10 +1037,10 @@ There is also some infrastructure to implement access control. Before
 each method call, the C<GetAccessibility> method of the service is
 called. Depending on the response from C<GetAccessibility> the actual
 method will be called, or an error is returned to the remote caller.
-The example in the synopys shows how to use that for implementing an
-actuall authentication process.
+The example in the synopsis shows how to use that for implementing an
+authentication process.
 
-C<GetAccessibility> must return the following access levels
+C<GetAccessibility> must return one of the following access levels
 
 =over
 
@@ -1063,16 +1068,14 @@ Access is denied
 
 =head2 Persistant Data in the Session module
 
-Methods get access to the session as a parameter of the error object.
-Session allows to easily store persistant data in methods. Since
-the session module writes all parameters in one go, this can
-result in a race condition when two instances store data.
+Methods get access to the session handle as a parameter of the error object.
+Session allows to easy storage of persistant data. Since the session module
+writes all parameters in one go, this can result in a race condition when
+two instances store data.
 
 =head1 AUTHOR
 
-Nick Glencross E<lt>nick.glencross@gmail.comE<gt>
+Nick Glencross E<lt>nick.glencross@gmail.comE<gt>,
+Tobi Oetiker E<lt>tobi@oetiker.chE<gt>
 
 =cut
-
-
-1;
