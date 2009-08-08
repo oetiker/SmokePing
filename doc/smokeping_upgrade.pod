@@ -23,6 +23,14 @@ An official list of changes with each release can be found in the CHANGES
 file in the Smokeping distribution. This document tries to complement
 that with upgrading instructions etc.
 
+=head1 2.4.2 to 2.4.3
+
+To fix zooming for FF3.5 I prototype and scriptaculous have been updated. To
+complete the fix you have to update your basepage.html too and include
+effects in the scriptaculous load line
+
+ cropper/lib/scriptaculous.js?load=builder,effects,dragdrop
+
 =head1 2.3.6 to 2.4.0
 
 The new SmokeTrace tool was added to SmokePing. For setup instructions
