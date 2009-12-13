@@ -1,3 +1,6 @@
+* make the build system compatible with HTML::Parser >= 3.64 
+  --niko, reported as Debian bug #560562
+
 * update prototype and scriptaculous libraries to make zooming work again on
   ff3.5, to make it work, make sure to update the basepage.html to include
 

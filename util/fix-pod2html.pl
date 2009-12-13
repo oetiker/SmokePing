@@ -22,7 +22,7 @@ my $p = HTML::Parser->new(api_version => 3);
 $p->handler(start => \&startsub, 'tagname, text');
 $p->handler(end => \&endsub, 'tagname, text');
 $p->handler(default => sub { print shift() }, 'text');
-$p->parse_file(shift||"-") or die("parse: $!");
+$p->parse_file(shift||\*STDIN) or die("parse: $!");
 
 my @stack;
 my $a=0;
