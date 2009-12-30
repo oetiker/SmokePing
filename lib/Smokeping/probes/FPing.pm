@@ -65,6 +65,7 @@ sub new($$$)
 	my $testhost = $self->testhost;
         my $return = `$binary -C 1 $testhost 2>&1`;
         $self->{enable}{S} = (`$binary -h 2>&1` =~ /\s-S\s/);
+        $self->{enable}{O} = (`$binary -h 2>&1` =~ /\s-O\s/);
         croak "ERROR: fping ('$binary -C 1 $testhost') could not be run: $return"
             if $return =~ m/not found/;
         croak "ERROR: FPing must be installed setuid root or it will not work\n" 
@@ -123,6 +124,11 @@ sub ping ($){
        $self->do_log("WARNING: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.");
     }
     push @params, "-S$self->{properties}{sourceaddress}" if $self->{properties}{sourceaddress} and $self->{enable}{S};
+
+    if ($self->rounds_count == 1 and $self->{properties}{tos} and not $self->{enable}{O}){
+       $self->do_log("WARNING: your fping binary doesn't support type of service setting (-O), I will ignore any tos configurations.");
+    }
+    push @params, "-O$self->{properties}{tos}" if $self->{properties}{tos} and $self->{enable}{O};
 
     my $pings =  $self->pings;
     if (($self->{properties}{blazemode} || '') eq 'true'){
@@ -227,6 +233,15 @@ DOC
 The fping "-S" parameter . From fping(1):
 
 Set source address.
+DOC
+		},
+		tos => {
+			_re => '\d+|0x[0-9a-zA-Z]+',
+			_example => '0x20',
+			_doc => <<DOC,
+Set the type of service (TOS) of outgoing ICMP packets.
+You need at laeast fping-2.4b2_to3-ipv6 for this to work. Find
+a copy on www.smokeping.org/pub.
 DOC
 		},
 	});
