@@ -1808,7 +1808,7 @@ sub check_alerts {
                 $line =~ s|/host$||;
                 $line =~ s|/|.|g;
                 my $urlline = $cfg->{General}{cgiurl}."?target=".$line;
-                $line .= "[from $slave]" if $slave;
+                $line .= " [from $slave]" if $slave;
                 do_log("Alert $_ $what for $line");
                 my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
                 my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
