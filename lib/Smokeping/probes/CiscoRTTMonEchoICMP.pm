@@ -59,7 +59,7 @@ If you want to be a bit more restrictive with SNMP write access to the router, t
 The above configuration grants SNMP read-write only to 10.37.3.5 (the smokeping host) and only to the ciscoRttMon MIB tree. The probe does not need access to SNMP variables outside the RttMon tree.
 DOC
 		bugs => <<DOC,
-The probe sends unnecessary pings, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all pings in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*2+3 seconds (2 secs is the ping timeout value hardcoded into this probe). 
+The probe sends unnecessary pings, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all pings in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*5+3 seconds (5 secs is the ping timeout value hardcoded into this probe). 
 DOC
 		see_also => <<DOC,
 L<http://oss.oetiker.ch/smokeping/>
@@ -75,7 +75,7 @@ DOC
 	}
 }
 
-my $pingtimeout =2;
+my $pingtimeout = 5;
 
 sub new($$$)
 {
@@ -274,6 +274,12 @@ The (mandatory) ioshost parameter specifies the Cisco router, which will
 execute the pings, as well as the SNMP community string on the router.
 DOC
 		},
+        timeout => {
+             _re => '\d+', 
+             _example => 15,
+             _default => $pingtimeout+10,
+             _doc => "How long a single RTTMonEcho ICMP 'ping' take at maximum plus 10 seconds to spare. Since we control our own timeout the only purpose of this is to not have us killed by the ping method from basefork.",
+        },
 		iosint => {
 			_example => '10.33.22.11',
 			_doc => <<DOC,
