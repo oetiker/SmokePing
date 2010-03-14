@@ -1,3 +1,6 @@
+* new probe for SIP Ping test based on sipsak tool 
+  -- tobi sponsored by ANI Networks
+
 * bandaid fix for timeout issue in CiscoRTTMonEchoICMP probe ...
   since the probe needs a longer timeout, the basefork parent needs to wait
   longer too ... a local timeout configurable with higher default should fix
