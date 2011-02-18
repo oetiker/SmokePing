@@ -28,7 +28,7 @@ DOC
               description => <<DOC,
 Integrates FPing as a probe into smokeping. The variable B<binary> must 
 point to your copy of the FPing program.  If it is not installed on 
-your system yet, you can get it from L<http://www.fping.com/>.
+your system yet, you can get a slightly enhanced version from L<www.smokeping.org/pub>.
   
 The (optional) B<packetsize> option lets you configure the packetsize for the pings sent.
 
