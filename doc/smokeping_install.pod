@@ -27,10 +27,9 @@ logging and graphing in SmokePing.
 
 =item FPing 
 
-L<http://www.fping.com/>
-
-The official site seems to be a bit unmaintained. You might want to grab the 
-fping source from L<http://packages.debian.org/unstable/net/fping> (at the bottom of the page).
+The official site L<http://fping.sourceforge.net/> seems to be a bit
+unmaintained. You might want to grab an updated version of fping from
+L<http://oss.oetiker.ch/smokeping/pub/>. 
 
 Note that fping must be installed setuid root. It seems that older versions
 of fping report round trip times in 0.1 milliseconds instead of 1 milliseconds
