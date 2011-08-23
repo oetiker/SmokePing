@@ -16,10 +16,11 @@ to generate the POD document.
 
 use strict;
 use base qw(Smokeping::probes::basevars);
-use SNMP_Session;
-use SNMP_util "0.89";
+use SNMP_Session "1.13";
+use SNMP_util "1.13";
 use Smokeping::pingMIB "0.1";
 use Socket;
+use Net::Domain qw(hostname);
 
 sub pod_hash {
     my $e = "=";
@@ -31,7 +32,8 @@ DOC
 Uses the DISMAN-PING-MIB to cause a remote system to send probes.
 DOC
         authors => <<DOC,
-Bill Fenner <fenner\@research.att.com>
+Bill Fenner <fenner\@research.att.com>,
+Tobi Oetiker <tobi\@oetiker.ch>
 DOC
         credits => <<DOC,
 This structure of this probe module is heavily based on
@@ -53,8 +55,8 @@ This probe requires read/write access to the pingCtlTable.
 It also requires read-only access to the pingResultsTable and the
 pingHistoryTable.  The DISMAN-PING-MIB is structured such that
 it is possible to restrict by pingCtlOwnerIndex.  This probe
-uses a pingCtlOwnerIndex of "smokeping" by default; use
-B<ownerindex> to configure this if needed.
+uses a pingCtlOwnerIndex of "SP on hostname ICPM ping"
+by default; use B<ownerindex> to configure this if needed.
 
 ${e}head2 SAMPLE JUNOS CONFIGURATION
 
@@ -115,13 +117,13 @@ sub probevars {
                 _sub     => sub {
                     my $val = shift;
                     return
-                        "ERROR: for DismanPing, pings must be between 1 and 15"
+                        "ERROR: for DismanPing, pings must be between 1 and 15."
                         unless $val >= 1 and $val <= 15;
                     return undef;
                 },
                 _doc => <<DOC,
 How many pings should be sent to each target. Note that the maximum value
-for DismanPing is 15, which is less than the SmokePing default, so this
+for DismanPing MIP is 15, which is less than the SmokePing default, so this
 class has its own default value.  If your Database section specifies a
 value less than 15, you must also set it for this probe.
 Note that the number of pings in
@@ -146,6 +148,9 @@ sub targetvars {
 The SNMP OwnerIndex to use when setting up the test.
 When using VACM, can map to a Security Name or Group Name
 of the entity running the test.
+
+By default this will be set to
+
 DOC
                 _example => "smokeping"
             },
@@ -241,7 +246,6 @@ sub ProbeDesc($) {
 # way to verify that the values haven't changed since the last
 # time we set it.
 sub ping($) {
-    use Data::Dumper;
     my $self    = shift;
     my $pending = {};
     my $longest = 0;
@@ -251,23 +255,20 @@ sub ping($) {
         my $addr = $t->{addr};
         my $idx  = idx($t);
         my $host = host($t);
-
         # Delete any existing row.  Ignore error.
         #Smokeping::do_log("DismanPing deleting for $host $t->{vars}{menu}");
         my $ret =
-            &snmpset( $host, "pingCtlRowStatus.$idx", "integer", 6 );   #destroy
+            snmpset( $host, "pingCtlRowStatus.$idx", "integer", 6 );   #destroy
+
         if ( !defined($ret) ) {
-            Smokeping::do_log(
-"DismanPing: old probe for $t->{vars}{menu} is probably running: "
+            Smokeping::do_log( "DismanPing: old probe for $t->{vars}{host} is probably running: "
                     . $SNMP_Session::errmsg );
             next;
         }
 
         my $targetaddr = inet_aton($addr);
-        if ( !defined($targetaddr) ) {
-            Smokeping::do_log(
-"DismanPing can't resolve destination address $addr for $t->{vars}{menu}"
-            );
+        if ( not defined $targetaddr ) {
+            Smokeping::do_log("DismanPing can't resolve destination address $addr for $t->{vars}{host}");
             next;
         }
 
@@ -277,25 +278,23 @@ sub ping($) {
         my @values = (
             "pingCtlTargetAddressType.$idx", "integer",     1,             #ipv4
             "pingCtlTargetAddress.$idx",     "octetstring", $targetaddr,
+            "pingCtlFrequency.$idx",   "gauge",   0,                # run test only once
+            "pingCtlTimeOut.$idx",     "gauge",   3,                # timeout ping after 3 seconds (this is also the interval for sending pings)
             "pingCtlProbeCount.$idx",  "gauge",   $t->{vars}{pings},
             "pingCtlMaxRows.$idx",     "gauge",   $t->{vars}{pings},
             "pingCtlAdminStatus.$idx", "integer", 1,                #enabled
             "pingCtlRowStatus.$idx",   "integer", 4,                #createAndGo
-
-#       "pingCtlRowStatus.$idx",                "integer",        5, #createAndWait
         );
 
         # add pingsrc, packetsize into @values if defined
-        if ( defined( $t->{vars}{packetsize} ) ) {
+        if ( defined  $t->{vars}{packetsize} ) {
             unshift( @values,
                 "pingCtlDataSize.$idx", "gauge", $t->{vars}{packetsize} );
         }
-        if ( defined( $t->{vars}{pingsrc} ) ) {
+        if ( defined  $t->{vars}{pingsrc} ) {
             my $srcaddr = inet_aton( $t->{vars}{pingsrc} );
-            if ( !defined($srcaddr) ) {
-                Smokeping::do_log(
-"WARNING: DismanPing can't resolve source address $t->{vars}{pingsrc} for $t->{vars}{menu}"
-                );
+            if ( not defined $srcaddr ) {
+                Smokeping::do_log("WARNING: DismanPing can't resolve source address $t->{vars}{pingsrc} for $t->{vars}{host}");
             }
             else {
                 unshift(
@@ -309,25 +308,12 @@ sub ping($) {
         # Todo: pingCtlDSField.
         # Todo: pingCtlTimeout.
         my @snmpsetret;
-        if ( ( @snmpsetret = &snmpset( $host, @values ) )
-            && defined( $snmpsetret[0] ) )
-        {
-            {
-                use Data::Dumper;
-                open( my $tmp, ">>/tmp/disman-smoke" );
-                print $tmp Dumper(
-                    scalar( localtime(time) ),
-                    $t->{vars}{menu},
-                    \@snmpsetret
-                );
-                close($tmp);
-            }
+        if ( ( @snmpsetret = snmpset( $host, @values ) )
+            and defined $snmpsetret[0] ) {
             $pending->{ $t->{tree} } = 1;
         }
         else {
-            Smokeping::do_log(
-"ERROR: DismanPing row creation failed for $t->{vars}{menu}: $SNMP_Session::errmsg"
-            );
+            Smokeping::do_log( "ERROR: DismanPing row creation failed for $t->{vars}{host} on $t->{vars}{pinghost}: $SNMP_Session::errmsg" );
         }
         my $timeout = 3;    # XXX DEFVAL for pingCtlTimeOut
         my $length = $t->{vars}{pings} * $timeout;
@@ -337,7 +323,7 @@ sub ping($) {
     }
     my $setup = time - $start;
     Smokeping::do_debuglog(
-        "DismanPing took $setup to set up, now sleeping for $longest");
+        "DismanPing took $setup s to set up, now sleeping for $longest s");
     sleep($longest);
     my $allok    = 0;
     my $startend = time;
@@ -349,25 +335,20 @@ sub ping($) {
             my $host = host($t);
 
             # check if it's done - pingResultsOperStatus != 1
-            my $status = &snmpget( $host, "pingResultsOperStatus.$idx" );
-            if ( !defined($status) || $status == 1 )
-            {    # if SNMP fails, assume it's not done.
+            my $status = snmpget( $host, "pingResultsOperStatus.$idx" );
+            if ( not defined $status or $status == 1 ) {
+                # if SNMP fails, assume it's not done.
                 my $howlong = time - $start;
                 if ( $howlong > $self->step ) {
-                    Smokeping::do_log(
-"DismanPing: abandoning $t->{vars}{menu} after $howlong seconds"
-                    );
+                    Smokeping::do_log( "DismanPing: abandoning $t->{vars}{host} after $howlong seconds" );
                     $pending->{ $t->{tree} } = 0;
                 }
                 else {
-                    Smokeping::do_log(
-"DismanPing: $t->{vars}{menu} is still running after $howlong seconds"
-                    );
+                    Smokeping::do_log( "DismanPing: $t->{vars}{host} is still running after $howlong seconds" );
                     $allok = 0;
                 }
                 next;
             }
-
             # if so, get results from History Table
             my @times = ();
 
@@ -383,24 +364,25 @@ sub ping($) {
             );
             Smokeping::do_debuglog( "DismanPing: table download returned "
                     . ( defined($ret) ? $ret : "undef" ) );
-
+            
             # Make sure we have exactly pings results.
             # Fewer are probably an implementation problem (we asked for
             #  15, it said the test was done, but didn't return 15).
             # More are a less-bad implementation problem - we can keep
             #  the last 15.
             if ( @times < $t->{vars}{pings} ) {
-                Smokeping::do_log( "DismanPing: $t->{vars}{menu} only returned "
+                Smokeping::do_log( "DismanPing: $t->{vars}{host} only returned "
                         . scalar(@times)
                         . " results" );
                 @times = ();
             }
             elsif ( @times > $t->{vars}{pings} ) {
-                Smokeping::do_log( "DismanPing: $t->{vars}{menu} returned "
+                Smokeping::do_log( "DismanPing: $t->{vars}{host} returned "
                         . scalar(@times)
                         . " results, taking last $t->{vars}{pings}" );
                 @times = @times[ $#times - $t->{vars}{pings} .. $#times ];
             }
+            
             if (@times) {
                 my (@goodtimes) = ();
                 foreach $t (@times) {
@@ -415,8 +397,7 @@ sub ping($) {
     }
     my $howlong = time - $start;
     my $endtime = time - $startend;
-    Smokeping::do_debuglog(
-        "DismanPing took $howlong total, $endtime collecting results");
+    Smokeping::do_debuglog( "DismanPing took $howlong total, $endtime collecting results");
 }
 
 # Return index string for this test:
@@ -432,20 +413,17 @@ sub ping($) {
 # get a unique test name.
 sub idx ($) {
     my $t = shift;
-
-    my $ownerindex = $t->{vars}{ownerindex} || "smokeping";
-    my $testname = $t->{vars}{menu};
-    if ( length($testname) > 32 ) {
-        $testname = substr( $testname, -32 );
-    }
+    my $ownerindex = substr($t->{vars}{ownerindex} || 'SP on '.hostname().' ICMP ping',0,32);
+    print STDERR $ownerindex;
+    my $testname =  $t->{vars}{host};
     return join( ".",
         length($ownerindex), unpack( "C*", $ownerindex ),
-        length($testname),   unpack( "C*", $testname ) );
+        length($testname),   unpack( "C*", $testname ) 
+    );
 }
 
 sub host ($) {
     my $t = shift;
-
     # gotta be aggressive with the SNMP to keep within
     #  the time budget, so set the timeout to 1 second
     #  and only try twice.
