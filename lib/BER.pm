@@ -17,7 +17,7 @@
 ### Contributions and fixes by:
 ###
 ### Andrzej Tobola <san@iem.pw.edu.pl>:  Added long String decode
-### Tobias Oetiker <oetiker@ee.ethz.ch>:  Added 5 Byte Integer decode ...
+### Tobias Oetiker <tobi@oetiker.ch>:  Added 5 Byte Integer decode ...
 ### Dave Rand <dlr@Bungi.com>:  Added SysUpTime decode
 ### Philippe Simonet <sip00@vg.swissptt.ch>:  Support larger subids
 ### Yufang HU <yhu@casc.com>:  Support even larger subids

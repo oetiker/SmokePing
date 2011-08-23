@@ -62,7 +62,7 @@ sub map_table_start_end ($$$$$$);
 sub index_compare ($$);
 sub oid_diff ($$);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 @ISA = qw(Exporter);
 
@@ -153,7 +153,11 @@ BEGIN {
     eval 'local $SIG{__DIE__};local $SIG{__WARN__};$dont_wait_flags = MSG_DONTWAIT();';
 }
 
-my $the_socket;
+### Cache for reusable sockets.  This is indexed by socket (address)
+### family, so that we don't try to reuse an IPv4 socket for IPv6 or
+### vice versa.
+###
+my %the_socket = ();
 
 $SNMP_Session::errmsg = '';
 $SNMP_Session::suppress_warnings = 0;
@@ -633,15 +637,15 @@ sub open {
 	$remote_addr = inet_aton ($remote_hostname)
 	    or return $this->error_return ("can't resolve \"$remote_hostname\" to IP address");
     }
-    if ($SNMP_Session::recycle_socket && defined $the_socket) {
-	$socket = $the_socket;
+    if ($SNMP_Session::recycle_socket && exists $the_socket{$sockfamily}) {
+	$socket = $the_socket{$sockfamily};
     } else {
 	$socket = IO::Socket::INET->new(Proto => 17,
 					Type => SOCK_DGRAM,
 					LocalAddr => $local_hostname,
 					LocalPort => $local_port)
 	    || return $this->error_return ("creating socket: $!");
-	$the_socket = $socket
+	$the_socket{$sockfamily} = $socket
 	    if $SNMP_Session::recycle_socket;
     }
     $remote_addr = pack_sockaddr_in ($port, $remote_addr)
@@ -662,8 +666,8 @@ sub open {
 	    return $this->error_return ("can't resolve \"$remote_hostname\" to IPv6 address");
 	}
 
-	if ($SNMP_Session::recycle_socket && defined $the_socket) {
-	    $socket = $the_socket;
+	if ($SNMP_Session::recycle_socket && exists $the_socket{$sockfamily}) {
+	    $socket = $the_socket{$sockfamily};
 	} elsif ($sockfamily == AF_INET) {
 	    $socket = IO::Socket::INET->new(Proto => 17,
 					    Type => SOCK_DGRAM,
@@ -676,7 +680,7 @@ sub open {
 					     LocalAddr => $local_hostname,
 					     LocalPort => $local_port)
 	         || return $this->error_return ("creating socket: $!");
-	    $the_socket = $socket
+	    $the_socket{$sockfamily} = $socket
 	        if $SNMP_Session::recycle_socket;
 	}
     }
@@ -728,7 +732,8 @@ sub close {
     my($this) = shift;
     ## Avoid closing the socket if it may be shared with other session
     ## objects.
-    if (! defined $the_socket || $this->sock ne $the_socket) {
+    if (! exists $the_socket{$this->{sockfamily}}
+	or $this->sock ne $the_socket{$this->{sockfamily}}) {
 	close ($this->sock) || $this->error ("close: $!");
     }
 }

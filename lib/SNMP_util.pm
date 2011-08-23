@@ -2,7 +2,7 @@
 ######################################################################
 ### SNMP_util -- SNMP utilities using SNMP_Session.pm and BER.pm
 ######################################################################
-### Copyright (c) 1998-2007, Mike Mitchell.
+### Copyright (c) 1998-2008, Mike Mitchell.
 ###
 ### This program is free software; you can redistribute it under the
 ### "Artistic License 2.0" included in this distribution
@@ -44,7 +44,7 @@ use BER "1.02";
 use SNMP_Session "1.00";
 use Socket;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 @ISA = qw(Exporter);
 
@@ -1199,6 +1199,7 @@ sub snmpMIB_to_OID ($) {
     $buf =~ s/OBJECT-IDENTITY/OBJECT IDENTIFIER/;
     $buf =~ s/OBJECT-GROUP/OBJECT IDENTIFIER/;
     $buf =~ s/MODULE-IDENTITY/OBJECT IDENTIFIER/;
+    $buf =~ s/NOTIFICATION-TYPE/OBJECT IDENTIFIER/;
     $buf =~ s/ IMPORTS .*\;//;
     $buf =~ s/ SEQUENCE *{.*}//;
     $buf =~ s/ SYNTAX .*//;
@@ -1275,7 +1276,7 @@ sub MIB_fill_OID ($)
 	}
       }
       if ($val =~ /^[\d\.]+$/) {
-	$val =~ s/^\.//;
+	$val =~ s/^\.+//;
 	if (!exists($SNMP_util::OIDS{$var})
 	|| (length($val) > length($SNMP_util::OIDS{$var}))) {
 	  $SNMP_util::OIDS{$var} = $val;
