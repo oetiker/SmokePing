@@ -1,5 +1,5 @@
 SHELL = /bin/sh
-VERSION := 2.4.2
+VERSION := 2.5
 SVNREPO = svn://svn.oetiker.ch/smokeping
 ############ A is for features
 ############ B is for bugfixes
@@ -159,25 +159,25 @@ smokeping-$(VERSION).tar.gz:
 	$(PERL) -i -p -e 's/VERSION="\d.*?"/VERSION="$(NUMVERSION)"/' lib/Smokeping.pm 
 	$(PERL) -i -p -e 's/Smokeping \d.*?;/Smokeping $(NUMVERSION);/' bin/smokeping.dist htdocs/smokeping.cgi.dist bin/tSmoke.dist
 	$(PERL) -i -p -e 'do { my @d = localtime; my $$d = (1900+$$d[5])."/".(1+$$d[4])."/".$$d[3]; print "$$d -- released version $(VERSION)\n\n" } unless $$done++ || /version $(VERSION)/' CHANGES
-	$(PERL) -i -p -e "s/Atom\('SmokeTrace \S+?'/Atom('SmokeTrace "$(VERSION)"'/" qooxdoo/source/class/Tr/Application.js 
+#	$(PERL) -i -p -e "s/Atom\('SmokeTrace \S+?'/Atom('SmokeTrace "$(VERSION)"'/" qooxdoo/source/class/Tr/Application.js 
 	svn commit -m "prepare for the release of smokeping-$(VERSION)"
 	svn export $(SVNREPO)/trunk/software smokeping-$(VERSION)
-	rm -rf  smokeping-$(VERSION)/qooxdoo/source/class/Smokeping
-	rm -rf  smokeping-$(VERSION)/qooxdoo/source/grapher.cgi 
-	rm -rf  smokeping-$(VERSION)/qooxdoo/source/smokeping.cgi
-	rm -rf  smokeping-$(VERSION)/qooxdoo/source/perl/Qooxdoo/Services/Smokeping.pm 
-	(cd smokeping-$(VERSION) && $(MAKE) doc)
-	- rm -rf  rm /tmp/qooxdoo-cache/Tr.*
-	(cd smokeping-$(VERSION)/qooxdoo && $(MAKE) && $(MAKE) build)
-	(cd smokeping-$(VERSION)/qooxdoo; \
-	cp build/tr.cgi ../htdocs/tr.cgi.dist;\
-	cp build/index.html ../htdocs/tr.html;\
-	cp -rp build/script ../htdocs;\
-	cp -rp build/resource ../htdocs;\
-	cp -rp build/perl/* ../lib;\
-	make clean; \
-	rm -rf build)
-	$(PERL) -i -p -e 's/SmokeTrace VERSION/SmokeTrace $(VERSION)/' smokeping-$(VERSION)/htdocs/script/Tr.js
+#	rm -rf  smokeping-$(VERSION)/qooxdoo/source/class/Smokeping
+#	rm -rf  smokeping-$(VERSION)/qooxdoo/source/grapher.cgi 
+#	rm -rf  smokeping-$(VERSION)/qooxdoo/source/smokeping.cgi
+#	rm -rf  smokeping-$(VERSION)/qooxdoo/source/perl/Qooxdoo/Services/Smokeping.pm 
+#	(cd smokeping-$(VERSION) && $(MAKE) doc)
+#	- rm -rf  rm /tmp/qooxdoo-cache/Tr.*
+#	(cd smokeping-$(VERSION)/qooxdoo && $(MAKE) && $(MAKE) build)
+#	(cd smokeping-$(VERSION)/qooxdoo; \
+#	cp build/tr.cgi ../htdocs/tr.cgi.dist;\
+#	cp build/index.html ../htdocs/tr.html;\
+#	cp -rp build/script ../htdocs;\
+#	cp -rp build/resource ../htdocs;\
+#	cp -rp build/perl/* ../lib;\
+#	make clean; \
+#	rm -rf build)
+#	$(PERL) -i -p -e 's/SmokeTrace VERSION/SmokeTrace $(VERSION)/' smokeping-$(VERSION)/htdocs/script/Tr.js
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 

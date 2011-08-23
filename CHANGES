@@ -1,3 +1,6 @@
+* removed smoketrace support. this and more functionality is now provided by
+  remocular (www.remocular.org)
+
 * give more advise when resetting LC_NUMERIC is not successful
 -- Lee Thompson 
 
