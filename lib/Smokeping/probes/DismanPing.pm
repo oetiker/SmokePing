@@ -55,8 +55,8 @@ This probe requires read/write access to the pingCtlTable.
 It also requires read-only access to the pingResultsTable and the
 pingHistoryTable.  The DISMAN-PING-MIB is structured such that
 it is possible to restrict by pingCtlOwnerIndex.  This probe
-uses a pingCtlOwnerIndex of "SP on hostname ICPM ping"
-by default; use B<ownerindex> to configure this if needed.
+uses a pingCtlOwnerIndex of "SP on hostname"
+as ownerindex by default; use B<ownerindex> to configure this if needed.
 
 ${e}head2 SAMPLE JUNOS CONFIGURATION
 
@@ -413,9 +413,9 @@ sub ping($) {
 # get a unique test name.
 sub idx ($) {
     my $t = shift;
-    my $ownerindex = substr($t->{vars}{ownerindex} || 'SP on '.hostname().' ICMP ping',0,32);
+    my $ownerindex = substr($t->{vars}{ownerindex} || 'SP on '.hostname(),0,32);
     print STDERR $ownerindex;
-    my $testname =  $t->{vars}{host};
+    my $testname =  substr($t->{vars}{host} . ' ICMP ping',0,32);
     return join( ".",
         length($ownerindex), unpack( "C*", $ownerindex ),
         length($testname),   unpack( "C*", $testname ) 

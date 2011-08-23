@@ -1,3 +1,6 @@
+* Integrated Disman probe ( DISMAN-PING-MIB: RFC Ping ) by Bill Fenner. This
+  work has been sponsored by Juniper.
+  
 * removed smoketrace support. this and more functionality is now provided by
   remocular (www.remocular.org)
 
