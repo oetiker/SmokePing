@@ -1,3 +1,5 @@
+
+
 * Added new OpenSSHJunOSPing probe to run ping from a juniper router via
   ssh.  This work has been sponsored by Juniper.
 
@@ -7,8 +9,7 @@
 * removed smoketrace support. this and more functionality is now provided by
   remocular (www.remocular.org)
 
-* give more advise when resetting LC_NUMERIC is not successful
--- Lee Thompson 
+* give more advise when resetting LC_NUMERIC is not successful -- Lee Thompson 
 
 * allow alert patterns with lower AND upper limit  >a<b or >=A%<B% or ...
   -- tobi idea by Justin LeMay
