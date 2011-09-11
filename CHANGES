@@ -1,3 +1,6 @@
+* Added new OpenSSHJunOSPing probe to run ping from a juniper router via
+  ssh.  This work has been sponsored by Juniper.
+
 * Integrated Disman probe ( DISMAN-PING-MIB: RFC Ping ) by Bill Fenner. This
   work has been sponsored by Juniper.
   
