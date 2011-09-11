@@ -1,10 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # -*-perl-*-
 
-use lib qw(/scratch/oetiker/rrd-trunk/lib/perl);
-use lib qw(lib);
 use strict;
 use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../thirdparty/lib/perl5";
+use lib "$FindBin::Bin/../lib";
+
 use Smokeping 2.004002;
  
 Smokeping::main("etc/config.dist");
