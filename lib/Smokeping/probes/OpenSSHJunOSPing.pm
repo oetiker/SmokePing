@@ -1,4 +1,4 @@
-package Smokeping::probes::OpenSSHJunoOSPing;
+package Smokeping::probes::OpenSSHJunOSPing;
 
 =head1 301 Moved Permanently
 
@@ -24,7 +24,7 @@ my $e = "=";
 sub pod_hash {
 	return {
 		name => <<DOC,
-Smokeping::probes::OpenSSHJunoOSPing - Juniper SSH JunOS Probe for SmokePing
+Smokeping::probes::OpenSSHJunOSPing - Juniper SSH JunOS Probe for SmokePing
 DOC
 		description => <<DOC,
 Connect to Juniper JunOS via OpenSSH to run ping commands.
@@ -102,7 +102,7 @@ sub pingone ($$){
         timeout => 60 
     );
     if ($ssh->error) {
-        warn "OpenSSHJunoOSPing connecting $source: ".$ssh->error."\n";
+        warn "OpenSSHJunOSPing connecting $source: ".$ssh->error."\n";
         return undef;
     };
 
