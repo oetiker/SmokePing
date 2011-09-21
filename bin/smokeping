@@ -10,7 +10,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Smokeping 2.004002;
  
-Smokeping::main("etc/config.dist");
+Smokeping::main("$FindBin::Bin/../etc/config");
 
 =head1 NAME
 

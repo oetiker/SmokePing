@@ -3766,7 +3766,7 @@ sub daemonize_me ($) {
 sub load_cfg ($;$) { 
     my $cfgfile = shift;
     my $noinit = shift;
-    my $cfmod = (stat $cfgfile)[9] || die "ERROR: calling stat on $cfgfile: $!\n";
+    my $cfmod = (stat $cfgfile)[9] || die "ERROR: loading smokeping configuration file $cfgfile: $!\n";
     # when running under speedy this will prevent reloading on every run
     # if cfgfile has been modified we will still run.
     if (not defined $cfg or not defined $probes # or $cfg->{__last} < $cfmod
@@ -3892,12 +3892,12 @@ ${e}cut
 POD
 
 }
-sub cgi ($) {
+sub cgi ($$) {
     my $cfgfile = shift;
+    my $q = shift;
     $cgimode = 'yes';
     umask 022;
     load_cfg $cfgfile;
-    my $q=new CGI;
     initialize_cgilog();
     if ($q->param(-name=>'slave')) { # a slave is calling in
         Smokeping::Master::answer_slave($cfg,$q);

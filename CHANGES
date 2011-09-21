@@ -1,4 +1,4 @@
-
+* Switch from using SpeedyCGI to FastCGI.
 
 * Added new OpenSSHJunOSPing probe to run ping from a juniper router via
   ssh.  This work has been sponsored by Juniper.

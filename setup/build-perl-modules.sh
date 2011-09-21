@@ -10,7 +10,9 @@ for module in \
     Digest::HMAC_MD5 \
     Net::Telnet \
     Net::OpenSSH \
-    Net::SNMT \
+    Net::SNMP \
+    Net::LDAP \
+    Net::DNS \
     IO::Pty \
     LWP \
 ; do
