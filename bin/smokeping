@@ -8,7 +8,7 @@ use FindBin;
 use lib "$FindBin::Bin/../thirdparty/lib/perl5";
 use lib "$FindBin::Bin/../lib";
 
-use Smokeping 2.004002;
+use Smokeping 2.005000;
  
 Smokeping::main("$FindBin::Bin/../etc/config");
 
