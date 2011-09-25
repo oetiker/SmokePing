@@ -1420,7 +1420,7 @@ sub get_detail ($$$$;$){
              print "Content-Length: ".length($data)."\n\n";
              print $data;
              unlink "${imgbase}_${end}_${start}.png";
-             exit;
+             return undef;
         } 
         elsif ($mode eq 'n'){ # navigator mode
 #           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
