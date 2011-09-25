@@ -13,7 +13,7 @@ $SIG{CHLD} = 'IGNORE';
 
 use CGI::Carp qw(fatalsToBrowser);
 
-use Smokeping 2.004002;
+use Smokeping 2.005000;
 
 use CGI::Fast;
 
