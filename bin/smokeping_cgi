@@ -26,7 +26,7 @@ while (my $q = new CGI::Fast) {
 
 =head1 NAME
 
-smokeping.cgi - SmokePing webfrontend
+smokeping_cgi - SmokePing webfrontend
 
 =head1 OVERVIEW
 
