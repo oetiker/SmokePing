@@ -1,5 +1,7 @@
 2011/09/25 -- released version 2.5.0
 
+* in zoom/ajax mode, do not exit ... fastcgis should not quit
+
 * Switch from using SpeedyCGI to FastCGI.
 
 * Added new OpenSSHJunOSPing probe to run ping from a juniper router via

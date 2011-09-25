@@ -281,7 +281,7 @@ sub get_multi_detail ($$$$;$){
              print "Content-Length: ".length($data)."\n\n";
              print $data;
              unlink "${imgbase}_${end}_${start}.png";
-             exit;
+             return undef;
         } 
 
         elsif ($mode eq 'n'){ # navigator mode
