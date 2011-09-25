@@ -1,5 +1,5 @@
 SHELL = /bin/sh
-VERSION := 2.5
+VERSION := 2.5.0
 SVNREPO = svn://svn.oetiker.ch/smokeping
 ############ A is for features
 ############ B is for bugfixes
