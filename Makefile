@@ -181,9 +181,10 @@ smokeping-$(VERSION).tar.gz:
 	tar czvf smokeping-$(VERSION).tar.gz --exclude '*.tmp' smokeping-$(VERSION)
 	rm -rf smokeping-$(VERSION)
 
-dist:   smokeping-$(VERSION).tar.gz
+dist:   tag
+        smokeping-$(VERSION).tar.gz
 	scp CHANGES smokeping-$(VERSION).tar.gz oposs@oss.oetiker.ch:public_html/smokeping/pub/
 
-tag:    dist
-	svn ls $(SVNREPO)/tags/$(VERSION) || \
+tag:    svn ls $(SVNREPO)/tags/$(VERSION) || \
 	svn copy -m "tagging version $(VERSION)" $(SVNREPO)/trunk/software $(SVNREPO)/tags/$(VERSION)
+
