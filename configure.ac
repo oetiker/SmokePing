@@ -43,6 +43,9 @@ AC_ARG_ENABLE(pkgonly,
                         [Skip all checking])])
 AC_SUBST(enable_pkgonly)
 
+HTDOCSDIR=${prefix}/htdocs
+AC_ARG_WITH(htdocs-dir,[  --with-htdocs-dir=[DIR]    Where to install htdocs [PREFIX/htdocs]], [HTDOCSDIR=$withval])
+AC_SUBST(HTDOCSDIR)
         
 PERLLIBDIRS=
 

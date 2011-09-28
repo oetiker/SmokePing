@@ -25,7 +25,7 @@ CGI = smokeping.fcgi.dist smokeping.cgi.dist
 
 EXTRA_DIST = $(JS) $(CGI)
 
-jsdir = $(DESTDIR)$(prefix)/htdocs
+jsdir = $(DESTDIR)$(HTDOCSDIR)
 nobase_js_DATA = $(JS)
 js_SCRIPTS = $(CGI)
 
