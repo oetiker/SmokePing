@@ -1916,7 +1916,7 @@ DOC
                               RTT   => $rtt,
                               COMMENT => $alert->{comment}
                                       },$default_mail) || "Subject: smokeping failed to open mailtemplate '$alert->{mailtemplate}'\n\nsee subject\n";
-                    my $rfc2822stamp =  strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
+                    my $rfc2822stamp =  POSIX::strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
                                 my $to = join ",",@to;
                                     sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
