@@ -26,7 +26,7 @@ DOCSCONFIG = smokeping_config.pod smokeping_examples.pod
 
 #PM :=  ../lib/Smokeping.pm ../lib/Smokeping/Examples.pm ../lib/Smokeping/RRDtools.pm
 
-EXTRA_DIST = $(DOCS)
+EXTRA_DIST = $(DOCS) smokeping_install.txt
 
 PODPROBE :=  $(wildcard ../lib/Smokeping/probes/*.pm)
 PODMATCH :=  $(wildcard ../lib/Smokeping/matchers/*.pm)
@@ -40,7 +40,7 @@ MODBASE = $(subst .pm,,$(subst ../lib/Smokeping/probes/,Smokeping_probes_,$(PODP
 
 PROGBASE = smokeping smokeping_cgi tSmoke
 
-DOCSCONFIGBASE = smokeping_config
+DOCSCONFIGBASE = smokeping_config smokeping_examples
 
 MAN3 = $(addsuffix .3,$(MODBASE))
 MAN5 = $(addsuffix .5,$(DOCSCONFIGBASE))
@@ -50,53 +50,57 @@ MAN1 = $(addsuffix .1,$(PROGBASE))
 POD2MAN = pod2man --release=$(VERSION) --center=SmokePing $<
 
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
-MAKEPOD= $(PERL) $(PERLOPTS) -I../lib -mSmokeping -e 'Smokeping::main()' -- --makepod
-GENEX= $(PERL) $(PERLOPTS)  -I../lib -mSmokeping -e 'Smokeping::main()' -- --gen-examples
+MAKEPOD= PERL5LIB=$(PERL5LIB) $(PERL) -I../lib -mSmokeping -e 'Smokeping::main()' -- --makepod
+GENEX= PERL5LIB=$(PERL5LIB) $(PERL)  -I../lib -mSmokeping -e 'Smokeping::main()' -- --gen-examples
 
 %.7: %.pod
-	$(POD2MAN) --section 7 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 7 > $@
+
 %.5: %.pod
-	$(POD2MAN) --section 5 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 5 > $@
 
 Smokeping.3: ../lib/Smokeping.pm
-	$(POD2MAN) --section 3 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
 Smokeping_Examples.3: ../lib/Smokeping/Examples.pm        
-	$(POD2MAN) --section 3 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
 Smokeping_RRDtools.3: ../lib/Smokeping/RRDtools.pm
-	$(POD2MAN) --section 3 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
 Smokeping_probes_%.pod: ../lib/Smokeping/probes/%.pm
-	$(MAKEPOD) Smokeping::probes::$* > $@
+	$(AM_V_GEN)$(MAKEPOD) Smokeping::probes::$* > $@
 
 Smokeping_probes_%.3: Smokeping_probes_%.pod
-	$(POD2MAN) --section 3 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
 Smokeping_matchers_%.3: ../lib/Smokeping/matchers/%.pm
-	$(POD2MAN) --section 3 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
 Smokeping_sorters_%.3: ../lib/Smokeping/sorters/%.pm
-	$(POD2MAN) --section 3 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
 smokeping.1: ../bin/smokeping
-	$(POD2MAN) --section 1 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 1 > $@
 
 smokeping_cgi.1: ../bin/smokeping_cgi
-	$(POD2MAN) --section 1 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 1 > $@
 
 tSmoke.1: ../bin/tSmoke
-	$(POD2MAN) --section 1 > $@
+	$(AM_V_GEN)$(POD2MAN) --section 1 > $@
 
 smokeping_config.pod: ../lib/Smokeping.pm
-	$(MAKEPOD) > $@
+	$(AM_V_GEN)$(MAKEPOD) > $@
 
 smokeping_examples.pod: ../lib/Smokeping/Examples.pm ../etc/config.dist
-	$(MKDIR) -p examples
-	$(GENEX)
+	$(AM_V_GEN)$(MKDIR) -p examples
+	$(AM_V_GEN)$(GENEX)
 
-clean-local:
-	-$(RM) -r *.[1357] smokeping_examples.pod smokeping_config.pod examples
+.1.txt .3.txt .5.txt .7.txt:
+	$(AM_V_GEN)GROFF_NO_SGR=1 @NROFF@ -man -Tlp $< > $@
+
+
+CLEANFILES = *.[1357] smokeping_examples.pod smokeping_config.pod examples/*
 
 iman1dir = $(DESTDIR)$(mandir)/man1
 iman1_DATA = $(MAN1)
@@ -114,3 +118,4 @@ EXAMPLES := $(wildcard examples/config.*)
 
 etcdir = $(DESTDIR)$(sysconfdir)/examples
 etc_DATA = $(EXAMPLES)
+

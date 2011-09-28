@@ -1,9 +1,12 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 use strict;
+use warnings;
 
-use lib qw(/usr/pack/rrdtool-1.3.2-to/lib/perl);
 use FindBin;
+# PERL5LIB
+use lib "$FindBin::Bin/../thirdparty/lib/perl5";
 use lib "$FindBin::Bin/../lib";
+
 use Smokeping::Info;
 use Getopt::Long 2.25 qw(:config no_ignore_case);
 use Pod::Usage 1.14;

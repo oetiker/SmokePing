@@ -52,10 +52,11 @@ use warnings;
 #
 # Point the lib variables to your implementation
 use FindBin;
+# PERL5LIB
 use lib "$FindBin::Bin/../thirdparty/lib/perl5";
 use lib "$FindBin::Bin/../lib";
 
-use Smokeping 2.004002;
+use Smokeping;
 use Net::SMTP;
 use Getopt::Long;
 use Pod::Usage;
