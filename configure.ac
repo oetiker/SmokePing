@@ -26,7 +26,7 @@ AM_INIT_AUTOMAKE(1.9)
 AM_MAINTAINER_MODE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-AC_PREFIX_DEFAULT( /opt/smokeping-$PACKAGE_VERSION )
+AC_PREFIX_DEFAULT(/opt/smokeping-$PACKAGE_VERSION)
 
 AC_ARG_VAR(PERL,   [Path to local perl binary])
 AC_PATH_PROG(PERL, perl, no)
@@ -61,16 +61,20 @@ AC_SUBST(PERL5LIB)
 
 mod_ok=1
 if test "$enable_pkgonly" != yes; then
+   prfx=$prefix
+   if test x$prfx = xNONE; then
+       prfx=$ac_default_prefix
+   fi
    for module in RRDs FCGI CGI CGI::Fast Config::Grammar Digest::HMAC_MD5; do
      AC_MSG_CHECKING([checking for perl module '$module'])
-     if ${PERL} -I$prefix/thirdparty/lib/perl5 -e 'use '$module 2>/dev/null ; then
+     if ${PERL} -I$prfx/thirdparty/lib/perl5 -e 'use '$module 2>/dev/null ; then
          AC_MSG_RESULT([Ok])
      else
          AC_MSG_RESULT([Failed])
          mod_ok=0
      fi
    done
-   if [[ $mod_ok = 0 ]]; then
+   if test x$mod_ok = x0; then
         cat <<NOTES
 
 ** Aborting Configure ******************************
@@ -84,7 +88,7 @@ if test "$enable_pkgonly" != yes; then
    Now you can install local copies of the missing modules 
    by running
 
-     ./setup/build-perl-modules.sh $prefix/thirdparty
+     ./setup/build-perl-modules.sh ${prfx}/thirdparty
 
    The RRDs perl module is part of RRDtool. Either use the rrdtool
    package provided by your OS or install rrdtool from source. 
