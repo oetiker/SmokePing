@@ -28,6 +28,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
 AC_PREFIX_DEFAULT( /opt/smokeping-$PACKAGE_VERSION )
 
+AC_ARG_VAR(PERL,   [Path to local perl binary])
 AC_PATH_PROG(PERL, perl, no)
 AC_PATH_PROG(SED, sed, no)
 AC_PATH_PROG(GREP, grep, no)
@@ -52,21 +53,48 @@ AC_SUBST(HTDOCSDIR)
 
 #AC_ARG_WITH(perl5lib,  [  --with-perl5lib=[A:B:C]  Colon separated list of perl library directories], [PERL5LIB=$withval])
 
-AC_ARG_VAR(PERL5LIB,   [[]             Colon separated list of perl library directories])
+AC_ARG_VAR(PERL5LIB,   [Colon separated list of perl library directories])
 
 AC_SUBST(PERL5LIB)
 
 # Check the necessary Perl modules
 
+mod_ok=1
 if test "$enable_pkgonly" != yes; then
    for module in RRDs FCGI CGI CGI::Fast Config::Grammar Digest::HMAC_MD5; do
-     AC_MSG_CHECKING([presence of $module])
-     if ${PERL} -e 'use '$module; then
+     AC_MSG_CHECKING([checking for perl module '$module'])
+     if ${PERL} -I$prefix/thirdparty/lib/perl5 -e 'use '$module 2>/dev/null ; then
          AC_MSG_RESULT([Ok])
      else
-         AC_MSG_ERROR([Perl cannot find $module ($PERL5LIB)]);
+         AC_MSG_RESULT([Failed])
+         mod_ok=0
      fi
    done
+   if [[ $mod_ok = 0 ]]; then
+        cat <<NOTES
+
+** Aborting Configure ******************************
+   
+   If you know where perl can find the missing modules, set
+   the PERL5LIB environment variable accordingly.
+
+   FIRST though, make sure that 'perl' starts the perl
+   binary you want to use for SmokePing.
+
+   Now you can install local copies of the missing modules 
+   by running
+
+     ./setup/build-perl-modules.sh $prefix/thirdparty
+
+   The RRDs perl module is part of RRDtool. Either use the rrdtool
+   package provided by your OS or install rrdtool from source. 
+   If you install from source, the RRDs module is located
+   PREFIX/lib/perl
+
+NOTES
+      exit 1
+   fi
+
 fi
 
 
