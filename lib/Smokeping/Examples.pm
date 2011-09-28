@@ -65,7 +65,7 @@ Niko Tyni <ntyni@iki.fi>
 use strict;
 
 sub read_config_template {
-	my $file = "etc/config.dist";
+	my $file = "../etc/config.dist";
 	my $h = {
 		common => "", # everything up to the Probes section
 		probes => "",   # the Probes section, without the *** Probes *** line
@@ -165,7 +165,7 @@ sub make {
 		my $h = $examples->{$ex};
 		$manual .= "\n=head2 Example $h->{order}: config.$ex\n\n"
 			.   genpod($h);
-		my $cfgfile = "doc/examples/config.$ex";
+		my $cfgfile = "examples/config.$ex";
 		print "\t$cfgfile ...\n";
 		writecfg($cfgfile, $template, $h);
 		if ($check) {
@@ -183,7 +183,7 @@ sub make {
 
 sub writemanual {
 	my $text = shift;
-	my $filename = "doc/smokeping_examples.pod";
+	my $filename = "smokeping_examples.pod";
 	print "\t$filename ...\n";
 	open(F, ">$filename") or die("open $filename for writing: $!");
 	print F $text;
