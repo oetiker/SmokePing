@@ -21,9 +21,7 @@ JS = cropper/smokeping-zoom.js cropper/lib/unittest.js cropper/lib/slider.js cro
      cropper/lib/builder.js cropper/lib/scriptaculous.js \
      cropper/cropper.uncompressed.js cropper/cropper.js
 
-CGI = smokeping.fcgi.dist smokeping.cgi.dist
-
-EXTRA_DIST = $(JS) $(CGI)
+EXTRA_DIST = $(JS)
 
 jsdir = $(DESTDIR)$(HTDOCSDIR)
 nobase_js_DATA = $(JS)
