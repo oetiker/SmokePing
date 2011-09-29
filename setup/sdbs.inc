@@ -31,7 +31,7 @@ export PKG_CONFIG_PATH=$EPREFIX/lib/pkgconfig
 export LD_LIBRARY_PATH=$EPREFIX/lib
 # find our own perl modules
 export PERL5LIB=$EPREFIX/lib/perl5
-if [ x$PERL != x ]; then
+if [ ${PERL:-x} != x ]; then
    PATH=`dirname $PERL`:$PATH
 fi
 export PERL=perl
