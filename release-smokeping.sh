@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 VERSION=`perl -n -e 'm/\QAC_INIT([rrdtool],[\E(.+?)\Q])\E/ && print $1' configure.ac`
-svn commit -m "preparing for the release of smokeping-$VERSION"
+svn status -q && echo "ERROR: make sure your tree is consistent before release" && exit 1
 cd /tmp
 svn export svn://svn.oetiker.ch/smokeping/trunk/software smokeping-$$
 cd smokeping-$$
