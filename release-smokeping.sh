@@ -13,6 +13,8 @@ automake -a -c
 ./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build PERL5LIB=/scratch/oetiker/rrd-dev/lib/perl
 make install
 make dist
+echo READY TO SYNC ?
+read XXX
 scp CHANGES smokeping-$VERSION.tar.gz oposs@james:public_html/smokeping/pub
 cd /tmp
 rm -fr smokeping-$$*
