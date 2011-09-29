@@ -199,6 +199,8 @@ your F</etc/init.d> tree. Check out L<smokeping> for further information.
 
 When you can now also open the smokeping.cgi webpage to look at your data.
 
+See the L<smokeping_cgi> documentation on how to setup the smokeping web interface.
+
 =head1 COPYRIGHT
 
 Copyright (c) 2001, 2011 by Tobias Oetiker. All right reserved.

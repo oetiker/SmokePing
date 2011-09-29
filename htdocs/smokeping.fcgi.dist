@@ -1,4 +1,2 @@
 #!/bin/sh
-# maybe add some extra perl search path
-# export PERL5LIB=/opt/rrdtool/lib/perl
 exec /opt/smokeping/bin/smokeping_cgi /opt/smokeping/etc/config

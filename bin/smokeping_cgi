@@ -14,7 +14,7 @@ $SIG{CHLD} = 'IGNORE';
 
 use CGI::Carp qw(fatalsToBrowser);
 
-use Smokeping 2.005000;
+use Smokeping;
 
 use CGI::Fast;
 
@@ -37,7 +37,7 @@ as they are required by people looking at the pages.
 
 =head1 DESCRIPTION
 
-To get B<smokeping.cgi> going, you need a webserver which allows you to run
+To get B<smokeping_cgi> going, you need a webserver which allows you to run
 CGI or better FastCGI scripts. The system must be setup so that the cgi
 process is allowed to write to the image caching area as defined in the
 config file.
@@ -51,13 +51,11 @@ Please refer to the installation document for detailed setup instructions.
 
 =head1 SETUP
 
-When installing SmokePing, I recomend to place a little shell wrapper
-into your htdocs directory, to launch the actual smokeping.cgi process:
-
- #!/bin/sh
- # maybe add some extra perl search path
- # export PERL5LIB=/opt/rrdtool/lib/perl
- exec /opt/smokeping/bin/smokeping.cgi /opt/smokeping/etc/config
+There is a sample F<htdocs> directory in your smokeping installation root.
+Copy its content to the place where your webserver expects its files.
+There are also two sample cgi scripts showing how to launch the
+smokeping cgi in your website. The only difference is the file extension.
+Adjust the paths in the script and you should be ready to go.
 
 =head1 COPYRIGHT
 
