@@ -11,6 +11,7 @@ autoconf
 automake -a -c
 ./setup/build-perl-modules.sh /tmp/smokeping-$$-build/thirdparty
 ./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build PERL5LIB=/scratch/oetiker/rrd-dev/lib/perl
+make install
 make dist
 scp smokeping-$VERSION.tar.gz oposs@james:public_html/smokeping/pub
 cd /tmp
