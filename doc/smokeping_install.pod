@@ -12,9 +12,7 @@ This document explains how to setup SmokePing at your site.
 
 SmokePing does not stand alone. It relies on various other tools and
 services being present. Apart from a Unix OS and a working Perl installation
-you need the following things. The list contains the names of the tools
-together with the version of the tool which I am using, and a link for
-downloading the tool.
+you need the following components:
 
 =over
 
@@ -24,7 +22,7 @@ Smokeping uses RRDtool for logging and graphing. If you linux distro provides
 an rrdtool  package with perl support, use this. If you want to get the latest
 and greates version, compile your own: L<http://oss.oetiker.ch/rrdtool/>
 
-=item FPing 
+=item FPing (optional)
 
 The official site L<http://fping.sourceforge.net/> seems to be a bit
 unmaintained. You might want to grab an updated version of fping from
@@ -78,11 +76,9 @@ If you still have an older version, maybe have a look at perlbrew.
 
 =item Various Perl modules (Many are optional)
 
-They are all from L<http://www.cpan.org> and you may be able to get them as
-packages from your distro, but there is also a script provided in the setup
-folder of this package which will install all the missing modules in a
-thirdparty directory into your smokeping installation. So, if you don't have
-them yet, look further down.
+The modules are al available from L<http://www.cpan.org> and you may be able to get them as
+packages from your distros repository. There is also a script provided in the setup
+folder to install the missing bits. You will be instructed later on how to use the script.
 
 =over
 
@@ -101,16 +97,15 @@ The configuration file parser used in smokeping
 =item LWP
 
 The master/slave functionality introduced a dependency LWP::UserAgent
-from the libwww-perl (also known as LWP) library. Currently the module
-is needed even if the master/slave mode is not enabled.
+from the libwww-perl (also known as LWP) library. The module
+is required even if the master/slave mode is not enabled.
 
 =item Socket6 (optional)
 
-Optionally installing the Socket6 module for perl enables
-smokeping to check hostnames that only resolve to an IPv6
-address. If you probe such hosts using ie. the FPing6 probe
-and get warnings that those hosts don't resolve to an IP
-address, you need to install it.
+The Socket6 module enables smokeping to check hostnames that only resolve to
+an IPv6 address. If you probe such hosts using ie. the FPing6 probe and get
+warnings that those hosts don't resolve to an IP address, you need to
+install it.
 
 =item Net::Telnet (optional)
 
@@ -143,39 +138,35 @@ You need this for the Radius probe.
 =head2 Installation
 
 Once the tools listed above are in place, you can start setting up SmokePing
-itself. Once the SmokePing tar archive is unpacked, it is more of less ready
-to use. At least to the extent, that it is not necessary to B<install> them.
+itself. Unpack the tar archive and run the included configure script:
 
-You may want to move and rename the directory so that it does not contain the
-version number of SmokePing, or at least make a symlink, so that you can use
-a persistent name when referring to SmokePing files.
+ ./configure --prefix=/opt/smokeping
 
-Once all is in place, you get to plug everyting together:
+Configure will verify that all the required perl modules are available.
+If some are missing it will tell you to run the module build script.
+Just follow the instructions on screen and then run configure again.
+Once it completes, you can run
 
-=over
+ make install
 
-=item Building missing perl modules
+to finish your setup.
 
-To make sure all the necessary perl modules are available, use the script in the F<setup/> directory:
-
- cd setup
- ./build-perl-modules.sh
-
-=item Configure Smokeping
+=head2 Configuration
 
 Use the F<etc/config.dist> file as a template to create your own smokeping configuration file.
 See L<smokeping_config> for details.
 
+=over
+
 =item Installing the webinterface
 
-Copy the content of the F<htdocs/> directory to the place where your webserver
+Copy the content of the F<PREFIX/htdocs> directory to the place where your webserver
 expects its data. Maybe to F</var/www/smokeping>.
 
-Edit the F<smokeping.fcgi> script to point to your smokeping installation.
+Edit the F<smokeping.fcgi> script to point to your smokeping_cgi script.
 
-If you have no FastCGI support in your webserver, you may want to rename the script
-to F<smokeping.cgi>.
-
+If you have no FastCGI support in your webserver, you may want to use the
+F<smokeping.cgi> script.
 
 =item F<etc/basepage.html>
 

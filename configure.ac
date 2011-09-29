@@ -74,7 +74,7 @@ if test "$enable_pkgonly" != yes; then
    if test x$prfx = xNONE; then
        prfx=$ac_default_prefix
    fi
-   for module in RRDs FCGI CGI CGI::Fast Config::Grammar Digest::HMAC_MD5; do
+   for module in RRDs FCGI CGI CGI::Fast Config::Grammar Digest::HMAC_MD5 LWP; do
      AC_MSG_CHECKING([checking for perl module '$module'])
      if ${PERL} -I$prfx/thirdparty/lib/perl5 -e 'use '$module 2>/dev/null ; then
          AC_MSG_RESULT([Ok])
