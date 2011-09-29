@@ -41,6 +41,15 @@ AC_PATH_PROG(MKDIR, mkdir, no)
 AC_PATH_PROG(FIND, find, no)
 AC_PATH_PROGS(NROFF, [gnroff nroff])
 
+AC_ARG_VAR(GMAKE,   [Path to local GNU Make binary])
+AC_PATH_PROGS(GMAKE, [gnumake gmake make])
+
+AC_MSG_CHECKING([checking for gnu make availablility])
+if  ( $GMAKE --version 2> /dev/null | $GREP GNU  > /dev/null 2>&1 );  then
+    AC_MSG_RESULT([$GMAKE is GNU make])
+else
+    AC_MSG_ERROR([GNU make not found. Try setting the GMAKE environment variable.])
+fi
 
 AC_ARG_ENABLE(pkgonly,
         [AC_HELP_STRING([--enable-pkgonly],
@@ -107,3 +116,19 @@ AC_CONFIG_FILES([Makefile bin/Makefile doc/Makefile htdocs/Makefile etc/Makefile
 AC_SUBST(VERSION)
 
 AC_OUTPUT
+
+        cat <<NOTES
+
+** Ready to install Smokeping ******************************
+   
+   Settings:
+
+     PERL5LIB = ${PERL5LIB:-"not set"}
+     PERL = $PERL
+
+   The Smokeping Makefiles use GNU make functionality.
+   Continue installation with
+
+     $GMAKE install
+
+NOTES
