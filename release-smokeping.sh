@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 VERSION=`perl -n -e 'm/\QAC_INIT([rrdtool],[\E(.+?)\Q])\E/ && print $1' configure.ac`
-[ `svn status -q | wc -l` > 0 ] && echo "ERROR: commit all changes before release" && exit 1
+[ `svn status -q | wc -l` -gt 0 ] && echo "ERROR: commit all changes before release" && exit 1
 cd /tmp
 svn export svn://svn.oetiker.ch/smokeping/trunk/software smokeping-$$
 cd smokeping-$$
