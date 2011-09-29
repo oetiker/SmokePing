@@ -29,6 +29,7 @@ jsdir = $(DESTDIR)$(HTDOCSDIR)
 nobase_js_DATA = $(JS)
 
 install-data-local:
+	$(MKDIR) -p $(DESTDIR)$(HTDOCSDIR)
 	$(ECHO)	"#!/bin/sh" > $(DESTDIR)$(HTDOCSDIR)/smokeping.fcgi.dist
 	$(ECHO)	"$(prefix)/bin/smokeping_cgi $(prefix)/etc/config" >> $(DESTDIR)$(HTDOCSDIR)/smokeping.fcgi.dist
 	chmod +x $(DESTDIR)$(HTDOCSDIR)/smokeping.fcgi.dist
