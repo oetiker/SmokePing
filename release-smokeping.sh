@@ -5,6 +5,7 @@ svn commit -m "preparing for the release of smokeping-$VERSION"
 cd /tmp
 svn export svn://svn.oetiker.ch/smokeping/trunk/software smokeping-$$
 cd smokeping-$$
+mkdir conftools
 aclocal
 autoconf
 automake -a -c
