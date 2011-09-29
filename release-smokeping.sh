@@ -13,7 +13,7 @@ automake -a -c
 ./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build PERL5LIB=/scratch/oetiker/rrd-dev/lib/perl
 make install
 make dist
-scp smokeping-$VERSION.tar.gz oposs@james:public_html/smokeping/pub
+scp CHANGES smokeping-$VERSION.tar.gz oposs@james:public_html/smokeping/pub
 cd /tmp
 rm -fr smokeping-$$*
 svn copy -m "tagging version $VERSION" svn://svn.oetiker.ch/smokeping/trunk/software svn://svn.oetiker.ch/smokeping/tags/$VERSION
