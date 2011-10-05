@@ -18,7 +18,7 @@ AUTOMAKE_OPTIONS =  foreign
 
 SUBDIRS = bin doc etc htdocs lib
 
-EXTRA_DIST = setup/build-perl-modules.sh setup/sdbs.inc
+EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE setup/build-perl-modules.sh setup/sdbs.inc
 
 dist-hook:
 	$(PERL) -i -p -e '"$(PACKAGE_VERSION)" =~ /(\d+)\.(\d+)\.(\d+)/ and $$v = sprintf("%d.%03d%03d",$$1,$$2,$$3) and s/^\$$VERSION\s+=\s+".+?"/\$$VERSION = "$$d"/'  $(distdir)/lib/Smokeping.pm
