@@ -102,20 +102,20 @@ smokeping_examples.pod: ../lib/Smokeping/Examples.pm ../etc/config.dist
 
 CLEANFILES = *.[1357] smokeping_examples.pod smokeping_config.pod examples/*
 
-iman1dir = $(DESTDIR)$(mandir)/man1
+iman1dir = $(mandir)/man1
 iman1_DATA = $(MAN1)
 
-iman3dir = $(DESTDIR)$(mandir)/man3
+iman3dir = $(mandir)/man3
 iman3_DATA = $(MAN3)
 
-iman5dir = $(DESTDIR)$(mandir)/man5
+iman5dir = $(mandir)/man5
 iman5_DATA = $(MAN5)
 
-iman7dir = $(DESTDIR)$(mandir)/man7
+iman7dir = $(mandir)/man7
 iman7_DATA = $(MAN7)
 
 EXAMPLES := $(wildcard examples/config.*)
 
-etcdir = $(DESTDIR)$(sysconfdir)/examples
+etcdir = $(sysconfdir)/examples
 etc_DATA = $(EXAMPLES)
 

@@ -23,7 +23,7 @@ JS = cropper/smokeping-zoom.js cropper/lib/unittest.js cropper/lib/slider.js cro
 
 EXTRA_DIST = $(JS)
 
-jsdir = $(DESTDIR)$(HTDOCSDIR)
+jsdir = $(HTDOCSDIR)
 nobase_js_DATA = $(JS)
 
 install-data-local:

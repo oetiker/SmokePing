@@ -17,5 +17,5 @@
 
 EXTRA_DIST = basepage.html.dist config.dist smokemail.dist smokeping_secrets.dist tmail.dist 
 
-etcdir = $(DESTDIR)$(sysconfdir)
+etcdir = $(sysconfdir)
 etc_DATA = $(EXTRA_DIST)

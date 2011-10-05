@@ -31,5 +31,5 @@ MATCH := $(wildcard Smokeping/matchers/*.pm)
 
 EXTRA_DIST = $(PM) $(SP) $(SORT) $(PROBE) $(MATCH)
 
-perllibdir = $(DESTDIR)$(prefix)/lib
+perllibdir = $(prefix)/lib
 nobase_perllib_DATA = $(EXTRA_DIST)
