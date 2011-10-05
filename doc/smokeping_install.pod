@@ -18,9 +18,9 @@ you need the following components:
 
 =item RRDtool 1.2.x or later
 
-Smokeping uses RRDtool for logging and graphing. If you linux distro provides
+Smokeping uses RRDtool for logging and graphing. If your linux distro provides
 an rrdtool  package with perl support, use this. If you want to get the latest
-and greates version, compile your own: L<http://oss.oetiker.ch/rrdtool/>
+and greatest version, compile your own: L<http://oss.oetiker.ch/rrdtool/>
 
 =item FPing (optional)
 
@@ -31,7 +31,7 @@ L<http://oss.oetiker.ch/smokeping/pub/>.
 Note that fping must be installed setuid root. It seems that older versions
 of fping report round trip times in 0.1 milliseconds instead of 1 milliseconds
 as advertised ... SmokePing tries to figure this out. It tells
-you when it starts ... let me know it it gets it wrong.
+you when it starts ... let me know if it gets it wrong.
 
 =item EchoPing  (Optional)
 
@@ -76,7 +76,7 @@ If you still have an older version, maybe have a look at perlbrew.
 
 =item Various Perl modules (Many are optional)
 
-The modules are al available from L<http://www.cpan.org> and you may be able to get them as
+The modules are all available from L<http://www.cpan.org> and you may be able to get them as
 packages from your distros repository. There is also a script provided in the setup
 folder to install the missing bits. You will be instructed later on how to use the script.
 
@@ -96,7 +96,7 @@ The configuration file parser used in smokeping
 
 =item LWP
 
-The master/slave functionality introduced a dependency LWP::UserAgent
+The master/slave functionality introduced a dependency on LWP::UserAgent
 from the libwww-perl (also known as LWP) library. The module
 is required even if the master/slave mode is not enabled.
 
@@ -172,7 +172,7 @@ F<smokeping.cgi> script.
 
 Edit the html template to your likings. Please do not remove the link to the
 SmokePing counter and my name from the template. The content of the template
-will be renderd by the smokeping.cgi. This means that all embeded links must
+will be renderd by the smokeping.cgi. This means that all embedded links must
 be relative to smokeping.cgi.
 
 =item F<etc/smokemail>
@@ -183,13 +183,13 @@ If you are going to use the B<DYNAMIC> IP support, customize the contents of thi
 
 =head2 Starting the Smokeping Daemon
 
-With all the scaffolding in place, you can now launch the smokeping daemon and send
+With all the scaffolding in place, you can now launch the smokeping daemon and
 have it gather data for you. First you may want to run it in debug mode to see what
 it is doing
 
  ./bin/smokeping --config=/opt/smokeping/etc/config --debug
 
-once all is well, start it up as a deamon. I would recomend to enable the logfile
+once all is well, start it up as a daemon. I would recomend to enable the logfile
 option so that you can see if it runs into trouble.
 
  ./bin/smokeping --config=/opt/smokeping/etc/config --logfile=smoke.log
@@ -197,7 +197,7 @@ option so that you can see if it runs into trouble.
 Once the system works, you may want to put a SmokePing startup script into
 your F</etc/init.d> tree. Check out L<smokeping> for further information.
 
-When you can now also open the smokeping.cgi webpage to look at your data.
+You can now open the smokeping.cgi webpage to look at your data.
 
 See the L<smokeping_cgi> documentation on how to setup the smokeping web interface.
 
