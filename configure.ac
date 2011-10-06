@@ -57,10 +57,8 @@ AC_ARG_ENABLE(pkgonly,
 AC_SUBST(enable_pkgonly)
 
 HTDOCSDIR=${prefix}/htdocs
-AC_ARG_WITH(htdocs-dir,[  --with-htdocs-dir=[DIR]    Where to install htdocs [PREFIX/htdocs]], [HTDOCSDIR=$withval])
+AC_ARG_WITH(htdocs-dir,AC_HELP_STRING([--with-htdocs-dir=DIR],[Where to install htdocs [PREFIX/htdocs]]), [HTDOCSDIR=$withval])
 AC_SUBST(HTDOCSDIR)
-
-#AC_ARG_WITH(perl5lib,  [  --with-perl5lib=[A:B:C]  Colon separated list of perl library directories], [PERL5LIB=$withval])
 
 AC_ARG_VAR(PERL5LIB,   [Colon separated list of perl library directories])
 
