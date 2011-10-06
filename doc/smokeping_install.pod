@@ -61,7 +61,7 @@ You need this for the SSH probe.
 
 L<http://httpd.apache.org/>
 
-Well I wont get much into this. The important thing is, to have a webserver
+Well I won't get much into this. The important thing is, to have a webserver
 which allows you to run CGI and preferably FastCGI scripts. If you are using
 Apache I strongly recommend using the F<suexec> system for running CGI
 scripts as a particular user.
@@ -76,9 +76,10 @@ If you still have an older version, maybe have a look at perlbrew.
 
 =item Various Perl modules (Many are optional)
 
-The modules are all available from L<http://www.cpan.org> and you may be able to get them as
-packages from your distros repository. There is also a script provided in the setup
-folder to install the missing bits. You will be instructed later on how to use the script.
+The modules are all available from L<http://www.cpan.org> and you may be
+able to get them as packages from your distro's repository.  There is also a
+script provided in the setup folder to install the missing bits.  You will
+be instructed later on how to use the script.
 
 =over
 
@@ -97,8 +98,8 @@ The configuration file parser used in smokeping
 =item LWP
 
 The master/slave functionality introduced a dependency on LWP::UserAgent
-from the libwww-perl (also known as LWP) library. The module
-is required even if the master/slave mode is not enabled.
+from the libwww-perl (also known as LWP) library.  The module is required
+even if the master/slave mode is not enabled.
 
 =item Socket6 (optional)
 
@@ -171,9 +172,9 @@ F<smokeping.cgi> script.
 =item F<etc/basepage.html>
 
 Edit the html template to your likings. Please do not remove the link to the
-SmokePing counter and my name from the template. The content of the template
-will be renderd by the smokeping.cgi. This means that all embedded links must
-be relative to smokeping.cgi.
+SmokePing counter and my name from the template.  The content of the
+template will be renderd by smokeping.cgi.  This means that all embedded
+links must be relative to smokeping.cgi.
 
 =item F<etc/smokemail>
 
@@ -189,8 +190,8 @@ it is doing
 
  ./bin/smokeping --config=/opt/smokeping/etc/config --debug
 
-once all is well, start it up as a daemon. I would recomend to enable the logfile
-option so that you can see if it runs into trouble.
+once all is well, start it up as a daemon. I would recomend you enable the
+logfile option so that you can see if it runs into trouble.
 
  ./bin/smokeping --config=/opt/smokeping/etc/config --logfile=smoke.log
 

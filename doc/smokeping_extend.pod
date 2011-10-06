@@ -15,11 +15,13 @@ source of this document are most appreciated.
 
 =head1 CHOOSING A BASE CLASS
 
-The first thing you should decide is which base class you should
-use for your probe. For most (if not all) uses it's a choice between
-L<Smokeping::probes::base|Smokeping::probes::base> and L<Smokeping::probes::basefork|Smokeping::probes::basefork>. The former is intended for probes
-that can measure their targets all in one go, while the latter is for
-probing them one at a time, possibly in several concurrent subprocesses.
+The first thing you should decide is which base class you should use for
+your probe.  For most (if not all) uses it's a choice between
+L<Smokeping::probes::base|Smokeping::probes::base> and
+L<Smokeping::probes::basefork|Smokeping::probes::basefork>.  The former is
+intended for probes that can measure their targets all in one go, while the
+latter is for probing them one at a time, possibly in several concurrent
+subprocesses.
 
 At the moment, the only probes that use C<Smokeping::probes::base> are the FPing
 derivatives. All the others use C<Smokeping::probes::basefork>, and chances are
