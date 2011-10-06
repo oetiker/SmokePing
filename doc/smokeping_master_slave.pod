@@ -1,6 +1,6 @@
 =head1 NAME
 
-smokeping_master_slave - How run multiple distributed instances of SmokePing
+smokeping_master_slave - How to run multiple distributed instances of SmokePing
 
 =head1 OVERVIEW
 
@@ -47,12 +47,12 @@ communication can run over ssl.
               +---------------+
 
 The slave is a normal smokeping instance setup where the configuration comes
-from the master instead of a local configuration file. The slave tries to
+from the master instead of a local configuration file.  The slave tries to
 contact the master server after every round of probing, supplying its
-results. If the master server can not be reached, the results will be sent
-to the server together with the next round of results. Results will be
-stored in a perl storable so that they survive a restart of the smokeping
-instance.
+results.  If the master server can not be reached, the results will be sent
+to the server together with the next round of results.  Results will be
+stored in a file in Perl storable form so that they survive a restart of the
+smokeping instance.
 
 =head2 Master Configuration
 
@@ -62,7 +62,7 @@ master configuration file. The section name must match the hostname of the
 slave. If some configuration parameter must be set to a special value for
 the slave, use an override section to configure this.
 
-The slave names must be the names the hosts think they have not their
+The slave names must be the names the hosts think they have, not their
 outside hostnames or ip addresses or anything like that. When the slave
 calls the master to get its config or report its measurements it will tell
 the master its 'hostname'. This together with the shared secret is used to
@@ -98,8 +98,8 @@ A slave will then get the appropriate configuration assigned by the server.
  +dest3
  ... 
 
-The data from the slaves will be stored in F<TargetName~SlaveName.rrd>. So the example above would
-create the following files:
+The data from the slaves will be stored in F<TargetName~SlaveName.rrd>. So
+the example above would create the following files:
 
  dest1.rrd
  dest2.rrd
@@ -130,12 +130,12 @@ is NOT the same as the F<slavesecrets.conf> file the master uses.
 
 =head1 SECURITY CONSIDERATIONS
 
-The master effectively has full access to slave hosts as the user the
-slave smokeping instance is run as. The configuration is transferred as
-Perl code that is evaluated on the slave. While this is done inside a
-restricted C<Safe> compartment, there are various ways that a malicious
-master could use to embed arbitrary commands in the configuration and
-get them to run when the slave probes its targets.
+The master effectively has full access to slave hosts as the user running
+the slave smokeping instance.  The configuration is transferred as Perl code
+that is evaluated on the slave.  While this is done inside a restricted
+C<Safe> compartment, there are various ways that a malicious master could
+embed arbitrary commands in the configuration and get them to run when the
+slave probes its targets.
 
 The strength of the shared secret is thus of paramount importance. Brute
 forcing the secret would enable a man-in-the-middle to inject a malicious
