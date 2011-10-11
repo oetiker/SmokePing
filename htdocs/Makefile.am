@@ -16,10 +16,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 JS = cropper/smokeping-zoom.js cropper/lib/unittest.js cropper/lib/slider.js cropper/lib/controls.js \
-     cropper/lib/sound.js cropper/lib/dragdrop.js \
-     cropper/lib/prototype.js cropper/lib/effects.js \
-     cropper/lib/builder.js cropper/lib/scriptaculous.js \
-     cropper/cropper.uncompressed.js cropper/cropper.js
+     cropper/lib/sound.js cropper/lib/dragdrop.js cropper/lib/prototype.js cropper/lib/effects.js \
+     cropper/lib/builder.js cropper/lib/scriptaculous.js  cropper/marqueeVert.gif cropper/cropper.uncompressed.js \
+     cropper/licence.txt cropper/marqueeHoriz.gif cropper/cropper.js cropper/cropper.css
 
 EXTRA_DIST = $(JS)
 

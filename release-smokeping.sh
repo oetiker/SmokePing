@@ -1,9 +1,6 @@
 #!/bin/sh
 set -e
-[ `svn status -q | wc -l` -gt 0 ] && echo "ERROR: commit all changes before release" && exit 1
-cd /tmp
-svn export svn://svn.oetiker.ch/smokeping/trunk/software smokeping-$$
-cd smokeping-$$
+[ `git status -s | wc -l` -gt 0 ] && echo "ERROR: commit all changes before release" && exit 1
 VERSION=`perl -n -e 'm/\QAC_INIT([smokeping],[\E(.+?)\Q]\E/ && print $1' configure.ac`
 mkdir conftools
 aclocal
@@ -16,7 +13,7 @@ make dist
 echo READY TO SYNC ?
 read XXX
 scp CHANGES smokeping-$VERSION.tar.gz oposs@james:public_html/smokeping/pub
-cd /tmp
-rm -fr smokeping-$$*
-svn copy -m "tagging version $VERSION" svn://svn.oetiker.ch/smokeping/trunk/software svn://svn.oetiker.ch/smokeping/tags/$VERSION
+rm -fr /tmp/smokeping-$$-build
+git tag $VERSION
+echo "run 'git push;git push --tags' to sync github"
 
