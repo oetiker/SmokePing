@@ -2,7 +2,7 @@
 set -e
 [ `git status -s | wc -l` -gt 0 ] && echo "ERROR: commit all changes before release" && exit 1
 VERSION=`perl -n -e 'm/\QAC_INIT([smokeping],[\E(.+?)\Q]\E/ && print $1' configure.ac`
-mkdir conftools
+mkdir -p conftools
 aclocal
 autoconf
 automake -a -c
