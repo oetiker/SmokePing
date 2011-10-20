@@ -75,7 +75,7 @@ sub pingone ($) {
     my $t0;
     for ( my $run = 0 ; $run < $self->pings($target) ; $run++ ) {
     	if (defined $t0) {
-		my $elapsed = tv_interval($t0, [gettimeofday]);
+		my $elapsed = tv_interval($t0, [gettimeofday()]);
 		my $timeleft = $mininterval - $elapsed;
 		sleep $timeleft if $timeleft > 0;
 	}
@@ -106,10 +106,10 @@ sub pingone ($) {
 	my $sel = IO::Select->new( \*Socket_Handle );
 
 	# connect () and measure the Time.
-	$t0 = [gettimeofday];
+	$t0 = [gettimeofday()];
 	connect( Socket_Handle, $sin );
 	($ready) = $sel->can_read($timeout);
-	$t1 = [gettimeofday];
+	$t1 = [gettimeofday()];
 	
 	if(not defined $ready) {
 		$self->do_debug("Timeout!");
@@ -131,10 +131,10 @@ sub pingone ($) {
 		$self->do_debug("Huh? Can't write.");
 		close(Socket_Handle); next;
 	}
-	$t2 = [gettimeofday];
+	$t2 = [gettimeofday()];
 	syswrite( Socket_Handle, $greeting . "\n" );
 	($ready) = $sel->can_read($timeout);
-	$t3 = [gettimeofday];
+	$t3 = [gettimeofday()];
 	if(not defined $ready) {
 		$self->do_debug("Timeout!");
 		close(Socket_Handle); next;

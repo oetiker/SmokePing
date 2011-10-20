@@ -88,10 +88,10 @@ sub pingone ($) {
 		my $timeleft = $mininterval - $elapsed;
 		sleep $timeleft if $timeleft > 0;
 	}
-        my $t0 = [gettimeofday];
+        my $t0 = [gettimeofday()];
         $sock->send($packet);
         my ($ready) = $sel->can_read($timeout);
-        my $t1 = [gettimeofday];
+        my $t1 = [gettimeofday()];
         $elapsed = tv_interval( $t0, $t1 );
         if ( defined $ready ) {
             my $buf = '';
