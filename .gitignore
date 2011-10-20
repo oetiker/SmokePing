@@ -1,0 +1,16 @@
+*~
+Makefile
+Makefile.in
+config.status
+configure
+config.log
+aclocal.m4
+DEADJOE
+autom4te.cache/
+conftools/
+smokeping-*.tar.gz
+doc/examples
+doc/*.[1-9]
+doc/smokeping_config.pod
+doc/smokeping_examples.pod
+doc/smokeping_install.txt
