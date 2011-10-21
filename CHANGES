@@ -1,3 +1,7 @@
+2011/10/20 -- released version 2.6.4
+
+* fixed gettimeofday() in SSH.pm probe too as noted by Phillip Corchary
+
 2011/10/20 -- released version 2.6.3
 
 * make sure probes call gettimeofday with () as noted by Phillip Corchary
