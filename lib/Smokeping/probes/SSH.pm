@@ -88,7 +88,7 @@ sub pingone ($){
     # get the user and system times before and after the test
     $self->do_debug("query=$query\n");
     for (my $run = 0; $run < $self->pings; $run++) {
-       my $t0 = [gettimeofday];
+       my $t0 = [gettimeofday()];
 
 	my $pid = open3($inh,$outh,$errh, $query);
        while (<$errh>) {
