@@ -56,6 +56,18 @@ AC_ARG_ENABLE(pkgonly,
                         [Skip all checking])])
 AC_SUBST(enable_pkgonly)
 
+# $prefix stores the value of the --prefix command line option, or
+# NONE if the option wasn't set.  In the case that it wasn't set, make
+# it be the default, so that we can use it to expand directories now.
+if test "x$prefix" = "xNONE"; then
+  prefix=$ac_default_prefix
+fi
+
+# and similarly for $exec_prefix
+if test "x$exec_prefix" = "xNONE"; then
+  exec_prefix=$prefix
+fi
+
 HTDOCSDIR=${prefix}/htdocs
 AC_ARG_WITH(htdocs-dir,AC_HELP_STRING([--with-htdocs-dir=DIR],[Where to install htdocs [PREFIX/htdocs]]), [HTDOCSDIR=$withval])
 AC_SUBST(HTDOCSDIR)
