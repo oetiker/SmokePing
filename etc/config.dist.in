@@ -3,17 +3,17 @@
 owner    = Peter Random
 contact  = some@address.nowhere
 mailhost = my.mail.host
-sendmail = /usr/lib/sendmail
+sendmail = @SENDMAIL@
 # NOTE: do not put the Image Cache below cgi-bin
 # since all files under cgi-bin will be executed ... this is not
 # good for images.
-imgcache = /home/oetiker/public_html/smokeping-ms/cache
+imgcache = @prefix@/cache
 imgurl   = cache
-datadir  = /tmp/smokeping-ms/data
-piddir  = /tmp/smokeping-ms/var
+datadir  = @prefix@/data
+piddir  = @prefix@/var
 cgiurl   = http://some.url/smokeping.cgi
-smokemail = /home/oetiker/checkouts/smokeping/trunk/software/etc/smokemail.dist
-tmail = /home/oetiker/checkouts/smokeping/trunk/software/etc/tmail.dist
+smokemail = @prefix@/etc/smokemail.dist
+tmail = @prefix@/etc/tmail.dist
 # specify this to get syslog logging
 syslogfacility = local0
 # each probe is now run in its own process
@@ -47,7 +47,7 @@ AVERAGE  0.5 144   720
 
 *** Presentation ***
 
-template = /home/oetiker/checkouts/smokeping/trunk/software/etc/basepage.html.dist
+template = @prefix@/etc/basepage.html.dist
 
 + charts
 
@@ -108,7 +108,7 @@ unison_tolerance = 2
 binary = /usr/sbin/fping
 
 *** Slaves ***
-secrets=/home/oetiker/checkouts/smokeping/trunk/software/etc/smokeping_secrets.dist
+secrets=@prefix@/etc/smokeping_secrets.dist
 +boomer
 display_name=boomer
 color=0000ff
