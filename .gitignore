@@ -14,3 +14,4 @@ doc/*.[1-9]
 doc/smokeping_config.pod
 doc/smokeping_examples.pod
 doc/smokeping_install.txt
+etc/config.dist
