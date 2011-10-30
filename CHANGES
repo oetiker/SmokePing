@@ -1,3 +1,8 @@
+2011/10/30 -- released version 2.6.5
+
+* improved configurability and generate config specific config.dist file
+  by Tim Wild
+
 2011/10/20 -- released version 2.6.4
 
 * fixed gettimeofday() in SSH.pm probe too as noted by Phillip Corchary
