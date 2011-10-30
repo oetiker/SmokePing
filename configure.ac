@@ -39,6 +39,7 @@ AC_PATH_PROG(RM, rm, no)
 AC_PATH_PROG(RMDIR, rmdir, no)
 AC_PATH_PROG(MKDIR, mkdir, no)
 AC_PATH_PROG(FIND, find, no)
+AC_PATH_PROG(SENDMAIL, sendmail, /path/to/sendmail, [$PATH$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/usr/lib])
 AC_PATH_PROGS(NROFF, [gnroff nroff])
 
 AC_ARG_VAR(GMAKE,   [Path to local GNU Make binary])
@@ -80,13 +81,9 @@ AC_SUBST(PERL5LIB)
 
 mod_ok=1
 if test "$enable_pkgonly" != yes; then
-   prfx=$prefix
-   if test x$prfx = xNONE; then
-       prfx=$ac_default_prefix
-   fi
    for module in RRDs FCGI CGI CGI::Fast Config::Grammar Digest::HMAC_MD5 LWP; do
      AC_MSG_CHECKING([checking for perl module '$module'])
-     if ${PERL} -I$prfx/thirdparty/lib/perl5 -e 'use '$module 2>/dev/null ; then
+     if ${PERL} -I$prefix/thirdparty/lib/perl5 -e 'use '$module 2>/dev/null ; then
          AC_MSG_RESULT([Ok])
      else
          AC_MSG_RESULT([Failed])
@@ -107,7 +104,7 @@ if test "$enable_pkgonly" != yes; then
    Now you can install local copies of the missing modules 
    by running
 
-     ./setup/build-perl-modules.sh ${prfx}/thirdparty
+     ./setup/build-perl-modules.sh ${prefix}/thirdparty
 
    The RRDs perl module is part of RRDtool. Either use the rrdtool
    package provided by your OS or install rrdtool from source. 
@@ -121,7 +118,7 @@ NOTES
 fi
 
 
-AC_CONFIG_FILES([Makefile bin/Makefile doc/Makefile htdocs/Makefile etc/Makefile lib/Makefile])
+AC_CONFIG_FILES([Makefile bin/Makefile doc/Makefile htdocs/Makefile etc/Makefile lib/Makefile etc/config.dist])
 
 AC_SUBST(VERSION)
 
