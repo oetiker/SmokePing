@@ -21,7 +21,7 @@ SUBDIRS = bin doc etc htdocs lib
 EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE setup/build-perl-modules.sh setup/sdbs.inc
 
 dist-hook:
-	$(PERL) -i -p -e '"$(PACKAGE_VERSION)" =~ /(\d+)\.(\d+)\.(\d+)/ and $$v = sprintf("%d.%03d%03d",$$1,$$2,$$3) and s/^\$$VERSION\s*=\s*".+?"/\$$VERSION = "$$d"/'  $(distdir)/lib/Smokeping.pm
+	$(PERL) -i -p -e '"$(PACKAGE_VERSION)" =~ /(\d+)\.(\d+)\.(\d+)/ and $$v = sprintf("%d.%03d%03d",$$1,$$2,$$3) and s/^\$$VERSION\s*=\s*".*?"/\$$VERSION = "$$v"/'  $(distdir)/lib/Smokeping.pm
 
 #	echo Version $(PACKAGE_VERSION) >DIST_REVISION
 #	svn info >>DIST_REVISION
