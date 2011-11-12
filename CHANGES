@@ -1,3 +1,7 @@
+2011/11/12 -- released version 2.6.6
+
+* fixed embedded version number in Smokeping.pm
+
 2011/10/30 -- released version 2.6.5
 
 * improved configurability and generate config specific config.dist file
