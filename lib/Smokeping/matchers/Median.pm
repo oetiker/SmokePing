@@ -85,7 +85,14 @@ sub Test($$)
     my $ac = $self->{param}{old};
     my $bc = $self->{param}{new};
     my $cc = $ac +$bc;
-    my $oldm = (sort {$a <=> $b} @{$data->{rtt}}[-$cc..-$bc-1])[int($ac/2)];
-    my $newm = (sort {$a <=> $b} @{$data->{rtt}}[-$bc..-1])[int($bc/2)];
+    my $oldm = robust_median(@{$data->{rtt}}[-$cc..-$bc-1]);
+    my $newm = robust_median(@{$data->{rtt}}[-$bc..-1]);
     return abs($oldm-$newm) > $self->{param}{diff};
+}
+
+sub robust_median(@){
+    my @numbers = sort {$a <=> $b} grep { defined $_ and $_ =~ /\d/ } @_;
+    my $count = scalar @numbers;
+    return 0 if $count == 0;
+    return ($count / 2 == int($count/2)) ? $numbers[$count/2] : ($numbers[$count/2+0.5] + $numbers[$count/2-0.5])/2;
 }
