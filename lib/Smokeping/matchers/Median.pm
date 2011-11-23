@@ -85,7 +85,7 @@ sub Test($$)
     my $ac = $self->{param}{old};
     my $bc = $self->{param}{new};
     my $cc = $ac +$bc;
-    my $count = scalar @{$data->{rtt};
+    my $count = scalar @{$data->{rtt}};
     $cc = $count if $count < $cc;
     $bc = $count if $count < $bc;
     my $oldm = robust_median(@{$data->{rtt}}[-$cc..-$bc-1]);
