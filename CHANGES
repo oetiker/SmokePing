@@ -40,7 +40,7 @@
 
 * in zoom/ajax mode, do not exit ... fastcgis should not quit
 
-* Switch from using SpeedyCGI to FastCGI.
+* Switch from using SpeedyCGI to FastCGI. inspired by a patch from Ken Dreyer
 
 * Added new OpenSSHJunOSPing probe to run ping from a juniper router via
   ssh.  This work has been sponsored by Juniper.
