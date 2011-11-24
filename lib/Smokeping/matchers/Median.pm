@@ -95,8 +95,7 @@ sub Test($$)
 
 sub robust_median(@){
     my @numbers = sort {$a <=> $b} grep { defined $_ and $_ =~ /\d/ } @_;
-    my $count = scalar @numbers;
-    return 0 if $count == 0;
-    $count--; # we are 0 based
+    my $count = $#numbers;
+    return 0 if $count < 0;
     return ($count / 2 == int($count/2)) ? $numbers[$count/2] : ($numbers[$count/2+0.5] + $numbers[$count/2-0.5])/2;
 }
