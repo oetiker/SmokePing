@@ -89,7 +89,7 @@ sub probevars {
 	return $class->_makevars($class->SUPER::probevars, {
 		_mandatory => [ 'binary' ],
 		binary => { 
-			_doc => "The location of your TCPPing script.",
+			_doc => "The location of your tcpping script.",
 			_example => '/usr/bin/tcpping',
 			_sub => sub { 
 				my $val = shift;
@@ -98,11 +98,15 @@ sub probevars {
             				unless -f $val and -x _;
 
 				my $return = `$val -C -x 1 localhost 2>&1`;
-				return "ERROR: TCPPing must be installed setuid root or it will not work\n"
+				return "ERROR: tcpping must be installed setuid root or it will not work\n"
 					if $return =~ m/only.+root/;
 
 				return undef;
 			},
+		},
+		tcptraceroute => { 
+			_doc => "tcptraceroute Options to pass to tcpping.",
+			_example => '-e "sudo /bin/tcptraceroute"',
 		},
 	});
 }
@@ -140,12 +144,21 @@ sub pingone ($){
 
     my @cmd = (
                     $self->{properties}{binary},
-                    '-C', '-x', $self->pings($target), 
-                    $target->{addr}, @port);
+                    '-C', '-x', $self->pings($target)
+	);
+
+    if ($self->{properties}{tcptraceroute})
+    {
+        push @cmd, '-e', $self->{properties}{tcptraceroute};
+    }
+
+    push @cmd, $target->{addr}, @port;
+
     $self->do_debug("Executing @cmd");
     my $pid = open3($inh,$outh,$errh, @cmd);
     while (<$outh>){
         chomp;
+        $self->do_debug("Received: $outh");
         next unless /^\S+\s+:\s+[\d\.]/; #filter out error messages from tcpping
         @times = split /\s+/;
         my $ip = shift @times;

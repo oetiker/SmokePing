@@ -1,3 +1,5 @@
+* Updated TCPPing probe -- Chris Wilson chris aptivate.org
+
 * Make Median matcher work without complaint at startup and if unknown data elements occur in the stream.
 
 2011/11/12 -- released version 2.6.6
