@@ -168,8 +168,10 @@ sub cgiurl {
 sub hierarchy ($){
     my $q = shift;
     my $hierarchy = '';
+    my $h = $q->param('hierarchy');
     if ($q->param('hierarchy')){
-       $hierarchy = 'hierarchy='.$q->param('hierarchy').';';
+       $h =~ s/[<>&%]/./g;
+       $hierarchy = 'hierarchy='.$h.';';
     }; 
     return $hierarchy;
 }        
@@ -210,6 +212,7 @@ sub update_dynaddr ($$){
     my $address = $ENV{REMOTE_ADDR};
     my $targetptr = $cfg->{Targets};
     foreach my $step (@target){
+        $step =~ s/[<>&%]/./g; 
         return "Error: Unknown target $step" 
           unless defined $targetptr->{$step};
         $targetptr =  $targetptr->{$step};
@@ -1044,7 +1047,7 @@ sub get_detail ($$$$;$){
     my $tree = shift;
     my $open = shift;
     my $mode = shift || $q->param('displaymode') || 's';
-    
+    $mode =~ s/[<>&%]/./g; 
     my $phys_tree = $tree;
     my $phys_open = $open;    
     if ($tree->{__tree_link}){
@@ -1443,13 +1446,15 @@ sub get_detail ($$$$;$){
         } elsif ($mode eq 's') { # classic mode
             $startstr =~ s/\s/%20/g;
             $endstr =~ s/\s/%20/g;
+            my $t = $q->param('target');
+            $t =~ s/[<>&%]/./g; 
             for my $slave (@slaves){
                 my $s = $slave ? "~$slave" : "";
                 $page .= "<div>";
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
                 $page .= "<br/>";
-                $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').$s.'">'
+                $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$t.$s.'">'
                       . qq{<IMG BORDER="0" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
                 $page .= "</div>";
             }
@@ -1593,8 +1598,10 @@ sub display_webpage($$){
     my $cfg = shift;
     my $q = shift;
     my $targ = '';
-    if ( $q->param('target') and $q->param('target') !~ /\.\./ and $q->param('target') =~ /(\S+)/){
+    my $t = $q->param('target');
+    if ( $t and $t !~ /\.\./ and $t =~ /(\S+)/){
         $targ = $1;
+        $targ =~ s/[<>;%]/./g;
     }
     my ($path,$slave) = split(/~/,$targ);
     if ($slave and $slave =~ /(\S+)/){
@@ -1603,8 +1610,9 @@ sub display_webpage($$){
         $slave = $1;
     }
     my $hierarchy = $q->param('hierarchy');
+    $hierarchy =~ s/[<>;%]/./g;
     die "ERROR: unknown hierarchy $hierarchy\n" 
-	if $hierarchy and not $cfg->{Presentation}{hierarchies}{$hierarchy};
+        if $hierarchy and not $cfg->{Presentation}{hierarchies}{$hierarchy};
     my $open = [ (split /\./,$path||'') ];
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;

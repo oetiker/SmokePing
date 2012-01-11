@@ -1,3 +1,6 @@
+* be more careful in handling input from the web to prevent xss. Thanks to
+  Russ McRee <holisticinfosec@gmail.com> for pointing this out.
+
 * Updated TCPPing probe -- Chris Wilson chris aptivate.org
 
 * Make Median matcher work without complaint at startup and if unknown data elements occur in the stream.
