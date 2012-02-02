@@ -58,19 +58,30 @@ sub pingone {
     my @times;
     my $elapsed;
     my $pingcount = $self->pings($target);
+    my $keep = $vars->{keep_second};
     $host = $vars->{user}.'@'.$host if $vars->{user};
-    $host = $host . ':' . $vars->{port} if $vars->{port};    
+    $host = $host . ':' . $vars->{port} if $vars->{port};        
     my @extra_opts = ();
     @extra_opts = split /\s/, $vars->{params} if $vars->{params};
     open (my $sak,'-|',$self->{properties}{binary},'-vv','-A',$pingcount,'-s','sip:'.$host,@extra_opts)
         or die("ERROR: $target->{binary}: $!\n");
-    while(<$sak>){    
-	chomp;
-        if (/^(?:\s+and|\*\*\sreply\sreceived\safter)\s(\d+(?:\.\d+))\sms\s/){	
+    my $reply = join ("",<$sak>);
+    close $sak;
+
+    my @reply = split /\*\*\sreply/, $reply;
+    # don't need the stuff before the first replyx
+    shift @reply;
+
+    my $filter = '.*';
+    if (scalar @reply > $pingcount){
+        $filter = $keep eq 'yes' ? 'final' : 'provisional';
+    }
+    for my $item (@reply){
+        next unless $item =~ /$filter/;
+        if (/^(?:\s+and|\sreceived\safter)\s(\d+(?:\.\d+))\sms\s/){
             push @times,$1/1000;
         }
     }
-    close $sak;
     return sort { $a <=> $b } @times;
 }
 
@@ -105,6 +116,12 @@ sub targetvars {
             _doc => "additional sipsak options. The options will get split on space.",
             _example => '--numeric --password=mysecret'
         },        
+        full_test => {
+            _doc => "If OPTIONS is actually implemented by the server, SipSak will receive two responses. If this option is set, the timeing from the second, final response will be counter",
+            _example => 'yes',
+            _re => 'yes|no'
+            
+        }
     });
 }
 
