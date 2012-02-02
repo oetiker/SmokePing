@@ -116,7 +116,7 @@ sub targetvars {
             _doc => "additional sipsak options. The options will get split on space.",
             _example => '--numeric --password=mysecret'
         },        
-        full_test => {
+        keep_second => {
             _doc => "If OPTIONS is actually implemented by the server, SipSak will receive two responses. If this option is set, the timeing from the second, final response will be counter",
             _example => 'yes',
             _re => 'yes|no'
