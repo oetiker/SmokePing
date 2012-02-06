@@ -17,7 +17,7 @@
 #
 
 
-AC_INIT([smokeping],[2.6.7],[tobi@oetiker.ch])
+AC_INIT([smokeping],[2.6.8],[tobi@oetiker.ch])
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(conftools)
 AC_CANONICAL_TARGET
