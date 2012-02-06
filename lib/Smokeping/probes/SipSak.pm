@@ -73,13 +73,22 @@ sub pingone {
     shift @reply;
 
     my $filter = '.*';
+    $self->do_debug("SipSak: got ".(scalar @reply)." replies, expected $pingcount");
     if (scalar @reply > $pingcount){
-        $filter = $keep eq 'yes' ? 'final' : 'provisional';
+        $filter = $keep eq 'yes' ? 'final received' : 'provisional received';
     }
     for my $item (@reply){
-        next unless $item =~ /$filter/;
-        if (/^(?:\s+and|\sreceived\safter)\s(\d+(?:\.\d+))\sms\s/){
+        $self->do_debug("SipSak: looking at '$item'");
+        if (not $item =~ /$filter/){
+            $self->do_debug("SipSak: skipping as there was not match for $filter");
+            next;
+        }
+        if ($item =~ /(?:\sand|\sreceived\safter)\s(\d+(?:\.\d+)?)\sms\s/){
+            $self->do_debug("SipSak: match");
             push @times,$1/1000;
+        }
+        else {
+            $self->do_debug("SipSak: no match");
         }
     }
     return sort { $a <=> $b } @times;
