@@ -7,7 +7,7 @@ aclocal
 autoconf
 automake -a -c
 ./setup/build-perl-modules.sh /tmp/smokeping-$$-build/thirdparty
-./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build PERL5LIB=/scratch/oetiker/rrd-dev/lib/perl
+./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build PERL5LIB=/scratch/rrd-trunk/lib/perl
 make install
 make dist
 echo READY TO SYNC ?
