@@ -1872,10 +1872,18 @@ sub check_alerts {
                         next unless $addr;
                         if ( $addr =~ /^\|(.+)/) {
                         my $cmd = $1;
-                        if ($edgetrigger) {
-                                        system $cmd,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
-                        } else {
-                                        system $cmd,$_,$line,$loss,$rtt,$tree->{host};
+                        # fork them in case they 
+                        unless ($pid = fork) {
+                            unless (fork) {
+                                $SIG{CHLD} = 'DEFAULT';
+                                if ($edgetrigger) {
+                                   exec $cmd,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
+                                } else {
+                                   exec $cmd,$_,$line,$loss,$rtt,$tree->{host};
+                                }
+                                die "exec failed!";
+                            }
+                            exit 0;
                         }
                     }
                     elsif ( $addr =~ /^snpp:(.+)/ ) {
