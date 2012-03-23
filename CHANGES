@@ -1,3 +1,9 @@
+* Fork alert handler scripts so that sokeping does not block
+
+2012/02/07 -- released version 2.6.8
+
+* Make SipSak work with sip services actually implementing OPTIONS -- tobi
+
 2012/01/11 -- released version 2.6.7
 
 * be more careful in handling input from the web to prevent xss. Thanks to
