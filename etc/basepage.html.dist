@@ -66,6 +66,7 @@ a.menulink:hover       {
 <TR>
   <TD class="menubar" align="left" width="130" valign="top">
   <P></P>
+  <P><h3>Logged in as <##authuser##></h3></P>
   <P><B>SmokePing Targets:</B>&nbsp;&nbsp;</P>
   <P><##menu##></P>
   <br/>
