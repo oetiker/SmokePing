@@ -175,6 +175,8 @@ Edit the html template to your likings. Please do not remove the link to the
 SmokePing counter and my name from the template.  The content of the
 template will be renderd by smokeping.cgi.  This means that all embedded
 links must be relative to smokeping.cgi.
+If you are using HTTP authentication, then the template variable C<authuser> will be populated
+from the C<$ENV{REMOTE_USER}> environment variable.
 
 =item F<etc/smokemail>
 
