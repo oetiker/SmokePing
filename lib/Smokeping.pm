@@ -1677,6 +1677,7 @@ sub display_webpage($$){
 
     my $display_tree = $tree->{__tree_link} ? $tree->{__tree_link} : $tree;
 
+    my $authuser = $ENV{REMOTE_USER} || 'Guest';
     my $page = fill_template
       ($cfg->{Presentation}{template},
        {
@@ -1700,6 +1701,7 @@ sub display_webpage($$){
         step => $step,
         rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img border="0" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
         smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
+        authuser => $authuser,
        }
        );
     my $expi = $cfg->{Database}{step} > 120 ? $cfg->{Database}{step} : 120;
@@ -3955,6 +3957,7 @@ sub gen_page  ($$$) {
     my $step = $probes->{$tree->{probe}}->step();
     my $readversion = "?";
     $VERSION =~ /(\d+)\.(\d{3})(\d{3})/ and $readversion = sprintf("%d.%d.%d",$1,$2,$3);
+    my $authuser = $ENV{REMOTE_USER} || 'Guest';
     $page = fill_template
         ($cfg->{Presentation}{template},
          {
@@ -3973,6 +3976,7 @@ sub gen_page  ($$$) {
           step => $step,
           rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img border="0" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
           smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
+          authuser => $authuser,
          });
 
     print PAGEFILE $page || "<HTML><BODY>ERROR: Reading page template ".$cfg->{Presentation}{template}."</BODY></HTML>";
