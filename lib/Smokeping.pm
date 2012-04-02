@@ -1866,13 +1866,14 @@ sub check_alerts {
                 my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
                         my $time = time;
                 my @stamp = localtime($time);
-                        my $stamp = localtime($time);
-                        my @to;
-                        foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$alert->{to}){
-                        next unless $addr;
-                        if ( $addr =~ /^\|(.+)/) {
+                my $stamp = localtime($time);
+                my @to;
+                foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$alert->{to}){
+                    next unless $addr;
+                    if ( $addr =~ /^\|(.+)/) {
                         my $cmd = $1;
-                        # fork them in case they 
+                        # fork them in case they take a long time
+                        my $pid;
                         unless ($pid = fork) {
                             unless (fork) {
                                 $SIG{CHLD} = 'DEFAULT';
@@ -1885,6 +1886,7 @@ sub check_alerts {
                             }
                             exit 0;
                         }
+                        waitpid($pid, 0);
                     }
                     elsif ( $addr =~ /^snpp:(.+)/ ) {
                                     sendsnpp $1, <<SNPPALERT;
