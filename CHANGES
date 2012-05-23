@@ -1,3 +1,6 @@
+* in the smokeping.fcgi sample, make sure to exec the script so that
+  mod_fcgi tracks the right process -- Eric Searcy
+
 * Fork alert handler scripts so that sokeping does not block
 
 2012/02/07 -- released version 2.6.8
