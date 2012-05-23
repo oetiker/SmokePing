@@ -971,6 +971,7 @@ sub findmax ($$) {
         $start = exp2seconds($start);        
         my ($graphret,$xs,$ys) = RRDs::graph
           ("dummy", '--start', -$start, 
+           '--width',$cfg->{Presentation}{overview}{width},
            '--end','-'.int($start / $cfg->{Presentation}{detail}{width}),
            "DEF:maxping=${rrd}:median:AVERAGE",
            'PRINT:maxping:MAX:%le' );
