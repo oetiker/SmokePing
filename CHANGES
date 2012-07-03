@@ -1,3 +1,6 @@
+* in smokeinfo actually use the start and end options ... do not only
+  advertise them ... thanks to Chris Myers for reporting this -- tobi
+
 * in the smokeping.fcgi sample, make sure to exec the script so that
   mod_fcgi tracks the right process -- Eric Searcy
 

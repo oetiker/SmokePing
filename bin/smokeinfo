@@ -33,7 +33,7 @@ sub main()
     print '# ',join $opt{separator}, 'node_path',@rows if not $opt{'no-head'};
     print "\n";
     for my $node (@$nodes) {
-        my $data = $si->stat_node($node,'end-24h','now');
+        my $data = $si->stat_node($node,$opt{start},$opt{end});
 	print join $opt{separator},$node->{path},map {defined $data->{$_} ? sprintf($opt{format},$data->{$_}) : '?'} @rows;
 	print "\n";
     }
