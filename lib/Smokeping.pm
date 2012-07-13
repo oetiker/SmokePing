@@ -1156,7 +1156,8 @@ sub get_detail ($$$$;$){
 
 	$q->param('epoch_start',parse_datetime($q->param('start')));
 	$q->param('epoch_end',parse_datetime($q->param('end')));
-        @tasks = (["Navigator Graph".$name, parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
+    my $title = $q->param('title') || ("Navigator Graph".$name);
+    @tasks = ([$title, parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
         my ($graphret,$xs,$ys) = RRDs::graph
           ("dummy", 
            '--start', $tasks[0][1],
