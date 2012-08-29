@@ -32,6 +32,9 @@ your system yet, you can get a slightly enhanced version from L<www.smokeping.or
   
 The (optional) B<packetsize> option lets you configure the packetsize for the pings sent.
 
+Since version 3.3 fping sends its statistics to stdout. Set B<usestdout> to 'true'
+so make smokeping read stdout instead of stderr.
+
 In B<blazemode>, FPing sends one more ping than requested, and discards
 the first RTT value returned as it's likely to be an outlier.
 
@@ -142,7 +145,8 @@ sub ping ($){
     $self->do_debug("Executing @cmd");
     my $pid = open3($inh,$outh,$errh, @cmd);
     $self->{rtts}={};
-    while (<$errh>){
+    my $fh = $self->{properties}{usestdout} || '') eq 'true' ? $outh : $errh;
+    while (<$fh>){
         chomp;
 	$self->do_debug("Got fping output: '$_'");
         next unless /^\S+\s+:\s+[-\d\.]/; #filter out error messages from fping
@@ -192,6 +196,12 @@ sub probevars {
 			_re => '(true|false)',
 			_example => 'true',
 			_doc => "Send an extra ping and then discarge the first answer since the first is bound to be an outliner.",
+
+		},
+		usestdout => {
+			_re => '(true|false)',
+			_example => 'true',
+			_doc => "Listen for FPing output on stdout instead of stderr ... (version 3.3+ sends its statistics on stdout).",
 
 		},
 		timeout => {
