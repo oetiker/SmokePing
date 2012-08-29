@@ -145,7 +145,7 @@ sub ping ($){
     $self->do_debug("Executing @cmd");
     my $pid = open3($inh,$outh,$errh, @cmd);
     $self->{rtts}={};
-    my $fh = $self->{properties}{usestdout} || '') eq 'true' ? $outh : $errh;
+    my $fh = ( $self->{properties}{usestdout} || '') eq 'true' ? $outh : $errh;
     while (<$fh>){
         chomp;
 	$self->do_debug("Got fping output: '$_'");
