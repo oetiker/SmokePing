@@ -164,6 +164,14 @@ and then specify C<extraargs = --header;Host: www.example.com>.
 DOC
 			_example => "-6 --head --user user:password",
 		},
+		expect => {
+      		       _doc => <<DOC,
+Require the given text to appear somewhere in the response, otherwise
+probe is treated as a failure
+DOC
+		_default => "",
+		_example => "Status: green",
+    },
 	});
 }
 
@@ -271,7 +279,7 @@ sub make_commandline {
 	my $host = $target->{addr};
 	$url =~ s/%host%/$host/g;
 	my @urls = split(/\s+/, $url);
-	push @args, ("-o", "/dev/null") for (@urls);
+#	push @args, ("-o", "/dev/null") for (@urls);
 	push @args, $self->proto_args($target);
 	push @args, $self->extra_args($target);
 	
@@ -293,10 +301,15 @@ sub pingone {
 		open(P, "-|") or exec @cmd;
 
 		my $val;
+		my $expectOK = 1;
+		$expectOK = 0 if ($t->{vars}{expect} ne "");
 
 		while (<P>) {
 			chomp;
-			/^Time: (\d+\.\d+) DNS time: (\d+\.\d+) Redirect time: (\d+\.\d+)?/ and do {
+			if (!$expectOK and index($_, $t->{vars}{expect}) != -1) {
+			    $expectOK = 1;
+			}
+			/Time: (\d+\.\d+) DNS time: (\d+\.\d+) Redirect time: (\d+\.\d+)?/ and do {
 				$val += $1 - $2;
 				if ($t->{vars}{include_redirects} eq "yes" and defined $3) {
 					$val += $3;
@@ -317,7 +330,7 @@ sub pingone {
 
 			$self->$function(qq(WARNING: curl exited $why on $t->{addr}));
 		}
-		push @times, $val if defined $val;
+		push @times, $val if (defined $val and $expectOK);
 	}
 	
 	# carp("Got @times") if $self->debug;
