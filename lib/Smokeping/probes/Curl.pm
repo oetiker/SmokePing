@@ -330,7 +330,7 @@ sub pingone {
 
 			$self->$function(qq(WARNING: curl exited $why on $t->{addr}));
 		}
-	        push @times, $val if (defined $val and $expectOK);
+		push @times, $val if (defined $val and $expectOK);
 	}
 	
 	# carp("Got @times") if $self->debug;
