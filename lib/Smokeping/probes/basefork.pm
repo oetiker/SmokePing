@@ -201,6 +201,9 @@ sub ping {
 				# we detach from the parent's process group
 				setpgrp(0, $$);
 
+                # re-initialize the RNG for each subprocess
+                srand(time()+$$);
+
 				my @times = $self->pingone($t);
 				print join(" ", @times), "\n";
 				exit;
