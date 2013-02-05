@@ -255,6 +255,11 @@ sub ping($) {
         my $addr = $t->{addr};
         my $idx  = idx($t);
         my $host = host($t);
+
+        # Empty out any RTTs from the last time around, so that on error we
+        # return "no result".
+        $self->{rtts}{ $t->{tree} } = {};
+
         # Delete any existing row.  Ignore error.
         #Smokeping::do_log("DismanPing deleting for $host $t->{vars}{menu}");
         my $ret =
