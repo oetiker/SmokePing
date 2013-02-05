@@ -251,10 +251,15 @@ sub ping($) {
     my $longest = 0;
     my $start   = time;
 
+    # Empty out any RTTs from the last round.  Otherwise, if we get an
+    # SNMP error for a target, we'll report his last result.
+    $self->{rtts} = {};
+
     foreach my $t ( @{ $self->targets } ) {
         my $addr = $t->{addr};
         my $idx  = idx($t);
         my $host = host($t);
+
         # Delete any existing row.  Ignore error.
         #Smokeping::do_log("DismanPing deleting for $host $t->{vars}{menu}");
         my $ret =
