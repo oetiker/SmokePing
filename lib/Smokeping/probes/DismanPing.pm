@@ -390,9 +390,9 @@ sub ping($) {
             
             if (@times) {
                 my (@goodtimes) = ();
-                foreach $t (@times) {
-                    push( @goodtimes, $t->[0] )
-                        if ( $t->[1] == 1 );    # responseReceived(1)
+                foreach my $result (@times) {
+                    push( @goodtimes, $result->[0] )
+                        if ( $result->[1] == 1 );    # responseReceived(1)
                 }
                 $self->{rtts}{ $t->{tree} } = [ sort { $a <=> $b } @goodtimes ];
             }
