@@ -266,8 +266,20 @@ sub ping($) {
             snmpset( $host, "pingCtlRowStatus.$idx", "integer", 6 );   #destroy
 
         if ( !defined($ret) ) {
-            Smokeping::do_log( "DismanPing: old probe for $t->{vars}{host} is probably running: "
-                    . $SNMP_Session::errmsg );
+            my ( $err ) = ( $SNMP_Session::errmsg =~ /error status: (\S+)/ );
+            my $msgmap = {
+                'notWritable' => 'does the remote support DISMAN-PING-MIB?',
+                'inconsistentValue' => 'is an old ping running?',
+                'noAccess' => 'is access control set up properly?'
+            };
+            if ( !defined( $err ) ) {
+                # errmsg can have arbitrary text on the first line.
+                $err = "SNMP error";
+            }
+            # SNMP::Sesison already carp()d errmsg, so don't include it here.
+            # It's already in the log.
+            Smokeping::do_log( "DismanPing: got $err trying to clean up $t->{vars}{host}" .
+                        ( $msgmap->{ $err } ? " -- " . $msgmap->{ $err } : "" ) );
             next;
         }
 
