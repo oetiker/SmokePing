@@ -726,6 +726,8 @@ sub target_menu($$$$;$){
              if ($menuextra){
                  $menuextra =~ s/{HOST}/#$host/g;
                  $menuextra =~ s/{CLASS}/$menuclass/g;
+                 $menuextra =~ s/{HASH}/#/g;
+                 $menuextra =~ s/{HOSTNAME}/$host/g;
                  $menuextra = '&nbsp;'.$menuextra;
              } else {
                  $menuextra = '';
@@ -2304,10 +2306,14 @@ DOC
 The slave names must match the slaves you have setup in the slaves section.
 DOC
            menuextra => { 
-                        _doc => <<DOC },
-HTML String to be added to the end of each menu entry. The C<{HOST}> entry will be replaced by the
-host property of the relevant section. The C<{CLASS}> entry will be replaced by the same
-class as the other tags in the manu line.
+                        _doc => <<'DOC' },
+HTML String to be added to the end of each menu entry. The following tags will be replaced:
+
+  {HOST}     -> #$hostname
+  {HOSTNAME} -> $hostname
+  {CLASS}    -> same class as the other tags in the menu line
+  {HASH}     -> #
+
 DOC
            probe => {
                         _sub => sub {
