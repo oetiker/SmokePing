@@ -1,3 +1,33 @@
+2013/03/04 - released version 2.6.9
+
+*  be more careful about preventing xss attacks, re http://bugs.debian.org/659899 (tobi)
+
+*  provide more configurable replacements for remocular integration (tobi)
+
+*  Added new probe SendEmail -- Florian Coulmier <florian@coulmier.fr>
+
+*  re-initialize rand upon fork -- Niko Tyni <ntyni@debian.org>
+
+*  add expect parameter to Curl.pm --  Jeremy Weatherford <jweather@xidus.net>
+
+*  allow to configure FPing probe to read fping output form stdout instead of stderr (tobi)
+
+*  allow title to be defined via cgi parameter when calling navigator interface directly (tobi)
+
+*  respect the probe timeout -- Dmitry Melekhov
+
+*  fix smokeinfo to actually consider --start and --end (tobi)
+
+*  exec the cgi to make sure fastcgi is tracking the right process - Eric Searcy
+
+*  must provide the actual width when finding max or consolidation will cause problems - thanks david for the hint!
+
+*  wait for the first gen child to terminate (tobi)
+
+* Template support for HTTP auth user - Darren Murphy <darren@victoriajd.com>
+
+* fork alert handlers, so that smokeping does not block (tobi)
+
 * in smokeinfo actually use the start and end options ... do not only
   advertise them ... thanks to Chris Myers for reporting this -- tobi
 
