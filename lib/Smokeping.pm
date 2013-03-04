@@ -28,6 +28,8 @@ setlogsock('unix')
 # make sure we do not end up with , in odd places where one would expect a '.'
 # we set the environment variable so that our 'kids' get the benefit too
 
+my $xssBadRx = qr/[<>%&'";]/;
+
 $ENV{'LC_NUMERIC'}='C';
 if (setlocale(LC_NUMERIC,"") ne "C") {
     if ($ENV{'LC_ALL'} eq 'C') {
@@ -170,7 +172,7 @@ sub hierarchy ($){
     my $hierarchy = '';
     my $h = $q->param('hierarchy');
     if ($q->param('hierarchy')){
-       $h =~ s/[<>&%]/./g;
+       $h =~ s/$xssBadRx/_/g;
        $hierarchy = 'hierarchy='.$h.';';
     }; 
     return $hierarchy;
@@ -212,7 +214,7 @@ sub update_dynaddr ($$){
     my $address = $ENV{REMOTE_ADDR};
     my $targetptr = $cfg->{Targets};
     foreach my $step (@target){
-        $step =~ s/[<>&%]/./g; 
+        $step =~ s/$xssBadRx/_/g; 
         return "Error: Unknown target $step" 
           unless defined $targetptr->{$step};
         $targetptr =  $targetptr->{$step};
@@ -1050,7 +1052,7 @@ sub get_detail ($$$$;$){
     my $tree = shift;
     my $open = shift;
     my $mode = shift || $q->param('displaymode') || 's';
-    $mode =~ s/[<>&%]/./g; 
+    $mode =~ s/$xssBadRx/_/g; 
     my $phys_tree = $tree;
     my $phys_open = $open;    
     if ($tree->{__tree_link}){
@@ -1451,7 +1453,7 @@ sub get_detail ($$$$;$){
             $startstr =~ s/\s/%20/g;
             $endstr =~ s/\s/%20/g;
             my $t = $q->param('target');
-            $t =~ s/[<>&%]/./g; 
+            $t =~ s/$xssBadRx/_/g; 
             for my $slave (@slaves){
                 my $s = $slave ? "~$slave" : "";
                 $page .= "<div>";
@@ -1605,7 +1607,7 @@ sub display_webpage($$){
     my $t = $q->param('target');
     if ( $t and $t !~ /\.\./ and $t =~ /(\S+)/){
         $targ = $1;
-        $targ =~ s/[<>;%]/./g;
+        $targ =~ s/$xssBadRx/_/g;
     }
     my ($path,$slave) = split(/~/,$targ);
     if ($slave and $slave =~ /(\S+)/){
@@ -1614,7 +1616,7 @@ sub display_webpage($$){
         $slave = $1;
     }
     my $hierarchy = $q->param('hierarchy');
-    $hierarchy =~ s/[<>;%]/./g;
+    $hierarchy =~ s/$xssBadRx/_/g;
     die "ERROR: unknown hierarchy $hierarchy\n" 
         if $hierarchy and not $cfg->{Presentation}{hierarchies}{$hierarchy};
     my $open = [ (split /\./,$path||'') ];
