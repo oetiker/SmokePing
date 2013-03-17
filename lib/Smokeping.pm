@@ -1028,8 +1028,9 @@ sub smokecol ($) {
 
 sub parse_datetime($){
     my $in = shift;
-    for ($in){
-	/^(\d+)$/ && do { my $value = $1; $value = time if $value > 2**32; return $value};
+    for ($in){ 
+        $in =~ s/$xssBadRx/_/g;
+        /^(\d+)$/ && do { my $value = $1; $value = time if $value > 2**32; return $value};
         /^\s*(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?\s*$/  && 
             return POSIX::mktime($6||0,$5||0,$4||0,$3,$2-1,$1-1900,0,0,-1);
         /^now$/ && return time;
