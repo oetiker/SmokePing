@@ -16,10 +16,6 @@
 
 *  respect the probe timeout -- Dmitry Melekhov
 
-*  fix smokeinfo to actually consider --start and --end (tobi)
-
-*  exec the cgi to make sure fastcgi is tracking the right process - Eric Searcy
-
 *  must provide the actual width when finding max or consolidation will cause problems - thanks david for the hint!
 
 *  wait for the first gen child to terminate (tobi)
