@@ -85,6 +85,7 @@ sub pingone ($$){
     my $password = $target->{vars}{eospass};
     my $bytes = $self->{properties}{packetsize};
     my $pings = $self->pings($target);
+    my $unpriv = $target->{vars}{unpriv} || 0;
 
     # do NOT call superclass ... the ping method MUST be overwriten
     my %upd;
@@ -94,23 +95,32 @@ sub pingone ($$){
         $source,
         $login ? ( user => $login ) : (),
         $password ? ( password => $password ) : (),
-        timeout => 60 
+        timeout => 60,
+        batch_mode => 1
     );
     if ($ssh->error) {
         $self->do_log( "OpenSSHEOSPing connecting $source: ".$ssh->error );
-        return undef;
+        return ();
     };
 
-    if ( $psource ) {
-        @output = $ssh->capture("ping $dest repeat $pings size $bytes source $psource");
+    if ( $unpriv ) {
+        @output = $ssh->capture("ping $dest");
     } else {
-        @output = $ssh->capture("ping $dest repeat $pings size $bytes");
+        if ( $psource ) {
+            @output = $ssh->capture("ping $dest repeat $pings size $bytes source $psource");
+        } else {
+            @output = $ssh->capture("ping $dest repeat $pings size $bytes");
+        }
     }
-    $ssh->system("quit");
+
+    if ($ssh->error) {
+        $self->do_log( "OpenSSHEOSPing running commands on $source: ".$ssh->error );
+        return ();
+    };
 
     if ($output[ 0 ] !~ /^PING/) {
-        $self->do_log( "OpenSSHEOSPing got error on $source for $dest: ".$output[ 0 ] );
-        return undef;
+        $self->do_log( "OpenSSHEOSPing got error on $source for $dest: "." / ".join( @output ) );
+        return ();
     }
     my @times = ();
     for (@output){
@@ -181,6 +191,15 @@ specified with the option eosuser.
 DOC
 			_example => 'password',
 		},
+                unpriv => {
+                        _doc => <<DOC,
+If the account is unprivileged, specify the 'unpriv' option.
+You must also configure "pings = 5", since that is the only
+value supported, and values specified for packetsize or
+psource are ignored.
+DOC
+                        _example => '1',
+                },
 	});
 }
 
