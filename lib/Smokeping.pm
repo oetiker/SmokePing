@@ -1944,7 +1944,10 @@ DOC
                               RTT   => $rtt,
                               COMMENT => $alert->{comment}
                                       },$default_mail) || "Subject: smokeping failed to open mailtemplate '$alert->{mailtemplate}'\n\nsee subject\n";
+                    my $oldLocale = POSIX::setlocale(LC_TIME);
+                    POSIX::setlocale(LC_TIME,"en_US");
                     my $rfc2822stamp =  POSIX::strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
+                    POSIX::setlocale(LC_TIME,$oldLocale);
                                 my $to = join ",",@to;
                                     sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
