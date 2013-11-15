@@ -251,18 +251,35 @@ sub ping($) {
     my $longest = 0;
     my $start   = time;
 
+    # Empty out any RTTs from the last round.  Otherwise, if we get an
+    # SNMP error for a target, we'll report his last result.
+    $self->{rtts} = {};
+
     foreach my $t ( @{ $self->targets } ) {
         my $addr = $t->{addr};
         my $idx  = idx($t);
         my $host = host($t);
+
         # Delete any existing row.  Ignore error.
         #Smokeping::do_log("DismanPing deleting for $host $t->{vars}{menu}");
         my $ret =
             snmpset( $host, "pingCtlRowStatus.$idx", "integer", 6 );   #destroy
 
         if ( !defined($ret) ) {
-            Smokeping::do_log( "DismanPing: old probe for $t->{vars}{host} is probably running: "
-                    . $SNMP_Session::errmsg );
+            my ( $err ) = ( $SNMP_Session::errmsg =~ /error status: (\S+)/ );
+            my $msgmap = {
+                'notWritable' => 'does the remote support DISMAN-PING-MIB?',
+                'inconsistentValue' => 'is an old ping running?',
+                'noAccess' => 'is access control set up properly?'
+            };
+            if ( !defined( $err ) ) {
+                # errmsg can have arbitrary text on the first line.
+                $err = "SNMP error";
+            }
+            # SNMP::Sesison already carp()d errmsg, so don't include it here.
+            # It's already in the log.
+            Smokeping::do_log( "DismanPing: got $err trying to clean up $t->{vars}{host}" .
+                        ( $msgmap->{ $err } ? " -- " . $msgmap->{ $err } : "" ) );
             next;
         }
 
@@ -385,9 +402,9 @@ sub ping($) {
             
             if (@times) {
                 my (@goodtimes) = ();
-                foreach $t (@times) {
-                    push( @goodtimes, $t->[0] )
-                        if ( $t->[1] == 1 );    # responseReceived(1)
+                foreach my $result (@times) {
+                    push( @goodtimes, $result->[0] )
+                        if ( $result->[1] == 1 );    # responseReceived(1)
                 }
                 $self->{rtts}{ $t->{tree} } = [ sort { $a <=> $b } @goodtimes ];
             }
