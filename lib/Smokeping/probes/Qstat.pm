@@ -115,7 +115,7 @@ sub pinghost($$) {
     while (<$outh>){
         chomp;
 	$self->do_debug("Got quakestat output: '$_'");
-        next unless /^\s*<ping>(\d+)<\/ping>\s*$/; #filter out error messages from fping
+        next unless /^\s*<ping>(\d+)<\/ping>\s*$/; #filter out the ping latency line
         $time = $1;
     }
     waitpid $pid,0;
@@ -133,7 +133,7 @@ sub probevars {
 		binary => {
 			_sub => sub {
 				my ($val) = @_;
-        			return undef if $ENV{SERVER_SOFTWARE}; # don't check for fping presence in cgi mode
+				return undef if $ENV{SERVER_SOFTWARE}; # don't check for qstat presence in cgi mode
 				return "ERROR: Qstat 'binary' does not point to an executable"
             				unless -f $val and -x _;
 				return undef;
@@ -167,10 +167,7 @@ DOC
 			_example => .1,
 			_default => .5,
 			_doc => <<DOC,
-The fping "-i" parameter, but in (probably fractional) seconds rather than
-milliseconds, for consistency with other Smokeping probes. From fping(1):
-
-The minimum amount of time between sending a ping packet to any target.
+The minimum amount of time between sending a ping packet to the target.
 DOC
 		},
 		sourceaddress => {
