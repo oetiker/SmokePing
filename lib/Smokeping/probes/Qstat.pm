@@ -96,9 +96,9 @@ sub pinghost($$) {
     my @params = ();
     push @params, "-nocfg";
     push @params, "-xml";
-    push @params, "-timeout " . $self->{properties}{timeout} if $self->{properties}{timeout};
-    push @params, "-srcip " . $self->{properties}{sourceaddress} if $self->{properties}{sourceaddress};
-    push @params, "-srcport " . $self->{properties}{sourceport} if $self->{properties}{sourceport};
+    push @params, "-timeout", $self->{properties}{timeout} if $self->{properties}{timeout};
+    push @params, "-srcip", $self->{properties}{sourceaddress} if $self->{properties}{sourceaddress};
+    push @params, "-srcport", $self->{properties}{sourceport} if $self->{properties}{sourceport};
     push @params, "-" . $self->{properties}{game};
     if ($self->{properties}{port} && $address !~ /:/) {
       push @params, $address . ':' . $self->{properties}{port};
@@ -111,7 +111,6 @@ sub pinghost($$) {
 		    @params);
     $self->do_debug("Executing @cmd");
     my $pid = open3($inh,$outh,$errh, @cmd);
-    $self->{rtts}={};
     while (<$outh>){
         chomp;
 	$self->do_debug("Got quakestat output: '$_'");
