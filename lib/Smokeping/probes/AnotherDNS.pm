@@ -108,7 +108,7 @@ sub pingone ($) {
         $elapsed = tv_interval( $t0, $t1 );
         if ( defined $ready ) {
             my $buf = '';
-            $ready->recv( $buf, &Net::DNS::PACKETSZ );
+            $ready->recv( $buf, 512 );
 	    my ($recvPacket, $err) = Net::DNS::Packet->new(\$buf);
 	    if (defined $recvPacket) {
 		my $recvHeader = $recvPacket->header();
