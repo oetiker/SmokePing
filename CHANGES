@@ -1,3 +1,26 @@
+2014/10/29 - released version 2.6.10
+
+2014-10-29 09:35:03 +0100  (HEAD, origin/master, origin/HEAD, master)  ready for 2.6.10 -- Tobias Oetiker
+2014-07-14 09:58:10 -0500   Update AnotherDNS.pm -- felderado
+2014-02-15 18:53:38 -0500   Added IPv6 (ipversion) and TCP (protocol) support -- jimpop-at-gmail-dot-com
+2013-04-23 19:28:58 -0700   Better error logging, and support unpriv'd accounts -- Bill Fenner
+2013-04-16 07:44:45 -0700   A probe to use the EOS "ping" cli command -- Bill Fenner
+2013-02-05 09:48:49 -0800   Improved logging from SNMP errors. -- Bill Fenner
+2013-02-05 08:53:34 -0800   Don't reuse $t, even if perl scoping rules allow it. -- Bill Fenner
+2013-02-05 07:00:26 -0800   Empty out any RTTs from the last round. -- Bill Fenner
+2013-11-14 19:30:16 -0600   Fixes up parameter passing to qstat -- Walter Huf
+2013-11-14 18:20:55 -0600   Cleans out remnants of Fping plugin -- Walter Huf
+2013-11-14 17:02:02 -0600   Adds a Qstat probe plugin -- Walter Huf
+2014-10-29 09:02:40 +0100   actually override defaults -- Tobias Oetiker
+2014-10-29 09:02:35 +0100   have 443 as default port -- Tobias Oetiker
+2013-11-14 10:43:05 +0100   fix fping -- Tobias Oetiker
+2013-10-24 09:14:16 +0200   make sure locale settings are now screwing with the creation of the rfc2822 timestamp -- Tobias Oetiker
+2013-09-04 19:20:06 +0200   Fix wrong hardcoded path in fcgi example file -- Florian Pritz
+2013-09-04 19:19:28 +0200   Fix syntax error in POD -- Florian Pritz
+2013-10-23 16:26:02 +0200   PERL5LIB is : separated while use lib expects an Array -- Tobias Oetiker
+2013-03-21 22:55:32 +0100   remove duplicate entries -- Tobias Oetiker
+2013-03-17 13:11:10 +0100   xss fix from Steven Chamberlain -- Tobias Oetiker
+
 2013/03/04 - released version 2.6.9
 
 *  be more careful about preventing xss attacks, re http://bugs.debian.org/659899 (tobi)

@@ -1,13 +1,11 @@
 #!/bin/sh
 set -e
 [ `git status -s | wc -l` -gt 0 ] && echo "ERROR: commit all changes before release" && exit 1
-VERSION=`perl -n -e 'm/\QAC_INIT([smokeping],[\E(.+?)\Q]\E/ && print $1' configure.ac`
+VERSION=`cat VERSION`
 mkdir -p conftools
-aclocal
-autoconf
-automake -a -c
+./bootstrap
 ./setup/build-perl-modules.sh /tmp/smokeping-$$-build/thirdparty
-./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build PERL5LIB=/scratch/rrd-trunk/lib/perl
+./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build PERL5LIB=/scratch/rrd-149/lib/perl/5.18.2/x86_64-linux-gnu-thread-multi
 make install
 make dist
 echo READY TO SYNC ?
