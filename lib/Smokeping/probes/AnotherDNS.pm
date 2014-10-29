@@ -69,15 +69,28 @@ sub pingone ($) {
     my $recordtype = $target->{vars}{recordtype};
     my $timeout = $target->{vars}{timeout};
     my $port = $target->{vars}{port};
+    my $ipversion = $target->{ipversion} || 4;
+    my $protocol = $target->{protcol} || "udp";
     my $require_noerror = $target->{vars}{require_noerror};
     $lookuphost = $target->{addr} unless defined $lookuphost;
 
     my $packet = Net::DNS::Packet->new( $lookuphost, $recordtype )->data;
-    my $sock = IO::Socket::INET->new(
-        "PeerAddr" => $host,
-        "PeerPort" => $port,
-        "Proto"    => "udp",
-    );
+    my $sock = 0;
+    
+    if ($ipversion == 6) {
+        $sock = IO::Socket::INET6->new(
+            "PeerAddr" => $host,
+            "PeerPort" => $port,
+            "Proto"    => $protocol,
+        );
+    } else {
+        $sock = IO::Socket::INET->new(
+            "PeerAddr" => $host,
+            "PeerPort" => $port,
+            "Proto"    => $protocol,
+        );
+    }
+
     my $sel = IO::Select->new($sock);
 
     my @times;
@@ -95,7 +108,7 @@ sub pingone ($) {
         $elapsed = tv_interval( $t0, $t1 );
         if ( defined $ready ) {
             my $buf = '';
-            $ready->recv( $buf, &Net::DNS::PACKETSZ );
+            $ready->recv( $buf, 512 );
 	    my ($recvPacket, $err) = Net::DNS::Packet->new(\$buf);
 	    if (defined $recvPacket) {
 		my $recvHeader = $recvPacket->header();
@@ -162,6 +175,18 @@ DOC
 			_default => 53,
 			_re => '\d+',
 		},
+                protocol => {
+                        _doc => 'The Network Protocol to use.',
+                        _default => 'udp',
+                },
+                ipversion => {
+                        _doc => <<DOC,
+The IP protocol used. Possible values are "4" and "6". 
+Passed to echoping(1) as the "-4" or "-6" options.
+DOC
+                        _example => 4,
+                        _re => '[46]'
+                },
 	});
 }
 
