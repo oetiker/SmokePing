@@ -69,8 +69,8 @@ sub pingone ($) {
     my $recordtype = $target->{vars}{recordtype};
     my $timeout = $target->{vars}{timeout};
     my $port = $target->{vars}{port};
-    my $ipversion = $target->{ipversion} || 4;
-    my $protocol = $target->{protcol} || "udp";
+    my $ipversion = $target->{vars}{ipversion} || 4;
+    my $protocol = $target->{vars}{protocol} || "udp";
     my $require_noerror = $target->{vars}{require_noerror};
     $lookuphost = $target->{addr} unless defined $lookuphost;
 
