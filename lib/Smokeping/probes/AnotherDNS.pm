@@ -69,8 +69,8 @@ sub pingone ($) {
     my $recordtype = $target->{vars}{recordtype};
     my $timeout = $target->{vars}{timeout};
     my $port = $target->{vars}{port};
-    my $ipversion = $target->{ipversion} || 4;
-    my $protocol = $target->{protcol} || "udp";
+    my $ipversion = $target->{vars}{ipversion};
+    my $protocol = $target->{vars}{protocol};
     my $require_noerror = $target->{vars}{require_noerror};
     $lookuphost = $target->{addr} unless defined $lookuphost;
 
@@ -175,18 +175,20 @@ DOC
 			_default => 53,
 			_re => '\d+',
 		},
-                protocol => {
-                        _doc => 'The Network Protocol to use.',
-                        _default => 'udp',
-                },
-                ipversion => {
-                        _doc => <<DOC,
+		protocol => {
+			_doc => 'The Network Protocol to use.',
+			_default => 'udp',
+			_re => '(udp|UDP|tcp|TCP)',
+		},
+		ipversion => {
+			_doc => <<DOC,
 The IP protocol used. Possible values are "4" and "6". 
 Passed to echoping(1) as the "-4" or "-6" options.
 DOC
-                        _example => 4,
-                        _re => '[46]'
-                },
+			_example => 4,
+            _default => 4,
+			_re => '[46]',
+		},
 	});
 }
 
