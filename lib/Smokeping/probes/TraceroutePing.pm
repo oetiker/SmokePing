@@ -222,7 +222,7 @@ sub pingone ($) {
 	my $killed;
 	my $f_stdin = gensym;
 	my $f_stdout = gensym;
-	my $errh = gensym;
+	my $f_stderr = gensym;
 	my $pid = open3($f_stdin, $f_stdout, $f_stderr, @cmd);
 	while (<$f_stdout>){
 	    my $line = $_;
