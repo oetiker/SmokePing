@@ -93,7 +93,7 @@ sub pingone ($$){
     my $login = $target->{vars}{junosuser};
     my $password = $target->{vars}{junospass};
     my $bytes = $self->{properties}{packetsize};
-    my $tos = $self->{properties}{packetsize};
+    my $tos = $self->{properties}{tos};
     my $pings = $self->pings($target);
 
     # do NOT call superclass ... the ping method MUST be overwriten
