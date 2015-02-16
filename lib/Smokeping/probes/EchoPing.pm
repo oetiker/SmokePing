@@ -233,7 +233,7 @@ sub targetvars {
 		waittime => {
 			_doc => 'The "-w" echoping(1) option.',
 			_example => 1,
-			_re => '\d+',
+			_re => '\d+(?:\.\d+)?',
 		},
 		size => {
 			_doc => 'The "-s" echoping(1) option.',
