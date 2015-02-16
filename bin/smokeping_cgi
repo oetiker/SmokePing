@@ -56,7 +56,7 @@ Copy its content to the place where your webserver expects its files.  The
 fcgi script shows the preferred method for runnig smokeping.  You can also
 run smokeping as a cgi.  But make sure to still use the wrapper as exposing
 ARGV to the webserver represents a security vulnerability you may rather not
-wand to deal with.
+want to deal with.
 
 Adjust the paths in the script and you should be ready to go.
 
