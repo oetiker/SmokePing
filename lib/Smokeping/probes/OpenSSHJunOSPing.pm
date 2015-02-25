@@ -153,8 +153,8 @@ The (optional) type of service for the pings sent.
 DOC
 			_sub => sub {
 				my $val = shift;
-				return "ERROR: tos must be 0-7"
-			        if $val and $val !~ /^[0-7]$/;
+				return "ERROR: tos must be 0-255"
+			        if $val and not ( $val =~ /^\d+$/ and int($val) <= 255;
 				return undef;
 			},
 		},
