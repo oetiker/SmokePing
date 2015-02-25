@@ -154,7 +154,7 @@ DOC
 			_sub => sub {
 				my $val = shift;
 				return "ERROR: tos must be 0-255"
-			        if $val and not ( $val =~ /^\d+$/ and int($val) <= 255;
+			        if $val and not ( $val =~ /^\d+$/ and int($val) <= 255);
 				return undef;
 			},
 		},
