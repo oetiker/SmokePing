@@ -138,7 +138,10 @@ sub pingone ($$){
     my $bytes = $self->{properties}{packetsize};
     my $pings = $self->pings($target);
     my $timeout = $self->{properties}{timeout};
-
+    my $vrf ="";
+    if ( defined ($target->{vars}{vrf}) ) {
+    	$vrf = " vrf $target->{vars}{vrf}";
+    }	
     # do NOT call superclass ... the ping method MUST be overwriten
     my %upd;
     my @args = ();
@@ -166,7 +169,7 @@ sub pingone ($$){
      $telnet->waitfor('/[\@\w\-\.]+[>#][ ]*$/');
      $telnet->print("terminal length 0");
      $telnet->waitfor('/[\@\w\-\.]+[>#][ ]*$/');
-     $telnet->print("ping");
+     $telnet->print("ping$vrf");
      $telnet->waitfor('/Protocol \[ip\]: $/');
      $telnet->print("");
      $telnet->waitfor('/Target IP address: $/');
@@ -278,6 +281,13 @@ specified with the option iosuser.
 DOC
 			_example => 'password',
 		},
+
+		vrf => {
+			_doc => <<DOC,
+The vrf option allows you to specify the vrf for ping
+DOC
+			_example => 'VRF1',
+		},	
 	});
 }
 
