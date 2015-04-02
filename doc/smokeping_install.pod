@@ -24,9 +24,7 @@ and greatest version, compile your own: L<http://oss.oetiker.ch/rrdtool/>
 
 =item FPing (optional)
 
-The official site L<http://fping.sourceforge.net/> seems to be a bit
-unmaintained. You might want to grab an updated version of fping from
-L<http://oss.oetiker.ch/smokeping/pub/>. 
+Go to L<http://www.fping.org/> to grab a copy.
 
 Note that fping must be installed setuid root. It seems that older versions
 of fping report round trip times in 0.1 milliseconds instead of 1 milliseconds

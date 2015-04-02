@@ -55,4 +55,12 @@ sub ProbeDesc($) {
 }
 
 
+sub targetvars {
+    my $class = shift;
+    my $h = $class->SUPER::targetvars;
+    $h->{prot}{_example} = 3443;
+    $h->{prot}{_default} = 443;
+    return $h;
+}
+
 1;

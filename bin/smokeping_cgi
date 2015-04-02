@@ -51,10 +51,13 @@ Please refer to the installation document for detailed setup instructions.
 
 =head1 SETUP
 
-There is a sample F<htdocs> directory in your smokeping installation root.
-Copy its content to the place where your webserver expects its files.
-There are also two sample cgi scripts showing how to launch the
-smokeping cgi in your website. The only difference is the file extension.
+There is a sample F<htdocs> directory in your smokeping installation root. 
+Copy its content to the place where your webserver expects its files.  The
+fcgi script shows the preferred method for runnig smokeping.  You can also
+run smokeping as a cgi.  But make sure to still use the wrapper as exposing
+ARGV to the webserver represents a security vulnerability you may rather not
+want to deal with.
+
 Adjust the paths in the script and you should be ready to go.
 
 =head1 COPYRIGHT

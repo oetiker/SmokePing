@@ -1,0 +1,12 @@
+FCGI
+CGI
+CGI::Fast
+Config::Grammar
+Digest::HMAC_MD5
+Net::Telnet
+Net::OpenSSH
+Net::SNMP
+Net::LDAP
+Net::DNS
+IO::Pty
+LWP

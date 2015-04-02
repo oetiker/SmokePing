@@ -1,22 +1,11 @@
 #!/bin/bash
 
-. `dirname $0`/sdbs.inc
+dir=`dirname $0`;
+. $dir/sdbs.inc
 
-for module in \
-    FCGI \
-    CGI \
-    CGI::Fast \
-    Config::Grammar \
-    Digest::HMAC_MD5 \
-    Net::Telnet \
-    Net::OpenSSH \
-    Net::SNMP \
-    Net::LDAP \
-    Net::DNS \
-    IO::Pty \
-    LWP \
-; do
+
+for module in `perl -ne 'chomp; print qq{$_ }' $dir/../PERL_MODULES `; do
     perlmodule $module
 done
-
+    
         

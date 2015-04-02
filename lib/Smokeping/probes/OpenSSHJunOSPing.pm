@@ -76,7 +76,11 @@ sub new($$$)
 sub ProbeDesc($){
     my $self = shift;
     my $bytes = $self->{properties}{packetsize};
-    return "Juniper JunOS - ICMP Echo Pings ($bytes Bytes)";
+    my $ret = "Juniper JunOS - ICMP Echo Pings ($bytes Bytes";
+    if (defined (my $tos = $self->{properties}{tos})){
+        $ret = " tos $tos";
+    }
+    return $ret.")";    
 }
 
 sub pingone ($$){
@@ -89,6 +93,7 @@ sub pingone ($$){
     my $login = $target->{vars}{junosuser};
     my $password = $target->{vars}{junospass};
     my $bytes = $self->{properties}{packetsize};
+    my $tos = $self->{properties}{tos};
     my $pings = $self->pings($target);
 
     # do NOT call superclass ... the ping method MUST be overwriten
@@ -105,11 +110,14 @@ sub pingone ($$){
         warn "OpenSSHJunOSPing connecting $source: ".$ssh->error."\n";
         return undef;
     };
-
+    my $tosadd = '';
+    if ( defined $tos){
+        $tosadd = " tos $tos";
+    }
     if ( $psource ) {
-        @output = $ssh->capture("ping $dest count $pings size $bytes source $psource");
+        @output = $ssh->capture("ping $dest count $pings size $bytes source $psource$tosadd");
     } else {
-        @output = $ssh->capture("ping $dest count $pings size $bytes");
+        @output = $ssh->capture("ping $dest count $pings size $bytes$tosadd");
     }
     $ssh->system("quit");
 
@@ -136,6 +144,17 @@ DOC
 				my $val = shift;
 				return "ERROR: packetsize must be between 12 and 64000"
 					unless $val >= 12 and $val <= 64000;
+				return undef;
+			},
+		},
+		tos => {
+			_doc => <<DOC,
+The (optional) type of service for the pings sent.
+DOC
+			_sub => sub {
+				my $val = shift;
+				return "ERROR: tos must be 0-255"
+			        if $val and not ( $val =~ /^\d+$/ and int($val) <= 255);
 				return undef;
 			},
 		},
