@@ -4,11 +4,11 @@ package Smokeping::probes::OpenSSHJunOSPing;
 
 This is a Smokeping probe module. Please use the command 
 
-C<smokeping -man Smokeping::probes::TelnetJunOSPing>
+C<smokeping -man Smokeping::probes::OpenSSHJunOSPing>
 
 to view the documentation or the command
 
-C<smokeping -makepod Smokeping::probes::TelnetJunOSPing>
+C<smokeping -makepod Smokeping::probes::OpenSSHJunOSPing>
 
 to generate the POD document.
 
@@ -51,9 +51,9 @@ ${e}head2 Requirements
 This module requires the  L<Net::OpenSSH> and L<IO::Pty>.
 DOC
 		authors => <<'DOC',
-Tobias Oetiker L<lt>tobi@oetiker.chL<gt>
+Tobias Oetiker E<lt>tobi@oetiker.chE<gt>
 
-based on L<Smokeping::probes::TelnetJunOSPing> by S H A N L<lt>shanali@yahoo.comL<gt>.
+based on L<Smokeping::probes::TelnetJunOSPing> by S H A N E<lt>shanali@yahoo.comE<gt>.
 DOC
 	}
 }
