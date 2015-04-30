@@ -104,10 +104,6 @@ sub probevars {
 				return undef;
 			},
 		},
-		tcptraceroute => { 
-			_doc => "tcptraceroute Options to pass to tcpping.",
-			_example => '-e "sudo /bin/tcptraceroute"',
-		},
 	});
 }
 
@@ -146,11 +142,6 @@ sub pingone ($){
                     $self->{properties}{binary},
                     '-C', '-x', $self->pings($target)
 	);
-
-    if ($self->{properties}{tcptraceroute})
-    {
-        push @cmd, '-e', $self->{properties}{tcptraceroute};
-    }
 
     push @cmd, $target->{addr}, @port;
 
