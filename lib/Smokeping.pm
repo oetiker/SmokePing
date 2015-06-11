@@ -557,8 +557,8 @@ sub init_target_tree ($$$$) {
                         ($name.$s.".rrd", "--start",(time-1),"--step",$step,
                               "DS:uptime:GAUGE:".(2*$step).":0:U",
                               "DS:loss:GAUGE:".(2*$step).":0:".$pings,
-                              "DS:median:GAUGE:".(2*$step).":0:180",
-                              (map { "DS:ping${_}:GAUGE:".(2*$step).":0:180" }
+                              "DS:median:GAUGE:".(2*$step).":0:U",
+                              (map { "DS:ping${_}:GAUGE:".(2*$step).":0:U" }
                                                                           1..$pings),
                               (map { "RRA:".(join ":", @{$_}) } @{$cfg->{Database}{_table}} ));
                 if (not -f $name.$s.".rrd"){
