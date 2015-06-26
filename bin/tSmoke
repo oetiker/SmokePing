@@ -404,7 +404,7 @@ sub list_rrds($$$$$) {
 	my $slaves = shift;
 	my $nomasterpoll = shift;
     my $prline = '';
-	if ( $opt{slaves} ) {
+	if ( exists( $opt{slaves} ) ) {
 		$slaves = $tree->{slaves} if exists( $tree->{slaves} );
 	} else {
 		$slaves = '';
