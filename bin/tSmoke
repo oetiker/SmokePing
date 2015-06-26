@@ -419,7 +419,7 @@ sub list_rrds($$$$$) {
 				foreach( split( /\s+/, $slaves ) ) {
 					my $tslave = $_;
 					$prline .= "$cfg->{General}{datadir}$path~$tslave".".rrd\n"
-						if $opt{slaves} eq '' || grep( $tslave, split( ',', $opt{slaves} ) );
+						if $opt{slaves} eq '' || grep( { $_ eq $tslave } split( ',', $opt{slaves} ) );
 				}
 				$prline .= "$cfg->{General}{datadir}$path".".rrd\n" unless $nomasterpoll;
 			} else {
