@@ -33,7 +33,7 @@ you when it starts ... let me know if it gets it wrong.
 
 =item EchoPing  (Optional)
 
-L<http://echoping.sourceforge.net/>
+L<https://github.com/bortzmeyer/echoping/>
 
 You need this to run the EchoPing probes
 
