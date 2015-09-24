@@ -104,6 +104,10 @@ sub ping ($){
     push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     push @params, "-i" . int(1000 * $self->{properties}{mininterval});
     push @params, "-p" . int(1000 * $self->{properties}{hostinterval}) if $self->{properties}{hostinterval};
+    if (($self->{properties}{tcp} || '') eq 'true'){
+	push @params, "-T";
+    }
+    
 
     my $pings =  $self->pings;
     if (($self->{properties}{blazemode} || '') eq 'true'){
@@ -157,6 +161,11 @@ sub probevars {
 			_example => 'true',
 			_doc => "Send an extra ping and then discard the first answer since the first is bound to be an outlier.",
 
+		},
+		tcp => {
+			_re => '(true|false)',
+			_example => 'true',
+			_doc => "Use TCP insteadof UDP.",
 		},
 		timeout => {
 			_re => '(\d*\.)?\d+',
