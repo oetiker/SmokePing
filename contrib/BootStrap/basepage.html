@@ -1,0 +1,78 @@
+<!DOCTYPE html> 
+<html lang='en'>
+<head>
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="refresh" content="<##step##>">
+<title>SmokePing Latency Page for <##title##></title>
+
+<script src="/cropper/lib/prototype.js" type="text/javascript"></script>      
+<script src="/cropper/lib/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
+<script src="/cropper/cropper.js" type="text/javascript"></script>
+<script src="/cropper/smokeping-zoom.js" type="text/javascript"></script>
+
+
+<link rel="stylesheet" href='css/bootstrap.min.css'>
+<link rel="stylesheet" href='css/darkly/bootstrap.min.css'>
+<script src='js/bootstrap.min.js'>
+</script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+.panel-body img { width: 100%;}
+footer {width: 100%; }
+footer div { text-align: right; }
+footer img { width: 70px; }
+</style>
+
+
+</head>
+<body >
+
+<div class='container'>
+<div class='jumbotron'><h1>SmokePing<small>|<##title##></small></h1></div>
+
+<div class='row'>
+
+
+	<div class='col-md-3'>
+		<div class='panel panel-primary'>
+		<div class='panel-heading'><h3>Menu</h3></div>
+		<div class='panel-body'><##menu##></div>
+		</div>
+
+		<div class='panel panel-primary'>
+		<div class='panel-heading'><h3>Authentication</h3></div>
+		<div class='panel-body'><##authuser##></div>
+		</div>
+
+	</div>
+
+        <div class='col-md-9'>
+	        <div class='panel panel-primary'>
+	        <div class='panel-heading'><h3><##title##></h3></div>
+		        <div class='panel-body'>
+			<p><##remark##></p>
+		        <P><##overview##></P>
+		        <##body##>
+			</div>
+	        </div>
+        </div>
+
+</div>
+
+<footer class='bg-primary'>
+<div class='bg-primary'>
+  <p><small>Maintained by <A href="mailto:<##contact##>"><##owner##></A><br/>
+  Running on <##smokeping##> by <##author##></small></p>
+</div>
+	<div class='bg-primary'>
+	  <P><##smokelogo##> <##rrdlogo##></P>
+	</div>
+</footer>
+
+</div>
+
+</body>
+</html>
