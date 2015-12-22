@@ -10,7 +10,7 @@ use SNMP_util;
 use SNMP_Session;
 # enable locale??
 #use locale;
-use POSIX qw(locale_h signal_h sys_wait_h);
+use POSIX qw(fmod locale_h signal_h sys_wait_h);
 use Smokeping::Config;
 use RRDs;
 use Sys::Syslog qw(:DEFAULT setlogsock);
@@ -21,6 +21,7 @@ use Smokeping::Slave;
 use Smokeping::RRDhelpers;
 use Smokeping::Graphs;
 use URI::Escape;
+use Time::HiRes;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -4395,18 +4396,27 @@ KID:
 
     report_probes($probes, $myprobe);
 
+    my $now = Time::HiRes::time();
+    my $longprobe = 0;
     while (1) {
         unless ($opt{nosleep} or $opt{debug}) {
-                my $sleeptime = $step - (time-$offset) % $step;
-                if (defined $myprobe) {
-                        $probes->{$myprobe}->do_debug("Sleeping $sleeptime seconds.");
-                } else {
-                        do_debuglog("Sleeping $sleeptime seconds.");
+                my $sleeptime = $step - fmod($now-$offset, $step);
+                my $logmsg = "Sleeping $sleeptime seconds.";
+                if ($longprobe && $step-$sleeptime < 0.3) {
+                    $logmsg = "NOT sleeping $sleeptime seconds, running probes immediately.";
+                    $sleeptime = 0;
                 }
-                sleep $sleeptime;
+                if (defined $myprobe) {
+                        $probes->{$myprobe}->do_debug($logmsg);
+                } else {
+                        do_debuglog($logmsg);
+                }
+                if ($sleeptime > 0) {
+                    Time::HiRes::sleep($sleeptime);
+                }
                 last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
         }
-        my $now = time;       
+        my $startts = Time::HiRes::time();
         run_probes $probes, $myprobe; # $myprobe is undef if running without 'concurrentprobes'
         my %sortercache;
         if ($opt{'master-url'}){            
@@ -4430,8 +4440,11 @@ KID:
             save_sortercache($cfg,\%sortercache,$myprobe);
         }
         exit 0 if $opt{debug};
-        my $runtime = time - $now;
+        $now = Time::HiRes::time();
+        my $runtime = $now - $startts;
+        $longprobe = 0;
         if ($runtime > $step) {
+                $longprobe = 1;
                 my $warn = "WARNING: smokeping took $runtime seconds to complete 1 round of polling. ".
                 "It should complete polling in $step seconds. ".
                 "You may have unresponsive devices in your setup.\n";
@@ -4442,6 +4455,7 @@ KID:
                 }
         }
         elsif ($runtime > $step * 0.8) {
+                $longprobe = 1;
                 my $warn = "NOTE: smokeping took $runtime seconds to complete 1 round of polling. ".
                 "This is over 80% of the max time available for a polling cycle ($step seconds).\n";
                 if (defined $myprobe) {
