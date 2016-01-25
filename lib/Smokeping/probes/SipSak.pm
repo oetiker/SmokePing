@@ -2,7 +2,7 @@ package Smokeping::probes::SipSak;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::SipSak>
 
@@ -17,6 +17,7 @@ to generate the POD document.
 use strict;
 use base qw(Smokeping::probes::basefork);
 use Carp;
+use IO::Select;
 
 sub pod_hash {
     return {
@@ -39,7 +40,7 @@ DOC
 }
 
 sub ProbeDesc ($) {
-        my $self = shift;  
+        my $self = shift;
     return sprintf("SIP OPTIONS messages");
 }
 
@@ -60,11 +61,18 @@ sub pingone {
     my $pingcount = $self->pings($target);
     my $keep = $vars->{keep_second};
     $host = $vars->{user}.'@'.$host if $vars->{user};
-    $host = $host . ':' . $vars->{port} if $vars->{port};        
+    $host = $host . ':' . $vars->{port} if $vars->{port};
     my @extra_opts = ();
     @extra_opts = split /\s/, $vars->{params} if $vars->{params};
     open (my $sak,'-|',$self->{properties}{binary},'-vv','-A',$pingcount,'-s','sip:'.$host,@extra_opts)
-        or die("ERROR: $target->{binary}: $!\n");
+        or die("ERROR: $self->{properties}{binary}: $!\n");
+    my $sel = IO::Select->new();
+    $sel->add($sak);
+    if (not $sel->can_read($vars->{sipsak_timeout})){
+        $self->do_debug("SipSak: timeout for $host");
+        return '';
+    }
+
     my $reply = join ("",<$sak>);
     close $sak;
 
@@ -107,9 +115,9 @@ sub probevars {
                 return undef;
             },
         },
-    });    
+    });
 }
-        
+
 sub targetvars {
     my $class = shift;
     return $class->_makevars($class->SUPER::targetvars, {
@@ -124,13 +132,16 @@ sub targetvars {
         params => {
             _doc => "additional sipsak options. The options will get split on space.",
             _example => '--numeric --password=mysecret'
-        },        
+        },
         keep_second => {
             _doc => "If OPTIONS is actually implemented by the server, SipSak will receive two responses. If this option is set, the timeing from the second, final response will be counter",
             _example => 'yes',
             _re => 'yes|no'
-            
-        }
+        },
+        sipsak_timeout => {
+            _doc => "Timeout for sipsak in seconds (fractional)",
+            _default => 2,
+        },
     });
 }
 
