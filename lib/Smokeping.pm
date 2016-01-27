@@ -1871,10 +1871,10 @@ sub check_alerts {
                 $line =~ s|/|.|g;
                 my $urlline = $cfg->{General}{cgiurl}."?target=".$line;
                 $line .= " [from $slave]" if $slave;
-                do_log("Alert $_ $what for $line");
                 my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
                 my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
                         my $time = time;
+                do_log("Alert $_ $what for $line $loss $rtt $alert->{comment}");
                 my @stamp = localtime($time);
                 my $stamp = localtime($time);
                 my @to;
