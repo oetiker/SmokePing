@@ -1871,10 +1871,11 @@ sub check_alerts {
                 $line =~ s|/|.|g;
                 my $urlline = $cfg->{General}{cgiurl}."?target=".$line;
                 $line .= " [from $slave]" if $slave;
+                my $lossratio = "$loss/$pings";
                 my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
                 my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
                         my $time = time;
-                do_log("Alert $_ $what for $line $loss $rtt $alert->{comment}");
+                do_log("Alert $_ $what for $line $loss(${lossratio})  $rtt prevmatch: $prevmatch comment: $alert->{comment}");
                 my @stamp = localtime($time);
                 my $stamp = localtime($time);
                 my @to;
@@ -1960,7 +1961,11 @@ ALERT
             } else {
                         do_debuglog("Alert \"$_\": no match for target $name\n");
             }
-            $tree->{'prevmatch'.$s}{$_} = $match;
+            if ($match == 0) {
+                $tree->{'prevmatch'.$s}{$_} = $match;
+            } else {
+                $tree->{'prevmatch'.$s}{$_} += $match;
+            }
         }
     } # end alerts
     return $gotalert;
