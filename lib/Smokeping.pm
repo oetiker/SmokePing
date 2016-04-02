@@ -3372,8 +3372,9 @@ DOC
               mailtemplate => {
                       _doc => <<DOC,
 When sending out mails for alerts, smokeping normally uses an internally
-generated message. With the mailtemplate you can customize the alert mails
-to look they way you like them. The all B<E<lt>##>I<keyword>B<##E<gt>> type
+generated message. With the mailtemplate you can specify a filename for 
+a custom template. The file should contain a 'Subject: ...' line. The
+rest of the file should contain text. The all B<E<lt>##>I<keyword>B<##E<gt>> type
 strings will get replaced in the template before it is sent out. the
 following keywords are supported:
 
