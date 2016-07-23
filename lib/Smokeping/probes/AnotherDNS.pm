@@ -67,6 +67,7 @@ sub pingone ($) {
     my $lookuphost = $target->{vars}{lookup};
     my $mininterval = $target->{vars}{mininterval};
     my $recordtype = $target->{vars}{recordtype};
+    my $authoritative = $target->{vars}{authoritative};
     my $timeout = $target->{vars}{timeout};
     my $port = $target->{vars}{port};
     my $ipversion = $target->{vars}{ipversion};
@@ -74,7 +75,6 @@ sub pingone ($) {
     my $require_noerror = $target->{vars}{require_noerror};
     $lookuphost = $target->{addr} unless defined $lookuphost;
 
-    my $packet = Net::DNS::Packet->new( $lookuphost, $recordtype )->data;
     my $sock = 0;
     
     if ($ipversion == 6) {
@@ -101,6 +101,9 @@ sub pingone ($) {
 		my $timeleft = $mininterval - $elapsed;
 		sleep $timeleft if $timeleft > 0;
 	}
+        my $query = Net::DNS::Packet->new( $lookuphost, $recordtype );
+        $query->header->rd(!$authoritative);
+        my $packet = $query->data;
         my $t0 = [gettimeofday()];
         $sock->send($packet);
         my ($ready) = $sel->can_read($timeout);
@@ -112,6 +115,8 @@ sub pingone ($) {
 	    my ($recvPacket, $err) = Net::DNS::Packet->new(\$buf);
 	    if (defined $recvPacket) {
 		my $recvHeader = $recvPacket->header();
+                next if $recvHeader->id != $query->header->id;
+                next if $authoritative && !$recvHeader->aa;
 		next if $recvHeader->ancount() < $target->{vars}{require_answers};
 	    	if (not $require_noerror) {
 		    push @times, $elapsed;
@@ -152,6 +157,10 @@ Minimum time between sending two lookup queries in (possibly fractional) seconds
 DOC
 			_default => .5,
 			_re => '(\d*\.)?\d+',
+		},
+		authoritative => {
+			_doc => 'Send non-recursive queries and require authoritative answers.',
+			_default => 0,
 		},
 		require_noerror => {
 			_doc => 'Only Count Answers with Response Status NOERROR.',

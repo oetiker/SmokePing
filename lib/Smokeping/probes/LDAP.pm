@@ -98,6 +98,15 @@ sub targetvars {
 			_doc => "TCP port of the LDAP server",
 			_example => 389,
 		},
+
+		scheme => {
+			_re => '(ldap|ldaps|ldapi)',
+			_doc => "LDAP scheme to use: ldap, ldaps or ldapi",
+			_example => 'ldap',
+                        _default => 'ldap',
+		},
+
+
 		version => {
 			_re => '\d+',
 			_doc => "The LDAP version to be used.",
@@ -151,6 +160,15 @@ s.",
 			_re => "(base|one|sub)",
 			_default => "sub",
 		},
+		verify => {
+			_doc => "The TLS verification level. Can be either 'none', 'optional', 'require'. See the Net::LDAPS documentation for details.",
+			_example => "optional",
+			_re => "(none|optional|require)",
+			_default => "require",
+		},
+
+
+
 	});
 }
 
@@ -174,10 +192,13 @@ sub pingone {
 	my $mininterval = $vars->{mininterval};
 
 	my $binddn = $vars->{binddn};
-
+	my $scheme = $vars->{scheme};
 	my $timeout = $vars->{timeout};
 
 	my $scope = $vars->{scope};
+
+
+	my $verify = $vars->{verify};
 
 	my $password;
 	if (defined $binddn) {
@@ -211,7 +232,7 @@ sub pingone {
 		}
 		local $IO::Socket::SSL::SSL_Context_obj; # ugly but necessary
 		$start = gettimeofday();
-		my $ldap = new Net::LDAP($host, port => $port, version => $version, timeout => $timeout)
+		my $ldap = new Net::LDAP($host, scheme => $scheme, port => $port, version => $version, timeout => $timeout, verify => $verify )
 			or do {
 				$self->do_log("connection error on $host: $!");
 				next;

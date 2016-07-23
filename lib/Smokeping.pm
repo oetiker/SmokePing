@@ -1871,10 +1871,11 @@ sub check_alerts {
                 $line =~ s|/|.|g;
                 my $urlline = $cfg->{General}{cgiurl}."?target=".$line;
                 $line .= " [from $slave]" if $slave;
-                do_log("Alert $_ $what for $line");
+                my $lossratio = "$loss/$pings";
                 my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
                 my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
                         my $time = time;
+                do_log("Alert $_ $what for $line $loss(${lossratio})  $rtt prevmatch: $prevmatch comment: $alert->{comment}");
                 my @stamp = localtime($time);
                 my $stamp = localtime($time);
                 my @to;
@@ -1960,7 +1961,11 @@ ALERT
             } else {
                         do_debuglog("Alert \"$_\": no match for target $name\n");
             }
-            $tree->{'prevmatch'.$s}{$_} = $match;
+            if ($match == 0) {
+                $tree->{'prevmatch'.$s}{$_} = $match;
+            } else {
+                $tree->{'prevmatch'.$s}{$_} += $match;
+            }
         }
     } # end alerts
     return $gotalert;
@@ -3367,8 +3372,9 @@ DOC
               mailtemplate => {
                       _doc => <<DOC,
 When sending out mails for alerts, smokeping normally uses an internally
-generated message. With the mailtemplate you can customize the alert mails
-to look they way you like them. The all B<E<lt>##>I<keyword>B<##E<gt>> type
+generated message. With the mailtemplate you can specify a filename for 
+a custom template. The file should contain a 'Subject: ...' line. The
+rest of the file should contain text. The all B<E<lt>##>I<keyword>B<##E<gt>> type
 strings will get replaced in the template before it is sent out. the
 following keywords are supported:
 
