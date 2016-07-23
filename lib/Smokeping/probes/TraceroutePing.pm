@@ -287,7 +287,7 @@ sub pingone ($) {
 	    my $line = $_;
 	    chomp($line);
 	    $self->do_debug("stdout: $line");
-	    next unless $line =~ /^\s+\d+\s+\S+\s+(\d|\.|,)+\s+\S+\s*$/; # only match RTT output
+	    next unless $line =~ /^\s*\d+\s+\S+\s+[\d\.,]+\s+\S+\s*$/; # only match RTT output
 
 	    my @fields = split(/\s+/,$line);
 	    shift @fields if $fields[0] eq ''; # discard empty first field
