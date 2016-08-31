@@ -2306,7 +2306,7 @@ of the parent node, circular dependencies are not possible.
 DOC
            },
 
-           alertee => { _re => '(\|.+|.+@\S+|snpp:)',
+           alertee => { _re => '^(?:\|.+|.+@\S+|snpp:.+)(?:\s*,\s*(?:\|.+|.+@\S+|snpp:.+))*$',
                         _re_error => 'the alertee must be an email address here',
                         _doc => <<DOC },
 If you want to have alerts for this target and all targets below it go to a particular address
