@@ -46,6 +46,7 @@ use base qw(Smokeping::matchers::base);
 use vars qw($VERSION);
 $VERSION = 1.0;
 use Carp;
+use List::Util qw(min max);
 
 # I never checked why Median works, but for some reason the first part of the hash was being passed as the rules instead
 sub new(@) {
@@ -74,17 +75,20 @@ sub Test($$) {
     my $target = $self->{param}{l};
     my $count  = 0;
     my $loss;
-    foreach $loss ( @{ $data->{loss} } ) {
-
+    my $x = min($self->{param}{x}, scalar @{ $data->{loss} });
+    
+    #Iterate thru last x number of samples, starting with the most recent
+    for (my $i=1;$i<=$x;$i++) {
+        $loss = $data->{loss}[$_-$i];
         # If there's an S in the array anywhere, return prevmatch
         if ( $loss =~ /S/ ) { return $data->{prevmatch}; }
         if ( $data->{prevmatch} ) {
 
-            # Alert has already been raised.  Check to make sure ALL latencies in RTT are less than the target
+            # Alert has already been raised.  Evaluate and count consecutive loss values that are below threshold.
             if ( $loss < $target ) { $count++; }
         } else {
 
-            # Alert is not raised.  If all values are over the alert threshold OR unreachable, raise the alert
+            # Alert is not raised.  Evaluate and count consecutive loss values that are above threshold.
             if ( $loss >= $target ) { $count++; }
         }
     }
