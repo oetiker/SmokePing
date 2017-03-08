@@ -707,25 +707,23 @@ sub target_menu($$$$;$){
         }
 
 		my $class = 'menuitem';
+		my $menuclass = "menulink";
    	    if ($key eq $current ){
 			if ( @$open ) {
          		$class = 'menuopen';
     		} else {
    	            $class = 'menuactive';
+                $menuclass = "menulinkactive";
             }
    	    };
 		if ($filter){
 			if (($menu and $menu =~ /$filter/i) or ($title and $title =~ /$filter/i)){
-				push @matches, ["$path$key$suffix",$menu,$class];
+				push @matches, ["$path$key$suffix",$menu,$class,$menuclass];
 			};
 			push @matches, target_menu($tree->{$key}, $open, "$path$key.",$filter, $suffix);
 		}
 		else {
     	    $menu =~ s/ /&nbsp;/g;
-            my $menuclass = "menulink";
-            if ($key eq $current and !@$open) {
-                 $menuclass = "menulinkactive";
-             }
              if ($menuextra){
                  $menuextra =~ s/{HOST}/#$host/g;
                  $menuextra =~ s/{CLASS}/$menuclass/g;
@@ -753,8 +751,8 @@ sub target_menu($$$$;$){
 		}
 		else {
 			for my $entry (sort {$a->[1] cmp $b->[1] } grep {ref $_ eq 'ARRAY'} @matches) {
-				my ($href,$menu,$class) = @{$entry};
-				$print .= qq{<div class="$class">-&nbsp;<a class="menulink" href="$href">$menu</a></div>\n};
+				my ($href,$menu,$class,$menuclass) = @{$entry};
+				$print .= qq{<div class="$class">-&nbsp;<a class="$menuclass" href="$href">$menu</a></div>\n};
 			}			
 		}
 	}
