@@ -2607,6 +2607,20 @@ try one after the other if one does not answer for 5 seconds.
 DOC
           _sub => sub { require Net::SMTP ||return "ERROR: loading Net::SMTP"; return undef; }
          },
+	 
+	 mailuser  => 
+         {
+          _doc => <<DOC,
+username on mailhost, SmokePing will use this user to send mail (Net::SMTP).
+DOC
+         },
+	 
+	 mailpass  => 
+         {
+          _doc => <<DOC,
+password of username on mailhost, SmokePing will use this password to send mail (Net::SMTP).
+DOC
+         },
 
          snpphost  => 
          {
