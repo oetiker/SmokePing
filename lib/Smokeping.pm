@@ -1909,6 +1909,33 @@ SNPPALERT
                                     push @to, $addr;
                     }
                 };
+                    elsif ( $addr =~ /^xmpp:(.+)/ ) {
+                        my $xmpparg = "$1 -s '[Smokeping] Alert'";
+                        my $xmppalert = <<XMPPALERT;
+$stamp
+$_ $what on $line
+$urlline
+
+Pattern: $alert->{pattern}
+
+Data (old --> now)
+$loss
+$rtt
+
+Comment: $alert->{comment}
+
+**************************************************
+
+
+
+
+
+XMPPALERT
+                        if (-x "/usr/bin/sendxmpp"){
+                            open (M, "|-") || exec ("/usr/bin/sendxmpp $xmpparg");
+                            print M $xmppalert;
+                            close M;
+                        }
                 if (@to){
                     my $default_mail = <<DOC;
 Subject: [SmokeAlert] <##ALERT##> <##WHAT##> on <##LINE##>
