@@ -1905,10 +1905,6 @@ $loss
 $rtt
 SNPPALERT
                     } 
-                    else {
-                                    push @to, $addr;
-                    }
-                };
                     elsif ( $addr =~ /^xmpp:(.+)/ ) {
                         my $xmpparg = "$1 -s '[Smokeping] Alert'";
                         my $xmppalert = <<XMPPALERT;
@@ -1936,7 +1932,15 @@ XMPPALERT
                             print M $xmppalert;
                             close M;
                         }
-                if (@to){
+                        else {
+                            warn "Command sendxmpp not found. Try 'apt-get install sendxmpp' to install it. xmpp message with arg line $xmpparg could not be sent";
+                        }
+                    }
+                    else {
+                                    push @to, $addr;
+                    }
+                };
+		if (@to){
                     my $default_mail = <<DOC;
 Subject: [SmokeAlert] <##ALERT##> <##WHAT##> on <##LINE##>
 
