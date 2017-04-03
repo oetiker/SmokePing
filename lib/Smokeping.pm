@@ -261,6 +261,8 @@ sub sendmail ($$$){
     my $body = shift;
     if ($cfg->{General}{mailhost} and  
         my $smtp = Net::SMTP->new([split /\s*,\s*/, $cfg->{General}{mailhost}],Timeout=>5) ){
+	$smtp->auth($cfg->{General}{mailuser}, $cfg->{General}{mailpass})
+	    if ($cfg->{General}{mailuser} and $cfg->{General}{mailpass});
         $smtp->mail($from);
         $smtp->to(split(/\s*,\s*/, $to));
         $smtp->data();
@@ -2582,7 +2584,7 @@ General configuration values valid for the whole SmokePing setup.
 DOC
          _vars =>
          [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
-              smokemail cgiurl mailhost snpphost contact display_name
+              smokemail cgiurl mailhost mailuser mailpass snpphost contact display_name
               syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
               changecgiprogramname linkstyle precreateperms ) ],
 
@@ -2635,6 +2637,20 @@ script). Several comma separated mailhosts can be specified. SmokePing will
 try one after the other if one does not answer for 5 seconds.
 DOC
           _sub => sub { require Net::SMTP ||return "ERROR: loading Net::SMTP"; return undef; }
+         },
+	 
+	 mailuser  => 
+         {
+          _doc => <<DOC,
+username on mailhost, SmokePing will use this user to send mail (Net::SMTP).
+DOC
+         },
+	 
+	 mailpass  => 
+         {
+          _doc => <<DOC,
+password of username on mailhost, SmokePing will use this password to send mail (Net::SMTP).
+DOC
          },
 
          snpphost  => 
