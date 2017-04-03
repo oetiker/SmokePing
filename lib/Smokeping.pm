@@ -1905,11 +1905,42 @@ $loss
 $rtt
 SNPPALERT
                     } 
+                    elsif ( $addr =~ /^xmpp:(.+)/ ) {
+                        my $xmpparg = "$1 -s '[Smokeping] Alert'";
+                        my $xmppalert = <<XMPPALERT;
+$stamp
+$_ $what on $line
+$urlline
+
+Pattern: $alert->{pattern}
+
+Data (old --> now)
+$loss
+$rtt
+
+Comment: $alert->{comment}
+
+**************************************************
+
+
+
+
+
+XMPPALERT
+                        if (-x "/usr/bin/sendxmpp"){
+                            open (M, "|-") || exec ("/usr/bin/sendxmpp $xmpparg");
+                            print M $xmppalert;
+                            close M;
+                        }
+                        else {
+                            warn "Command sendxmpp not found. Try 'apt-get install sendxmpp' to install it. xmpp message with arg line $xmpparg could not be sent";
+                        }
+                    }
                     else {
                                     push @to, $addr;
                     }
                 };
-                if (@to){
+		if (@to){
                     my $default_mail = <<DOC;
 Subject: [SmokeAlert] <##ALERT##> <##WHAT##> on <##LINE##>
 
@@ -2304,7 +2335,7 @@ of the parent node, circular dependencies are not possible.
 DOC
            },
 
-           alertee => { _re => '^(?:\|.+|.+@\S+|snpp:.+)(?:\s*,\s*(?:\|.+|.+@\S+|snpp:.+))*$',
+           alertee => { _re => '^(?:\|.+|.+@\S+|snpp:.+|xmpp:.+)(?:\s*,\s*(?:\|.+|.+@\S+|snpp:.+|xmpp:.+))*$',
                         _re_error => 'the alertee must be an email address here',
                         _doc => <<DOC },
 If you want to have alerts for this target and all targets below it go to a particular address
@@ -3346,7 +3377,7 @@ whenever an alert matches, using the following 5 arguments
 B<name-of-alert>, B<target>, B<loss-pattern>, B<rtt-pattern>, B<hostname>.
 You can also provide a comma separated list of addresses and programs.
 DOC
-                        _re => '(\|.+|.+@\S+|snpp:)',
+                        _re => '(\|.+|.+@\S+|snpp:|xmpp:)',
                         _re_error => 'put an email address or the name of a program here',
                       },
              from => { _doc => 'who should alerts appear to be coming from ?',
@@ -3408,7 +3439,7 @@ DOC
                   _inherited => [ qw(edgetrigger mailtemplate) ],
                   _mandatory => [ qw(type pattern comment) ],
                   to => { _doc => 'Similar to the "to" parameter on the top-level except that  it will only be used IN ADDITION to the value of the toplevel parameter. Same rules apply.',
-                        _re => '(\|.+|.+@\S+|snpp:)',
+                        _re => '(\|.+|.+@\S+|snpp:|xmpp:)',
                         _re_error => 'put an email address or the name of a program here',
                           },
                   
