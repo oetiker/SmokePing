@@ -117,7 +117,7 @@ sub info2create {
 	my $cf = $info->{"rra[0].cf"};
 	die("$file: no RRAs found?") 
 		unless defined $cf;
-	my @fetch = RRDs::fetch($file, $cf);
+	my @fetch = RRDs::fetch($file, $cf, "-s 0", "-e 0");
 	$error = RRDs::error;
 	die("RRDs::fetch $file $cf: ERROR: $error") if $error;
 	my @ds = @{$fetch[2]};
