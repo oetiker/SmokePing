@@ -1372,7 +1372,7 @@ sub get_detail ($$$$;$){
             my @lazy =();
             @lazy = ('--lazy') if $mode eq 's' and $lastheight{$s} and $lastheight{$s}{$start} and $lastheight{$s}{$start} == $max->{$s}{$start};
             my $timer_start = time();
-            my $from = $s ? " from $cfg->{Slaves}{$slave}{display_name}": "";
+            my $from = " from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
             my @task =
                ("${imgbase}${s}_${end}_${start}.png",
                @lazy,
