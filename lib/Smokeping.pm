@@ -940,7 +940,7 @@ sub get_overview ($$$$){
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.png",
     #       '--lazy',
            '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
-           '--title',$phys_tree->{title},
+           '--title',$cfg->{Presentation}{htmltitle} ne 'yes' ? $phys_tree->{title} : '',
            '--height',$cfg->{Presentation}{overview}{height},
            '--width',$cfg->{Presentation}{overview}{width},
            '--vertical-label', $ProbeUnit,
@@ -953,6 +953,8 @@ sub get_overview ($$$$){
            "COMMENT:$date\\r");
         my $ERROR = RRDs::error();
         $page .= "<div class=\"panel\">";
+        $page .= "<div class=\"panel-heading\"><h2>".$phys_tree->{title}."</h2></div>"
+            if $cfg->{Presentation}{htmltitle} eq 'yes';
         $page .= "<div class=\"panel-body\">";
         if (defined $ERROR) {
                 $page .= "ERROR: $ERROR<br>".join("<br>", map {"'$_'"} @G);
@@ -1373,7 +1375,10 @@ sub get_detail ($$$$;$){
             my @lazy =();
             @lazy = ('--lazy') if $mode eq 's' and $lastheight{$s} and $lastheight{$s}{$start} and $lastheight{$s}{$start} == $max->{$s}{$start};
             my $timer_start = time();
-            my $from = " from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
+            my $title = "";
+            if ($cfg->{Presentation}{htmltitle} ne 'yes') {
+                $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
+            }
             my @task =
                ("${imgbase}${s}_${end}_${start}.png",
                @lazy,
@@ -1381,7 +1386,7 @@ sub get_detail ($$$$;$){
                ($end ne 'last' ? ('--end',$end) : ()),
                '--height',$cfg->{Presentation}{detail}{height},
                '--width',$cfg->{Presentation}{detail}{width},
-               '--title',$desc.$from,
+               '--title',$title,
                '--rigid',
                '--upper-limit', $max->{$s}{$start},
                @log,
@@ -1462,6 +1467,11 @@ sub get_detail ($$$$;$){
                 $page .= "<div class=\"panel\">";
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
+                if ($cfg->{Presentation}{htmltitle} eq 'yes') {
+                    # TODO we generate this above to, maybe share code or store variable ?
+                    my $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
+                    $page .= "<div class=\"panel-heading\"><h2>$title</h2></div>";
+                }
                 $page .= "<div class=\"panel-body\">";
                 $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$t.$s.'">'
                       . qq{<IMG BORDER="0" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
@@ -2957,7 +2967,7 @@ Defines how the SmokePing data should be presented.
 DOC
           _sections => [ qw(overview detail charts multihost hierarchies) ],
           _mandatory => [ qw(overview template detail) ],
-          _vars      => [ qw (template charset) ],
+          _vars      => [ qw (template charset htmltitle) ],
           template   => 
          {
           _doc => <<DOC,
@@ -2979,6 +2989,14 @@ DOC
 By default, SmokePing assumes the 'iso-8859-15' character set. If you use
 something else, this is the place to speak up.
 DOC
+         },
+         htmltitle => {
+           _doc => <<DOC,
+By default, SmokePing will render the title of the graph in the image,
+when set to 'yes' the title is inserted in the html page.
+DOC
+           _re  => '(yes|no)',
+           _re_error =>"this must either be 'yes' or 'no'",
          },
          charts => {
            _doc => <<DOC,
