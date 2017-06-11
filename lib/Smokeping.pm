@@ -678,7 +678,7 @@ sub target_menu($$$$;$){
     }
     return wantarray ? () : "" unless @hashes;
 
-	$print .= qq{<table width="100%" class="menu" border="0" cellpadding="0" cellspacing="0">\n}
+	$print .= qq{<ul class="menu">\n}
 		unless $filter;
 
 	my @matches;
@@ -725,7 +725,6 @@ sub target_menu($$$$;$){
 			push @matches, target_menu($tree->{$key}, $open, "$path$key.",$filter, $suffix);
 		}
 		else {
-    	    $menu =~ s/ /&nbsp;/g;
              if ($menuextra){
                  $menuextra =~ s/{HOST}/#$host/g;
                  $menuextra =~ s/{CLASS}/$menuclass/g;
@@ -736,26 +735,27 @@ sub target_menu($$$$;$){
                  $menuextra = '';
              }
 
-          	 my $menuadd ="";
-		     $menuadd = "&nbsp;" x (20 - length($menu.$menuextra)) if length($menu.$menuextra) < 20;
-             $print .= qq{<tr><td class="$class" colspan="2">&nbsp;-&nbsp;<a class="$menuclass" HREF="$path$key$suffix">$menu</a>$menuextra$menuadd</td></tr>\n};
+          	$print .= qq{<li class="$class"><a class="$menuclass" href="$path$key$suffix">$menu</a>\n};
      	    if ($key eq $current){
         	    my $prline = target_menu $tree->{$key}, $open, "$path$key.",$filter, $suffix;
-	            $print .= qq{<tr><td class="$class">&nbsp;&nbsp;</td><td align="left">$prline</td></tr>}
+	            $print .= $prline
    		           if $prline;
         	}
+            $print .= "</li>";
 		}
     }
-    $print .= "</table>\n" unless $filter;
+    $print .= "</ul>\n" unless $filter;
 	if ($filter){
 		if (wantarray()){
 			return @matches;
 		}
 		else {
+			$print .= qq{<ul class="menu">\n};
 			for my $entry (sort {$a->[1] cmp $b->[1] } grep {ref $_ eq 'ARRAY'} @matches) {
 				my ($href,$menu,$class,$menuclass) = @{$entry};
-				$print .= qq{<div class="$class">-&nbsp;<a class="$menuclass" href="$href">$menu</a></div>\n};
-			}			
+				$print .= qq{<li class="$class"><a class="$menuclass" href="$href">$menu</a></li>\n};
+			}
+			$print .= "</ul>\n";
 		}
 	}
     return $print;
