@@ -952,7 +952,8 @@ sub get_overview ($$$$){
            @G,
            "COMMENT:$date\\r");
         my $ERROR = RRDs::error();
-        $page .= "<div>";
+        $page .= "<div class=\"panel\">";
+        $page .= "<div class=\"panel-body\">";
         if (defined $ERROR) {
                 $page .= "ERROR: $ERROR<br>".join("<br>", map {"'$_'"} @G);
         } else {
@@ -960,7 +961,7 @@ sub get_overview ($$$$){
             "<IMG BORDER=\"0\" WIDTH=\"$xs\" HEIGHT=\"$ys\" ".
             "SRC=\"".$cfg->{General}{imgurl}.$dir."/${prop}_mini.png\"></A>";
         }
-        $page .="</div>"
+        $page .="</div></div>\n";
     }
     return $page;
 }
@@ -1458,16 +1459,16 @@ sub get_detail ($$$$;$){
             $t =~ s/$xssBadRx/_/g; 
             for my $slave (@slaves){
                 my $s = $slave ? "~$slave" : "";
-                $page .= "<div>";
+                $page .= "<div class=\"panel\">";
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
-                $page .= "<br/>";
+                $page .= "<div class=\"panel-body\">";
                 $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$t.$s.'">'
                       . qq{<IMG BORDER="0" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
-                $page .= "</div>";
+                $page .= "</div></div>\n";
             }
         } else { # chart mode
-            $page .= "<div>";
+            $page .= qq{<div class="panel-body">};
             my $href= (split /~/, (join ".", @$open))[0]; #/ # the link is 'slave free'            
             $page .= (  qq{<a href="}.lnk($q, $href).qq{">}
                       . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
@@ -1495,7 +1496,8 @@ sub get_charts ($$$){
     }
     if (not defined $open->[1]){
         for my $chart ( keys %charts ){
-            $page .= "<h2>$cfg->{Presentation}{charts}{$chart}{title}</h2>\n";
+            $page .= "<div class=\"panel\">";
+            $page .= "<div class=\"panel-heading\"><h2>$cfg->{Presentation}{charts}{$chart}{title}</h2></div>\n";
             if (not defined $charts{$chart}[0]){
                 $page .= "<p>No targets returned by the sorter.</p>"
             } else {
@@ -1510,6 +1512,7 @@ sub get_charts ($$$){
                 }
                 $page .= get_detail($cfg,$q,$tree,$chartentry->{open},'c');
             }
+            $page .= "</div>\n";
          }
      } else {
         my $chart = $open->[1];
@@ -1527,12 +1530,14 @@ sub get_charts ($$$){
                 last unless ref $tree->{$host} eq 'HASH';
                 $tree = $tree->{$host};
             }       
-            $page .= "<h2>$rank.";     
+            $page .= "<div class=\"panel\">";
+            $page .= "<div class=\"panel-heading\"><h2>$rank."; 
             $page .= " ".sprintf($cfg->{Presentation}{charts}{$chart}{format},$chartentry->{value})
                 if ($cfg->{Presentation}{charts}{$chart}{format});
-            $page .= "</h2>";
+            $page .= "</h2></div>";
             $rank++;
             $page .= get_detail($cfg,$q,$tree,$chartentry->{open},'c');
+            $page .= "</div>\n";
           }
        }
      }   
