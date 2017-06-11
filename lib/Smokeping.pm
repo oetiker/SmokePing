@@ -1592,10 +1592,12 @@ sub hierarchy_switcher($$){
     my $cfg = shift;
     my $print =$q->start_form(-name=>'hswitch',-method=>'get',-action=>$q->url(-relative=>1));    
     if ($cfg->{Presentation}{hierarchies}){
-            $print .= "<div id='hierarchy_title'><small>Hierarchy:</small></div>";
-	    $print .= "<div id='hierarchy_popup'>";
+            $print .= "<div class=\"hierarchy\">";
+            $print .= "<label for=\"hierarchy\" class=\"hierarchy-label\">Hierarchy:</label>";
+	    $print .= "<div class=\"hierarchy-popup\">";
 	    $print .= $q->popup_menu(-name=>'hierarchy',
 			             -onChange=>'hswitch.submit()',
+                         -id=>'hierarchy',
             		             -values=>[0, sort map {ref $cfg->{Presentation}{hierarchies}{$_} eq 'HASH' 
                                                  ? $_ : () } keys %{$cfg->{Presentation}{hierarchies}}],
             		             -labels=>{0=>'Default Hierarchy',
