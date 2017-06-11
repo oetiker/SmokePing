@@ -1606,14 +1606,16 @@ sub hierarchy_switcher($$){
 				    );
              $print .= "</div>";
      }
-     $print .= "<div id='filter_title'><small>Filter:</small></div>";
-     $print .= "<div id='filter_text'>";
+     $print .= "<div class=\"filter\">";
+     $print .= "<label for=\"filter\" class=\"filter-label\">Filter:</label>";
+     $print .= "<div class=\"filter-text\">";
      $print .= $q->textfield (-name=>'filter',
-		             -onChange=>'hswitch.submit()',
+                     -id=>'filter',
+                     -placeholder=>'Filter menu...',
+                     -onChange=>'hswitch.submit()',
 		             -size=>15,
 			    );
-     $print .= '</div>'.$q->end_form();
-     $print .= "<br/><br/>";
+     $print .= '</div></div>'.$q->end_form();
      return $print;
 }
 
