@@ -1606,7 +1606,7 @@ sub hierarchy_switcher($$){
                                                     : () } keys %{$cfg->{Presentation}{hierarchies}}
 					      }
 				    );
-             $print .= "</div>";
+             $print .= "</div></div>";
      }
      $print .= "<div class=\"filter\">";
      $print .= "<label for=\"filter\" class=\"filter-label\">Filter:</label>";
