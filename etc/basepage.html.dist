@@ -39,35 +39,39 @@ h2 {
 
 .sidebar-header {
     border-bottom: 1px solid #373737;
-    height: 40px;
+    height: 20px;
     position: relative;
     padding: 10px;
 }
-
 .sidebar-header p {
     margin: 0;
+    color: #fff;
+    font-size: 14px;
 }
 
 .sidebar-menu {
-
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: fixed;
+    top: 41px;
+    bottom: 100px;
+    width: 250px;
 }
 
 .sidebar .filter-label,
 .sidebar .hierarchy-label {
     display: none;
 }
-
 .sidebar .filter-text,
 .sidebar .hierarchy-popup {
     margin: 10px;
 }
-
 .sidebar .hierarchy-popup select {
-    width: 230px;
+    width: 100%;
 }
-
 .sidebar .filter-text input {
-    width: 220px;
+    width: 100%;
+    box-sizing: border-box;
     border: 0;
     padding: 5px;
     border-radius: 3px;
@@ -80,6 +84,7 @@ h2 {
     padding: 0;
     list-style: none;
     display: block;
+    padding-bottom: 10px;
 }
 
 .sidebar ul.menu li {
@@ -87,7 +92,6 @@ h2 {
     border: 1px solid transparent;
     position: relative;
 }
-
 .sidebar ul.menu li.menuopen,
 .sidebar ul.menu li:hover,
 .sidebar ul.menu li.menuactive {
@@ -95,35 +99,36 @@ h2 {
     background: #232323;
     color: #fff:
 }
-
 .sidebar ul.menu li a {
     color: #ccc;
-    line-height: 2.5em;
+    line-height: 2.0em;
     display: block;
     padding-left: 5px;
     text-decoration: none;
 }
-
 .sidebar ul.menu li a.menulinkactive {
     color: #67c2ef;
 }
-
 .sidebar ul.menu li ul {
     background: #343434;
     padding: 5px;
 }
 
+
 .sidebar .sidebar-footer {
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 250px;
-}
-
-.sidebar .sidebar-footer {
     padding: 5px 10px;
     width: 230px;
     text-align: center;
+    box-shadow: 0 -3px 1px -1px rgba(0,0,0,0.05);
+    border-top: 1px solid #373737;
+    background: #4c4c4c;
+}
+.sidebar .sidebar-footer p {
+    margin: 0;
+    margin-bottom: 10px;
 }
 .sidebar .sidebar-footer,
 .sidebar .sidebar-footer a {
@@ -135,6 +140,7 @@ h2 {
 }
 .sidebar .footer-logo {
     width: 115px;
+    height: 30px;
     float: left;
 }
 
@@ -178,7 +184,7 @@ h2 {
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <p>Welcome back <##authuser##><p>
+        <p>Welcome back <strong><##authuser##></strong><p>
     </div>
 
     <div class="sidebar-menu">
