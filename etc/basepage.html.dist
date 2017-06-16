@@ -171,6 +171,10 @@ h2 {
     padding: 5px;
 }
 
+
+/*img #zoom {
+    cursor: crosshair;
+}*/
 </STYLE>
 
 <script src="cropper/lib/prototype.js" type="text/javascript"></script>

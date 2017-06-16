@@ -285,9 +285,12 @@ sub get_multi_detail ($$$$;$){
         } 
 
         elsif ($mode eq 'n'){ # navigator mode
-#           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
+            $page .= "<div class=\"panel\">";
+            $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>"
+                if $cfg->{Presentation}{htmltitle} eq 'yes';
+            $page .= "<div class=\"panel-body\">";
+
            $page .= qq|<IMG id="zoom" border="0" width="$xs" height="$ys" SRC="${imghref}_${end}_${start}.png">| ;
-#           $page .= "</div>";
 
            $page .= $q->start_form(-method=>'GET', -id=>'range_form')
               . "<p>Time range: "
@@ -302,6 +305,8 @@ sub get_multi_detail ($$$$;$){
               . $q->submit(-name=>'Generate!')
               . "</p>"
               . $q->end_form();
+
+           $page .= "</div></div>\n";
         } elsif ($mode eq 's') { # classic mode
             $startstr =~ s/\s/%20/g;
             $endstr =~ s/\s/%20/g;
