@@ -249,7 +249,7 @@ sub get_multi_detail ($$$$;$){
                ($end ne 'last' ? ('--end',$end) : ()),
                '--height',$cfg->{Presentation}{detail}{height},
                '--width',$cfg->{Presentation}{detail}{width},
-               '--title',$desc,
+               '--title',$cfg->{Presentation}{htmltitle} ne 'yes' ? $desc : '',
                '--rigid','--upper-limit', $max->{$start},
                '--lower-limit',($cfg->{Presentation}{detail}{logarithmic} ? ($max->{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
                '--vertical-label',$ProbeUnit,
@@ -305,18 +305,23 @@ sub get_multi_detail ($$$$;$){
         } elsif ($mode eq 's') { # classic mode
             $startstr =~ s/\s/%20/g;
             $endstr =~ s/\s/%20/g;
-            $page .= "<div>";
+            $page .= "<div class=\"panel\">";
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
-            $page .= "<br/>";
+            $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>"
+                if $cfg->{Presentation}{htmltitle} eq 'yes';
+            $page .= "<div class=\"panel-body\">";
             $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
                   . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
-            $page .= "</div>";
+            $page .= "</div></div>\n";
         } else { # chart mode
-            $page .= "<div>";
+            $page .= "<div class=\"panel\">";
+            $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>"
+                if $cfg->{Presentation}{htmltitle} eq 'yes';
+            $page .= "<div class=\"panel-body\">";
             $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
                       . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
-            $page .= "</div>";
+            $page .= "</div></div>\n";
             
         }
 
