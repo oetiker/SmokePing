@@ -122,11 +122,12 @@ sub morning_update($) {
 		my $ERR=RRDs::error;
 		die "ERROR while reading $_: $ERR\n" if $ERR;
 		foreach my $line (@$data) {
-			$Loss += $$line[3];
+			$Loss += ( defined($$line[3]) ? $$line[3] : 0 );
 		}
 		$Down += 1 if $Loss == 0;
 		$target =~ s/^([a-zA-Z0-9]*\/)*//;
 		$target =~ s/.rrd//;
+		$target =~ s/\~(.*)/ from $1/ if $target =~ m/\~/;
 		$TmpBody .= "$target\n" if $Loss == 0;
 	}
 	$Body = <<MAIL_END;
@@ -394,19 +395,36 @@ sub DetailSheet($) {
   return $Body;
   }
 
-sub list_rrds($$$);
-sub list_rrds($$$) {
+sub list_rrds($$$$$);
+sub list_rrds($$$$$) {
 	# List the RRD's used by this configuration
     my $tree = shift;
     my $path = shift;
     my $print = shift;
-    my $prline;
+	my $slaves = shift;
+	my $nomasterpoll = shift;
+    my $prline = '';
+	if ( $opt{slaves} ) {
+		$slaves = $tree->{slaves} if exists( $tree->{slaves} );
+	} else {
+		$slaves = '';
+	}
+	$nomasterpoll = $tree->{nomasterpoll} if exists ( $tree->{nomasterpoll} );
     foreach my $rrds (keys %{$tree}) {
         if (ref $tree->{$rrds} eq 'HASH'){
-			$prline .= list_rrds( $tree->{$rrds}, $path."/$rrds", $print );
+			$prline .= list_rrds( $tree->{$rrds}, $path."/$rrds", $print, $slaves, $nomasterpoll );
         } 
         if ($rrds eq 'host' and $tree->{$rrds} !~ m|/| ) {
-            $prline .= "$cfg->{General}{datadir}$path".".rrd\n";
+			if ( exists( $opt{slaves} ) && $slaves ) {
+				foreach( split( /\s+/, $slaves ) ) {
+					my $tslave = $_;
+					$prline .= "$cfg->{General}{datadir}$path~$tslave".".rrd\n"
+						if $opt{slaves} eq '' || grep( $tslave, split( ',', $opt{slaves} ) );
+				}
+				$prline .= "$cfg->{General}{datadir}$path".".rrd\n" unless $nomasterpoll;
+			} else {
+            	$prline .= "$cfg->{General}{datadir}$path".".rrd\n";
+			}
 		}
 	}
 	return $prline;
@@ -430,7 +448,7 @@ sub main ($) {
     umask 022;
     my $cfgfile = shift;
     my $sendto;
-    GetOptions(\%opt, 'quiet','version','testmail','listrrds','to=s','detail=n','morning','weekly','help','man') or pod2usage(2);
+    GetOptions(\%opt, 'quiet','version','testmail','listrrds','to=s','detail=n','morning','weekly','help','man','slaves:s') or pod2usage(2);
     if($opt{version})  { print "$RCS_VERSION\n"; exit(0) };
     if($opt{help})     {  pod2usage(-verbose => 1); exit 0 };
     if($opt{man})      {  pod2usage(-verbose => 2); exit 0 };
@@ -438,7 +456,7 @@ sub main ($) {
     print "tSmoke for network managed by $cfg->{General}{owner}\nat $cfg->{General}{contact}\n(c) 2003 Dan McGinn-Combs\n" unless $opt{quiet};
     if($opt{testmail}) { test_mail($cfg) };
     if($opt{listrrds}) { 	print "List of Round Robin Databases used by this implementation\n";
-							my @rrds = split ( /\n/,list_rrds($cfg->{Targets},"","") );
+							my @rrds = split ( /\n/,list_rrds($cfg->{Targets},"","","","") );
 							foreach (@rrds) {
 								print "RRD: $_\n"; };
 							}
@@ -453,7 +471,7 @@ tSmoke - Commandline tool for sending SmokePing information
 
 =head1 SYNOPSIS
 
-B<tSmoke> [ B<--testmail> | B<--morning> | B<--weekly> | B<--version> | B<--help> | B<--man>]
+B<tSmoke> [ B<--testmail> | B<--morning> | B<--weekly> | B<--version> | B<--help> | B<--man> | B<--slaves> ]
 
  Options:
 
@@ -467,6 +485,8 @@ B<tSmoke> [ B<--testmail> | B<--morning> | B<--weekly> | B<--version> | B<--help
  --to       E-mail address to send message (i.e. '--to=xyz@company.com.invalid'
  --detail   How much detail to send in weekly report (i.e. '--detail=1')
  --quiet    Do not print welcome
+ --slaves   Enable slave support assumes all slaves unless csv list of slaves
+            is added (i.e. '--slaves' or '--slaves=slave1[,slave2...]')
  
 =head1 DESCRIPTION
 
