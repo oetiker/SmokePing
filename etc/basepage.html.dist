@@ -237,10 +237,10 @@ a#menu-button:hover {
 }
 </style>
 
-<script src="cropper/lib/prototype.js" type="text/javascript"></script>
-<script src="cropper/lib/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
-<script src="cropper/cropper.js" type="text/javascript"></script>
-<script src="cropper/smokeping-zoom.js" type="text/javascript"></script>
+<script src="js/prototype.js" type="text/javascript"></script>
+<script src="js/scriptaculous/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
+<script src="js/cropper/cropper.js" type="text/javascript"></script>
+<script src="js/smokeping.js" type="text/javascript"></script>
 
 </head>
 <body id="body">
