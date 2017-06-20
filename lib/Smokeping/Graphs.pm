@@ -22,6 +22,18 @@ the graphs shown in the overview page, except for the size.
 
 =cut
 
+sub get_colors ($){
+    my $cfg = shift;
+
+    if ($cfg->{Presentation}{graphborders} eq 'no') {
+        return '--border', '0',
+                '--color', 'BACK#ffffff00',
+                '--color', 'CANVAS#ffffff00';
+    }
+
+    # Use rrdtool defaults
+    return;
+}
 
 sub get_multi_detail ($$$$;$){
     # a) 's' classic with several static graphs on the page
@@ -254,10 +266,7 @@ sub get_multi_detail ($$$$;$){
                '--lower-limit',($cfg->{Presentation}{detail}{logarithmic} ? ($max->{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
                '--vertical-label',$ProbeUnit,
                '--imgformat','PNG',
-               '--color', 'SHADEA#ffffff',
-               '--color', 'SHADEB#ffffff',
-               '--color', 'BACK#ffffff',
-               '--color', 'CANVAS#ffffff',
+               Smokeping::Graphs::get_colors($cfg),
                 @G,
                "COMMENT:$ProbeDesc",
                'COMMENT:end\: '.$date.'\j';
@@ -327,7 +336,6 @@ sub get_multi_detail ($$$$;$){
             $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
                       . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
             $page .= "</div></div>\n";
-            
         }
 
     }
