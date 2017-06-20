@@ -5,26 +5,28 @@
     <meta http-equiv="pragma" content="no-cache">
     <META http-equiv="Refresh" content="<##step##>">
     <title>SmokePing Latency Page for <##title##></title>
-<STYLE type="text/css">
+<style type="text/css">
 
-body {
+body, html {
     background: #eee;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 12px;
+    margin: 0;
 }
 
 h1 {
     font-size: 32px;
     line-height:32px;
     font-weight: 400;
+    margin: 10px 0;
 }
 h2 {
     font-size: 16px;
     line-height:16px;
     font-weight: 400;
 }
-
-.main {
-    padding: 10px 10px 0 280px;
+small {
+    font-size: 10px;
 }
 
 .sidebar {
@@ -39,23 +41,24 @@ h2 {
 
 .sidebar-header {
     border-bottom: 1px solid #373737;
-    height: 20px;
+    height: 50px;
     position: relative;
     padding: 10px;
+    box-sizing: border-box;
 }
-.sidebar-header p {
+.sidebar-header .logo {
     margin: 0;
-    color: #fff;
-    font-size: 14px;
+    display: inline-block;
+    padding: 0 5px;
 }
 
 .sidebar-menu {
     overflow-x: hidden;
     overflow-y: auto;
     position: fixed;
-    top: 41px;
-    bottom: 100px;
-    width: 250px;
+    top: 50px;
+    bottom: 0;
+    width: 249px;
 }
 
 .sidebar .filter-label,
@@ -115,35 +118,63 @@ h2 {
 }
 
 
-.sidebar .sidebar-footer {
+.navbar {
+    height: 50px;
+    border-bottom: 1px solid #afafaf;
+    background: linear-gradient(#f8f8f8,#eee);
+    box-sizing: border-box;
     position: fixed;
-    bottom: 0;
-    left: 0;
-    padding: 5px 10px;
-    width: 230px;
-    text-align: center;
-    box-shadow: 0 -3px 1px -1px rgba(0,0,0,0.05);
-    border-top: 1px solid #373737;
-    background: #4c4c4c;
-}
-.sidebar .sidebar-footer p {
-    margin: 0;
-    margin-bottom: 10px;
-}
-.sidebar .sidebar-footer,
-.sidebar .sidebar-footer a {
-    color: #747474;
-    text-decoration: none;
-}
-.sidebar .sidebar-footer a:hover {
-    text-decoration: underline;
-}
-.sidebar .footer-logo {
-    width: 115px;
-    height: 30px;
-    float: left;
+    top: 0;
+    right: 0;
+    left: 250px;
+    box-shadow: 0 3px 1px -1px rgba(0,0,0,0.05);
+    text-shadow: 0 1px 1px rgba(255,255,255,0.9);
 }
 
+.navbar .navbar-menu {
+    border-right: 1px solid #afafaf;
+    height: 50px;
+    display: inline-block;
+}
+.navbar .navbar-user {
+    border-left: 1px solid #afafaf;
+    height: 50px;
+    display: inline-block;
+    right: 0;
+    position: absolute;
+    padding: 0 10px;
+    line-height: 50px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.navbar .navbar-user .icon-person {
+    background: no-repeat left url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAQAAABLCVATAAAA1ElEQVR4Ae3SPUoDYRSG0QPqDGQD4v9qdAu6BBGNcQO6FME+lbgCLSQhEqMb0EK7QSRoCuFqKcOHzIyIzZynf+HC1fqlXM/A1MzIkVxDaybiWxMrGshNRKmxTG09kWhPbQOR6EptU5Go+Meh9GmXauuKRLtqy92KUjcWNLBqXPqiZQ1lDlx79WboUKb1Jzq2nOi7V/j4qnCn79imjooyOy7MhHTvzm3L/Ghe17Oo0JN9c6RtGIkaDa1LWPIoavZgkbIz0aBTyl5EgwrKolntUIUqa30CLm2RNE9+n04AAAAASUVORK5CYII=');
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    vertical-align: middle;
+    padding-right: 10px;
+    opacity: 0.3;
+}
+a#menu-button {
+    background: no-repeat center url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAQAAABLCVATAAAAJUlEQVR4AWOgKhgFo+A/eXAIGIQAo2A0HY2mo9F0NJqORsEoAAAO8PsFZyNgiAAAAABJRU5ErkJggg==);
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    display: block;
+    opacity: 0.3;
+    height: 50px;
+    width: 50px;
+}
+a#menu-button:hover {
+    opacity: 0.5;
+}
+
+.main {
+    padding-left: 250px;
+    margin: 10px 20px;
+    padding-top: 50px;
+}
 
 .main .panel {
     border: 1px solid #d4d4d4;
@@ -171,39 +202,67 @@ h2 {
     padding: 5px;
 }
 
+.footer {
+    border-top: 1px solid #d4d4d4;
+    padding-left: 250px;
+}
 
-/*img #zoom {
-    cursor: crosshair;
-}*/
-</STYLE>
+.footer p {
+    display: inline-block;
+    margin: 5px 10px;
+}
+
+.footer p.footer-right {
+    float: right;
+}
+
+.footer,
+.footer a {
+    color: #747474;
+    text-decoration: none;
+}
+.footer a:hover {
+    text-decoration: underline;
+}
+
+.sidebar-hidden .sidebar {
+    display: none !important;
+}
+.sidebar-hidden .main,
+.sidebar-hidden .footer {
+    padding-left: 0 !important;
+}
+.sidebar-hidden .navbar {
+    left: 0 !important;
+}
+</style>
 
 <script src="cropper/lib/prototype.js" type="text/javascript"></script>
 <script src="cropper/lib/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
 <script src="cropper/cropper.js" type="text/javascript"></script>
 <script src="cropper/smokeping-zoom.js" type="text/javascript"></script>
 
-
-</HEAD>
-<BODY>
+</head>
+<body id="body">
 
 <div class="sidebar">
     <div class="sidebar-header">
-        <p>Welcome back <strong><##authuser##></strong><p>
+        <div class="logo">
+            <##smokelogo##>
+        </div>
+        <div class="logo">
+            <##rrdlogo##>
+        </div>
     </div>
 
     <div class="sidebar-menu">
         <##menu##>
     </div>
-    <div class="sidebar-footer">
-        <p>Running on <##smokeping##> by <##author##></p>
-        <p><small>Maintained by <a href="mailto:<##contact##>"><##owner##></a></small></p>
-        <div class="footer-logo">
-            <##smokelogo##>
-        </div>
-        <div class="footer-logo">
-            <##rrdlogo##>
-        </div>
-    </div>
+</div>
+
+<div class="navbar">
+    <div class="navbar-menu"><a id="menu-button" href="#">Toggle Menu</a></div>
+    <div class="navbar-user"><div class="icon-person"></div><##authuser##></div>
 </div>
 
 <div class="main">
@@ -217,8 +276,12 @@ h2 {
     <div class="details">
         <##body##>
     </div>
-
 </div>
 
-</BODY>
-</HTML>
+<div class="footer">
+    <p class="footer-right"><small>Running on <##smokeping##> by <##author##></small></p>
+    <p><small>Maintained by <a href="mailto:<##contact##>"><##owner##></a></small></p>
+</div>
+
+</body>
+</html>
