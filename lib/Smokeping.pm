@@ -1439,9 +1439,13 @@ sub get_detail ($$$$;$){
              return undef;
         } 
         elsif ($mode eq 'n'){ # navigator mode
-#           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
+           $page .= "<div class=\"panel\">";
+           if ($cfg->{Presentation}{htmltitle} eq 'yes') {
+                # TODO we generate this above to, maybe share code or store variable ?
+                $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>";
+            }
+           $page .= "<div class=\"panel-body\">";
            $page .= qq|<IMG alt="" id="zoom" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
-#           $page .= "</div>";
            $page .= $q->start_form(-method=>'POST', -id=>'range_form')
               . "<p>Time range: "		
               . $q->hidden(-name=>'epoch_start',-id=>'epoch_start')
@@ -1455,6 +1459,7 @@ sub get_detail ($$$$;$){
               . $q->submit(-name=>'Generate!')
               . "</p>"
               . $q->end_form();
+           $page .= "</div></div>\n";
         } elsif ($mode eq 's') { # classic mode
             $startstr =~ s/\s/%20/g;
             $endstr =~ s/\s/%20/g;
