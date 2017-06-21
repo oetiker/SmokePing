@@ -945,6 +945,7 @@ sub get_overview ($$$$){
            '--width',$cfg->{Presentation}{overview}{width},
            '--vertical-label', $ProbeUnit,
            '--imgformat','PNG',
+           Smokeping::Graphs::get_colors($cfg),
            '--alt-autoscale-max',
            '--alt-y-grid',
            '--rigid',
@@ -1393,10 +1394,7 @@ sub get_detail ($$$$;$){
                '--lower-limit',(@log ? ($max->{$s}{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
                '--vertical-label',$ProbeUnit,
                '--imgformat','PNG',
-               '--color', 'SHADEA#ffffff',
-               '--color', 'SHADEB#ffffff',
-               '--color', 'BACK#ffffff',
-               '--color', 'CANVAS#ffffff',
+               Smokeping::Graphs::get_colors($cfg),
                (map {"DEF:ping${_}=${rrd}:ping${_}:AVERAGE"} 1..$pings),
                (map {"CDEF:cp${_}=ping${_},$max->{$s}{$start},LT,ping${_},INF,IF"} 1..$pings),
                ("DEF:loss=${rrd}:loss:AVERAGE"),
@@ -2971,7 +2969,7 @@ Defines how the SmokePing data should be presented.
 DOC
           _sections => [ qw(overview detail charts multihost hierarchies) ],
           _mandatory => [ qw(overview template detail) ],
-          _vars      => [ qw (template charset htmltitle) ],
+          _vars      => [ qw (template charset htmltitle graphborders) ],
           template   => 
          {
           _doc => <<DOC,
@@ -2998,6 +2996,15 @@ DOC
            _doc => <<DOC,
 By default, SmokePing will render the title of the graph in the image,
 when set to 'yes' the title is inserted in the html page.
+DOC
+           _re  => '(yes|no)',
+           _re_error =>"this must either be 'yes' or 'no'",
+         },
+         graphborders => {
+           _doc => <<DOC,
+By default, SmokePing will render gray border on a light gray background,
+if set to 'no' borders will be hidden and the background and canvas
+will be transparent.
 DOC
            _re  => '(yes|no)',
            _re_error =>"this must either be 'yes' or 'no'",

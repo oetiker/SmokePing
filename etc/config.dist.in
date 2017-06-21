@@ -48,6 +48,8 @@ AVERAGE  0.5 144   720
 *** Presentation ***
 
 template = @prefix@/etc/basepage.html.dist
+htmltitle = yes
+graphborders = no
 
 + charts
 

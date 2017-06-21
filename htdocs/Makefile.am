@@ -15,10 +15,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-JS = cropper/smokeping-zoom.js cropper/lib/unittest.js cropper/lib/slider.js cropper/lib/controls.js \
-     cropper/lib/sound.js cropper/lib/dragdrop.js cropper/lib/prototype.js cropper/lib/effects.js \
-     cropper/lib/builder.js cropper/lib/scriptaculous.js  cropper/marqueeVert.gif cropper/cropper.uncompressed.js \
-     cropper/licence.txt cropper/marqueeHoriz.gif cropper/cropper.js cropper/cropper.css
+JS = js/smokeping.js \
+    js/prototype.js \
+    js/cropper/cropper.js \
+    js/cropper/licence.txt \
+    js/cropper/marqueeVert.gif \
+    js/cropper/cropper.uncompressed.js \
+    js/cropper/cropper.css \
+    js/cropper/marqueeHoriz.gif \
+    js/scriptaculous/controls.js \
+    js/scriptaculous/slider.js \
+    js/scriptaculous/sound.js \
+    js/scriptaculous/effects.js \
+    js/scriptaculous/unittest.js \
+    js/scriptaculous/builder.js \
+    js/scriptaculous/scriptaculous.js \
+    js/scriptaculous/dragdrop.js
 
 EXTRA_DIST = $(JS)
 

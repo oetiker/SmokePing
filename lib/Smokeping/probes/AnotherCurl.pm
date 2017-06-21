@@ -17,7 +17,6 @@ to generate the POD document.
 use strict;
 use base qw(Smokeping::probes::basefork);
 use Carp;
-use Switch;
 
 my $DEFAULTBIN = "/usr/bin/curl";
 
@@ -319,17 +318,16 @@ sub pingone {
 				# Appconnect: time_appconnect
 				# Pretransfert: time_pretransfer
 				# Starttransfert: time_starttransfer
-                                # Default is current behaviour where we take total minus DNS resolution.
-                                switch ($t->{vars}{write_out}) {
-					case 'time_total'         {$val += $1}
-					case 'time_namelookup'    {$val += $2}
-					case 'time_redirect'      {$val += $3}
-					case 'time_connect'       {$val += $4}
-					case 'time_appconnect'    {$val += $5}
-					case 'time_pretransfer'   {$val += $6}
-					case 'time_starttransfer' {$val += $7}
-                                        else {$val += $1 - $2;}
-				}
+				# Default is current behaviour where we take total minus DNS resolution.
+				if ($t->{vars}{write_out} eq 'time_total') {$val += $1}
+				elsif ($t->{vars}{write_out} eq 'time_namelookup') {$val += $2}
+				elsif ($t->{vars}{write_out} eq 'time_redirect') {$val += $3}
+				elsif ($t->{vars}{write_out} eq 'time_connect') {$val += $4}
+				elsif ($t->{vars}{write_out} eq 'time_appconnect') {$val += $5}
+				elsif ($t->{vars}{write_out} eq 'time_pretransfer') {$val += $6}
+				elsif ($t->{vars}{write_out} eq 'time_starttransfer') {$val += $7}
+				else {$val += $1 - $2;}
+
 				if ($t->{vars}{include_redirects} eq "yes" and defined $3) {
 					$val += $3;
 				}

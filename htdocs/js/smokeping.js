@@ -77,19 +77,23 @@ function changeRRDImage(coords,dimensions){
 };
 
 Event.observe( 
-           window, 
-           'load', 
-           function() { 
-               if ( $('zoom') != null ){
-                 myCropper = new Cropper.Img( 
-                                'zoom', 
-                                        { 
-                                                minHeight: $('zoom').getDimensions().height,
-                                                maxHeight: $('zoom').getDimensions().height,
-                                                onEndCrop: changeRRDImage
-                                        } 
-                                ) 
-                   }
+    window,
+    'load',
+    function() {
+        $('menu-button').observe('click', function (e) {
+            $('body').toggleClassName('sidebar-hidden');
+            Event.stop(e);
+        });
+        if ($('zoom') != null) {
+            myCropper = new Cropper.Img(
+                'zoom',
+                {
+                    minHeight: $('zoom').getDimensions().height,
+                    maxHeight: $('zoom').getDimensions().height,
+                    onEndCrop: changeRRDImage
                 }
-           );
+            )
+        }
+    }
+);
 
