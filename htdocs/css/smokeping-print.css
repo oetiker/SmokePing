@@ -1,0 +1,13 @@
+body, html {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 12px;
+}
+.sidebar, .navbar {
+	display: none;
+}
+.panel {
+	page-break-inside: avoid;
+}
+.panel h2 {
+	font-size: 12px;
+}
