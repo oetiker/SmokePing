@@ -236,12 +236,6 @@ a#menu-button:hover {
     left: 0 !important;
 }
 </style>
-
-<script src="js/prototype.js" type="text/javascript"></script>
-<script src="js/scriptaculous/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
-<script src="js/cropper/cropper.js" type="text/javascript"></script>
-<script src="js/smokeping.js" type="text/javascript"></script>
-
 </head>
 <body id="body">
 
@@ -282,6 +276,11 @@ a#menu-button:hover {
     <p class="footer-right"><small>Running on <##smokeping##> by <##author##></small></p>
     <p><small>Maintained by <a href="mailto:<##contact##>"><##owner##></a></small></p>
 </div>
+
+<script src="js/prototype.js" type="text/javascript"></script>
+<script src="js/scriptaculous/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
+<script src="js/cropper/cropper.js" type="text/javascript"></script>
+<script src="js/smokeping.js" type="text/javascript"></script>
 
 </body>
 </html>
