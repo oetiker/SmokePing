@@ -1,23 +1,29 @@
-body, html {
+body {
 	background: #eee;
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 12px;
 	margin: 0;
+	display: inline-block;
+    width: 100%;
 }
 
 h1 {
 	font-size: 32px;
 	line-height:32px;
 	font-weight: 400;
-	margin: 10px 0;
+	margin: 10px 5px;
 }
 h2 {
 	font-size: 16px;
 	line-height:16px;
 	font-weight: 400;
+	margin: 5px;
 }
 small {
 	font-size: 10px;
+}
+hr {
+	display: none;
 }
 
 .sidebar {
@@ -46,8 +52,8 @@ small {
 .sidebar-menu {
 	overflow-x: hidden;
 	overflow-y: auto;
-	position: fixed;
-	top: 50px;
+	position: relative;
+	top: 0px;
 	bottom: 0;
 	width: 249px;
 }
@@ -91,7 +97,7 @@ small {
 .sidebar ul.menu li.menuactive {
 	border: 1px solid #4a4a4a;
 	background: #232323;
-	color: #fff;
+	color: #fff:
 }
 .sidebar ul.menu li a {
 	color: #ccc;
@@ -163,15 +169,16 @@ a#menu-button:hover {
 
 .main {
 	padding-left: 250px;
-	margin: 10px 20px;
+	margin: 10px 10px;
 	padding-top: 50px;
+	display: inline-block;
 }
 
 .main .panel {
 	border: 1px solid #d4d4d4;
 	box-shadow: 0 2px 1px -1px rgba(0,0,0,0.1);
 	background: #fff;
-	margin-bottom: 20px;
+	margin: 5px;
 	display: inline-block;
 }
 
@@ -217,12 +224,34 @@ a#menu-button:hover {
 }
 
 .sidebar-hidden .sidebar {
-	display: none !important;
+	left: -250px !important;
 }
+
 .sidebar-hidden .main,
 .sidebar-hidden .footer {
 	padding-left: 0 !important;
 }
 .sidebar-hidden .navbar {
 	left: 0 !important;
+}
+
+@media (max-width: 900px) {
+	.sidebar, .navbar {
+		transition: left 0.4s ease;
+	}
+	.sidebar {
+		left: -250px;
+	}
+	.navbar {
+		left: 0;
+	}
+	.main, .footer {
+		padding-left: 0;
+	}
+	.sidebar-visible .sidebar {
+		left: 0px !important;
+	}
+	.sidebar-visible .navbar {
+		left: 250px !important;
+	}
 }

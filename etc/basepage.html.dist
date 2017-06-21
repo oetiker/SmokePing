@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="pragma" content="no-cache">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <META http-equiv="Refresh" content="<##step##>">
     <title>SmokePing Latency Page for <##title##></title>
     <link rel="stylesheet" type="text/css" href="css/smokeping-screen.css" media="screen">

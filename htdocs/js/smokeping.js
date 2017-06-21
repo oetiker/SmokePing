@@ -81,7 +81,13 @@ Event.observe(
     'load',
     function() {
         $('menu-button').observe('click', function (e) {
-            $('body').toggleClassName('sidebar-hidden');
+            if ($('sidebar').getStyle('left') == '0px') {
+                $('body').addClassName('sidebar-hidden');
+                $('body').removeClassName('sidebar-visible');
+            } else {
+                $('body').removeClassName('sidebar-hidden');
+                $('body').addClassName('sidebar-visible');
+            }
             Event.stop(e);
         });
         if ($('zoom') != null) {
