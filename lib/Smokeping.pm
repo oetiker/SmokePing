@@ -961,7 +961,7 @@ sub get_overview ($$$$){
                 $page .= "ERROR: $ERROR<br>".join("<br>", map {"'$_'"} @G);
         } else {
          $page.="<A HREF=\"".lnk($q, (join ".", @$open, ${prop}))."\">".
-            "<IMG BORDER=\"0\" WIDTH=\"$xs\" HEIGHT=\"$ys\" ".
+            "<IMG ALT=\"\" WIDTH=\"$xs\" HEIGHT=\"$ys\" ".
             "SRC=\"".$cfg->{General}{imgurl}.$dir."/${prop}_mini.png\"></A>";
         }
         $page .="</div></div>\n";
@@ -1440,7 +1440,7 @@ sub get_detail ($$$$;$){
         } 
         elsif ($mode eq 'n'){ # navigator mode
 #           $page .= qq|<div class="zoom" style="cursor: crosshair;">|;
-           $page .= qq|<IMG id="zoom" BORDER="0" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
+           $page .= qq|<IMG alt="" id="zoom" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
 #           $page .= "</div>";
            $page .= $q->start_form(-method=>'POST', -id=>'range_form')
               . "<p>Time range: "		
@@ -1472,14 +1472,14 @@ sub get_detail ($$$$;$){
                 }
                 $page .= "<div class=\"panel-body\">";
                 $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$t.$s.'">'
-                      . qq{<IMG BORDER="0" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}${s}_${end}_${start}.png">}."</a>" ); #"
                 $page .= "</div></div>\n";
             }
         } else { # chart mode
             $page .= qq{<div class="panel-body">};
             my $href= (split /~/, (join ".", @$open))[0]; #/ # the link is 'slave free'            
             $page .= (  qq{<a href="}.lnk($q, $href).qq{">}
-                      . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
             $page .= "</div>";
             
         }
@@ -1724,8 +1724,8 @@ sub display_webpage($$){
         smokeping => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
 
         step => $step,
-        rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img border="0" alt="RRDtool" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
-        smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" alt="Smokeping" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
+        rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img alt="RRDtool" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
+        smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img alt="Smokeping" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
         authuser => $authuser,
        }
        );
@@ -4074,8 +4074,8 @@ sub gen_page  ($$$) {
           author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
           smokeping => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
           step => $step,
-          rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img border="0" alt="RRDtool" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
-          smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img border="0" alt="Smokeping" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
+          rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img alt="RRDtool" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
+          smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img alt="Smokeping" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
           authuser => $authuser,
          });
 

@@ -2,6 +2,9 @@ body, html {
 	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 	font-size: 12px;
 }
+img {
+	border: 0;
+}
 .sidebar, .navbar {
 	display: none;
 }

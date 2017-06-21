@@ -25,6 +25,9 @@ small {
 hr {
 	display: none;
 }
+img {
+	border: 0;
+}
 
 .sidebar {
 	background: #4c4c4c;
