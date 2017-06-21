@@ -1732,7 +1732,7 @@ sub display_webpage($$){
     my $expi = $cfg->{Database}{step} > 120 ? $cfg->{Database}{step} : 120;
     print $q->header(-type=>'text/html',
                      -expires=>'+'.$expi.'s',
-                     -charset=> ( $cfg->{Presentation}{charset} || 'iso-8859-15'),
+                     -charset=> ( $cfg->{Presentation}{charset} || 'utf-8'),
                      -Content_length => length($page),
                      );
     print $page || "<HTML><BODY>ERROR: Reading page template".$cfg->{Presentation}{template}."</BODY></HTML>";
@@ -2988,7 +2988,7 @@ DOC
          },
          charset => {
           _doc => <<DOC,
-By default, SmokePing assumes the 'iso-8859-15' character set. If you use
+By default, SmokePing assumes the 'utf-8' character set. If you use
 something else, this is the place to speak up.
 DOC
          },
