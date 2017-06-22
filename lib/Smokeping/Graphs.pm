@@ -299,7 +299,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
 
-           $page .= qq|<IMG id="zoom" border="0" width="$xs" height="$ys" SRC="${imghref}_${end}_${start}.png">| ;
+           $page .= qq|<IMG id="zoom" alt="" width="$xs" height="$ys" SRC="${imghref}_${end}_${start}.png">| ;
 
            $page .= $q->start_form(-method=>'GET', -id=>'range_form')
               . "<p>Time range: "
@@ -326,7 +326,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
-                  . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                  . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
             $page .= "</div></div>\n";
         } else { # chart mode
             $page .= "<div class=\"panel\">";
@@ -334,7 +334,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
-                      . qq{<IMG BORDER="0" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
             $page .= "</div></div>\n";
         }
 

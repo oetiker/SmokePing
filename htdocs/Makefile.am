@@ -30,7 +30,9 @@ JS = js/smokeping.js \
     js/scriptaculous/unittest.js \
     js/scriptaculous/builder.js \
     js/scriptaculous/scriptaculous.js \
-    js/scriptaculous/dragdrop.js
+    js/scriptaculous/dragdrop.js \
+    css/smokeping-print.css \
+    css/smokeping-screen.css
 
 EXTRA_DIST = $(JS)
 
