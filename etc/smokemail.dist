@@ -9,7 +9,7 @@ your IP with SmokePing. You have to rerun this script at least everytime
 your IP changes. You can run the script as often as you want.
 
 The script is written in Perl. If you don't have Perl available on your
-system, you must have a Windows Box. You can easily fix this prolem by
+system, you must have a Windows Box. You can easily fix this problem by
 downloading ActivePerl from www.activestate.com
 
 As soon as you have run the SmokePing Agent, the SmokePing server will
