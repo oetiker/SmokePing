@@ -3463,7 +3463,7 @@ strings will get replaced in the template before it is sent out. the
 following keywords are supported:
 
  <##ALERT##>    - target name
- <##WHAT##>     - status (is active, was raised, was celared)
+ <##WHAT##>     - status (is active, was raised, was cleared)
  <##LINE##>     - path in the config tree
  <##URL##>      - webpage for graph
  <##STAMP##>    - date and time 
