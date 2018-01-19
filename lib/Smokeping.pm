@@ -910,6 +910,7 @@ sub get_overview ($$$$){
                     $label = "med RTT"
                 }
             };
+            $label =~ s/:/\\:/g;
 
             my $sdc = $medc;
             $sdc =~ s/^(......).*/${1}30/;
