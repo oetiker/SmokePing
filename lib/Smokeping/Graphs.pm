@@ -223,6 +223,8 @@ sub get_multi_detail ($$$$;$){
             my $pings = $probe->_pings($tree);
 
             $label = sprintf("%-20s",$label);
+	    $label =~ s/:/\\:/g;
+
             push @colors, $medc;
             my $sdc = $medc;
             my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime) || 0;
