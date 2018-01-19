@@ -2892,7 +2892,7 @@ DOC
            _doc => <<DOC,
 Duration of the base operation interval of SmokePing in seconds.
 SmokePing will venture out every B<step> seconds to ping your target hosts.
-If 'concurrent_probes' is set to 'yes' (see above), this variable can be 
+If 'concurrentprobes' is set to 'yes' (see above), this variable can be 
 overridden by each probe. Note that the step in the RRD files is fixed when 
 they are originally generated, and if you change the step parameter afterwards, 
 you'll have to delete the old RRD files or somehow convert them. 
