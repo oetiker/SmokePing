@@ -16,14 +16,14 @@
 
 AUTOMAKE_OPTIONS =  foreign
 
-SUBDIRS = bin doc etc htdocs lib
+SUBDIRS = thirdparty doc etc htdocs lib bin
 
-EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE setup/build-perl-modules.sh setup/sdbs.inc PERL_MODULES
+EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE PERL_MODULES
+
+THIRDPARTY_DIR := $(shell pwd)/thirdparty
 
 dist-hook:
 	$(PERL) -i -p -e '"$(PACKAGE_VERSION)" =~ /(\d+)\.(\d+)\.(\d+)/ and $$v = sprintf("%d.%03d%03d",$$1,$$2,$$3) and s/^\$$VERSION\s*=\s*".*?"/\$$VERSION = "$$v"/'  $(distdir)/lib/Smokeping.pm
 
-#	echo Version $(PACKAGE_VERSION) >DIST_REVISION
-#	svn info >>DIST_REVISION
-#	cp DIST_REVISION $(distdir)/
-#
+install-exec-hook:
+	[ ! -d $(THIRDPARTY_DIR)/lib/perl5 ] || $(CP) -fr $(THIRDPARTY_DIR)/lib/perl5/* $(DESTDIR)$(libdir)

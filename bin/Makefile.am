@@ -18,6 +18,8 @@
 dist_bin_SCRIPTS = smokeinfo smokeping smokeping_cgi tSmoke
 
 install-exec-hook:
-	[ x$PERL5LIB != x ] && cd "$(DESTDIR)$(bindir)" && $(PERL) -i -p -e 's{^#!.*}{#!$(PERL)}; s{.*# PERL5LIB}{use lib (split /:/, q{$(PERL5LIB)}); # PERL5LIB}' smokeinfo smokeping smokeping_cgi tSmoke
+	test "$(PERL5LIB)" = ""  || cd "$(DESTDIR)$(bindir)" && $(PERL) -i -p -e 's{^#!.*}{#!$(PERL)}; s{.*# PERL5LIB}{use lib (split /:/, q{$(PERL5LIB)}); # PERL5LIB}'  $(dist_bin_SCRIPTS)
+	cd "$(DESTDIR)$(bindir)" && $(PERL) -i -p -e 's{.*# LIBDIR}{use lib qw($(libdir)); # LIBDIR}' $(dist_bin_SCRIPTS)
+	cd "$(DESTDIR)$(bindir)" && $(PERL) -i -p -e 's{^#!.*perl.*}{#!$(PERL)};'  $(dist_bin_SCRIPTS)
 
 # EOF 

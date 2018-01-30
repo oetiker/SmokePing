@@ -15,3 +15,7 @@ doc/smokeping_config.pod
 doc/smokeping_examples.pod
 doc/smokeping_install.txt
 etc/config.dist
+thirdparty/*
+!thirdparty/
+!thirdparty/Makefile.am
+!thirdparty/Makefile.in

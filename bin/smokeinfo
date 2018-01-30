@@ -1,11 +1,9 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 use strict;
 use warnings;
 
-use FindBin;
-# PERL5LIB
-use lib "$FindBin::Bin/../thirdparty/lib/perl5";
-use lib "$FindBin::Bin/../lib";
+use lib (split /:/, q{}); # PERL5LIB
+use FindBin;use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 
 use Smokeping::Info;
 use Getopt::Long 2.25 qw(:config no_ignore_case);

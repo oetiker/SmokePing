@@ -1,13 +1,12 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # -*-perl-*-   
 
 use strict;
 use warnings;
 
+use lib (split /:/, q{}); # PERL5LIB
 use FindBin;
-# PERL5LIB
-use lib "$FindBin::Bin/../thirdparty/lib/perl5";
-use lib "$FindBin::Bin/../lib";
+use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 
 # don't bother with zombies
 $SIG{CHLD} = 'IGNORE';

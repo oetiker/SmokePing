@@ -50,8 +50,8 @@ MAN1 = $(addsuffix .1,$(PROGBASE))
 POD2MAN = pod2man --release=$(VERSION) --center=SmokePing $<
 
 # we go to this trouble to ensure that MAKEPOD only uses modules in the installation directory
-MAKEPOD= PERL5LIB=$(PERL5LIB) $(PERL) -I$(DESTDIR)$(prefix)/thirdparty/lib/perl5 -I../lib -mSmokeping -e 'Smokeping::main()' -- --makepod
-GENEX= PERL5LIB=$(PERL5LIB) $(PERL) -I$(DESTDIR)$(prefix)/thirdparty/lib/perl5  -I../lib -mSmokeping -e 'Smokeping::main()' -- --gen-examples
+MAKEPOD= PERL5LIB=$(PERL5LIB) $(PERL) -I../thirdparty/lib/perl5 -I../lib -mSmokeping -e 'Smokeping::main()' -- --makepod
+GENEX= PERL5LIB=$(PERL5LIB) $(PERL) -I../thirdparty/lib/perl5  -I../lib -mSmokeping -e 'Smokeping::main()' -- --gen-examples
 
 %.7: %.pod
 	$(AM_V_GEN)$(POD2MAN) --section 7 > $@

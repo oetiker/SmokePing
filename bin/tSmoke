@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 #
 #-----------------------------------------------
 # tSmoke.pl
@@ -51,10 +51,10 @@ use warnings;
 # -- Getopt::Long
 #
 # Point the lib variables to your implementation
-use FindBin;
-# PERL5LIB
-use lib "$FindBin::Bin/../thirdparty/lib/perl5";
-use lib "$FindBin::Bin/../lib";
+
+use lib (split /:/, q{}); # PERL5LIB
+use FindBin;use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
+
 
 use Smokeping;
 use Net::SMTP;
