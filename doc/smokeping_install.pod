@@ -22,6 +22,14 @@ Smokeping uses RRDtool for logging and graphing. If your linux distro provides
 an rrdtool  package with perl support, use this. If you want to get the latest
 and greatest version, compile your own: L<http://oss.oetiker.ch/rrdtool/>
 
+Ubuntu:
+
+ sudo apt install rrdtool librrds-perl
+
+RedHat:
+
+ sudo yum install rrdtool perl-rrdtool
+
 =item FPing (optional)
 
 Go to L<http://www.fping.org/> to grab a copy.
@@ -68,69 +76,17 @@ See L<http://httpd.apache.org/mod_fcgid/mod/mod_fcgid.html> and
 L<http://httpd.apache.org/docs/2.2/mod/mod_suexec.html> for more information
 on this.
 
-=item Perl 5.8.8 or later.
+=item Perl 5.10.1 or later.
 
 If you still have an older version, maybe have a look at perlbrew.
 
-=item Various Perl modules (Many are optional)
+Ubuntu:
 
-The modules are all available from L<http://www.cpan.org> and you may be
-able to get them as packages from your distro's repository.  There is also a
-script provided in the setup folder to install the missing bits.  You will
-be instructed later on how to use the script.
+ sudo apt install perl
 
-=over
+RedHat:
 
-=item FCGI
-
-The module for supporting FastCGI operation.
-
-=item CGI, CGI::Fast
-
-Perl CGI/FastCGI support. Might already be installed localy.
-
-=item Config::Grammar
-
-The configuration file parser used in smokeping
-
-=item LWP
-
-The master/slave functionality introduced a dependency on LWP::UserAgent
-from the libwww-perl (also known as LWP) library.  The module is required
-even if the master/slave mode is not enabled.
-
-=item Socket6 (optional)
-
-The Socket6 module enables smokeping to check hostnames that only resolve to
-an IPv6 address. If you probe such hosts using ie. the FPing6 probe and get
-warnings that those hosts don't resolve to an IP address, you need to
-install it.
-
-=item Net::Telnet (optional)
-
-You need this for the TelnetIOSPing probe.
-
-=item Net::OpenSSH (optional)
-
-You need this for the OpenSSHJunOSPing probe.
-
-=item Net::DNS (optional)
-
-You need this for the AnotherDNS probe.
-
-=item Net::LDAP (optional)
-
-You need this for the LDAP probe.
-
-=item IO::Socket::SSL (optional)
-
-You need this if you want the LDAP probe to be able to use the 'starttls' command.
-
-=item Authen::Radius (optional)
-
-You need this for the Radius probe.
-
-=back
+ sudo yum install perl-core
 
 =back
 
