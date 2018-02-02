@@ -1,3 +1,631 @@
+2018/02/02 - release version 2.7.0
+
+commit dcc17c1ce60504d8052ea639354b5660f598768a
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Tue Jan 30 21:10:00 2018 +0100
+
+    rebuilt build system
+
+commit 62a588d379f1ca7177faf448a377a27acfa2dace
+Author: Louis Sautier <sautier.louis@gmail.com>
+Date:   Fri Jan 19 10:45:53 2018 +0100
+
+    Fix typo in doc (#106)
+
+commit fc24b7ca86bd7e0d9c07b66805c115b49cc82fa1
+Author: Rick van der Zwet <info@rickvanderzwet.nl>
+Date:   Fri Jan 19 10:45:26 2018 +0100
+
+    Fix ipv6 in multigraph (#108)
+    
+    * Fix rendering multigraph with host ipv6 address
+    
+    A host IPv6 adress in [RFC5952] representation contains colons which
+    should be escaped in legends since colons are part of rddtool syntax.
+    
+    [RFC5952]: https://tools.ietf.org/html/rfc5952
+    
+    * Fix rendering minigrah with host ipv6 address
+
+commit 44682b6d3aec8d2063adae4dca1ce251c44e2fed
+Author: Rick van der Zwet <info@rickvanderzwet.nl>
+Date:   Wed Dec 6 11:17:42 2017 +0100
+
+    Fix typo in WHAT description text (#102)
+
+commit 2e4f6fb7cbf6458a8634092ed00c1b892ca77e6b
+Author: diegospd <diegospd@users.noreply.github.com>
+Date:   Wed Dec 6 02:17:12 2017 -0600
+
+    Fix typo: prolem -> problem (#98)
+
+commit 72ed1570fbb4ae0b90846625e1a3bd5d2bade531
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Sun Jun 25 20:19:47 2017 +0200
+
+    fing compatibility update. fix for #90
+
+commit 30d3032b5a8fc529c09bcdc31d9a4baf2bfecd66
+Author: Nick <nick@xfce.org>
+Date:   Thu Jun 22 08:35:33 2017 +0200
+
+    Improve mobile support (#89)
+    
+    * Move javascript under the fold.
+    
+    Render speed optimization.
+    
+    * Move css to separate file.
+    
+    Becomes a bit too much in the basepage and since js is
+    included as well, this should be just fine.
+    
+    * Make the site work a lot better on mobile devices
+    
+    Set viewport, auto hide sidemenu and some margin changes
+    to make it a bit nicer..
+    
+    * Remove the no-cache pragma's.
+    
+    Not valid html anymore, instead this should be in the header
+    so in the smokeping config for nginx/apache.
+    
+    * Add css for printing pages.
+    
+    * Fix typo in css.
+    
+    * Use utf-8 charset by default.
+    
+    Recommended by w3.org.
+    
+    * Remove border=0 and add alt=""
+    
+    An attempt to make everything html complaint...
+    
+    * Use cgiurl in hswitch form.
+    
+    Action was empty, which is not valid, use the absolute path
+    to the site here.
+    
+    * Uptimize the cropper.js file.
+    
+    * Add panel for navigator graph.
+
+commit 38bd70634c960c76203c30e58e55825fe080d809
+Author: Nick <nick@xfce.org>
+Date:   Wed Jun 21 11:54:09 2017 +0200
+
+    Nick (#88)
+    
+    * Add panel block around zoom image.
+    
+    * Update basebase to hide menu and make it more spaceious
+    
+    Add navbar and move stuff around a bit to give it some
+    more free space for the menu and contents.
+    
+    Use the prototype framework to toggle the sidebar.
+    
+    * Move javascript files around
+    
+    Mv files so we actully know which file belongs
+    to what library.
+    
+    * Update js prototype to 1.7.3.
+    
+    * Update js script.aculo.us to 1.9.0.
+    
+    * Update js cropper to 1.2.2.
+    
+    * Add option graphborders
+    
+    If option is set to 'no' borders will be hidden and
+    background and canvas will be transparent.
+    
+    Use central function for this, so all generated
+    pngs look identical.
+    
+    * Add new options to config.dist.
+    
+    * Fix compiler warnings.
+    
+    Apparently Switch adviced not to be used...
+
+commit 0088c1b4fef363b09ff992223a4c50f32e4067ea
+Author: Martin DiViaio <martindiv@yahoo.com>
+Date:   Fri Jun 16 03:40:33 2017 -0400
+
+    Fix unitialized value warnings when rrd returns undef. Add slave support (#42)
+    
+    Got rid of the warning that happens when RRD returns 'undef' in the math on line 125.
+    
+    Added support for slave rrd files using a cli option. If option exists all slaves are used. If a csv list of slaves is submitted with the option then only those slaves are used. Exact name match is required.
+    
+    Added regex substitution for a '~' in the rrd name to make it readable as 'host from server' in morning email.
+    
+    Added support for 'nomasterpoll' but only if processing for slaves. Having 'nomasterpoll' set for a host and no slaves configured for it is technically a configuration error, isn't it? If so, then this will show up as a 'down host' in the morning email this way.
+
+commit afb95d5dd350c7dddbcf2fce5a31f970ebe26304
+Author: Nick <nick@xfce.org>
+Date:   Fri Jun 16 09:38:12 2017 +0200
+
+    Improve smokeping dashboard (#87)
+    
+    * Generate unordered list for menu html
+    
+    List are much easier to style with css
+    
+    * Add div blocks around images in html layout
+    
+    <div class="panel">
+      <div class="panel-heading">
+        <h2>Title</h2>
+      </div>
+      <div class="panel-body">
+        IMG or content
+      </div>
+    </div>
+    
+    * Add config option htmltitle to render in div headings
+    
+    If the option is set to yes; the title is not rendered in
+    the rrd image, but added to the html panel as a h2 heading.
+    
+    * Update filter html
+    
+    Use a label instead of a div and use classes since this is a
+    bit more obvious for styling.
+    
+    * Use label for hierarchy popup
+    
+    And add classes for consistency.
+    
+    * Properly close the div tag
+    
+    Fix for previous commit
+    
+    * Add alt to rddtool and smokeping logos
+    
+    2 errors less in html validator...
+    
+    * Initial commit of new basepage
+    
+    * Smaller smokeping and rrdtool logos.
+    
+    Update the rrdlogo to the one currently used on
+    the website (with background that matches the
+    sidebar) and make both 100x30px.
+    
+    * Complete sidebar css.
+
+commit 48eb6391d95f0ddc53d632729f998dcec6edd472
+Author: Ivan Zahariev <famzah@users.noreply.github.com>
+Date:   Mon May 22 17:41:37 2017 +0300
+
+    Display the master host "display_name" in the chart title (#85)
+    
+    When having multiple slaves, and in general, it is more clear if all chart titles contain an explicit "from XYZ" label where XYZ is either the master host name or the slave's name. This gives us an immediate insight for source of the ping check. Otherwise we need to remember that if "from" is missing, then this comes from the master host. This brings inconsistency in the user experience.
+    
+    You can also consider the case when the CGI is behind a web reverse proxy. The user opens "https://web-proxy-server/smokeping.cgi?target=dc1.myhost" but the chart titles don't show a "from". In such a case, the user must know which is the actual master host which did the ping check. This could become even harder to remember if we have multiple instances of SmokePing.
+
+commit 5ce690e3aaece79a57404f73a47caa62c4f9cbb4
+Author: Daniel Néri <dne+github@mayonnaise.net>
+Date:   Mon May 1 17:36:58 2017 +0200
+
+    Download cpanminus securely (#83)
+
+commit fff19a73e0058e56b07834b37bf56b5b787681f0
+Author: Simon Arlott <lp0@users.noreply.github.com>
+Date:   Tue Apr 18 15:53:43 2017 +0100
+
+    Call RRDs::fetch() with a zero length time period (#81)
+    
+    The default fetch time period (1 day) can be very slow when the RRD
+    file is not in the filesystem cache.
+    
+    The info2create function doesn't even use the data, it's just trying
+    to get the DS definition.
+    
+    Specify a start and time of 0 so that no data is retrieved.
+
+commit 4ea88bc384f6852fba891b62973286df67189dec
+Author: 有张纸 <fanyeren@gmail.com>
+Date:   Mon Apr 3 22:11:08 2017 +0800
+
+    Update Smokeping.pm (#76)
+    
+    * Update Smokeping.pm
+    
+    add support for smtp authentication
+    
+    * Update Smokeping.pm
+    
+    add doc for username and userpass
+
+commit 21f4715f6f06c5165bf3e46b5731f34edab67db6
+Author: runout-at <markus@runout.at>
+Date:   Mon Apr 3 15:20:52 2017 +0200
+
+    add xmpp/jabber alerts (#78)
+    
+    * add xmpp alerts
+    
+    lets have alerts sent to xmpp/jabber servers/accounts/chatrooms
+    needs sendxmpp installed. (it's similar to sendmail)
+    
+    Example for the Alerts config:
+    to = xmpp:-t -u <sending_user> -j <jabberserver_of_sender> -p <passwort> <receiving_user>@<jabberserver_of_receiver>
+    
+    * bugfix
+    
+    * more lines where xmpp: is needed
+    
+    fix using xmpp: in alertee,...
+
+commit f993798d1597a0302c13ed972c7a7855068e85d9
+Merge: ed7f7ec 7fa1612
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Wed Mar 8 06:06:52 2017 +0100
+
+    Merge pull request #75 from bobbwest/master
+    
+    Fix white-on-white CSS bug with filter
+
+commit 7fa161250dbb3cedb2a65c139ce50355705f3865
+Author: Bob West <bob.b.west@gmail.com>
+Date:   Wed Mar 8 11:51:44 2017 +1100
+
+    Fix white-on-white CSS bug with filter
+
+commit ed7f7ec1c512a1876b2474dc2485b4ba98b098d5
+Merge: 88c7360 77253c3
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Jan 5 02:52:21 2017 -0500
+
+    Merge pull request #70 from rborgmaster/patch-1
+    
+    Update CheckLoss.pm
+
+commit 88c736037559772e1623a46d6946f94d50678542
+Merge: 3479284 716ffcf
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Jan 5 02:51:58 2017 -0500
+
+    Merge pull request #71 from rborgmaster/patch-2
+    
+    Update CheckLatency.pm
+
+commit 716ffcf3abfc90350203f525ebc090dba2687fd0
+Author: rborgmaster <rickard@borgmaster.se>
+Date:   Wed Jan 4 20:49:38 2017 +0100
+
+    Update CheckLatency.pm
+    
+    Address issue #69
+
+commit 77253c3c3cf158cabb1a0503dec1186c6fd49ff1
+Author: rborgmaster <rickard@borgmaster.se>
+Date:   Wed Jan 4 20:42:17 2017 +0100
+
+    Update CheckLoss.pm
+    
+    Adress issuse #69
+
+commit 3479284f786fb7683ef6dab442447903f42a10a0
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Wed Aug 31 21:45:27 2016 +0200
+
+    properly check alertee
+
+commit 2b1dbf9c3d1347e21933d6bdc62de8f954a50b21
+Merge: 5ac48fa 8334e15
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Sat Jul 23 09:02:27 2016 +0200
+
+    Merge branch 'master' of github.com:oetiker/SmokePing
+
+commit 5ac48fab69cfb674b0e43153e70444f1caff1a50
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Sat Jul 23 09:02:18 2016 +0200
+
+    fix for #65
+
+commit 8334e159d8bec5ca66317b7f29323ab5b8220d7d
+Merge: 7ca84ed e260302
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu May 12 10:59:12 2016 +0200
+
+    Merge pull request #59 from fgtb/master
+    
+    re: issue #58
+
+commit e260302502f7ac8be18a7007b4b33ca9e1bdb371
+Merge: 7ca84ed 52976ea
+Author: fgtb <github.20.fgt@recursor.net>
+Date:   Mon May 9 17:31:50 2016 +0100
+
+    Merge pull request #1 from fgtb/fgtb-patch-1
+    
+    Update OpenSSHJunOSPing.pm
+
+commit 52976eaedbaa64a22685d28668b260507c2e52ff
+Author: fgtb <github.20.fgt@recursor.net>
+Date:   Mon May 9 17:29:40 2016 +0100
+
+    Update OpenSSHJunOSPing.pm
+
+commit 7ca84ed877bc761759473a80e471b87948bfb3da
+Merge: f3d2aee 7870ad8
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Apr 28 11:34:13 2016 +0200
+
+    Merge pull request #54 from dne/auth-dns
+    
+    Add support for probing authoritative nameservers to AnotherDNS
+
+commit f3d2aee6f8dfdcf152756cc555a9b47106ba853d
+Merge: 962f3f4 e4c34a2
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Wed Apr 13 17:20:03 2016 +0200
+
+    Merge pull request #57 from mpawlik/master
+    
+    Add support for ldaps in LDAP probe.
+
+commit e4c34a2b4949bf80167e8f26283e61540c63d479
+Author: Maciej Pawlik <m.pawlik@cyfronet.pl>
+Date:   Wed Apr 13 17:07:23 2016 +0200
+
+    Add support to ldaps in LDAP probe.
+
+commit 962f3f458a11bc4bdd5a2ceebd3be7f4a1e7d204
+Merge: de9fb3b cf8d202
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Sat Apr 2 09:09:22 2016 +0200
+
+    Merge pull request #56 from NickHibma/master
+    
+    More details on mailtemplate
+
+commit cf8d202ef5315bc6920f4be8ba0df9e6208274c2
+Author: Nick Hibma <nick@van-laarhoven.org>
+Date:   Fri Apr 1 22:40:25 2016 +0200
+
+    More details on mailtemplate
+
+commit 7870ad812ac0f0b1650a683e1dc0dfa5332eec17
+Author: Daniel Néri <dne@mayonnaise.net>
+Date:   Sat Feb 20 18:12:10 2016 +0100
+
+    AnotherDNS: Add 'authoritative' option
+    
+    When enabled, send non-recursive queries (RD=0) and require
+    authoritative answers (AA=1).
+
+commit f24b83651d2eebc258036668ea0b9c39e7813fa9
+Author: Daniel Néri <dne@mayonnaise.net>
+Date:   Sat Feb 20 02:29:01 2016 +0100
+
+    AnotherDNS: Avoid reusing query IDs for each run and match responses with queries
+
+commit de9fb3bc9fcdf7f690524ef3aec494a5edc0eda9
+Merge: 4a10386 f9ba643
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Mon Feb 8 10:56:42 2016 +0100
+
+    Merge pull request #52 from mdiehm/patch-1
+    
+    Add even a little more valuable data to the syslog
+
+commit f9ba6432cf0d73832e77931d47cf231fa5083f3f
+Author: mdiehm <md@mailq.de>
+Date:   Fri Jan 29 10:38:00 2016 +0100
+
+    Add even a little more valuable data to the syslog
+    
+    Maybe some of this data is also wanted in the mail - esp. ratio number and prevmatch?
+
+commit 4a103866e3e7df3d09185df397d13d4f9cde44af
+Merge: 6e8fcc8 361c017
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Jan 28 09:53:05 2016 +0100
+
+    Merge pull request #51 from mdiehm/patch-1
+    
+    Little more verbose syslog-message in Smokeping.pm
+
+commit 361c0179c60de6c05c5ba5231a7d5b82cdda3f38
+Author: mdiehm <md@mailq.de>
+Date:   Wed Jan 27 18:18:25 2016 +0100
+
+    Update Smokeping.pm
+
+commit 6e8fcc8bb9dcb944e2efc832c27ecc6909d81b31
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Mon Jan 25 14:03:10 2016 +0100
+
+    added timeout to sipsak
+
+commit 2ed0b369276f188544edbadd81e505520522c816
+Merge: 8c67c29 3a8546b
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Tue Dec 22 13:20:34 2015 +0100
+
+    Merge pull request #49 from mmazur/high_precision_sleep_timer
+    
+    Add high precision timer for sleeps between steps
+
+commit 3a8546ba52448c54ca522027a599fb05039c19af
+Author: Mariusz Mazur <mmazur@pld-linux.org>
+Date:   Tue Dec 22 12:08:52 2015 +0100
+
+    Add high precision timer for sleeps between steps
+    
+    This code does two things:
+    1. Calculates sleep time till next step start as a float instead of an
+    integer, so next probe starts much more precisely when it should instead
+    of up to 0.9999 seconds later.
+    2. Adds a fail safe in which if the current step is overdue by less than
+    300ms, it is not skipped. In other words:
+     - let's have step 60s
+     - probe took 60.1s
+     - old code would sleep for 60s (and skip a step)
+     - new code notices it's only 100ms overdue, so it runs the probe anyway.
+    
+    This patch allows me to run fping every minute (step 60) with each run
+    taking almost a minute (120 pings total, one every 500ms) for constant
+    link monitoring.
+
+commit 8c67c298cf2c19be0c9b6cde58964d02c64da9a4
+Merge: 6547500 707a9ca
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Fri Nov 27 08:37:18 2015 +0100
+
+    Merge pull request #47 from eskyuu/master
+    
+     - Add the FPingContinuous probe
+
+commit 707a9ca656bb75e15c84baf056d82b58fff43651
+Author: Steven Wilton <swilton@fluentit.com.au>
+Date:   Wed Nov 25 16:30:55 2015 +0800
+
+     - Add the FPingContinuous probe
+
+commit 65475007b7879132b3cbc6565d6c11cdc907ee33
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Sep 24 16:32:10 2015 +0200
+
+    add support for -T option  from gurhan.ozen@gmail.com
+
+commit 4c6dec645583a8ddeea73335ed5abc0a0ed0813f
+Merge: a8c3b00 cd0879a
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Fri Jul 3 09:28:40 2015 +0200
+
+    Merge branch 'master' of github.com:oetiker/SmokePing
+
+commit a8c3b00dff57a3b62a6b4dc92d6d2c9ca02617a7
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Fri Jul 3 09:28:23 2015 +0200
+
+    fix echoping location
+
+commit cd0879a24707cc4ec30182c71205359e86bc3374
+Merge: 943f986 6041983
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Jun 11 23:56:36 2015 +0200
+
+    Merge pull request #39 from mad-ady/master
+    
+    Remove RRD max limit of 180 - so that the RRD can store values larger…
+
+commit 60419834f224a0735094fd4ad0aac8eac3b15289
+Author: Adrian Popa <adrian.popa.gh@gmail.com>
+Date:   Thu Jun 11 10:35:20 2015 +0300
+
+    Remove RRD max limit of 180 - so that the RRD can store values larger than 180 (e.g. for non-time data).
+
+commit 943f98660f16be1a7370f44efa656895b6090b57
+Merge: 0e2179c 6622ee2
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Apr 30 06:00:55 2015 +0200
+
+    Merge branch 'master' of github.com:oetiker/SmokePing
+
+commit 0e2179cbb917c15539a90a8d88866f06a3d1e93e
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Thu Apr 30 05:59:56 2015 +0200
+
+    the tcpping script does not support the -e switch ... fix for #37
+
+commit 6622ee22785c1ccd1543392605f28ee2d36e2e02
+Merge: ac57e1d 367e874
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Fri Apr 3 01:58:14 2015 +0200
+
+    Merge pull request #35 from fenner/master
+    
+    Minor markup fixes.
+
+commit 367e874034d424171ee1b6b11644fddbf52f0fa0
+Merge: ad76d30 ac57e1d
+Author: Bill Fenner <fenner@aristanetworks.com>
+Date:   Thu Apr 2 09:08:50 2015 -0700
+
+    Merge remote-tracking branch 'upstream/master'
+
+commit ad76d3052ed1d830083b0f413568c27b190c5e0d
+Author: Bill Fenner <fenner@aristanetworks.com>
+Date:   Thu Apr 2 09:08:32 2015 -0700
+
+    Minor markup fixes.
+
+commit ac57e1d3ac69d20533d6cb6215247a89b6887967
+Merge: 258a010 003ad71
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Wed Mar 4 10:55:16 2015 +0100
+
+    Merge pull request #34 from slesru/patch-1
+    
+    Update TelnetIOSPing.pm
+
+commit 003ad71f44772265732374a9c66974f75c6f13a0
+Author: slesru <slesru@yahoo.com>
+Date:   Wed Mar 4 13:32:48 2015 +0400
+
+    Update TelnetIOSPing.pm
+    
+    added VRF support
+
+commit 258a01011604dd3d65d6be4148cdbb745ccbbf0b
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Wed Feb 25 14:47:17 2015 +0100
+
+    TOS can be 0-255 fix for #33
+
+commit ca230332389b3402484791eae0d826cf6d4b223e
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Wed Feb 25 14:46:46 2015 +0100
+
+    TOS can be 0-255 fix for #33
+
+commit 08fa8bb3313ce9e085945e5c100c811154832a4f
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Mon Feb 16 17:45:17 2015 +0100
+
+    allow more precise waittime fix for #31
+
+commit 8c641451e5a79ce64391c2d5d531bbae1b1a2832
+Merge: 34a95b6 a4ab7d7
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Mon Feb 16 17:42:52 2015 +0100
+
+    Merge pull request #28 from SaaldjorMike/fix-typo
+    
+    Fixed typo in comment
+
+commit 34a95b6c5d745ee53d4671911fbeba07d7696bc4
+Merge: 6920029 2a3947f
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Mon Feb 16 17:42:37 2015 +0100
+
+    Merge pull request #27 from cgull/traceroute_ping
+    
+    New TraceroutePing probe module
+
+commit 692002997e1ba98601c977a4050f31440793c8d7
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Sun Jan 11 22:58:10 2015 +0100
+
+    must be tos not packetsize
+
+commit 9afefe173b0ab08240336258e12cc17f151bf0a9
+Author: Tobias Oetiker <tobi@oetiker.ch>
+Date:   Wed Jan 7 08:01:55 2015 +0100
+
+    add support for tos configuration
+
+
 2014/11/04 - released version 2.6.11
 * added missing PERL_MODULES file
 
