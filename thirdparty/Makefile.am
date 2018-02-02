@@ -11,6 +11,7 @@ EXTRA_DIST = $(THIRDPARTY_DIST) $(wildcard bin/cpanm)
 all-local: touch
 
 touch: CPAN/touch ../config.status ../PERL_MODULES
+	echo "If the moduile install hangs, this may be because one of the modules expects you to press [return] without telling you ... just do it!"
 	$(AM_V_GEN)cat ../PERL_MODULES  | PERL_CPANM_HOME=$(THIRDPARTY_DIR) xargs $(PERL) $(THIRDPARTY_DIR)/bin/cpanm -q --notest --local-lib-contained $(THIRDPARTY_DIR)  --mirror file://$(THIRDPARTY_DIR)/CPAN --mirror-only
 	$(AM_V_GEN)touch touch
 
