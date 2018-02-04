@@ -5,12 +5,12 @@ VERSION=`cat VERSION`
 mkdir -p conftools
 make clean
 ./bootstrap
+./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build
 make
 make clean
-touch PERL_MODULES
-make PERL=perl-5.10.1
-./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build
 make install
+touch PERL_MODULES
+make PERL=perl-5.10.1 || true
 make dist
 echo READY TO SYNC ?
 read XXX
