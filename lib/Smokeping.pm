@@ -1726,12 +1726,12 @@ sub display_webpage($$){
         owner => $cfg->{General}{owner},
         contact => $cfg->{General}{contact},
 
-        author => '<A HREF="http://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
-        smokeping => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
+        author => '<A HREF="https://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
+        smokeping => '<A HREF="https://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
 
         step => $step,
-        rrdlogo => '<A HREF="http://oss.oetiker.ch/rrdtool/"><img alt="RRDtool" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
-        smokelogo => '<A HREF="http://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img alt="Smokeping" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
+        rrdlogo => '<A HREF="https://oss.oetiker.ch/rrdtool/"><img alt="RRDtool" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
+        smokelogo => '<A HREF="https://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img alt="Smokeping" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
         authuser => $authuser,
        }
        );
