@@ -55,9 +55,9 @@ img {
 .sidebar-menu {
 	overflow-x: hidden;
 	overflow-y: auto;
-	position: relative;
-	top: 0px;
-	bottom: 0;
+	position: absolute;
+	top: 51px;
+	bottom: 0px;
 	width: 249px;
 }
 
