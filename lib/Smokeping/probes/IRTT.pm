@@ -46,13 +46,6 @@ instead of running IRTT, wait for the main target's output to become available,
 then parse it to record the chosen metric from the same data. See the
 B<writeto> and B<readfrom> variables for more information.
 
-=head2 INSTALLATION
-
-This probe requires the Path::Tiny perl module. If this is not already installed
-on your system, see L<Installing a Perl Module from CPAN|https://perlmaven.com/how-to-install-a-perl-module-from-cpan>.
-For example, on Debian, the following command will work:
-C<sudo apt-get install libpath-tiny-perl>.
-
 =head2 WARNING
 
 The results sharing feature (B<writeto> and B<readfrom> variables) requires the
