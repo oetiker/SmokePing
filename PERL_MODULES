@@ -13,3 +13,4 @@ Net::DNS
 IO::Pty
 LWP
 Authen::Radius
+Path::Tiny

@@ -16,13 +16,14 @@ to generate the POD document.
 
 use strict;
 use base qw(Smokeping::probes::basefork); 
+#use Data::Dumper;
 use IPC::Open2 qw(open2);
 use JSON::PP qw(decode_json);
 use Path::Tiny qw(path);
+use Scalar::Util qw(looks_like_number);
 use Switch;
 use Symbol qw(gensym);
 use Time::HiRes qw(usleep gettimeofday tv_interval);
-use Data::Dumper;
 
 sub pod_hash {
 	return {
@@ -60,12 +61,10 @@ DOC
 }
 
 sub new ($$$) {
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my $self = $class->SUPER::new(@_);
+	my $self = shift->SUPER::new(@_);
 
-    # no need for this if we run as a cgi (still run at startup)
-    unless ( $ENV{SERVER_SOFTWARE} ) {
+	# no need for this if we run as a cgi (still run at startup)
+	unless ( $ENV{SERVER_SOFTWARE} ) {
 		# check irtt version
 		my $vout = `$self->{properties}->{binary} version`
 			or die "ERROR: irtt version return code " . ($? >> 8);
@@ -78,7 +77,7 @@ sub new ($$$) {
 		}
 	};
 
-    return $self;
+	return $self;
 }
 
 sub probevars ($) {
@@ -201,15 +200,17 @@ The metric to record, one of:
 
 =item *
 
-rtt: round-trip time
+rtt: L<round-trip time|https://en.wikipedia.org/wiki/Round-trip_delay_time>
 
 =item *
 
-send: one-way send delay I<(requires external time synchronization)>
+send: L<one-way send delay|https://en.wikipedia.org/wiki/End-to-end_delay>
+I<(requires external time synchronization)>
 
 =item *
 
-receive: one-way receive delay I<(requires external time synchronization)>
+receive: L<one-way receive delay|https://en.wikipedia.org/wiki/End-to-end_delay>
+I<(requires external time synchronization)>
 
 =item *
 
@@ -227,9 +228,10 @@ receive_ipdv: IPDV for received packets
 =back
 
 Note that the C<send> and C<receive> metrics require accurate external system
-clock synchronization, otherwise the values from one may be abnormally high and
-the other may be abnormally low or even negative, in which case SmokePing will
-ignore the values. Properly configured NTP may be used to synchronize time to
+clock synchronization, otherwise the values from one will be abnormally high and
+the other will be abnormally low or even negative, in which case the value 0
+will be given SmokePing. It is recommended to install ntp on both the SmokePing
+client and IRTT server. Properly configured NTP may be able to synchronize time to
 within a few milliseconds, which is usually enough to provide useful results.
 PTP over a LAN may achieve microsecond-level accuracy. For best results between
 geographically remote hosts, GPS receivers may be used. Since C<send_ipdv> and
@@ -319,13 +321,13 @@ DOC
 }
 
 sub ProbeDesc ($) {
-    my $self = shift;
-    return "IRTT round-trips";
+	my $self = shift;
+	return "IRTT round-trips";
 }
 
 sub get_json_from_file ($$) {
-    my $self = shift;
-    my $target = shift;
+	my $self = shift;
+	my $target = shift;
 	my $t = $target;
 	my $tv = $t->{vars};
 	my $p = $self->{properties};
@@ -357,8 +359,8 @@ sub get_json_from_file ($$) {
 }
 
 sub run_irtt ($$) {
-    my $self = shift;
-    my $target = shift;
+	my $self = shift;
+	my $target = shift;
 	my $t = $target;
 	my $tv = $t->{vars};
 	my $p = $self->{properties};
@@ -386,7 +388,7 @@ sub run_irtt ($$) {
 		'-o', '-',
 	);
 	push @cmd, ("-l", $tv->{length}) if $tv->{length};
-    push @cmd, "--hmac=" . $tv->{hmac} if $tv->{hmac};
+	push @cmd, "--hmac=" . $tv->{hmac} if $tv->{hmac};
 	push @cmd, "--dscp=" . $tv->{dscp} if $tv->{dscp};
 	push @cmd, "--fill=" . $tv->{fill} if $tv->{fill};
 	push @cmd, "--sfill=" . $tv->{serverfill} if $tv->{serverfill};
@@ -425,19 +427,18 @@ sub nstos ($) {
 }
 
 sub median {
-    my @vals = sort {$a <=> $b} @_;
-    my $len = @vals;
-    if ($len%2) {
-        return $vals[int($len/2)];
-    }
-    else {
-        return ($vals[int($len/2)-1] + $vals[int($len/2)])/2;
-    }
+	my @vals = sort {$a <=> $b} @_;
+	my $len = @vals;
+	if ($len%2) {
+		return $vals[int($len/2)];
+	} else {
+        	return ($vals[int($len/2)-1] + $vals[int($len/2)])/2;
+	}
 }
 
 sub pingone ($$) {
-    my $self = shift;
-    my $target = shift;
+	my $self = shift;
+	my $target = shift;
 	my $t = $target;
 	my $tv = $t->{vars};
 	my $p = $self->{properties};
@@ -477,6 +478,9 @@ sub pingone ($$) {
 			switch ($tv->{metric}) {
 				case /^(rtt|send|receive)$/ {
 					$ns = $dl->{$tv->{metric}};
+					if ($ns < 0) {
+						$ns = 0;
+					}
 				}
 				case "ipdv" {
 					$ns = $pv->{'rtt'};
@@ -489,7 +493,7 @@ sub pingone ($$) {
 				}
 				die("ERROR: impossible metric $tv->{metric}")
 			}
-			push @times, nstos(abs($ns)) if $ns;
+			push @times, nstos(abs($ns)) if looks_like_number($ns);
 		}
 	}
 
