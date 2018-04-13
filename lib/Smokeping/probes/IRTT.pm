@@ -475,22 +475,26 @@ sub pingone ($$) {
 			my $ns;
 			my $dl = $rt->{'delay'};
 			my $pv = $rt->{'ipdv'};
-			switch ($tv->{metric}) {
-				case /^(rtt|send|receive)$/ {
+			for ($tv->{metric}) {
+				/^(rtt|send|receive)$/ && do {
 					$ns = $dl->{$tv->{metric}};
 					if ($ns < 0) {
 						$ns = 0;
 					}
-				}
-				case "ipdv" {
+					next;
+				};
+				/^ipdv$/ && do {
 					$ns = $pv->{'rtt'};
-				}
-				case "send_ipdv" {
+					next;
+				};
+				/^send_ipdv$/ && do {
 					$ns = $pv->{'send'};
-				}
-				case "receive_ipdv" {
+					next;
+				};
+				/^receive_ipdv$/ && do {
 					$ns = $pv->{'receive'};
-				}
+					next;
+				};
 				die("ERROR: impossible metric $tv->{metric}")
 			}
 			push @times, nstos(abs($ns)) if looks_like_number($ns);
