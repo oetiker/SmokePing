@@ -34,8 +34,8 @@ To test just try something like this:
 
 The next thing you see must be fping's output.
 
-The B<rhost>, B<ruser> and B<rbinary> variables used to be configured in
-the Targets section of the first target or its parents They were moved
+The B<rhost>, B<ruser>, B<rport> and B<rbinary> variables used to be configured
+in the Targets section of the first target or its parents They were moved
 to the Probes section, because the variables aren't really target-specific
 (all the targets are measured with the same parameters). The Targets
 sections aren't recognized anymore.
@@ -68,10 +68,11 @@ sub ProbeDesc($) {
 sub binary {
     my $self = shift;
     my @ret = ( $self->SUPER::binary );
-    for my $what (qw(ruser rhost rbinary)) {
+    for my $what (qw(ruser rport rhost rbinary)) {
         my $prefix = ($what eq 'ruser' ? "-l" : "");
+	my $port = ($what eq 'rport' ? "-p" : "");
         if (defined $self->{properties}{$what}) {
-		push @ret, $prefix . $self->{properties}{$what};
+		push @ret, $prefix . $port . $self->{properties}{$what};
         } 
     }
     return @ret;
@@ -91,7 +92,7 @@ sub probevars {
 This variable specifies the path of the remote shell program (usually ssh,
 rsh or remsh). Any other script or binary that can be called as
 
-binary [ -l ruser ] rhost rbinary
+binary [ -l ruser ] [ -p rport ] rhost rbinary
 
 may be used.
 DOC
@@ -115,6 +116,13 @@ The (optional) B<ruser> option allows you to specify the remote user,
 if different from the one running the smokeping daemon.
 DOC
 			_example => 'foo',
+		},
+		rport => {
+			_doc => <<DOC,
+The (optional) B<rport> option allows you to specify the port of the
+remote host.
+DOC
+			_example => '22',
 		},
 	});
 }
