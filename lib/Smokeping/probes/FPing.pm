@@ -202,6 +202,7 @@ sub probevars {
 		protocol => {
 			_re => '(4|6)',
 			_example => '4',
+			_default => '4',
 			_doc => "Choose if the ping should use IPv4 or IPv6.",
 
 		},
