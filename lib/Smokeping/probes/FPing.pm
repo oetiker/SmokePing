@@ -119,6 +119,7 @@ sub ping ($){
     # pinging nothing is pointless
     return unless @{$self->addresses};
     my @params = () ;
+    push @params, "-$self->{properties}{protocol}";
     push @params, "-b$self->{properties}{packetsize}" if $self->{properties}{packetsize};
     push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     push @params, "-i" . int(1000 * $self->{properties}{mininterval});
@@ -196,6 +197,13 @@ sub probevars {
 			_re => '(true|false)',
 			_example => 'true',
 			_doc => "Send an extra ping and then discarge the first answer since the first is bound to be an outliner.",
+
+		},
+		protocol => {
+			_re => '(4|6)',
+			_example => '4',
+			_default => '4',
+			_doc => "Choose if the ping should use IPv4 or IPv6.",
 
 		},
 		usestdout => {
