@@ -21,7 +21,6 @@ use IPC::Open2 qw(open2);
 use JSON::PP qw(decode_json);
 use Path::Tiny qw(path);
 use Scalar::Util qw(looks_like_number);
-use Switch;
 use Symbol qw(gensym);
 use Time::HiRes qw(usleep gettimeofday tv_interval);
 
