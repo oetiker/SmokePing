@@ -1709,6 +1709,8 @@ sub display_webpage($$){
     my $display_tree = $tree->{__tree_link} ? $tree->{__tree_link} : $tree;
 
     my $authuser = $ENV{REMOTE_USER} || 'Guest';
+    my $getdetailoutput = get_detail( $cfg,$q,$tree,$open_orig );
+    return if not defined $getdetailoutput;
     my $page = fill_template
       ($cfg->{Presentation}{template},
        {
@@ -1721,7 +1723,7 @@ sub display_webpage($$){
         title => $charts ? "" : $display_tree->{title},
         remark => $charts ? "" : ($display_tree->{remark} || ''),
         overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open),
-        body => $charts ? "" : get_detail( $cfg,$q,$tree,$open_orig ),
+        body => $charts ? "" : $getdetailoutput,
         target_ip => $charts ? "" : ($display_tree->{host} || ''),
         owner => $cfg->{General}{owner},
         contact => $cfg->{General}{contact},
