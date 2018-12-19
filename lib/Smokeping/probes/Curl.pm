@@ -171,7 +171,17 @@ probe is treated as a failure
 DOC
 		_default => "",
 		_example => "Status: green",
-    },
+		},
+		require_zero_status => {
+			_doc => <<DOC,
+If this variable is set to 'yes', responses will only be counted if
+Curl's exit status is '0'. This is useful for reporting timeouts as
+losses rather than delayed responses.
+DOC
+			_default => "no",
+			_re => "(yes|no)",
+			_example => "yes",
+		},
 	});
 }
 
@@ -330,7 +340,9 @@ sub pingone {
 
 			$self->$function(qq(WARNING: curl exited $why on $t->{addr}));
 		}
-		push @times, $val if (defined $val and $expectOK);
+		if ($? == 0 or $t->{vars}{require_zero_status} eq "no") {
+			push @times, $val if (defined $val and $expectOK);
+		}
 	}
 	
 	# carp("Got @times") if $self->debug;
