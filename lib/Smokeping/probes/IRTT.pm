@@ -54,7 +54,7 @@ set). Otherwise, there can be a deadlock while B<readfrom> targets wait for thei
 corresponding B<writeto> target to complete, which may never start.
 DOC
 		authors => <<'DOC',
-Pete Heist <pete@eventide.io>
+Pete Heist <pete@heistp.net>
 DOC
 	};
 }
