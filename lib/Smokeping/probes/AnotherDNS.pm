@@ -73,7 +73,14 @@ sub pingone ($) {
     my $ipversion = $target->{vars}{ipversion};
     my $protocol = $target->{vars}{protocol};
     my $require_noerror = $target->{vars}{require_noerror};
+    my $require_nxdomain = $target->{vars}{require_nxdomain};
+    my $expect_text = $target->{vars}{expect_text};
     $lookuphost = $target->{addr} unless defined $lookuphost;
+
+    if ($require_nxdomain eq 1 && $require_noerror eq 1) {
+        $self->do_log("ERROR: require_nxdomain and require_noerror can't both be enabled for the same target");
+        return;
+    }
 
     my $sock = 0;
     
@@ -97,6 +104,7 @@ sub pingone ($) {
 
     my $elapsed;
     for ( my $run = 0 ; $run < $self->pings($target) ; $run++ ) {
+	my $expectMatched = 0;
     	if (defined $elapsed) {
 		my $timeleft = $mininterval - $elapsed;
 		sleep $timeleft if $timeleft > 0;
@@ -115,6 +123,18 @@ sub pingone ($) {
 	    my ($recvPacket, $err) = Net::DNS::Packet->new(\$buf);
 	    if (defined $recvPacket) {
 		my $recvHeader = $recvPacket->header();
+		next if $require_nxdomain && $recvHeader->rcode ne "NXDOMAIN";
+		if ($expect_text ne "" && $recvHeader->ancount > 0) {
+		    #Test the answer RR(s) for the expected response string
+		    foreach ($recvPacket->answer()) {
+			#$self->do_debug("Checking for $expect_text in " . $_->string);
+			if (index($_->string, $expect_text) != -1) {
+			    $expectMatched = 1;
+			    last;
+			}
+		    }
+		}
+		next if $expect_text ne "" && $expectMatched eq 0;
                 next if $recvHeader->id != $query->header->id;
                 next if $authoritative && !$recvHeader->aa;
 		next if $recvHeader->ancount() < $target->{vars}{require_answers};
@@ -178,6 +198,26 @@ DOC
 			_doc => 'Timeout for a single request in seconds.',
 			_default => 5,
 			_re => '\d+',
+		},
+		expect_text => {
+			_doc => <<DOC,
+A string that should be present in the DNS answer. This can be used 
+to verify that an A record contains the expected IP address, a PTR 
+record reflects the expected hostname, etc. If the query returns 
+multiple records, any single match will pass the test.
+DOC
+			_example => '192.168.50.60',
+		},
+		require_nxdomain => {
+			_doc => <<DOC,
+Set to 1 if NXDOMAIN should be interpreted as success instead of 
+failure. This reverses the normal behavior of the probe. Example uses 
+include testing a DNS firewall, verifying that a mail server IP is 
+not listed on a DNSBL, or other scenarios where NXDOMAIN is desired.
+DOC
+			_default => 0,
+			_example => 0,
+			_re => '[01]',
 		},
 		port => {
 			_doc => 'The UDP Port to use.',
