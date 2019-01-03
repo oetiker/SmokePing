@@ -24,11 +24,11 @@ and greatest version, compile your own: L<http://oss.oetiker.ch/rrdtool/>
 
 Ubuntu:
 
- sudo apt install rrdtool librrds-perl
+ sudo apt install rrdtool librrds-perl libssl-dev
 
 RedHat:
 
- sudo yum install rrdtool perl-rrdtool
+ sudo yum install rrdtool perl-rrdtool openssl-devel
 
 =item FPing (optional)
 
