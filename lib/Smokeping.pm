@@ -2828,7 +2828,7 @@ hitting your network all at the same time. Using the offset parameter you
 can change the point in time when the probes are run. Offset is specified
 in % of total interval, or alternatively as 'random'. I recommend to use
 'random'. Note that this does NOT influence the rrds itself, it is just a
-matter of when data acqusition is initiated.  The default offset is 'random'.
+matter of when data acquisition is initiated.  The default offset is 'random'.
 DOC
          },
          concurrentprobes => {
