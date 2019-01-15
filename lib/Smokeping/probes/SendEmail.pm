@@ -43,7 +43,7 @@ sub pod_hash {
 Smokeping::probes::SendEmail - a Smokeping probe that measure time neeed to send an mail
 DOC
 		description => <<DOC,
-This probe actually send a mail to a MX server and measure time it took. You can choose the sender and recipient adress as well as the size of the mail.
+This probe actually send a mail to a MX server and measure time it took. You can choose the sender and recipient address as well as the size of the mail.
 DOC
 		authors => <<'DOC',
  Florian Coulmier <florian@coulmier.fr>,
