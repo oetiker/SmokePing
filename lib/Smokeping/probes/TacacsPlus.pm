@@ -178,7 +178,7 @@ sub pingone {
 		    push @times, $elapsed;
 		    $r->close();
 		  }else{
-	            $self->do_log("Unable to Autenticate to:$host with ID:$username Key:$secret");
+	            $self->do_log("Unable to Authenticate to:$host with ID:$username Key:$secret");
 		    $result = "Unable to Authenticate Msg: " . Authen::TacacsPlus::errmsg();
 		    $self->do_debug("$result");
 		  }
