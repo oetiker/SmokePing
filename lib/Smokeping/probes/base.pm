@@ -313,7 +313,7 @@ offset parameter you can change the point in time when each probe will
 be run. Offset is specified in % of total interval, or alternatively as
 'random', and the offset from the 'General' section is used if nothing
 is specified here. Note that this does NOT influence the rrds itself,
-it is just a matter of when data acqusition is initiated.
+it is just a matter of when data acquisition is initiated.
 (This variable is only applicable if the variable 'concurrentprobes' is set
 in the 'General' section.)
 DOC
