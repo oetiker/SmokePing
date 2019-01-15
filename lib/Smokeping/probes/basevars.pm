@@ -46,7 +46,7 @@ ${e}item tree
 
 The unique index that `probe::base' uses for targets.
 
-There's also the method 'vars' that returns the abovementioned
+There's also the method 'vars' that returns the above mentioned
 hash corresponding to the 'tree' index parameter.
 
 ${e}back
