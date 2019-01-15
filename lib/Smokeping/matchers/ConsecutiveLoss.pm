@@ -123,11 +123,11 @@ sub Test($$) {
     # Determine number of iterations for the for-loop. if we at all have enough values yet.
     if ( $data->{prevmatch} ) {
         # Alert state true
-        if (scalar @{ $data->{loss} } < $self->{param}{stepsclear})  { return $data->{prevmatch}; } # Cannot consider $stepclear values unless so many values actuelly exist in array
+        if (scalar @{ $data->{loss} } < $self->{param}{stepsclear})  { return $data->{prevmatch}; } # Cannot consider $stepclear values unless so many values actually exist in array
         $x = $self->{param}{stepsclear};
     } else {
         # Alert state false
-        if (scalar @{ $data->{loss} } < $self->{param}{stepsraise})  { return $data->{prevmatch}; } # Cannot consider $stepraise values unless so many values actuelly exist in array
+        if (scalar @{ $data->{loss} } < $self->{param}{stepsraise})  { return $data->{prevmatch}; } # Cannot consider $stepraise values unless so many values actually exist in array
         $x = $self->{param}{stepsraise};
     }
 
