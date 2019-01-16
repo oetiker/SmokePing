@@ -274,7 +274,7 @@ sub sendmail ($$$){
         print M $body;
         close M;
     } else {
-        warn "ERROR: not sending mail to $to, as all methodes failed\n";
+        warn "ERROR: not sending mail to $to, as all methods failed\n";
     }
 }
 
