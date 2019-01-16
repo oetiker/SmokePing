@@ -2042,7 +2042,7 @@ sub update_rrds($$$$$$) {
         if (ref $tree->{$prop} eq 'HASH'){
             update_rrds $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe, $sortercache;
         } 
-            # if we are looking down a branche where no probe property is set there is no sense
+            # if we are looking down a branch where no probe property is set there is no sense
         # in further exploring it
         next unless defined $probe;
         next if defined $justthisprobe and $probe ne $justthisprobe;
