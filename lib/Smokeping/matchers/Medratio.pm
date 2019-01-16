@@ -10,7 +10,7 @@ The Medratio matcher establishes a historic median latency over
 several measurement rounds. It compares this median, against a second
 median latency value again build over several rounds of measurement.
 
-By looking at the median value this matcher is largly immune against spikes
+By looking at the median value this matcher is largely immune against spikes
 and will only react to long term developments.
 
 =head1 DESCRIPTION
