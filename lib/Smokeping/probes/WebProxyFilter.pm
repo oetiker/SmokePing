@@ -35,7 +35,7 @@ each one of them and registers a 'loss' when it suceeeds.
 If you want to test availability of a website, use the EchoPingHttp probe.
 DOC
 		description => <<DOC,
-The probe uses the LWP::UserAgent module to retreive a series of wepages. It
+The probe uses the LWP::UserAgent module to retrieve a series of wepages. It
 expects to get the firewalls 'site-prohibited' page. Any other response (or
 a real loss) gets logged as a loss and can be used to trigger an alarm.
 
@@ -131,7 +131,7 @@ sub probevars {
 		},
 		maxsize => {
 			_default => 2000,
-			_doc => "How much of the webpage should be retreived."
+			_doc => "How much of the webpage should be retrieved."
 		},			
 			
 	});	
@@ -156,7 +156,7 @@ A comma separated list of banned websites to test in addition to the one
 specified in the I<host> variable. The websites will be tested one after the
 other in one round, this means that while normal probes do run the same test
 serveral times in a row, this one will alter the webpage with each round.
-The reason for this is, that eventhough we try to retreive remote webpages,
+The reason for this is, that eventhough we try to retrieve remote webpages,
 the answer will come from the firewall everytime, so we kill two birds in
 one go. First we test the firewalls latency and second we make sure its
 filter works properly.
