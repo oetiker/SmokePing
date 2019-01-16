@@ -2260,7 +2260,7 @@ are required to regularly contact the SmokePing server to confirm their IP addre
 B<--email> it will add a secret password to each of the B<DYNAMIC>
 host lines and send a script to the owner of each host. This script
 must be started periodically (cron) on the host in question to let smokeping know
-where the host is curently located. If the target machine supports
+where the host is currently located. If the target machine supports
 SNMP SmokePing will also query the hosts
 sysContact, sysName and sysLocation properties to make sure it is
 still the same host.
@@ -3046,7 +3046,7 @@ DOC
                _mandatory => [ qw(menu title sorter) ],
                menu => { _doc => 'Menu entry' },
                title => { _doc => 'Page title' },
-               format => { _doc => 'sprintf format string to format curent value' },
+               format => { _doc => 'sprintf format string to format current value' },
                sorter => { _re => '\S+\(\S+\)',
                            _re_error => 'use a sorter call here: Sorter(arg1=>val1,arg2=>val2)',
                            _doc => 'sorter for this charts sections',
