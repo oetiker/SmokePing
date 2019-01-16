@@ -2682,7 +2682,7 @@ DOC
          {
           _doc => <<DOC,
 If you have a SNPP (Simple Network Pager Protocol) server at hand, you can have alerts
-sent there too. Use the syntax B<snpp:someaddress> to use a snpp address in any place where you can use a mail address otherwhise.
+sent there too. Use the syntax B<snpp:someaddress> to use a snpp address in any place where you can use a mail address otherwise.
 DOC
           _sub => sub { require Net::SNPP ||return "ERROR: loading Net::SNPP"; return undef; }
          },
