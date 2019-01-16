@@ -3950,7 +3950,7 @@ Its location must be hardcoded in the smokeping script and smokeping.cgi.
 The contents of this manual is generated directly from the configuration
 file parser.
 
-The Parser for the Configuration file is written using David Schweikers
+The Parser for the Configuration file is written using David Schweikert
 Config::Grammar module. Read all about it in L<Config::Grammar>.
 
 The Configuration file has a tree-like structure with section headings at
