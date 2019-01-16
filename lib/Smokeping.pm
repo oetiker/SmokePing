@@ -45,7 +45,7 @@ if (setlocale(LC_NUMERIC,"") ne "C") {
         # setup of the operating system or multilanguage locale setup.  Hint,
         # setting LANG is better than setting LC_ALL...
         die("Resetting LC_NUMERIC failed probably because your international "
-          . "setup of the LC_ALL to \"". $ENV{'LC_ALL'} . "\" is overridding "
+          . "setup of the LC_ALL to \"". $ENV{'LC_ALL'} . "\" is overriding "
           . "LC_NUMERIC.  Setting LC_ALL is not compatible with smokeping...");
     }
     else {
