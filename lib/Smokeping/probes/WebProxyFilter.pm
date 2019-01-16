@@ -85,7 +85,7 @@ sub pingone {
 	my $pingcount = $self->pings($target);
 	my $deny_re = $vars->{deny_re};
 	if ($targcount > $self->pings($target)) {
-		$self->do_log("ERROR There are more host addresses ($targcount) than ping slots ($pingcount), either increasse the pings or reduce the targets.\n");
+		$self->do_log("ERROR There are more host addresses ($targcount) than ping slots ($pingcount), either increase the pings or reduce the targets.\n");
 		return;
 	}
 	
