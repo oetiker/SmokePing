@@ -18,7 +18,7 @@ Call the sorter in the charts section of the config file
 
  ++ loss
   sorter = Loss(entries=>10)
-  title = The Loosers
+  title = The Losers
   menu = Loss
   format = Packets Lost %f
 
