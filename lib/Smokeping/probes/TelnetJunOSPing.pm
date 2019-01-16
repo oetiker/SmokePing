@@ -133,7 +133,7 @@ sub pingone ($$){
     my $bytes = $self->{properties}{packetsize};
     my $pings = $self->pings($target);
 
-    # do NOT call superclass ... the ping method MUST be overwriten
+    # do NOT call superclass ... the ping method MUST be overridden
     my %upd;
     my @args = ();
 

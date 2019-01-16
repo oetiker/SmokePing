@@ -87,7 +87,7 @@ sub pingone ($$){
     my $pings = $self->pings($target);
     my $unpriv = $target->{vars}{unpriv} || 0;
 
-    # do NOT call superclass ... the ping method MUST be overwriten
+    # do NOT call superclass ... the ping method MUST be overridden
     my %upd;
     my @args = ();
 

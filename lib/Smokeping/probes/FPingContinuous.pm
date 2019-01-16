@@ -295,7 +295,7 @@ sub run_fping {
 
 sub ping ($){
     my $self = shift;
-    # do NOT call superclass ... the ping method MUST be overwriten
+    # do NOT call superclass ... the ping method MUST be overridden
 
     # pinging nothing is pointless
     return unless @{$self->addresses};

@@ -96,7 +96,7 @@ sub pingone ($$){
     my $tos = $self->{properties}{tos};
     my $pings = $self->pings($target);
 
-    # do NOT call superclass ... the ping method MUST be overwriten
+    # do NOT call superclass ... the ping method MUST be overridden
     my %upd;
     my @args = ();
 

@@ -142,7 +142,7 @@ sub pingone ($$){
     if ( defined ($target->{vars}{vrf}) ) {
     	$vrf = " vrf $target->{vars}{vrf}";
     }	
-    # do NOT call superclass ... the ping method MUST be overwriten
+    # do NOT call superclass ... the ping method MUST be overridden
     my %upd;
     my @args = ();
 

@@ -128,7 +128,7 @@ sub targetvars {
 sub pingone ($){
     my $self = shift;
     my $target = shift;
-    # do NOT call superclass ... the ping method MUST be overwriten
+    # do NOT call superclass ... the ping method MUST be overridden
     my $inh = gensym;
     my $outh = gensym;
     my $errh = gensym;
