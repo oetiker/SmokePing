@@ -3310,7 +3310,7 @@ DOC
            hierarchies => {
               _doc => <<DOC,
 Provide an alternative presentation hierarchy for your smokeping data. After setting up a hierarchy in this
-section. You can use it in each tagets parent property. A drop-down menu in the smokeping website lets
+section. You can use it in each target's parent property. A drop-down menu in the smokeping website lets
 the user switch presentation hierarchy.
 DOC
               _sections => [ "/$KEYD_RE/" ],
