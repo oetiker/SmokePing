@@ -3567,7 +3567,7 @@ END_DOC
                  return undef;
               },
               _doc => <<END_DOC,
-The slave secrets file contines one line per slave with the name of the slave followed by a colon
+The slave secrets file contains one line per slave with the name of the slave followed by a colon
 and the secret:
 
  slave1:secret1
