@@ -40,7 +40,7 @@ use Net::SMTP;
 sub pod_hash {
 	return {
 		name => <<DOC,
-Smokeping::probes::SendEmail - a Smokeping probe that measure time neeed to send an mail
+Smokeping::probes::SendEmail - a Smokeping probe that measure time needed to send an mail
 DOC
 		description => <<DOC,
 This probe actually send a mail to a MX server and measure time it took. You can choose the sender and recipient address as well as the size of the mail.
