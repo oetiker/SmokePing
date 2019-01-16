@@ -3974,7 +3974,7 @@ space will be inserted between the concatenated lines.
 
 '${a}include filename' is used to include another file.
 
-'${a}define a some value' will replace all occurences of 'a' in the following text
+'${a}define a some value' will replace all occurrences of 'a' in the following text
 with 'some value'.
 
 Fields in tables that contain white space can be enclosed in either C<'> or C<">.
