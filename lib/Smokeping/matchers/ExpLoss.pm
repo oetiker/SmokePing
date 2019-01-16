@@ -20,7 +20,7 @@ Call the matcher with the following sequence:
 
 Arguments:
  hist    - number of samples to weight against; weight will be disposed with
-           exponetial decreasing manner from newest to oldest, so that the
+           exponential decreasing manner from newest to oldest, so that the
            oldest sample would have 1% significance;
  rising  - rising threshold for packet loss, 0-100%
  falling - falling threshold for packet loss, default is <rising>
