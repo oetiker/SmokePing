@@ -94,7 +94,7 @@ sub Test($$) {
     my $self   = shift;
     my $data   = shift;               # @{$data->{rtt}} and @{$data->{loss}}
 
-    my $hist = $self->{param}{hist}; # history lengh
+    my $hist = $self->{param}{hist}; # history length
     my $skip = ($self->{param}{skip} || 0); # skip <skip> samples before start
     my $fast = ($self->{param}{fast} || 0); # use last <fast> samples for fast alerts
 
