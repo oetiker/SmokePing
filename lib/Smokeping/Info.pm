@@ -143,7 +143,7 @@ functionality containd in here.
 =head2 new(path)
 
 Create a new Smokeping::Info instance. Instantiating Smokeping::Info entails
-reading the configuration file. This is a compte heavy procedure. So you may
+reading the configuration file. This is a compute heavy procedure. So you may
 want to use a single info object to handle multiple requests.
 
 =head2 fetch_nodes(pattern=>'/...',mode=>{recursive|regexp})
