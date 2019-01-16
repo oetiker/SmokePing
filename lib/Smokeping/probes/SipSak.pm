@@ -134,7 +134,7 @@ sub targetvars {
             _example => '--numeric --password=mysecret'
         },
         keep_second => {
-            _doc => "If OPTIONS is actually implemented by the server, SipSak will receive two responses. If this option is set, the timeing from the second, final response will be counter",
+            _doc => "If OPTIONS is actually implemented by the server, SipSak will receive two responses. If this option is set, the timing from the second, final response will be counter",
             _example => 'yes',
             _re => 'yes|no'
         },
