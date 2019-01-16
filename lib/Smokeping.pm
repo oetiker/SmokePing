@@ -3615,7 +3615,7 @@ END_DOC
                   _doc => <<END_DOC,
 If part of the configuration information must be overwritten to match the
 settings of the you can specify this in this section. A setting is
-overwritten by giveing the full path of the configuration variable. If you
+overwritten by giving the full path of the configuration variable. If you
 have this configuration in the Probes section:
 
  *** Probes ***
