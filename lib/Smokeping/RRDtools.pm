@@ -209,7 +209,7 @@ sub tuneds {
 	       next unless $ds[1] eq $ds2[1] and $ds[2] eq $ds[2];
 	       if ($ds[3] ne $ds2[3]){
 	       		warn "## Updating $file DS:$ds[1] heartbeat $ds2[3] -> $ds[3]\n";
-	  	        RRDs::tune $file,"--hearbeat","$ds[1]:$ds[3]" unless $ds[3] eq $ds2[3];
+	  	        RRDs::tune $file,"--heartbeat","$ds[1]:$ds[3]" unless $ds[3] eq $ds2[3];
 	       }
 	       if ($ds[4] ne $ds2[4]){
 	       		warn "## Updating $file DS:$ds[1] minimum $ds2[4] -> $ds[4]\n";
