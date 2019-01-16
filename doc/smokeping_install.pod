@@ -125,7 +125,7 @@ F<smokeping.cgi> script.
 
 =item F<etc/basepage.html>
 
-Edit the html template to your likings. Please do not remove the link to the
+Edit the html template to your liking. Please do not remove the link to the
 SmokePing counter and my name from the template.  The content of the
 template will be renderd by smokeping.cgi.  This means that all embedded
 links must be relative to smokeping.cgi.
