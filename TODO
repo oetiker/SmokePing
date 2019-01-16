@@ -19,7 +19,7 @@
     -> generic uptime plugin?
 
 * ATTENTION
-  allow to define a thereshold rule by looking at
+  allow to define a threshold rule by looking at
   two average medians and take action when threshold triped
 
 * ALIASES
