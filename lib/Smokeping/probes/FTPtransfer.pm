@@ -35,7 +35,7 @@ DOC
 The probe uses the Net::FTP perl client to run performance tests using an
 FTP server as a target. This probe is B<intrusive> as it transfers real
 data. By using real data we get a fair shot at figuring out what a link is
-capable of when it comes to transfering actual files.
+capable of when it comes to transferring actual files.
 
 The password can be specified either (in order of precedence, with
 the latter overriding the former) in the probe-specific variable
