@@ -129,7 +129,7 @@ Smokeping::Info - Pull numerical info out of the rrd databases
 
 This module provides methods to further process information contained in
 smokeping rrd files. The smokeinfo tool is a simple wrapper around the
-functionality containd in here.
+functionality contained in here.
 
  my $si = Smokeping::Info->new("config/file/path");
 
