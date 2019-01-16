@@ -110,7 +110,7 @@ Figure out the current sorting value using te following input.
            pings  => [qw(a b c d)] }
 
 The output can have any structure you want. It will be returned to the
-sorter method for further processng.
+sorter method for further processing.
 
 =cut
 
