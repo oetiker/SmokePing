@@ -68,7 +68,7 @@ use File::Basename;
 use Smokeping::Examples;
 use Smokeping::RRDtools;
 
-# globale persistent variables for speedy
+# global persistent variables for speedy
 use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
 
 $VERSION="2.006000";
