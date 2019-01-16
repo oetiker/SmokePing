@@ -18,7 +18,7 @@ Smokeping::Slave - Slave functionality for Smokeping
 
 =head1 OVERVIEW
 
-The Module inmplements the functionality required to run in slave mode.
+The Module implements the functionality required to run in slave mode.
 
 =head2 IMPLEMENTATION
 
