@@ -37,7 +37,7 @@ ${e}head2 JunOS configuration
 The JunOS device should have a username/password configured, as well as
 the ability to connect to the VTY(s).
 
-Make sure to connect to the remote host once from the commmand line as the
+Make sure to connect to the remote host once from the command line as the
 user who is running smokeping. On the first connect ssh will ask to add the
 new host to its known_hosts file. This will not happen automatically so the
 script will fail to login until the ssh key of your juniper box is in the
