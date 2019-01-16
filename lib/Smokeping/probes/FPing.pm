@@ -196,7 +196,7 @@ sub probevars {
 		blazemode => {
 			_re => '(true|false)',
 			_example => 'true',
-			_doc => "Send an extra ping and then discard the first answer since the first is bound to be an outliner.",
+			_doc => "Send an extra ping and then discard the first answer since the first is bound to be an outlier.",
 
 		},
 		protocol => {
