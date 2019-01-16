@@ -62,7 +62,7 @@ Copyright (c) 2006 by OETIKER+PARTNER AG. All rights reserved.
 
 =head1 SPONSORSHIP
 
-The development of this matcher has been paied for by Virtela
+The development of this matcher has been paid for by Virtela
 Communications, L<http://www.virtela.net/>.
 
 =head1 LICENSE
