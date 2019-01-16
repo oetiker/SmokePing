@@ -103,7 +103,7 @@ sub pingone ($$) {
     my $tos   = $target->{vars}{tos};
     my $bytes = $target->{vars}{packetsize}; 
 
-    # use the proces ID as as row number to make this poll distinct on the router; 
+    # use the process ID as as row number to make this poll distinct on the router; 
     my $row=$$;
 
     if (defined 
