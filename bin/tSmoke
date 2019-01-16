@@ -282,7 +282,7 @@ sub Summary_Sheet() {
   $Body .= "<td class ='appHeader' colspan='5'>Compiled: ". scalar(localtime) . "</td></tr>\n";
   $Body .= "<tr>\n";
   $Body .= "<td class = 'subhead' width='20%'>Service</td>
-            <td class = 'subhead' witdh='20%'>Past Quarter</td>
+            <td class = 'subhead' width='20%'>Past Quarter</td>
             <td class = 'subhead' width='20%'>Past Month</td>
             <td class = 'subhead' width='20%'>Past Week</td>
             <td class = 'subhead' width='20%'>Past Day</td></tr>\n";
