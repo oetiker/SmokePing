@@ -146,7 +146,7 @@ it is doing
 
  ./bin/smokeping --config=/opt/smokeping/etc/config --debug
 
-once all is well, start it up as a daemon. I would recomend you enable the
+once all is well, start it up as a daemon. I would recommend you enable the
 logfile option so that you can see if it runs into trouble.
 
  ./bin/smokeping --config=/opt/smokeping/etc/config --logfile=smoke.log
