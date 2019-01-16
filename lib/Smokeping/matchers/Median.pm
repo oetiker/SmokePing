@@ -2,7 +2,7 @@ package Smokeping::matchers::Median;
 
 =head1 NAME
 
-Smokeping::matchers::Median - Find persistant changes in latency
+Smokeping::matchers::Median - Find persistent changes in latency
 
 =head1 OVERVIEW
 
