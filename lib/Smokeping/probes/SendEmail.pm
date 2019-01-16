@@ -81,16 +81,16 @@ sub probevars {
 		},
 		to => {
 			_doc => "Rcpt to address",
-			_exemple => 'test@test.com',
+			_example => 'test@test.com',
 		},
 		subject => {
 			_doc => "Subject of the mail",
-			_exemple => "Test Smokeping",
+			_example => "Test Smokeping",
 			_default => "Test",
 		},
 		bodysize => {
 			_doc => "Size of the mail to send in bytes. If set to 0, a default mail content will be set. Note that mail always contain From, To and Subject headers.",
-			_exemple => "1024",
+			_example => "1024",
 			_default => "0",
 		}
 	});
@@ -101,7 +101,7 @@ sub targetvars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::targetvars, {
 		port => { _doc => "Port of the SMTP server to reach",
-				_exemple => 25,
+				_example => 25,
 				_default => 25,
 		},
 	});
