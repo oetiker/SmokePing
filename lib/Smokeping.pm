@@ -3221,7 +3221,7 @@ DOC
                           0 => 
                           {
                            _doc => <<DOC,
-Activate when the number of losst pings is larger or equal to this number
+Activate when the number of lost pings is larger or equal to this number
 DOC
                            _re       => '\d+.?\d*',
                            _re_error =>
