@@ -50,7 +50,7 @@ DOC
 Tobias Oetiker <tobi@oetiker.ch> sponsored by Virtela
 DOC
 		bugs => <<DOC,
-This probe is somewhat unortodox, since it regards the sucessful retrieval
+This probe is somewhat unortodox, since it regards the successful retrieval
 of a banned webpage as a loss.
 DOC
 	}
