@@ -98,7 +98,7 @@ sub pingone ($$){
     my $self = shift;
     my $target = shift;
     my $bytes = $self->{properties}{packetsize};
-    # do NOT call superclass ... the ping method MUST be overwriten
+    # do NOT call superclass ... the ping method MUST be overridden
     my %upd;
     my $inh = gensym;
     my $outh = gensym;

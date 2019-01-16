@@ -151,7 +151,7 @@ DOC
 			_re => '\d+',
 			_example => 27970,
 			_doc => <<DOC,
-The game server port to check. It can also be overriden by adding :port to the host parameter in the Target config.
+The game server port to check. It can also be overridden by adding :port to the host parameter in the Target config.
 DOC
 		},
 		timeout => {
