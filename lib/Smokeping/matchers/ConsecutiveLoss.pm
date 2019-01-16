@@ -102,7 +102,7 @@ sub new(@) {
 # how many values should we require before raising?
 sub Length($) {
     my $self = shift;
-    return max($self->{param}{stepsraise},$self->{param}{stepsclear});    # Minimum numnber of samples required is the greater of stepsraise/stepsclear
+    return max($self->{param}{stepsraise},$self->{param}{stepsclear});    # Minimum number of samples required is the greater of stepsraise/stepsclear
 }
 
 sub Desc ($) {
