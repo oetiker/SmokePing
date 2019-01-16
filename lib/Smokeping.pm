@@ -2345,7 +2345,7 @@ DOC
            },
            parents => {
                         _re => "${KEYD_RE}:/(?:${KEYD_RE}(?:/${KEYD_RE})*)?(?: ${KEYD_RE}:/(?:${KEYD_RE}(?:/${KEYD_RE})*)?)*",
-                        _re_error => "Use hierarcy:/parent/path syntax",
+                        _re_error => "Use hierarchy:/parent/path syntax",
                         _doc => <<DOC
 After setting up a hierarchy in the Presentation section of the
 configuration file you can use this property to assign an entry to alternate
