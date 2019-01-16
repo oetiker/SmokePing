@@ -30,7 +30,7 @@ DOC
 		overview => <<DOC,
 This probe tests if your filtering webproxy is working properly. Drawing from
 a list of forbidden websites, it tries to establish a connection to
-each one of them and registers a 'loss' when it suceeeds.
+each one of them and registers a 'loss' when it succeeds.
 
 If you want to test availability of a website, use the EchoPingHttp probe.
 DOC
