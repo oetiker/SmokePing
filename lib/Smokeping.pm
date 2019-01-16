@@ -3315,7 +3315,7 @@ the user switch presentation hierarchy.
 DOC
               _sections => [ "/$KEYD_RE/" ],
               "/$KEYD_RE/" => {
-                  _doc => "Identifier of the hierarchie. Use this as prefix in the targets parent property",
+                  _doc => "Identifier of the hierarchies. Use this as prefix in the targets parent property",
                   _vars => [ qw(title) ],
                   _mandatory => [ qw(title) ],
                   title => {
