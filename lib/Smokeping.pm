@@ -2720,7 +2720,7 @@ DOC
         {
          %$DIRCHECK_SUB,
          _doc => <<DOC,
-The directory where SmokePing keeps its pid when daemonised.
+The directory where SmokePing keeps its pid when daemonized.
 DOC
          },
          sendmail => 
