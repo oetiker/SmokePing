@@ -37,7 +37,7 @@ ${e}head2 EOS configuration
 The EOS device should have a username/password configured, and
 the ssh server must not be disabled.
 
-Make sure to connect to the remote host once from the commmand line as the
+Make sure to connect to the remote host once from the command line as the
 user who is running smokeping. On the first connect ssh will ask to add the
 new host to its known_hosts file. This will not happen automatically so the
 script will fail to login until the ssh key of your EOS box is in the
