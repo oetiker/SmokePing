@@ -35,7 +35,7 @@ each one of them and registers a 'loss' when it succeeds.
 If you want to test availability of a website, use the EchoPingHttp probe.
 DOC
 		description => <<DOC,
-The probe uses the LWP::UserAgent module to retrieve a series of wepages. It
+The probe uses the LWP::UserAgent module to retrieve a series of webpages. It
 expects to get the firewalls 'site-prohibited' page. Any other response (or
 a real loss) gets logged as a loss and can be used to trigger an alarm.
 
