@@ -101,7 +101,7 @@ sub SortTree($$) {
 
 =head2 CalcValues
 
-Figure out the curent sorting value using te following input.
+Figure out the current sorting value using te following input.
 
  $info = { uptime => w,
   	   loss   => x,
