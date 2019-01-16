@@ -35,7 +35,7 @@ $ENV{'LC_NUMERIC'}='C';
 if (setlocale(LC_NUMERIC,"") ne "C") {
     if ($ENV{'LC_ALL'} eq 'C') {
         # This has got to be a bug in perl/mod_perl, apache or libc
-        die("Your internalization implementation on your operating system is "
+        die("Your internationalization implementation on your operating system is "
           . "not responding to your setup of LC_ALL to \"C\" as LC_NUMERIC is "
           . "coming up as \"" . setlocale(LC_NUMERIC, "") . "\" leaving "
           . "smokeping unable to compare numbers...");
@@ -54,7 +54,7 @@ if (setlocale(LC_NUMERIC,"") ne "C") {
         # affected by it.  The worst is when "setlocale" is reading the
         # environment variables of your webserver and not reading the PERL
         # %ENV array like it should.
-        die("Something is wrong with the internalization setup of your "
+        die("Something is wrong with the internationalization setup of your "
           . "operating system, webserver, or the perl plugin to your webserver "
           . "(like mod_perl) and smokeping can not compare numbers correctly.  "
           . "On unix, check your /etc/locale.gen and run sudo locale-gen, set "
