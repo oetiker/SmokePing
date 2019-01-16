@@ -81,7 +81,7 @@ sub Desc ($) {
 
 Returns an array of 'targets'. It is up to the sorter to decide how many
 entries the list should contain. If the list is empty, the whole entry will
-be supressed in the webfrontend. 
+be suppressed in the webfrontend. 
 
 The method gets access to all the targets in the system, together with the
 last data set acquired for each target.
