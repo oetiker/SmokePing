@@ -8,7 +8,7 @@ Smokeping::sorters::base - Base Class for implementing SmokePing Sorters
  
 Sorters are at the core of the SmokePing Charts feature, where the most
 interesting graphs are presented on a single page. The Sorter decides which
-graphs are considerd interesting.
+graphs are considered interesting.
 
 Every sorter must inherit from the base class and provide it's own
 methods for the 'business' logic.

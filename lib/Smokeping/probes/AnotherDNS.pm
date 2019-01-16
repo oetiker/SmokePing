@@ -32,7 +32,7 @@ Smokeping::probes::AnotherDNS - Alternate DNS Probe
 DOC
 		description => <<DOC,
 Like DNS, but uses Net::DNS and Time::HiRes instead of dig. This probe does
-*not* retry the request three times before it is considerd "lost", like dig and
+*not* retry the request three times before it is considered "lost", like dig and
 other resolver do by default. If operating as caching Nameserver, BIND (and
 maybe others) expect clients to retry the request if the answer is not in the
 cache. So, ask the nameserver for something that he is authoritative for if you
