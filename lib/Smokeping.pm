@@ -2214,7 +2214,7 @@ DOC
                      _doc => <<DOC,
 Set the hide property to 'yes' to hide this host from the navigation menu
 and from search results. Note that if you set the hide property on a non
-leaf entry all subordinate entries will also disapear in the menu structure.
+leaf entry all subordinate entries will also disappear in the menu structure.
 If you know a direct link to a page it is still accessible. Pages which are
 hidden from the menu due to a parent being hidden will still show up in
 search results and in alternate hierarchies where they are below a non
@@ -2229,7 +2229,7 @@ DOC
 Use this in a master/slave setup where the master must not poll a particular
 target. The master will now skip this entry in its polling cycle.
 Note that if you set the hide property on a non leaf entry
-all subordinate entries will also disapear in the menu structure. You can
+all subordinate entries will also disappear in the menu structure. You can
 still access them via direct link or via an alternate hierarchy.
 
 If you have no master/slave setup this will have a similar effect to the
