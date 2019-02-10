@@ -127,6 +127,8 @@ sub pingone ($){
 	    }
 	}
 	waitpid $pid,0;
+	my $rc = $?;
+	carp "$query returned with exit code $rc. run with debug enabled to get more information" unless $rc == 0;
 	close $errh;
 	close $inh;
 	close $outh;

@@ -320,7 +320,8 @@ sub pingone ($) {
 	    $self->do_debug("stderr: $line");
 	}
 	waitpid $pid,0;
-	$self->do_debug("Exitstatus: " . $?) if ($? && !$killed);
+	my $rc = $?;
+	carp join(" ",@cmd) . " returned with exit code $rc. run with debug enabled to get more information" unless ($rc == 0 || $killed);
 	close $f_stdin;
 	close $f_stdout;
 	close $f_stderr;

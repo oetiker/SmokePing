@@ -185,6 +185,8 @@ sub run_pinger {
 	if($fh->eof) {
 	  $self->do_log("fping process exited - restarting");
 	  waitpid $fping_pid,0;
+	  my $rc = $?;
+	  carp "fping process returned with exit code $rc. run with debug enabled to get more information" unless $rc == 0;
 	  close($fping_stdin);
 	  close($fping_stdout);
 	  close($fping_stderr);
@@ -240,6 +242,8 @@ sub run_pinger {
       } else {
 	$self->do_log("fping process exited - restarting");
 	waitpid $fping_pid,0;
+	my $rc = $?;
+	carp "fping process returned with exit code $rc. run with debug enabled to get more information" unless $rc == 0;
 	close($fping_stdin);
 	close($fping_stdout);
 	close($fping_stderr);
