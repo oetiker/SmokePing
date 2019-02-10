@@ -95,7 +95,7 @@ unison_tolerance = 2
 "Last 3 Hours"    3h
 "Last 30 Hours"   30h
 "Last 10 Days"    10d
-"Last 400 Days"   400d
+"Last 360 Days"   360d
 
 #+ hierarchies
 #++ owner
