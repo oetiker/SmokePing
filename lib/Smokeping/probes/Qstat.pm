@@ -118,6 +118,8 @@ sub pinghost($$) {
         $time = $1;
     }
     waitpid $pid,0;
+    my $rc = $?;
+    carp join(" ",@cmd) . " returned with exit code $rc. run with debug enabled to get more information" unless $rc == 0;
     close $inh;
     close $outh;
     close $errh;
