@@ -83,6 +83,10 @@ sub new($$$)
             $self->{pingfactor} = 1000; # Gives us a good-guess default
             warn "### assuming you are using an fping copy reporting in milliseconds\n";
         }
+
+        # fping only has -4 and -6 switches starting with 3.16 and the binary refuses
+        # to run if the switches are passed in to older versions.
+        $self->{enable}{proto} = (`$binary -v 2>&1` =~ /Version (3.1[6-9]|[4-9])/);
     };
 
     return $self;
@@ -119,7 +123,7 @@ sub ping ($){
     # pinging nothing is pointless
     return unless @{$self->addresses};
     my @params = () ;
-    push @params, "-$self->{properties}{protocol}";
+    push @params, "-$self->{properties}{protocol}" if $self->{enable}{proto};
     push @params, "-b$self->{properties}{packetsize}" if $self->{properties}{packetsize};
     push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     push @params, "-i" . int(1000 * $self->{properties}{mininterval});
