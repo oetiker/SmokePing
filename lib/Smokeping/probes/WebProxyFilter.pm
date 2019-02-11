@@ -156,8 +156,8 @@ A comma separated list of banned websites to test in addition to the one
 specified in the I<host> variable. The websites will be tested one after the
 other in one round, this means that while normal probes do run the same test
 several times in a row, this one will alter the webpage with each round.
-The reason for this is, that eventhough we try to retrieve remote webpages,
-the answer will come from the firewall everytime, so we kill two birds in
+The reason for this is, that even though we try to retrieve remote webpages,
+the answer will come from the firewall every time, so we kill two birds in
 one go. First we test the firewalls latency and second we make sure its
 filter works properly.
 DOC
