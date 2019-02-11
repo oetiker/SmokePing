@@ -3383,8 +3383,8 @@ in one element
 
 Sometimes it may be that conditions occur at irregular intervals. But still
 you only want to throw an alert if they occur several times within a certain
-amount of times. The operator B<*X*> will ignore up to I<X> values and still
-let the pattern match:
+time period. The operator B<*X*> will ignore up to I<X> values and still let
+the pattern match:
 
   >10%,*10*,>10%
 

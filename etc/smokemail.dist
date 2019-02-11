@@ -5,7 +5,7 @@ Subject: SmokePing Agent
 Hi,
   
 Please execute the attached Perl Script on your computer. It will register
-your IP with SmokePing. You have to rerun this script at least everytime
+your IP with SmokePing. You have to rerun this script at least every time
 your IP changes. You can run the script as often as you want.
 
 The script is written in Perl. If you don't have Perl available on your
