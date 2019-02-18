@@ -3990,6 +3990,49 @@ POD
     $retval .= $parser->makepod;
     $retval .= <<POD;
 
+${e}head1 SEE ALSO
+
+L<smokeping(1)>,L<smokeping_master_slave(7)>,L<smokeping_cgi(1)>
+
+Matchers:
+
+L<Smokeping_matchers_Avgratio(3)>, L<Smokeping_matchers_CheckLatency(3)>,
+L<Smokeping_matchers_CheckLoss(3)>, L<Smokeping_matchers_ExpLoss(3)>,
+L<Smokeping_matchers_Median(3)>, L<Smokeping_matchers_Medratio(3)>,
+L<Smokeping_matchers_base(3)>
+
+Probes:
+
+L<Smokeping_probes_CiscoRTTMonDNS(3)>,
+L<Smokeping_probes_CiscoRTTMonEchoICMP(3)>,
+L<Smokeping_probes_CiscoRTTMonTcpConnect(3)>, L<Smokeping_probes_Curl(3)>,
+L<Smokeping_probes_DNS(3)>, L<Smokeping_probes_DismanPing(3)>,
+L<Smokeping_probes_EchoPing(3)>, L<Smokeping_probes_EchoPingChargen(3)>,
+L<Smokeping_probes_EchoPingDNS(3)>, L<Smokeping_probes_EchoPingDiscard(3)>,
+L<Smokeping_probes_EchoPingHttp(3)>, L<Smokeping_probes_EchoPingHttps(3)>,
+L<Smokeping_probes_EchoPingIcp(3)>, L<Smokeping_probes_EchoPingLDAP(3)>,
+L<Smokeping_probes_EchoPingPlugin(3)>, L<Smokeping_probes_EchoPingSmtp(3)>,
+L<Smokeping_probes_EchoPingWhois(3)>, L<Smokeping_probes_FPing(3)>,
+L<Smokeping_probes_FPing6(3)>, L<Smokeping_probes_FPingContinuous(3)>,
+L<Smokeping_probes_FTPtransfer(3)>, L<Smokeping_probes_IOSPing(3)>,
+L<Smokeping_probes_IRTT(3)>, L<Smokeping_probes_LDAP(3)>,
+L<Smokeping_probes_NFSping(3)>, L<Smokeping_probes_OpenSSHEOSPing(3)>,
+L<Smokeping_probes_OpenSSHJunOSPing(3)>, L<Smokeping_probes_Qstat(3)>,
+L<Smokeping_probes_Radius(3)>, L<Smokeping_probes_RemoteFPing(3)>,
+L<Smokeping_probes_SSH(3)>, L<Smokeping_probes_SendEmail(3)>,
+L<Smokeping_probes_SipSak(3)>, L<Smokeping_probes_TCPPing(3)>,
+L<Smokeping_probes_TacacsPlus(3)>, L<Smokeping_probes_TelnetIOSPing(3)>,
+L<Smokeping_probes_TelnetJunOSPing(3)>, L<Smokeping_probes_TraceroutePing(3)>,
+L<Smokeping_probes_WebProxyFilter(3)>, L<Smokeping_probes_base(3)>,
+L<Smokeping_probes_basefork(3)>, L<Smokeping_probes_basevars(3)>,
+L<Smokeping_probes_passwordchecker(3)>, L<Smokeping_probes_skel(3)>
+
+Sorters:
+
+L<Smokeping_sorters_Loss(3)>, L<Smokeping_sorters_Max(3)>,
+L<Smokeping_sorters_Median(3)>, L<Smokeping_sorters_StdDev(3)>,
+L<Smokeping_sorters_base(3)>
+
 ${e}head1 COPYRIGHT
 
 Copyright (c) 2001-2007 by Tobias Oetiker. All right reserved.
@@ -4741,6 +4784,10 @@ figure heads allowing to hardcode some pathnames.
 
 If you feel like documenting what is happening within this library you are
 most welcome todo so.
+
+=head1 SEE ALSO
+
+L<smokeping_extend(7)>, L<smokeping(1)>, L<smokeping_config(5)>
 
 =head1 COPYRIGHT
 
