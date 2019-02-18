@@ -96,6 +96,10 @@ Show all nodes with '_wlan_' in the name
 
  smokeinfo --mode=regexp --filter=_wlan_ etc/config
 
+=head1 SEE ALSO
+
+L<smokeping(1)>
+
 =head1 COPYRIGHT
 
 Copyright (c) 2009 by OETIKER+PARTNER AG. All rights reserved.

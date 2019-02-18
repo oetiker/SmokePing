@@ -59,6 +59,11 @@ want to deal with.
 
 Adjust the paths in the script and you should be ready to go.
 
+=head1 SEE ALSO
+
+L<smokeping_config(5)>, L<smokeping(1)>, L<smokeping_install(7)>,
+L<smokeping_upgrade(7)>
+
 =head1 COPYRIGHT
 
 Copyright (c) 2011 by Tobias Oetiker. All right reserved.

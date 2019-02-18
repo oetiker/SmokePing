@@ -532,6 +532,10 @@ General section:
 
  tmail = /usr/local/smokeping/etc/tmail
 
+=head1 SEE ALSO
+
+L<smokeping(1)>, L<smokeping_config(5)>
+
 =head1 COPYRIGHT
 
 Copyright (c) 2003 by Dan McGinn-Combs. All right reserved.
