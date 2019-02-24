@@ -38,7 +38,7 @@ MODBASE = $(subst .pm,,$(subst ../lib/Smokeping/probes/,Smokeping_probes_,$(PODP
 	  $(subst .pm,,$(subst ../lib/Smokeping/matchers/,Smokeping_matchers_,$(PODMATCH))) \
 	  $(subst .pm,,$(subst ../lib/Smokeping/sorters/,Smokeping_sorters_,$(PODSORT)))
 
-PROGBASE = smokeping smokeping_cgi tSmoke
+PROGBASE = smokeping smokeping_cgi tSmoke smokeinfo
 
 DOCSCONFIGBASE = smokeping_config smokeping_examples
 
@@ -87,6 +87,9 @@ smokeping_cgi.1: ../bin/smokeping_cgi
 	$(AM_V_GEN)$(POD2MAN) --section 1 > $@
 
 tSmoke.1: ../bin/tSmoke
+	$(AM_V_GEN)$(POD2MAN) --section 1 > $@
+
+smokeinfo.1: ../bin/smokeinfo
 	$(AM_V_GEN)$(POD2MAN) --section 1 > $@
 
 smokeping_config.pod: ../lib/Smokeping.pm
