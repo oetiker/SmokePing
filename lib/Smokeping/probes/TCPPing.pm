@@ -28,8 +28,7 @@ DOC
               description => <<DOC,
 Integrates TCPPing as a probe into smokeping. The variable B<binary> must
 point to your copy of the TCPPing program. If it is not installed on
-your system yet, you can get it from http://www.vdberg.org/~richard/tcpping.
-You can also get it from http://www.darkskies.za.net/~norman/scripts/tcpping.
+your system yet, you can get it from https://github.com/deajan/tcpping.
 
 The (optional) port option lets you configure the port for the pings sent.
 The TCPPing manpage has the following to say on this topic:
