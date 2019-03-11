@@ -55,7 +55,7 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        my $call = "$self->{properties}{binary} -t dsa,rsa,rsa1 127.0.0.1";
+        my $call = "$self->{properties}{binary} -t dsa,rsa,ecdsa 127.0.0.1";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
             print "### parsing ssh-keyscan output...OK\n";
@@ -132,7 +132,7 @@ sub targetvars {
         return $class->_makevars($class->SUPER::targetvars, {
            keytype => {
                _doc => "Type of key, used in ssh-keyscan -t I<keytype>",
-	       _re => "[dr]sa1*",
+	       _re => "[ecdr]sa*",
                _example => 'dsa',
                _default => 'rsa',
            },
