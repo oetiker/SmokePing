@@ -26,12 +26,20 @@ var EndEpoch = 0;
 
 function changeRRDImage(coords,dimensions){
 
+    // disable reloading the RRD image while zoomed in
+    try {
+        window.stop();
+    } catch (exception) {
+        // fallback for IE
+        document.execCommand('Stop');
+    }
+    
     var SelectLeft = Math.min(coords.x1,coords.x2);
 
     var SelectRight = Math.max(coords.x1,coords.x2);
 
     if (SelectLeft == SelectRight)
-         return; // abort if nothing is selected.
+        return; // abort if nothing is selected.
 
     var RRDLeft  = 67;        // difference between left border of RRD image and content
     var RRDRight = 26;        // difference between right border of RRD image and content
