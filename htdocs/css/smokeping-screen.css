@@ -30,6 +30,7 @@ img {
 }
 
 .sidebar {
+	overflow: scroll;
 	background: #4c4c4c;
 	position: fixed;
 	top: 0;
