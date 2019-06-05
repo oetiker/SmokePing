@@ -84,6 +84,16 @@ function changeRRDImage(coords,dimensions){
 
 };
 
+if($('range_form') != null && $('range_form').length){
+    $('range_form').on('submit', (function() {
+    $form = $(this);
+        var cgiurl = $form.action.split("?");
+        var action = $form.serialize().split("&");
+        action = action.map(i=> i + ';');
+        $form.action = cgiurl[0] + "?" + action[4] + action[5] + action[6] + action[3];
+    }));
+}
+
 Event.observe( 
     window,
     'load',
