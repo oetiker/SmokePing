@@ -15,6 +15,32 @@ function urlObjGetUrlBase() {
    return this.urlBase;
 }
 
+function parseRelativeTime(currTime) {
+    var unit = '';
+    var offset = 0;
+    var sign = -1;
+    var table = {
+        s : 1,        // 1
+        m : 60,       // s * 60
+        h : 3600,     // m * 60
+        d : 86400,    // h * 24
+        w : 604800,    // d * 7
+        mo : 2592000, // d * 30
+        y : 31536000, // d * 365
+    };
+    var regexStr = currTime.match(/[+\-]|[^a-z]+|[a-zA-Z]+/gi);
+    if (regexStr[0] == '+')
+        sign = 1;
+    for (i=1; i< regexStr.length; i=i+2) {
+        unit = regexStr[i+1].slice(0,1);
+        if (regexStr[i+1].slice(0,2) == 'mo' || (regexStr[i+1] == 'm' && Math.abs(regexStr[i]) <= 5))
+            unit = 'mo';
+        offset += regexStr[i]*table[unit];
+
+    }
+    offset = offset*sign;
+    return Math.floor(Date.now()/1000) + offset;
+}
 
 // example with minimum dimensions
 var myCropper;
@@ -47,12 +73,16 @@ function changeRRDImage(coords,dimensions){
     var RRDImgUsable = RRDImgWidth - RRDRight - RRDLeft;  
     var form = $('range_form');   
     
-    if (StartEpoch == 0)
+    if (StartEpoch == 0) {
         StartEpoch = +$F('epoch_start');
-   
-    if (EndEpoch  == 0)
+        if (isNaN(StartEpoch))
+            StartEpoch = parseRelativeTime($F('epoch_start'));
+    }
+    if (EndEpoch  == 0) {
         EndEpoch = +$F('epoch_end');
-
+        if (isNaN(EndEpoch))
+            EndEpoch = parseRelativeTime($F('epoch_end'));
+    }
     var DivEpoch = EndEpoch - StartEpoch; 
 
     var Target = $F('target');
