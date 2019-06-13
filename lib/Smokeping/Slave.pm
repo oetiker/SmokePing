@@ -107,9 +107,16 @@ sub submit_results {
             warn "WARNING $slave_cfg->{master_url} sent data with wrong key";
             return undef;
         }
+        # Safe seems to reset SIG on at least FreeBSD, causing slave to crash after first reload
+        # since all handlers are gone.
+        my %sig_backup = %SIG;
+
         my $zone = new Safe;
         # $zone->permit_only(???); #input welcome as to good settings
         my $config = $zone->reval($data);
+
+        %SIG = %sig_backup;
+
         if ($@){
             warn "WARNING evaluating new config from server failed: $@ --\n$data";
         } elsif (defined $config and ref $config eq 'HASH'){
