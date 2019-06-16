@@ -30,7 +30,6 @@ img {
 }
 
 .sidebar {
-	overflow: scroll;
 	background: #4c4c4c;
 	position: fixed;
 	top: 0;
@@ -54,7 +53,7 @@ img {
 }
 
 .sidebar-menu {
-	overflow-x: hidden;
+	overflow-x: auto;
 	overflow-y: auto;
 	position: absolute;
 	top: 51px;
