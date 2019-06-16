@@ -61,6 +61,10 @@ img {
 	width: 249px;
 }
 
+.sidebar-menu img {
+	margin-left: 15px;
+}
+
 .sidebar .filter-label,
 .sidebar .hierarchy-label {
 	display: none;
