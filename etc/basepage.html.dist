@@ -14,13 +14,13 @@
         <div class="logo">
             <##smokelogo##>
         </div>
-        <div class="logo">
-            <##rrdlogo##>
-        </div>
     </div>
 
     <div class="sidebar-menu">
         <##menu##>
+        <div class="logo">
+            <##rrdlogo##>
+        </div>
     </div>
 </div>
 
