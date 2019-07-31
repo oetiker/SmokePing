@@ -1830,6 +1830,16 @@ sub save_sortercache($$$){
     rename "$dir/new$ext","$dir/data$ext.storable"
 }
 
+sub rfc2822timedate($) {
+    my $time = shift;
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
+    my @rfc2822_months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",
+        "Aug", "Sep", "Oct", "Nov", "Dec");
+    my @rfc2822_wdays = ("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat");
+    return sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", $rfc2822_wdays[$wday],
+        $mday, $rfc2822_months[$mon], $year + 1900, $hour, $min, $sec);
+}
+
 sub check_alerts {
     my $cfg = shift;
     my $tree = shift;
@@ -2002,18 +2012,15 @@ DOC
                               RTT   => $rtt,
                               COMMENT => $alert->{comment}
                                       },$default_mail) || "Subject: smokeping failed to open mailtemplate '$alert->{mailtemplate}'\n\nsee subject\n";
-                    my $oldLocale = POSIX::setlocale(LC_TIME);
-                    POSIX::setlocale(LC_TIME,"en_US");
-                    my $rfc2822stamp =  POSIX::strftime("%a, %e %b %Y %H:%M:%S %z", @stamp);
-                    POSIX::setlocale(LC_TIME,$oldLocale);
-                                my $to = join ",",@to;
-                                    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
+                    my $rfc2822stamp = rfc2822timedate($time);
+                    my $to = join ",",@to;
+                    sendmail $cfg->{Alerts}{from},$to, <<ALERT;
 To: $to
 From: $cfg->{Alerts}{from}
 Date: $rfc2822stamp
 $mail
 ALERT
-                            }
+                    }
             } else {
                         do_debuglog("Alert \"$_\": no match for target $name\n");
             }
