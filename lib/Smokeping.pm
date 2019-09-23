@@ -1889,7 +1889,7 @@ sub check_alerts {
                 $gotalert = $match unless $gotalert;
             my $edgetrigger = $alert->{edgetrigger} eq 'yes';
             my $what;
-            if ($edgetrigger and $prevmatch != $match) {
+            if ($edgetrigger and ($prevmatch ? 0 : 1 ) != ($match ? 0 : 1)) {
                 $what = ($prevmatch == 0 ? "was raised" : "was cleared");
             }
             if (not $edgetrigger and $match) {
