@@ -15,8 +15,8 @@ average drops under the "falling" threshold.
 Call the matcher with the following sequence:
 
  type = matcher
- pattern =  CheckLoss(hist => <hist>, rising=><rising> \
-                     [,falling => <falling>] [,skip=><stat>] [,fast=><fast>])
+ pattern = ExpLoss(hist => <hist>, rising=><rising> \
+                  [,falling => <falling>] [,skip=><stat>] [,fast=><fast>])
 
 Arguments:
  hist    - number of samples to weight against; weight will be disposed with
@@ -72,7 +72,7 @@ sub new(@) {
     my $rules = {
         hist => '\d+',
         rising => '\d+(\.\d+)?',
-	falling => '\d+(\.\d+)?',
+        falling => '\d+(\.\d+)?',
         skip => '\d+',
         fast => '\d+',
     };
