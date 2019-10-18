@@ -2608,7 +2608,7 @@ DOC
     my $parser = Smokeping::Config->new 
       (
        {
-        _sections  => [ qw(General Database Presentation Probes Targets Alerts Slaves) ],
+        _sections  => [ qw(General Database Presentation Probes Targets Alerts Slaves InfluxDB) ],
         _mandatory => [ qw(General Database Presentation Probes Targets) ],
         General => 
         {
@@ -2978,6 +2978,64 @@ DOC
                }
          }
         },
+
+	InfluxDB =>
+        {
+         _vars => [ qw(host port timeout database precision) ],
+         _mandatory => [ qw(host database) ],
+         _doc => <<DOC,
+If you want to export data to an InfluxDB database, fill in this section.
+DOC
+
+         host =>
+         {
+           _re => '\S+',
+           _doc => <<DOC,
+The FQDN or IP address of your InfluxDB server.
+For example 'localhost', 'influx.example.org' or '127.0.0.1'
+DOC
+         },
+         port  =>
+         {
+           _re => '\d+',
+	   _default => '8086',
+	   _sub => sub {
+		        return "Invalid InfluxDB port (needs to be between 1-65535)" unless $_[ 0 ] > 0 and  $_[ 0 ] < 65536;
+			return undef;
+	   }, 
+           _doc => <<DOC,
+The port of your InfluxDB server. Default is 8086
+DOC
+         },
+         timeout  =>
+	 {%$INTEGER_SUB,
+	   _default => '15',
+           _doc => <<DOC,
+Connection timeout to InfluxDB in seconds. Default is 15s.
+Too big of a timeout will cause polling errors when InfluxDB is down.
+DOC
+         },
+         database  =>
+         {
+           _re => '\S+',
+           _doc => <<DOC,
+Database name (where to write the data) within InfluxDB.
+If it doesn't exist, it will be created when writing data.
+DOC
+         },
+         precision  =>
+         {
+           _re => '^(ns|ms|s)$',
+	   _default => 'ms',
+           _doc => <<DOC,
+Timestamp precision in InfluxDB. The higher the precision, the more
+disk space is used for each measurement. Miliseconds should be fine (default).
+Allowed values: 'ns', 'ms' or 's'
+DOC
+         }
+        },
+
+
         Presentation => 
         { 
          _doc => <<DOC,
@@ -3742,7 +3800,7 @@ sub get_config ($$){
     if (not $cfg->{Presentation}{multihost} or not $cfg->{Presentation}{multihost}{colors}){
        $cfg->{Presentation}{multihost}{colors} = "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1";
     }
-    do_log("Dump parsed config: ".Dumper(\$cfg));
+    do_log("DBG: Dump parsed config: ".Dumper(\$cfg));
     return $cfg;
 
 
