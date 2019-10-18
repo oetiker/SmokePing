@@ -22,6 +22,7 @@ use Smokeping::RRDhelpers;
 use Smokeping::Graphs;
 use URI::Escape;
 use Time::HiRes;
+use Data::Dumper;
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -3741,6 +3742,7 @@ sub get_config ($$){
     if (not $cfg->{Presentation}{multihost} or not $cfg->{Presentation}{multihost}{colors}){
        $cfg->{Presentation}{multihost}{colors} = "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1";
     }
+    do_log("Dump parsed config: ".Dumper(\$cfg));
     return $cfg;
 
 
