@@ -3800,6 +3800,14 @@ sub get_config ($$){
     if (not $cfg->{Presentation}{multihost} or not $cfg->{Presentation}{multihost}{colors}){
        $cfg->{Presentation}{multihost}{colors} = "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1";
     }
+    # based on the current configuration - if influxdb support is enabled in the InfluxDB section, load the necessary influxdb perl modules
+    if(defined $cfg->{InfluxDB}{precision}){
+	do_log("DBG: Found InfluxDB section. Loading InfluxDB modules");
+	use InfluxDB::HTTP;
+	my $precision = $cfg->{InfluxDB}{precision};
+	use InfluxDB::LineProtocol qw(data2line precision=$precision);
+	
+    }
     do_log("DBG: Dump parsed config: ".Dumper(\$cfg));
     return $cfg;
 

@@ -14,3 +14,7 @@ IO::Pty
 LWP
 Authen::Radius
 Path::Tiny
+InfluxDB::HTTP
+InfluxDB::LineProtocol
+JSON::MaybeXS
+Object::Result
