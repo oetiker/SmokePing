@@ -2091,12 +2091,109 @@ sub update_rrds($$$$$$) {
                 RRDs::update ( @rrdupdate );
                 my $ERROR = RRDs::error();
                 do_log "RRDs::update ERROR: $ERROR\n" if $ERROR;
+
+                # insert in influxdb if needed
+                update_influxdb($name, $pings, $tree, $update) if (defined $influx);
+
                     # check alerts
                 my ($loss,$rtt) = (split /:/, $update->[2])[1,2];
                     my $gotalert = check_alerts $cfg,$tree,$pings,$name,$prop,$loss,$rtt,$update->[0];
                     update_sortercache $cfg,$sortercache,$name.$s,$update->[2],$gotalert;
                 }
         }
+    }
+}
+
+sub update_influxdb($$$);
+sub update_influxdb($$$) {
+    my $name = shift;
+    my $pings = shift;
+    my $tree = shift;
+    my $update = shift;
+
+    my @influx_data = ();
+    my %idata = ();
+    my %itags = ();
+    #measurements are stored in $update->[2]
+    #do_log("DBG: update->[2]: ".Dumper(\$update->[2]));
+    #do_log("DBG: update: ".Dumper(\$update));
+    #timestamp is $update->[1] in unix timestamp format
+
+    my @measurements = split(/:/, $update->[2]);
+    my $i = 1;
+
+    #Note, we force all measurement data to be float (scientific notation), 
+    #because the data type is derived from the first ever data point, which might be wrong.
+    #in case of measurements with no value (e.g. 'U'), we skip the data point so that influx
+    #knows it's lacking a datapoint and can act accordingly
+
+    #first 3 data points are as follows
+    $idata{uptime} = sprintf("%e", $measurements[0]) if($measurements[0] ne "U");
+
+    #if loss is indexed, it's easily searchable, but doesn't show up in Grafana graphs
+    #so save it both ways (loss is an integer, no need to make it float)
+    #loss is always a number, even when all other are unreachable, so no special treatment
+    my $loss = $measurements[1];
+    $itags{loss} = $loss;
+    $idata{loss} = $loss;
+    #calculate loss as a percentage as well
+    my $loss_percent = int($loss/$pings*100);
+    $itags{loss_percent} = $loss_percent;
+    $idata{loss_percent} = $loss_percent;
+
+    $idata{median} = sprintf("%e", $measurements[2]) if($measurements[2] ne "U");
+
+    #skip the first 3 items, since they were processed
+    splice(@measurements, 0, 3);
+
+    my $min = $measurements[1]; #first value
+    my $max = undef;
+
+    for (1..$pings){
+        if($measurements[${_}-1] ne "U"){
+            $idata{"ping${_}"} = sprintf("%e", $measurements[${_}-1]);
+            $min = $measurements[${_}-1] if($measurements[${_}-1] < $min);
+            $max = $measurements[${_}-1] if($measurements[${_}-1] > $max);
+        }
+    }
+    if($min ne 'U'){
+        $idata{"min"} = sprintf("%e", $min);
+    }
+    if(defined $max && $max ne 'U' ){
+        $idata{"max"} = sprintf("%e", $max);
+    }
+
+
+    $itags{host} = $tree->{host};
+    $itags{title} = $tree->{title};
+    # remove datadir as a prefix
+    $itags{path} = $name;
+    $itags{path}=~s/$cfg->{General}{datadir}//;
+
+    #for some reason, InfluxDB::HTTP has a bug and stores 0.000000e+00 as a string, not a float.
+    #this will cause measurement loss in InfluxDB
+    #so, we'll do a dirty hack and convert it to a very small non-zero value
+    # 'U' values are not affected by this (not inserted)
+
+    foreach my $key (keys %idata){
+        if($idata{$key} == 0){
+            next if($key eq "loss" || $key eq "loss_percent"); #loss was not a float, so no need for this
+            $idata{$key} = "0.1e-100"; #an arbitrary small number
+        }
+    } 
+
+    #do_debuglog("DBG: idata:".Dumper(\%idata).", itags:".Dumper(\%itags));
+
+    push @influx_data, data2line( $tree->{probe}, \%idata, \%itags);
+
+    if(defined $influx){
+        do_debuglog("DBG: About to insert to influxdb: ".Dumper(\@influx_data));
+        my $insert = $influx->write(
+            \@influx_data,
+            database => $cfg->{InfluxDB}{'database'},
+            precision => 'ms'
+        );
+        #do_debuglog("DBG: ".$insert);
     }
 }
 
