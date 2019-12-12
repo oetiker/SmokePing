@@ -2187,7 +2187,7 @@ sub update_influxdb($$$) {
     push @influx_data, data2line( $tree->{probe}, \%idata, \%itags);
 
     if(defined $influx){
-        do_debuglog("DBG: About to insert to influxdb: ".Dumper(\@influx_data));
+        #do_debuglog("DBG: About to insert to influxdb: ".Dumper(\@influx_data));
         my $insert = $influx->write(
             \@influx_data,
             database => $cfg->{InfluxDB}{'database'},
