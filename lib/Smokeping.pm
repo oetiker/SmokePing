@@ -86,6 +86,7 @@ BEGIN {
 my $DEFAULTPRIORITY = 'info'; # default syslog priority
 
 my $logging = 0; # keeps track of whether we have a logging method enabled
+my $influx = undef; #a handle to the InfluxDB::HTTP object (if any)
 
 sub find_libdir {
     # find the directory where the probe and matcher modules are located
