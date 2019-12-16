@@ -4071,6 +4071,15 @@ sub load_cfg ($;$) {
                die "ERROR: Could not load Storable Support. This is required for the Charts feature - $@\n" if $@;
            load_sorters $cfg->{Presentation}{charts};
         }
+        #initiate a connection to InfluxDB (if needed)
+        if(! defined $influx && defined $cfg->{'InfluxDB'}{'host'}){
+            do_log("DBG: Setting up a new InfluxDB connection");
+            $influx = InfluxDB::HTTP->new(
+                host => $cfg->{'InfluxDB'}{'host'},
+                port => $cfg->{'InfluxDB'}{'port'},
+                timeout => $cfg->{'InfluxDB'}{'timeout'}
+            );
+        }
         $cfg->{__parser} = $parser;
         $cfg->{__last} = $cfmod;
         $cfg->{__cfgfile} = $cfgfile;
