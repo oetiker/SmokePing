@@ -2194,7 +2194,7 @@ sub update_influxdb($$$) {
             database => $cfg->{InfluxDB}{'database'},
             precision => 'ms'
         );
-        #do_debuglog("DBG: ".$insert);
+        do_debuglog("InfluxDB Insert: ".$insert);
     }
 }
 
@@ -3079,7 +3079,7 @@ DOC
 
 	InfluxDB =>
         {
-         _vars => [ qw(host port timeout database precision) ],
+         _vars => [ qw(host port timeout database) ],
          _mandatory => [ qw(host database) ],
          _doc => <<DOC,
 If you want to export data to an InfluxDB database, fill in this section.
@@ -3119,16 +3119,6 @@ DOC
            _doc => <<DOC,
 Database name (where to write the data) within InfluxDB.
 If it doesn't exist, it will be created when writing data.
-DOC
-         },
-         precision  =>
-         {
-           _re => '^(ns|ms|s)$',
-	   _default => 'ms',
-           _doc => <<DOC,
-Timestamp precision in InfluxDB. The higher the precision, the more
-disk space is used for each measurement. Miliseconds should be fine (default).
-Allowed values: 'ns', 'ms' or 's'
 DOC
          }
         },
@@ -3899,14 +3889,13 @@ sub get_config ($$){
        $cfg->{Presentation}{multihost}{colors} = "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1";
     }
     # based on the current configuration - if influxdb support is enabled in the InfluxDB section, load the necessary influxdb perl modules
-    if(defined $cfg->{InfluxDB}{precision}){
-	do_log("DBG: Found InfluxDB section. Loading InfluxDB modules");
-	use InfluxDB::HTTP;
-	my $precision = $cfg->{InfluxDB}{precision};
-	use InfluxDB::LineProtocol qw(data2line precision=$precision);
+    if(defined $cfg->{InfluxDB}{host}){
+	    do_debuglog("Found InfluxDB section. Loading InfluxDB modules");
+	    use InfluxDB::HTTP;
+	    use InfluxDB::LineProtocol qw(data2line precision=ms);
 	
     }
-    do_log("DBG: Dump parsed config: ".Dumper(\$cfg));
+    #do_log("DBG: Dump parsed config: ".Dumper(\$cfg));
     return $cfg;
 
 
