@@ -2094,7 +2094,7 @@ sub update_rrds($$$$$$) {
                 do_log "RRDs::update ERROR: $ERROR\n" if $ERROR;
 
                 # insert in influxdb if needed
-                update_influxdb($name, $pings, $tree, $update) if (defined $influx);
+                update_influxdb($name, $s, $pings, $tree, $update) if (defined $influx);
 
                     # check alerts
                 my ($loss,$rtt) = (split /:/, $update->[2])[1,2];
@@ -2108,9 +2108,13 @@ sub update_rrds($$$$$$) {
 sub update_influxdb($$$);
 sub update_influxdb($$$) {
     my $name = shift;
+    my $s = shift;
     my $pings = shift;
     my $tree = shift;
     my $update = shift;
+
+    #for a slave cut out the first tilda
+    $s=~s/^~//;
 
     my @influx_data = ();
     my %idata = ();
@@ -2170,6 +2174,10 @@ sub update_influxdb($$$) {
     # remove datadir as a prefix
     $itags{path} = $name;
     $itags{path}=~s/$cfg->{General}{datadir}//;
+    if ($s ne ""){
+        #master won't have a slave tag value
+        $itags{slave} = $s;
+    }
 
     #for some reason, InfluxDB::HTTP has a bug and stores 0.000000e+00 as a string, not a float.
     #this will cause measurement loss in InfluxDB
@@ -2194,7 +2202,9 @@ sub update_influxdb($$$) {
             database => $cfg->{InfluxDB}{'database'},
             precision => 'ms'
         );
-        do_debuglog("InfluxDB Insert: ".$insert);
+        if(! $insert){
+            do_log("Error inserting measurement into influxdb: $insert")
+        }
     }
 }
 
