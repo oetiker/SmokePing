@@ -2179,6 +2179,19 @@ sub update_influxdb($$$) {
         $itags{slave} = $s;
     }
 
+    #send also probe configuration parameters that are prefixed with influx_. 
+    foreach my $parameter (keys %{$tree}){
+        if($parameter=~/^influx_(.+)/){
+            my $tag = $1;
+            #only non-empty parameters get sent
+            if($tree->{$parameter} ne ""){
+                # take care not to accidentaly use already used names, like 'host', 'title', 'path', 'slave', 'loss', 'loss_percent'
+                # or it will override the data parsed before
+                $itags{$tag} = $tree->{$parameter};
+            }
+        }
+    }
+
     #for some reason, InfluxDB::HTTP has a bug and stores 0.000000e+00 as a string, not a float.
     #this will cause measurement loss in InfluxDB
     #so, we'll do a dirty hack and convert it to a very small non-zero value
