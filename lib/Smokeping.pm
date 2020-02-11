@@ -2175,7 +2175,7 @@ sub update_influxdb($$$) {
     $itags{title} = $tree->{title};
     # remove datadir as a prefix
     $itags{path} = $name;
-    $itags{path}=~s/$cfg->{General}{datadir}//;
+    $itags{path} =~ s/$cfg->{General}{datadir}//;
     if ($s ne ""){
         #master won't have a slave tag value
         $itags{slave} = $s;
