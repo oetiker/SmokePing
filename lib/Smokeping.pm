@@ -2164,7 +2164,7 @@ sub update_influxdb($$$) {
         }
     }
     if ($min ne 'U'){
-        $idata{"min"} = sprintf("%e", $min);
+        $idata{min} = sprintf('%e', $min);
     }
     if(defined $max && $max ne 'U' ){
         $idata{"max"} = sprintf("%e", $max);
