@@ -2158,7 +2158,7 @@ sub update_influxdb($$$) {
 
     for (0..$pings-1){
         if ($measurements[$_] ne "U"){
-            $idata{"ping${_}"} = sprintf("%e", $measurements[${_}-1]);
+            $idata{'ping'.(${_}+1)} = sprintf('%e', $measurements[$_]);
             $min = $measurements[${_}-1] if($measurements[${_}-1] < $min);
             $max = $measurements[${_}-1] if($measurements[${_}-1] > $max);
         }
