@@ -2201,7 +2201,7 @@ sub update_influxdb($$$) {
 
     for my $key (sort keys %idata){
         if($idata{$key} == 0){
-            next if($key eq "loss" || $key eq "loss_percent"); #loss was not a float, so no need for this
+            next if ($key eq "loss" or $key eq "loss_percent"); #loss was not a float, so no need for this
             $idata{$key} = "0.1e-100"; #an arbitrary small number
         }
     } 
