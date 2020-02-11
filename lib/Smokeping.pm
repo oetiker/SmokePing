@@ -23,6 +23,8 @@ use Smokeping::Graphs;
 use URI::Escape;
 use Time::HiRes;
 use Data::Dumper;
+use InfluxDB::HTTP;
+use InfluxDB::LineProtocol qw(data2line precision=ms);
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -86,7 +88,7 @@ BEGIN {
 my $DEFAULTPRIORITY = 'info'; # default syslog priority
 
 my $logging = 0; # keeps track of whether we have a logging method enabled
-my $influx = undef; #a handle to the InfluxDB::HTTP object (if any)
+my $influx = undef; # a handle to the InfluxDB::HTTP object (if any)
 
 sub find_libdir {
     # find the directory where the probe and matcher modules are located
@@ -3911,14 +3913,6 @@ sub get_config ($$){
     if (not $cfg->{Presentation}{multihost} or not $cfg->{Presentation}{multihost}{colors}){
        $cfg->{Presentation}{multihost}{colors} = "004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1";
     }
-    # based on the current configuration - if influxdb support is enabled in the InfluxDB section, load the necessary influxdb perl modules
-    if(defined $cfg->{InfluxDB}{host}){
-	    do_debuglog("Found InfluxDB section. Loading InfluxDB modules");
-	    use InfluxDB::HTTP;
-	    use InfluxDB::LineProtocol qw(data2line precision=ms);
-	
-    }
-    #do_log("DBG: Dump parsed config: ".Dumper(\$cfg));
     return $cfg;
 
 
