@@ -2120,7 +2120,7 @@ sub update_influxdb($$$) {
 
     my @influx_data;
     my %idata;
-    my %itags = ();
+    my %itags;
     #measurements are stored in $update->[2]
     #do_log("DBG: update->[2]: ".Dumper(\$update->[2]));
     #do_log("DBG: update: ".Dumper(\$update));
