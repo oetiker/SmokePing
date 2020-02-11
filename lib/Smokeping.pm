@@ -2118,7 +2118,7 @@ sub update_influxdb($$$) {
     #for a slave cut out the first tilda
     $s=~s/^~//;
 
-    my @influx_data = ();
+    my @influx_data;
     my %idata = ();
     my %itags = ();
     #measurements are stored in $update->[2]
