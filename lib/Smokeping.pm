@@ -2199,7 +2199,7 @@ sub update_influxdb($$$) {
     #so, we'll do a dirty hack and convert it to a very small non-zero value
     # 'U' values are not affected by this (not inserted)
 
-    foreach my $key (keys %idata){
+    for my $key (sort keys %idata){
         if($idata{$key} == 0){
             next if($key eq "loss" || $key eq "loss_percent"); #loss was not a float, so no need for this
             $idata{$key} = "0.1e-100"; #an arbitrary small number
