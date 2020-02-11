@@ -2182,7 +2182,7 @@ sub update_influxdb($$$) {
     }
 
     #send also probe configuration parameters that are prefixed with influx_. 
-    foreach my $parameter (keys %{$tree}){
+    for my $parameter (sort keys %$tree){
         if($parameter=~/^influx_(.+)/){
             my $tag = $1;
             #only non-empty parameters get sent
