@@ -2148,7 +2148,7 @@ sub update_influxdb($$$) {
     $itags{loss_percent} = $loss_percent;
     $idata{loss_percent} = $loss_percent;
 
-    $idata{median} = sprintf("%e", $measurements[2]) if($measurements[2] ne "U");
+    $idata{median} = sprintf('%e', $measurements[2]) if($measurements[2] ne "U");
 
     #skip the first 3 items, since they were processed
     splice(@measurements, 0, 3);
