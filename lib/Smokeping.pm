@@ -2135,7 +2135,7 @@ sub update_influxdb($$$) {
     #knows it's lacking a datapoint and can act accordingly
 
     #first 3 data points are as follows
-    $idata{uptime} = sprintf("%e", $measurements[0]) if($measurements[0] ne "U");
+    $idata{uptime} = sprintf('%e', $measurements[0]) if($measurements[0] ne "U");
 
     #if loss is indexed, it's easily searchable, but doesn't show up in Grafana graphs
     #so save it both ways (loss is an integer, no need to make it float)
