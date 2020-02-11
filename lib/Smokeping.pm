@@ -2160,7 +2160,7 @@ sub update_influxdb($$$) {
         if ($measurements[$_] ne "U"){
             $idata{'ping'.(${_}+1)} = sprintf('%e', $measurements[$_]);
             $min = $measurements[$_] if($measurements[$_] < $min);
-            $max = $measurements[${_}-1] if($measurements[${_}-1] > $max);
+            $max = $measurements[$_] if($measurements[$_] > $max);
         }
     }
     if($min ne 'U'){
