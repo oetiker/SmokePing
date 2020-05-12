@@ -2107,8 +2107,8 @@ sub update_rrds($$$$$$) {
     }
 }
 
-sub update_influxdb($$$);
-sub update_influxdb($$$) {
+sub update_influxdb($$$$$);
+sub update_influxdb($$$$$) {
     my $name = shift;
     my $s = shift;
     my $pings = shift;
@@ -2218,7 +2218,7 @@ sub update_influxdb($$$) {
             precision => 'ms'
         );
         if(! $insert){
-            do_log("Error inserting measurement into influxdb: $insert")
+            do_log("Error inserting measurement into influxdb: $insert for ".Dumper(\@influx_data))
         }
     }
 }
