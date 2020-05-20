@@ -2167,7 +2167,7 @@ sub update_influxdb($$$$$) {
         $idata{min} = sprintf('%e', $min);
     }
     if (defined $max && $max ne 'U' ){
-        $idata{"max"} = sprintf("%e", $max);
+        $idata{"max"} = sprintf('%e', $max);
     }
 
 
@@ -2177,8 +2177,12 @@ sub update_influxdb($$$$$) {
     $itags{path} = $name;
     $itags{path} =~ s/$cfg->{General}{datadir}//;
     if ($s ne ""){
-        #master won't have a slave tag value
+        #this is a slave
         $itags{slave} = $s;
+    }
+    else{
+        #to improve filtering in grafana, mark the master
+        $itags{slave} = "master";
     }
 
     #send also probe configuration parameters that are prefixed with influx_. 
