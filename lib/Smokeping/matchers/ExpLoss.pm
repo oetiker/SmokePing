@@ -105,7 +105,10 @@ sub Test($$) {
     my $alfa = 1-0.01**(1/$hist);
 
     my $rising = $self->{param}{rising};
-    my $falling = (defined $self->{param}{falling} || $rising);
+    my $falling = $rising;
+    if(defined $self->{param}{falling}) {
+        $falling = $self->{param}{falling};
+    }
 
     my $result = 0; # initialize the filter as zero;
     my $loss;
