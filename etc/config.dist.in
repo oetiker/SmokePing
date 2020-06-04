@@ -37,13 +37,13 @@ pings    = 20
 
 # consfn mrhb steps total
 
-AVERAGE  0.5   1  1008
-AVERAGE  0.5  12  4320
-    MIN  0.5  12  4320
-    MAX  0.5  12  4320
-AVERAGE  0.5 144   720
-    MAX  0.5 144   720
-    MIN  0.5 144   720
+AVERAGE  0.5   1  28800
+AVERAGE  0.5  12   9600
+    MIN  0.5  12   9600
+    MAX  0.5  12   9600
+AVERAGE  0.5 144   2400
+    MAX  0.5 144   2400
+    MIN  0.5 144   2400
 
 *** Presentation ***
 
