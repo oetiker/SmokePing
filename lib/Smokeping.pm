@@ -3240,7 +3240,8 @@ DOC
 The Overview section defines how the Overview graphs should look.
 DOC
             max_rtt => {    _doc => <<DOC },
-Any roundtrip time larger than this value will cropped in the overview graph
+Any roundtrip time larger than this value will be cropped in the overview graph.
+Units is seconds (for example, 0.800).
 DOC
             median_color => {    _doc => <<DOC,
 By default the median line is drawn in red. Override it here with a hex color
@@ -3362,7 +3363,8 @@ EOF
                        _sub => sub { return "tolerance must be larger than 1" if $_[0] <= 1; return undef},
                              },
          max_rtt => {    _doc => <<DOC },
-Any roundtrip time larger than this value will cropped in the detail graph
+Any roundtrip time larger than this value will be cropped in the detail graph.
+Units is seconds (for example, 0.800).
 DOC
          width    => { _doc => 'How many pixels wide should detail graphs be',
                        _sub => sub {
