@@ -3108,7 +3108,7 @@ DOC
 
 	InfluxDB =>
         {
-         _vars => [ qw(host port timeout database) ],
+         _vars => [ qw(host port timeout database username password) ],
          _mandatory => [ qw(host database) ],
          _doc => <<DOC,
 If you want to export data to an InfluxDB database, fill in this section.
@@ -3148,6 +3148,22 @@ DOC
            _doc => <<DOC,
 Database name (where to write the data) within InfluxDB.
 If it doesn't exist, it will be created when writing data.
+DOC
+         },
+         username  =>
+         {
+          _re => '\S+',
+          _doc => <<DOC,
+Username for authentication to InfluxDB.
+If not supplied, no authentication is attempted.
+DOC
+         },
+         password  =>
+         {
+           _re => '\S+',
+           _doc => <<DOC,
+Password for authentication to InfluxDB.
+If not supplied, no authentication is attempted.
 DOC
          }
         },
@@ -4100,6 +4116,16 @@ sub load_cfg ($;$) {
                 port => $cfg->{'InfluxDB'}{'port'},
                 timeout => $cfg->{'InfluxDB'}{'timeout'}
             );
+            if (defined $cfg->{'InfluxDB'}{'username'} && defined $cfg->{'InfluxDB'}{'password'}) {
+                do_log("DBG: Setting credentials for InfluxDB connection");
+                my $ua = $influx->get_lwp_useragent();
+                $ua->credentials(
+                    $cfg->{'InfluxDB'}{'host'} . ':' . $cfg->{'InfluxDB'}{'port'},
+                    'InfluxDB',
+                    $cfg->{'InfluxDB'}{'username'},
+                    $cfg->{'InfluxDB'}{'password'}
+                );
+            }
         }
         $cfg->{__parser} = $parser;
         $cfg->{__last} = $cfmod;
