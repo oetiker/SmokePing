@@ -2125,7 +2125,7 @@ sub update_influxdb($$$$$) {
     #do_log("DBG: update->[2]: ".Dumper(\$update->[2]));
     #do_log("DBG: update: ".Dumper(\$update));
     #timestamp is $update->[1] in unix timestamp format
-
+    my $unixtimestamp = $update->[1];
     my @measurements = split(/:/, $update->[2]);
     my $i = 1;
 
@@ -2211,8 +2211,10 @@ sub update_influxdb($$$$$) {
     } 
 
     #do_debuglog("DBG: idata:".Dumper(\%idata).", itags:".Dumper(\%itags));
+    #convert unixtimestamp from seconds to ms (since rrd have only second precision)
+    $unixtimestamp = $unixtimestamp."000"; #avoid a multiply
 
-    push @influx_data, data2line( $tree->{probe}, \%idata, \%itags);
+    push @influx_data, data2line( $tree->{probe}, \%idata, \%itags, $unixtimestamp);
 
     if(defined $influx){
         #do_debuglog("DBG: About to insert to influxdb: ".Dumper(\@influx_data));
