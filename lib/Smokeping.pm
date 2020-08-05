@@ -1928,7 +1928,7 @@ sub check_alerts {
                             unless (fork) {
                                 $SIG{CHLD} = 'DEFAULT';
                                 if ($edgetrigger) {
-                                   exec $cmd,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
+                                   exec $cmd,$_,$line,$loss,$rtt,$tree->{host}, (($what =~/raise/)? 1 : 0);
                                 } else {
                                    exec $cmd,$_,$line,$loss,$rtt,$tree->{host};
                                 }
