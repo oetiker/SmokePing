@@ -1233,7 +1233,7 @@ sub get_detail ($$$$;$){
                 4          => ["4/$p",  '#7e00ff'],
                 int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
                 $p-1       => [($p-1)."/$p",    '#ff0000'],
-                $p 	   => ["$p/$p", '#a00000']
+                $p         => ["$p/$p", '#a00000']
                 );
     };
     # determine a more 'pastel' version of the ping colours; this is 
