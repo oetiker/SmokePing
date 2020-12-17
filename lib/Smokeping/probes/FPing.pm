@@ -128,6 +128,7 @@ sub ping ($){
     push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     push @params, "-i" . int(1000 * $self->{properties}{mininterval});
     push @params, "-p" . int(1000 * $self->{properties}{hostinterval}) if $self->{properties}{hostinterval};
+    push @params, "--iface=$self->{properties}{interface}" if $self->{properties}{interface};
     if ($self->rounds_count == 1 and $self->{properties}{sourceaddress} and not $self->{enable}{S}){
        $self->do_log("WARNING: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.");
     }
@@ -266,6 +267,11 @@ Set the type of service (TOS) of outgoing ICMP packets.
 You need at laeast fping-2.4b2_to3-ipv6 for this to work. Find
 a copy on www.smokeping.org/pub.
 DOC
+		},
+		interface => {
+			_re => '[a-zA-Z0-9]+',
+			_example => 'eth0',
+			_doc => "The name of the network interface to perform the ping on.",
 		},
 	});
 }
