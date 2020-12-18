@@ -2189,11 +2189,10 @@ sub update_influxdb($$$$$) {
     #send also probe configuration parameters that are prefixed with influx_. 
     for my $parameter (sort keys %$tree){
         if($parameter=~/^influx_(.+)/){
-            my $tag = $1;
+            my $tag = "tag_".$1;
             #only non-empty parameters get sent
             if($tree->{$parameter} ne ""){
-                # take care not to accidentaly use already used names, like 'host', 'title', 'path', 'slave', 'loss', 'loss_percent'
-                # or it will override the data parsed before
+                #tags will be in the form "tag_location", based on what the user supplied
                 $itags{$tag} = $tree->{$parameter};
             }
         }
