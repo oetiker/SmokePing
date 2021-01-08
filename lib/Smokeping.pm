@@ -2108,8 +2108,8 @@ sub update_rrds($$$$$$) {
     }
 }
 
-sub update_influxdb($$$);
-sub update_influxdb($$$) {
+sub update_influxdb($$$$$);
+sub update_influxdb($$$$$) {
     my $name = shift;
     my $s = shift;
     my $pings = shift;
@@ -2126,7 +2126,7 @@ sub update_influxdb($$$) {
     #do_log("DBG: update->[2]: ".Dumper(\$update->[2]));
     #do_log("DBG: update: ".Dumper(\$update));
     #timestamp is $update->[1] in unix timestamp format
-
+    my $unixtimestamp = $update->[1];
     my @measurements = split(/:/, $update->[2]);
     my $i = 1;
 
@@ -2168,7 +2168,7 @@ sub update_influxdb($$$) {
         $idata{min} = sprintf('%e', $min);
     }
     if (defined $max && $max ne 'U' ){
-        $idata{"max"} = sprintf("%e", $max);
+        $idata{"max"} = sprintf('%e', $max);
     }
 
 
@@ -2178,18 +2178,21 @@ sub update_influxdb($$$) {
     $itags{path} = $name;
     $itags{path} =~ s/$cfg->{General}{datadir}//;
     if ($s ne ""){
-        #master won't have a slave tag value
+        #this is a slave
         $itags{slave} = $s;
+    }
+    else{
+        #to improve filtering in grafana, mark the master
+        $itags{slave} = "master";
     }
 
     #send also probe configuration parameters that are prefixed with influx_. 
     for my $parameter (sort keys %$tree){
         if($parameter=~/^influx_(.+)/){
-            my $tag = $1;
+            my $tag = "tag_".$1;
             #only non-empty parameters get sent
             if($tree->{$parameter} ne ""){
-                # take care not to accidentaly use already used names, like 'host', 'title', 'path', 'slave', 'loss', 'loss_percent'
-                # or it will override the data parsed before
+                #tags will be in the form "tag_location", based on what the user supplied
                 $itags{$tag} = $tree->{$parameter};
             }
         }
@@ -2208,8 +2211,10 @@ sub update_influxdb($$$) {
     } 
 
     #do_debuglog("DBG: idata:".Dumper(\%idata).", itags:".Dumper(\%itags));
+    #convert unixtimestamp from seconds to ms (since rrd have only second precision)
+    $unixtimestamp = $unixtimestamp."000"; #avoid a multiply
 
-    push @influx_data, data2line( $tree->{probe}, \%idata, \%itags);
+    push @influx_data, data2line( $tree->{probe}, \%idata, \%itags, $unixtimestamp);
 
     if(defined $influx){
         #do_debuglog("DBG: About to insert to influxdb: ".Dumper(\@influx_data));
@@ -2219,7 +2224,7 @@ sub update_influxdb($$$) {
             precision => 'ms'
         );
         if(! $insert){
-            do_log("Error inserting measurement into influxdb: $insert")
+            do_log("Error inserting measurement into influxdb: $insert for ".Dumper(\@influx_data))
         }
     }
 }
@@ -3105,7 +3110,7 @@ DOC
 
 	InfluxDB =>
         {
-         _vars => [ qw(host port timeout database) ],
+         _vars => [ qw(host port timeout database username password) ],
          _mandatory => [ qw(host database) ],
          _doc => <<DOC,
 If you want to export data to an InfluxDB database, fill in this section.
@@ -3145,6 +3150,22 @@ DOC
            _doc => <<DOC,
 Database name (where to write the data) within InfluxDB.
 If it doesn't exist, it will be created when writing data.
+DOC
+         },
+         username  =>
+         {
+          _re => '\S+',
+          _doc => <<DOC,
+Username for authentication to InfluxDB.
+If not supplied, no authentication is attempted.
+DOC
+         },
+         password  =>
+         {
+           _re => '\S+',
+           _doc => <<DOC,
+Password for authentication to InfluxDB.
+If not supplied, no authentication is attempted.
 DOC
          }
         },
@@ -4099,6 +4120,16 @@ sub load_cfg ($;$) {
                 port => $cfg->{'InfluxDB'}{'port'},
                 timeout => $cfg->{'InfluxDB'}{'timeout'}
             );
+            if (defined $cfg->{'InfluxDB'}{'username'} && defined $cfg->{'InfluxDB'}{'password'}) {
+                do_log("DBG: Setting credentials for InfluxDB connection");
+                my $ua = $influx->get_lwp_useragent();
+                $ua->credentials(
+                    $cfg->{'InfluxDB'}{'host'} . ':' . $cfg->{'InfluxDB'}{'port'},
+                    'InfluxDB',
+                    $cfg->{'InfluxDB'}{'username'},
+                    $cfg->{'InfluxDB'}{'password'}
+                );
+            }
         }
         $cfg->{__parser} = $parser;
         $cfg->{__last} = $cfmod;

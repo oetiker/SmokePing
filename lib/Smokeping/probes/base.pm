@@ -340,7 +340,15 @@ DOC
 }
 
 sub targetvars {
-	return {_mandatory => []};
+	return {_mandatory => [],
+		'/^influx_.+/' => {
+			_re => '.*',
+			_example => 'influx_location = In the basement',
+			_doc => <<DOC,
+This is a tag that will be sent to influxdb and has no impact on the probe measurement. The tag name will be sent without the "influx_" prefix, which will be replaced with "tag_" instead. Tags can be used for filtering.
+DOC
+		},
+	};
 }
 
 # a helper method that combines two var hash references
