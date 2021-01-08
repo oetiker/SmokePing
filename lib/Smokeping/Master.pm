@@ -100,8 +100,10 @@ if 'dyndir' is not present.
 
 sub slavedatadir ($) {
     my $cfg = shift;
-    return $cfg->{General}{dyndir}  ||
+    my $dir = $cfg->{General}{dyndir}  ||
            $cfg->{General}{datadir};
+    $dir =~ s{/*$}{};
+    return $dir;
 }
 
 sub save_updates {
