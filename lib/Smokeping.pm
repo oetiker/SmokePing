@@ -787,6 +787,7 @@ sub fill_template ($$;$){
 
 sub exp2seconds ($) {
     my $x = shift;
+    $x =~/(\d+)s/ && return $1;
     $x =~/(\d+)m/ && return $1*60;
     $x =~/(\d+)h/ && return $1*60*60;
     $x =~/(\d+)d/ && return $1*60*60*24;
