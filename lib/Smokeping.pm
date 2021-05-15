@@ -1261,9 +1261,9 @@ sub get_detail ($$$$;$){
         %lc =  (0         => ['0',                                  '#26ff00'],
                 $per01    => [display_range(1         , $per01),    '#00b8ff'],
                 $per05    => [display_range($per01 + 1, $per05),    '#0059ff'],
-                $per10    => [display_range($per05 + 1, $per10),    '#5e00ff'],
-                $per25    => [display_range($per10 + 1, $per25),    '#7e00ff'],
-                $per50    => [display_range($per25 + 1, $per50),    '#dd00ff'],
+                $per10    => [display_range($per05 + 1, $per10),    '#7e00ff'],
+                $per25    => [display_range($per10 + 1, $per25),    '#ff00ff'],
+                $per50    => [display_range($per25 + 1, $per50),    '#ff5500'],
                 $p-1      => [display_range($per50 + 1, ($p-1)),    '#ff0000'],
                 $p        => ["$p/$p",                              '#a00000']
                 );
