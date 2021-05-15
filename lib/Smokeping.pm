@@ -300,6 +300,29 @@ sub min ($$) {
         return $a < $b ? $a : $b;
 }
 
+sub max ($$) {
+    my ($a, $b) = @_;
+    return $a < $b ? $b : $a;
+}
+
+sub display_range ($$) {
+    # Turn inputs into range, i.e. (10,19) is turned into "10-19"
+    my $lower = shift;
+    my $upper = shift;
+    my $ret;
+
+    # Only return actual range when there is a difference, otherwise return just lower bound
+    if ($upper < $lower) {
+        # Edgecase: Happens when $pings is less than 6 since there is no minimum value imposed on it
+        $ret = $upper;
+    } elsif ($upper > $lower) {
+        $ret = "$lower-$upper";
+    } else {
+        $ret = $lower;
+    }
+    return $ret;
+}
+
 sub init_alerts ($){
     my $cfg = shift;
     foreach my $al (keys %{$cfg->{Alerts}}) {
@@ -1225,16 +1248,24 @@ sub get_detail ($$$$;$){
             my ($num,$col,$txt) = @{$_};
             $lc{$num} = [ $txt, "#".$col ];
         }
-    } else {  
+    } else {
+
         my $p = $pings;
-        %lc =  (0          => ['0',   '#26ff00'],
-                1          => ["1/$p",  '#00b8ff'],
-                2          => ["2/$p",  '#0059ff'],
-                3          => ["3/$p",  '#5e00ff'],
-                4          => ["4/$p",  '#7e00ff'],
-                int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
-                $p-1       => [($p-1)."/$p",    '#ff0000'],
-                $p         => ["$p/$p", '#a00000']
+        # Return either approximate percentage or impose a minimum value
+        my $per01 = max(int(0.01 * $p), 1);
+        my $per05 = max(int(0.05 * $p), 2);
+        my $per10 = max(int(0.10 * $p), 3);
+        my $per25 = max(int(0.25 * $p), 4);
+        my $per50 = max(int(0.50 * $p), 5);
+
+        %lc =  (0         => ['0',                                  '#26ff00'],
+                $per01    => [display_range(1         , $per01),    '#00b8ff'],
+                $per05    => [display_range($per01 + 1, $per05),    '#0059ff'],
+                $per10    => [display_range($per05 + 1, $per10),    '#5e00ff'],
+                $per25    => [display_range($per10 + 1, $per25),    '#7e00ff'],
+                $per50    => [display_range($per25 + 1, $per50),    '#dd00ff'],
+                $p-1      => [display_range($per50 + 1, ($p-1)),    '#ff0000'],
+                $p        => ["$p/$p",                              '#a00000']
                 );
     };
     # determine a more 'pastel' version of the ping colours; this is 
