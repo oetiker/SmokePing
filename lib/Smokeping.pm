@@ -1433,7 +1433,7 @@ sub get_detail ($$$$;$){
                  ()),
                  'HRULE:0#000000',
                  "COMMENT:probe${BS}:       $pings $ProbeDesc every ${step}s",
-                 'COMMENT:end\: '.$date.'\j' );
+                 "COMMENT:$date\\j");
 #       do_log ("***** begin task ***** <br />");
 #       do_log (@task);
 #       do_log ("***** end task ***** <br />");

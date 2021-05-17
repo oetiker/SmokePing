@@ -271,7 +271,7 @@ sub get_multi_detail ($$$$;$){
                Smokeping::Graphs::get_colors($cfg),
                 @G,
                "COMMENT:$ProbeDesc",
-               'COMMENT:end\: '.$date.'\j';
+               "COMMENT:$date\\j";
 
         my $graphret;
         ($graphret,$xs,$ys) = RRDs::graph @task;
