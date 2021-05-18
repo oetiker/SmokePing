@@ -18,3 +18,4 @@ scp CHANGES smokeping-$VERSION.tar.gz oposs@freddie:public_html/smokeping/pub
 rm -fr /tmp/smokeping-$$-build
 git tag $VERSION
 echo "run 'git push;git push --tags' to sync github"
+
