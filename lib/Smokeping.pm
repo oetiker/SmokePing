@@ -300,6 +300,29 @@ sub min ($$) {
         return $a < $b ? $a : $b;
 }
 
+sub max ($$) {
+    my ($a, $b) = @_;
+    return $a < $b ? $b : $a;
+}
+
+sub display_range ($$) {
+    # Turn inputs into range, i.e. (10,19) is turned into "10-19"
+    my $lower = shift;
+    my $upper = shift;
+    my $ret;
+
+    # Only return actual range when there is a difference, otherwise return just lower bound
+    if ($upper < $lower) {
+        # Edgecase: Happens when $pings is less than 6 since there is no minimum value imposed on it
+        $ret = $upper;
+    } elsif ($upper > $lower) {
+        $ret = "$lower-$upper";
+    } else {
+        $ret = $lower;
+    }
+    return $ret;
+}
+
 sub init_alerts ($){
     my $cfg = shift;
     foreach my $al (keys %{$cfg->{Alerts}}) {
@@ -876,6 +899,7 @@ sub get_overview ($$$$){
         my $i = 0;
         my @colors = split /\s+/, $cfg->{Presentation}{multihost}{colors};
         my $ProbeUnit = $probe->ProbeUnit();
+        my $ProbeDesc = $probe->ProbeDesc();
         for my $slave (@slaves){
             $i++;
             my $rrd;
@@ -893,11 +917,23 @@ sub get_overview ($$$$){
                 $probe = $probes->{$tree->{probe}};
                 $pings = $probe->_pings($tree);
                 $label = $tree->{menu};
-                # if there are multiple units ... lets say so ... 
-                if ($ProbeUnit ne $probe->ProbeUnit()){
-                    $ProbeUnit = 'var units';
+
+                # if there are multiple probes ... lets say so ...
+                my $XProbeDesc = $probe->ProbeDesc();
+                if (not $ProbeDesc or $ProbeDesc eq $XProbeDesc){
+                    $ProbeDesc = $XProbeDesc;
                 }
-                
+                else {
+                    $ProbeDesc = "various probes";
+                }
+                my $XProbeUnit = $probe->ProbeUnit();
+                if (not $ProbeUnit or $ProbeUnit eq $XProbeUnit){
+                    $ProbeUnit = $XProbeUnit;
+                }
+                else {
+                    $ProbeUnit = "various units";
+                }
+
                 if ($real_slave){
                     $label .= "<".  $cfg->{Slaves}{$real_slave}{display_name};
                 }
@@ -957,7 +993,8 @@ sub get_overview ($$$$){
            '--rigid',
            '--lower-limit','0',
            @G,
-           "COMMENT:$date\\r");
+           "COMMENT:$ProbeDesc",
+           "COMMENT:$date\\j");
         my $ERROR = RRDs::error();
         $page .= "<div class=\"panel\">";
         $page .= "<div class=\"panel-heading\"><h2>".$phys_tree->{title}."</h2></div>"
@@ -1225,16 +1262,24 @@ sub get_detail ($$$$;$){
             my ($num,$col,$txt) = @{$_};
             $lc{$num} = [ $txt, "#".$col ];
         }
-    } else {  
+    } else {
+
         my $p = $pings;
-        %lc =  (0          => ['0',   '#26ff00'],
-                1          => ["1/$p",  '#00b8ff'],
-                2          => ["2/$p",  '#0059ff'],
-                3          => ["3/$p",  '#5e00ff'],
-                4          => ["4/$p",  '#7e00ff'],
-                int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
-                $p-1       => [($p-1)."/$p",    '#ff0000'],
-                $p         => ["$p/$p", '#a00000']
+        # Return either approximate percentage or impose a minimum value
+        my $per01 = max(int(0.01 * $p), 1);
+        my $per05 = max(int(0.05 * $p), 2);
+        my $per10 = max(int(0.10 * $p), 3);
+        my $per25 = max(int(0.25 * $p), 4);
+        my $per50 = max(int(0.50 * $p), 5);
+
+        %lc =  (0         => ['0',                                  '#26ff00'],
+                $per01    => [display_range(1         , $per01),    '#00b8ff'],
+                $per05    => [display_range($per01 + 1, $per05),    '#0059ff'],
+                $per10    => [display_range($per05 + 1, $per10),    '#7e00ff'],
+                $per25    => [display_range($per10 + 1, $per25),    '#ff00ff'],
+                $per50    => [display_range($per25 + 1, $per50),    '#ff5500'],
+                $p-1      => [display_range($per50 + 1, ($p-1)),    '#ff0000'],
+                $p        => ["$p/$p",                              '#a00000']
                 );
     };
     # determine a more 'pastel' version of the ping colours; this is 
@@ -1385,7 +1430,7 @@ sub get_detail ($$$$;$){
             my $timer_start = time();
             my $title = "";
             if ($cfg->{Presentation}{htmltitle} ne 'yes') {
-                $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
+                $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname) . " to $phys_tree->{title}";
             }
             my @task =
                ("${imgbase}${s}_${end}_${start}.png",
@@ -1419,7 +1464,7 @@ sub get_detail ($$$$;$){
                  ()),
                  'HRULE:0#000000',
                  "COMMENT:probe${BS}:       $pings $ProbeDesc every ${step}s",
-                 'COMMENT:end\: '.$date.'\j' );
+                 "COMMENT:$date\\j");
 #       do_log ("***** begin task ***** <br />");
 #       do_log (@task);
 #       do_log ("***** end task ***** <br />");
