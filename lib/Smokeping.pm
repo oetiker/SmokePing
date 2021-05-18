@@ -899,6 +899,7 @@ sub get_overview ($$$$){
         my $i = 0;
         my @colors = split /\s+/, $cfg->{Presentation}{multihost}{colors};
         my $ProbeUnit = $probe->ProbeUnit();
+        my $ProbeDesc = $probe->ProbeDesc();
         for my $slave (@slaves){
             $i++;
             my $rrd;
@@ -916,11 +917,23 @@ sub get_overview ($$$$){
                 $probe = $probes->{$tree->{probe}};
                 $pings = $probe->_pings($tree);
                 $label = $tree->{menu};
-                # if there are multiple units ... lets say so ... 
-                if ($ProbeUnit ne $probe->ProbeUnit()){
-                    $ProbeUnit = 'var units';
+
+                # if there are multiple probes ... lets say so ...
+                my $XProbeDesc = $probe->ProbeDesc();
+                if (not $ProbeDesc or $ProbeDesc eq $XProbeDesc){
+                    $ProbeDesc = $XProbeDesc;
                 }
-                
+                else {
+                    $ProbeDesc = "various probes";
+                }
+                my $XProbeUnit = $probe->ProbeUnit();
+                if (not $ProbeUnit or $ProbeUnit eq $XProbeUnit){
+                    $ProbeUnit = $XProbeUnit;
+                }
+                else {
+                    $ProbeUnit = "various units";
+                }
+
                 if ($real_slave){
                     $label .= "<".  $cfg->{Slaves}{$real_slave}{display_name};
                 }
@@ -980,7 +993,8 @@ sub get_overview ($$$$){
            '--rigid',
            '--lower-limit','0',
            @G,
-           "COMMENT:$date\\r");
+           "COMMENT:$ProbeDesc",
+           "COMMENT:$date\\j");
         my $ERROR = RRDs::error();
         $page .= "<div class=\"panel\">";
         $page .= "<div class=\"panel-heading\"><h2>".$phys_tree->{title}."</h2></div>"
@@ -1450,7 +1464,7 @@ sub get_detail ($$$$;$){
                  ()),
                  'HRULE:0#000000',
                  "COMMENT:probe${BS}:       $pings $ProbeDesc every ${step}s",
-                 'COMMENT:end\: '.$date.'\j' );
+                 "COMMENT:$date\\j");
 #       do_log ("***** begin task ***** <br />");
 #       do_log (@task);
 #       do_log ("***** end task ***** <br />");
