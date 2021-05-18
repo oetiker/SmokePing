@@ -1385,7 +1385,7 @@ sub get_detail ($$$$;$){
             my $timer_start = time();
             my $title = "";
             if ($cfg->{Presentation}{htmltitle} ne 'yes') {
-                $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
+                $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname) . " to $phys_tree->{title}";
             }
             my @task =
                ("${imgbase}${s}_${end}_${start}.png",
