@@ -123,7 +123,7 @@ sub save_updates {
         }
     }
     for my $name (sort keys %u){
-        my $file = slavedatadir($cfg) ."${name}.${slave}.slave_cache";
+        my $file = slavedatadir($cfg) ."/${name}.${slave}.slave_cache";
         for (my $i = 2; $i >= 0; $i--){
             my $fh;
             if ( open ($fh, '+>>' , $file) and flock($fh, LOCK_EX) ){
