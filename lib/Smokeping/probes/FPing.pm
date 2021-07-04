@@ -166,8 +166,16 @@ sub ping ($){
         map { $self->{rtts}{$_} = [@times] } @{$self->{addrlookup}{$ip}} ;
     }
     waitpid $pid,0;
+    # Exit status (of fping) is
+    #   0 if all the hosts are reachable,
+    #   1 if some hosts were unreachable,
+    #   2 if any IP addresses were not found,
+    #   3 for invalid command line arguments, and
+    #   4 for a system call failure.
+    # Don't log 0 or 1 as an unreachable host is not unexpected for a monitoring software
     my $rc = $?;
-    carp join(" ",@cmd) . " returned with exit code $rc. run with debug enabled to get more information" unless $rc == 0;
+    my $status = $rc >> 8;
+    carp join(" ",@cmd) . " returned with exit code $rc. run with debug enabled to get more information" unless $status == 0 or $status == 1;
     close $inh;
     close $outh;
     close $errh;
@@ -269,7 +277,6 @@ a copy on www.smokeping.org/pub.
 DOC
 		},
 		interface => {
-			_re => '[a-zA-Z0-9]+',
 			_example => 'eth0',
 			_doc => "The name of the network interface to perform the ping on.",
 		},
