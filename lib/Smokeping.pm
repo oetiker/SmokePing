@@ -23,8 +23,10 @@ use Smokeping::Graphs;
 use URI::Escape;
 use Time::HiRes;
 use Data::Dumper;
-use InfluxDB::HTTP;
-use InfluxDB::LineProtocol qw(data2line precision=ms);
+# optional dependencies
+# will be imported in case InfluxDB host is configured
+# InfluxDB::HTTP
+# InfluxDB::LineProtocol
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -4159,8 +4161,18 @@ sub load_cfg ($;$) {
            load_sorters $cfg->{Presentation}{charts};
         }
         #initiate a connection to InfluxDB (if needed)
-        if(! defined $influx && defined $cfg->{'InfluxDB'}{'host'}){
+        if(! defined $influx && defined $cfg->{'InfluxDB'}{'host'}) {
             do_log("DBG: Setting up a new InfluxDB connection");
+            my $rc = eval
+            {
+              require InfluxDB::HTTP;
+              InfluxDB::HTTP->import();
+              require InfluxDB::LineProtocol;
+              InfluxDB::LineProtocol->import(qw(data2line precision=ms));
+              1;
+            };
+            die "ERROR: Could not import InfluxDB modules, but InfluxDB host was configured: $@\n" if ! $rc;
+
             $influx = InfluxDB::HTTP->new(
                 host => $cfg->{'InfluxDB'}{'host'},
                 port => $cfg->{'InfluxDB'}{'port'},
