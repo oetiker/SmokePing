@@ -216,7 +216,7 @@ sub test_usage {
 
 	my $arghashref = $self->features;
 	my %arghash = %$arghashref;
-        my $curl_man = `$bin --help`;
+        my $curl_man = `$bin --help all`;
         
 	for my $feature (keys %arghash) {
 		next if $curl_man =~ /\Q$arghash{$feature}/;
@@ -302,15 +302,15 @@ sub pingone {
 
 	my @times;
 	my $count = $self->pings($t);
-
 	for (my $i = 0 ; $i < $count; $i++) {
 		open(P, "-|") or exec @cmd;
 
 		my $val;
-
-		while (<P>) {
-			chomp;
-			/^Total: (\d+\.\d+) DNS: (\d+\.\d+) Redirect: (\d+\.\d+) Connect: (\d+\.\d+) Appconnect: (\d+\.\d+) Pretransfert: (\d+\.\d+) Starttransfert: (\d+\.\d+)?/ and do {
+                my $scale = 1000000;
+            while (<P>) {
+                chomp;
+                # /^Total: (\d+\.\d+) DNS: (\d+\.\d+) Redirect: (\d+\.\d+) Connect: (\d+\.\d+) Appconnect: (\d+\.\d+) Pretransfert: (\d+\.\d+) Starttransfert: (\d+\.\d+)?/
+                /^Total: (\d+) DNS: (\d+) Redirect: (\d+) Connect: (\d+) Appconnect: (\d+) Pretransfert: (\d+) Starttransfert: (\d+).*/ and do {
 				# Total: time_total
 				# DNS: time_namelookup
 				# Redirect: time_redirect
@@ -319,13 +319,13 @@ sub pingone {
 				# Pretransfert: time_pretransfer
 				# Starttransfert: time_starttransfer
 				# Default is current behaviour where we take total minus DNS resolution.
-				if ($t->{vars}{write_out} eq 'time_total') {$val += $1}
-				elsif ($t->{vars}{write_out} eq 'time_namelookup') {$val += $2}
-				elsif ($t->{vars}{write_out} eq 'time_redirect') {$val += $3}
-				elsif ($t->{vars}{write_out} eq 'time_connect') {$val += $4}
-				elsif ($t->{vars}{write_out} eq 'time_appconnect') {$val += $5}
-				elsif ($t->{vars}{write_out} eq 'time_pretransfer') {$val += $6}
-				elsif ($t->{vars}{write_out} eq 'time_starttransfer') {$val += $7}
+				if ($t->{vars}{write_out} eq 'time_total') {$val += $1/$scale}
+				elsif ($t->{vars}{write_out} eq 'time_namelookup') {$val += $2/$scale}
+				elsif ($t->{vars}{write_out} eq 'time_redirect') {$val += $3/$scale}
+				elsif ($t->{vars}{write_out} eq 'time_connect') {$val += $4/$scale}
+				elsif ($t->{vars}{write_out} eq 'time_appconnect') {$val += $5/$scale}
+				elsif ($t->{vars}{write_out} eq 'time_pretransfer') {$val += $6/$scale}
+				elsif ($t->{vars}{write_out} eq 'time_starttransfer') {$val += $7/$scale}
 				else {$val += $1 - $2;}
 
 				if ($t->{vars}{include_redirects} eq "yes" and defined $3) {
