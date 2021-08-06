@@ -5,8 +5,7 @@ use strict;
 use warnings;
 
 use lib (split /:/, q{}); # PERL5LIB
-use FindBin;
-use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
+use FindBin; use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 
 use Smokeping;
  
