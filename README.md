@@ -1,18 +1,20 @@
- ____                  _        ____  _             
+```
+____                  _        ____  _             
 / ___| _ __ ___   ___ | | _____|  _ \(_)_ __   __ _ 
 \___ \| '_ ` _ \ / _ \| |/ / _ \ |_) | | '_ \ / _` |
  ___) | | | | | | (_) |   <  __/  __/| | | | | (_| |
 |____/|_| |_| |_|\___/|_|\_\___|_|   |_|_| |_|\__, |
                                               |___/ 
-Authors:  Tobias Oetiker <tobi of oetiker.ch>
-          Niko Tyni <ntyni with iki.fi>
+```
 
+Original Authors:  Tobias Oetiker <tobi of oetiker.ch> and Niko Tyni <ntyni with iki.fi>
 
-   SmokePing is a latency logging and graphing and
-   alerting system. It consists of a daemon process which
-   organizes the latency measurements and a CGI which
-   presents the graphs.
+[![Build Test](https://github.com/oetiker/SmokePing/actions/workflows/build-test.yaml/badge.svg)](https://github.com/oetiker/SmokePing/actions/workflows/build-test.yaml)
 
+SmokePing is a latency logging and graphing and
+alerting system. It consists of a daemon process which
+organizes the latency measurements and a CGI which
+presents the graphs.
 
 SmokePing is ...
 ================
@@ -29,15 +31,6 @@ SmokePing is ...
  * able to deal with DYNAMIC IP addresses as used with
    Cable and ADSL internet.
 
-Do you like it
-==============
-
-If you like SmokePing, and want to show your appreciation for
-the work I am doing (SmokePing like MRTG and RRDtool have
-been written entirely in my spare time) please feel free to
-use:
-
-  http://tobi.oetiker.ch/wish
 
 cheers
 tobi
