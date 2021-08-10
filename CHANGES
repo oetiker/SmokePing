@@ -1,3 +1,30 @@
+2021-08-06 15:46:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - release 2.8.0
+ - support for influxdb @mad-ady
+ - AnotherDNS update @parseword
+ - new matcher ConsecutiveLoss @rborgmaster
+ - lots of spelling fixes @jsoref
+ - update FPing commandline @lelutin
+ - better handling of return codes from probe binaries @lelutin
+ - manual page for smokeinfo @lelutin
+ - drop SSHv1 and rsa1 from SSH.pm @Strykar
+ - disable page refresh while zooming @n0rc
+ - overflow scrollbar @bevhost
+ - update url in zoom mode @dekenberg
+ - allow relative time entry for cropper @dekenberg
+ - fix config reload for slaves @stromnet
+ - improved template layout @bevhost
+ - fix edgetrigger functionality @oetiker
+ - fping protocol parameter optional @AID
+ - exploss matcher fixes @dfrli
+ - interface parameter for fping probe @saaly182
+ - pass 6th argument to edgetrigger external alerts @Ryan Rawdon
+ - red background for 100% loss @dagelf
+ - probe target in graph title @Daxtorim
+ - make loss colors more distinctive @Daxtorim
+ - calculate loss buckets based on number of 'pings' @Daxtorim
+
 commit 0992229546c3732d12ac5af348672c58b6ad8e74
 Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Dec 20 11:23:55 2018 +0100

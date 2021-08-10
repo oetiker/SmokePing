@@ -1,0 +1,69 @@
+name: Build Test
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+
+  build:
+    
+    strategy:
+      matrix:
+        os:
+          - ubuntu-18.04
+          - ubuntu-20.04
+          # no libssl on windows
+          # - windows-latest
+      fail-fast: false
+    name: ${{ matrix.os }}
+ 
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: CPAN Cache
+      id: cpan-cache
+      uses: actions/cache@v1
+      with:
+        path: thirdparty
+        key: ${{ matrix.os }}-cpan-{{ hashFiles('**/cpanfile') }}
+
+    - name: Install dependencies
+      run: sudo apt-get install librrds-perl rrdtool dma
+      
+
+    - name: Bootstrap
+      run: ./bootstrap
+
+    - name: Configure
+      run: ./configure --prefix=$HOME/test-install
+    
+    - name: Make
+      run: make
+      
+    - name: Dist
+      run: make dist
+      
+    - name: Check Dist
+      run: |
+        make dist
+        tar xf *-$(cat VERSION).tar.gz
+        cd *-$(cat VERSION)
+        ./configure --prefix=$HOME/test-install
+        cp -rp ../thirdparty/lib thirdparty/
+        make
+        make install
+        cd $HOME/test-install
+        ./bin/smokeping --version
+
+    - name: Cache Prep
+      run: |
+        rm -rf thirdparty/Makefile* thirdparty/work
+  
