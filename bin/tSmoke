@@ -63,7 +63,7 @@ use Pod::Usage;
 use RRDs;
 
 # Point to your Smokeping config file
-my $cfgfile = "etc/config.dist";
+my $cfgfile = (shift @ARGV) || "$FindBin::Bin/../etc/config";
 
 # global variables
 my $cfg;

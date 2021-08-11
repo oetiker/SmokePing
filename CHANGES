@@ -1,3 +1,8 @@
+2021-08-11 17:12:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - release 2.8.1
+ - fix regression with 'use FindBin' missing from the installed scripts
+
 2021-08-06 15:46:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - release 2.8.0

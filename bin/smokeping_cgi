@@ -4,8 +4,9 @@
 use strict;
 use warnings;
 
+use FindBin;
 use lib (split /:/, q{}); # PERL5LIB
-use FindBin; use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
+use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 
 # don't bother with zombies
 $SIG{CHLD} = 'IGNORE';
