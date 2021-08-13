@@ -18,7 +18,7 @@ AUTOMAKE_OPTIONS =  foreign
 
 SUBDIRS = lib thirdparty bin doc etc htdocs
 
-EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE cpanfile VERSION
+EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE cpanfile VERSION README.md
 
 dist-hook:
 	$(PERL) -i -p -e '"$(PACKAGE_VERSION)" =~ /(\d+)\.(\d+)\.(\d+)/ and $$v = sprintf("%d.%03d%03d",$$1,$$2,$$3) and s/^\$$VERSION\s*=\s*".*?"/\$$VERSION = "$$v"/'  $(distdir)/lib/Smokeping.pm
