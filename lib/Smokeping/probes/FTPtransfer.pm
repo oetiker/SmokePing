@@ -147,7 +147,7 @@ sub pingone {
 		$ftp->quit;
 		$elapsed = ( $end - $start );
 		$ok or next;
-		$self->do_debug("$host - $mode mode transfered $size Bytes in ${elapsed}s");
+		$self->do_debug("$host - $mode mode transferred $size Bytes in ${elapsed}s");
 		push @times, $elapsed;
 	}
 	return sort { $a <=> $b } @times;
@@ -160,7 +160,7 @@ sub probevars {
 	$h->{timeout}{_doc} = <<DOC;
 The timeout is the maximum amount of time you will allow the probe to
 transfer the file. If the probe does not succeed to transfer in the time specified,
-it will get killed and a 'loss' will be loged.
+it will get killed and a 'loss' will be logged.
 
 Since FTPtransfer is an invasive probe you should make sure you do not load
 the link for more than a few seconds anyway. Smokeping currently has a hard

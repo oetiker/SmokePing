@@ -1,3 +1,9 @@
+2021-08-13 08:12:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - release 2.8.2
+ - fix spelling issues in FTPtransfer.pm
+ - add missing README.md to the release archive
+
 2021-08-11 17:12:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - release 2.8.1
