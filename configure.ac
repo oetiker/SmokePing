@@ -34,7 +34,7 @@ AC_PATH_PROG(WGET, wget, no)
 URL_CAT="neither curl nor wget found"
 
 if test -x "$CURL"; then
-    URL_CAT="$CURL --location --insecure"
+    URL_CAT="$CURL --location"
 else
     if test -x "$WGET"; then
         URL_CAT="$WGET -O -"
