@@ -1,3 +1,5 @@
+ - remove --insecure from curl (wget does not have it!) in configure.ac @Gunni
+
 2021-08-13 08:12:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - release 2.8.2
