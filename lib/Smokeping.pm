@@ -1500,7 +1500,7 @@ sub get_detail ($$$$;$){
             }
            $page .= "<div class=\"panel-body\">";
            $page .= qq|<IMG alt="" id="zoom" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
-           $page .= $q->start_form(-method=>'POST', -id=>'range_form')
+           $page .= $q->start_form(-method=>'POST', -id=>'range_form', -action=>$cfg->{General}{cgiurl})
               . "<p>Time range: "		
               . $q->hidden(-name=>'epoch_start',-id=>'epoch_start')
               . $q->hidden(-name=>'hierarchy',-id=>'hierarchy')
