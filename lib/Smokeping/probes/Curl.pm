@@ -220,7 +220,7 @@ sub test_usage {
 
 	my $arghashref = $self->features;
 	my %arghash = %$arghashref;
-        my $curl_man = `$bin --help`;
+        my $curl_man = `$bin --help all`;
         
 	for my $feature (keys %arghash) {
 		next if $curl_man =~ /\Q$arghash{$feature}/;
