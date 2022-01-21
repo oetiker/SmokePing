@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1gQSFA8qQC+y8wAAAB10RVh0Q29tbWVudABDcmVhdGVkIHdpdGggVGhlIEdJTVDvZCVuAAABd0lEQVQoz5WSy07CQBSGTzuF6Y1buQSiCYSgYli7MC54AZc+gC/CE7kzrPQBjDsNIdF4I8oCwr1gO51OOy4aAbGS+K/OTM6X85/5R2g0GvAfSesHjPyj3LyasrIKxch3fXHiSN0Fvv4wbCZuAobsnld7Scw4wIhEhiSCEc/IbgqzZicTMuG0NEpi9jhRLzuZOUXBJRK4ITOfr1yIy6oYIwDQ7KSX3QDgcWFgR9ZtrwCLIQAoJ8j2pVG9Xg8qDsJe0j5MWcW4g5FvMUQ8cRvQXeAplXY0mlfpftI+zpu1tBURed/CHhdCAADoWfiml3gxlYUraZKXVdxKwq6lPx8mqvM97QcQaEalV1O57cffTGVXdzKKa8isNdI3l/6tzly+eM4BQDlOQl4pVEECLDSHUowUNCqsdedVelYZAEB7rIUkfVKYHaQs4okTIjEuJKJePMoCY1fvRghwN9R9gIJKs4orCtxm6Gmq3I/01lDnob+1PdbWR/+lL5mtm+fskIeBAAAAAElFTkSuQmCC" rel="icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <META http-equiv="Refresh" content="<##step##>">
     <title>SmokePing Latency Page for <##title##></title>
@@ -17,6 +18,9 @@
     </div>
 
     <div class="sidebar-menu">
+    <br><br>
+	<ul class="menu">
+	<li class="menuitem"><a class="menulink" href="/"><B>HOME</B></a></li></ul>
         <##menu##>
         <div class="logo">
             <##rrdlogo##>
