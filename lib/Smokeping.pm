@@ -3242,7 +3242,7 @@ Defines how the SmokePing data should be presented.
 DOC
           _sections => [ qw(overview detail charts multihost hierarchies) ],
           _mandatory => [ qw(overview template detail) ],
-          _vars      => [ qw (template charset htmltitle graphborders) ],
+          _vars      => [ qw (template charset htmltitle graphborders colortext colorbackground colorborder) ],
           template   => 
          {
           _doc => <<DOC,
@@ -3281,6 +3281,28 @@ will be transparent.
 DOC
            _re  => '(yes|no)',
            _re_error =>"this must either be 'yes' or 'no'",
+         },
+         colortext => {
+           _doc => <<DOC,
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
+         },
+         colorborder => {
+           _doc => <<DOC,
+By default, SmokePing will render the border gray, which may be overridden
+here with your own RGB value
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
+         },
+         colorbackground => {
+           _doc => <<DOC,
+By default, SmokePing will render the background light gray, which may be
+overridden here with your own RGB value
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
          },
          charts => {
            _doc => <<DOC,
