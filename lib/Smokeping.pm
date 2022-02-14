@@ -297,6 +297,22 @@ sub sendsnpp ($$){
     }
 }
 
+sub panel_class {
+    if ($cfg->{Presentation}{graphborders} eq 'no') {
+        return 'panel-no-border';
+    } else {
+        return 'panel';
+    }
+}
+
+sub panel_heading_class {
+    if ($cfg->{Presentation}{graphborders} eq 'no') {
+        return 'panel-heading-no-border';
+    } else {
+        return 'panel-heading';
+    }
+}
+
 sub min ($$) {
         my ($a, $b) = @_;
         return $a < $b ? $a : $b;
@@ -998,8 +1014,8 @@ sub get_overview ($$$$){
            "COMMENT:$ProbeDesc",
            "COMMENT:$date\\j");
         my $ERROR = RRDs::error();
-        $page .= "<div class=\"panel\">";
-        $page .= "<div class=\"panel-heading\"><h2>".$phys_tree->{title}."</h2></div>"
+        $page .= "<div class=\"".panel_class()."\">";
+        $page .= "<div class=\"".panel_heading_class()."\"><h2>".$phys_tree->{title}."</h2></div>"
             if $cfg->{Presentation}{htmltitle} eq 'yes';
         $page .= "<div class=\"panel-body\">";
         if (defined $ERROR) {
@@ -1493,10 +1509,10 @@ sub get_detail ($$$$;$){
              return undef;
         } 
         elsif ($mode eq 'n'){ # navigator mode
-           $page .= "<div class=\"panel\">";
+           $page .= "<div class=\"".panel_class()."\">";
            if ($cfg->{Presentation}{htmltitle} eq 'yes') {
                 # TODO we generate this above to, maybe share code or store variable ?
-                $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>";
+                $page .= "<div class=\"".panel_heading_class()."\"><h2>$desc</h2></div>";
             }
            $page .= "<div class=\"panel-body\">";
            $page .= qq|<IMG alt="" id="zoom" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
@@ -1521,13 +1537,13 @@ sub get_detail ($$$$;$){
             $t =~ s/$xssBadRx/_/g; 
             for my $slave (@slaves){
                 my $s = $slave ? "~$slave" : "";
-                $page .= "<div class=\"panel\">";
+                $page .= "<div class=\"".panel_class()."\">";
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
                 if ($cfg->{Presentation}{htmltitle} eq 'yes') {
                     # TODO we generate this above to, maybe share code or store variable ?
                     my $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
-                    $page .= "<div class=\"panel-heading\"><h2>$title</h2></div>";
+                    $page .= "<div class=\"".panel_heading_class()."\"><h2>$title</h2></div>";
                 }
                 $page .= "<div class=\"panel-body\">";
                 $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$t.$s.'">'
@@ -1563,8 +1579,8 @@ sub get_charts ($$$){
     }
     if (not defined $open->[1]){
         for my $chart ( keys %charts ){
-            $page .= "<div class=\"panel\">";
-            $page .= "<div class=\"panel-heading\"><h2>$cfg->{Presentation}{charts}{$chart}{title}</h2></div>\n";
+            $page .= "<div class=\"".panel_class()."\">";
+            $page .= "<div class=\"".panel_heading_class()."\"><h2>$cfg->{Presentation}{charts}{$chart}{title}</h2></div>\n";
             if (not defined $charts{$chart}[0]){
                 $page .= "<p>No targets returned by the sorter.</p>"
             } else {
@@ -1597,7 +1613,7 @@ sub get_charts ($$$){
                 last unless ref $tree->{$host} eq 'HASH';
                 $tree = $tree->{$host};
             }       
-            $page .= "<div class=\"panel\">";
+            $page .= "<div class=\"".panel_class()."\">";
             $page .= "<div class=\"panel-heading\"><h2>$rank."; 
             $page .= " ".sprintf($cfg->{Presentation}{charts}{$chart}{format},$chartentry->{value})
                 if ($cfg->{Presentation}{charts}{$chart}{format});
@@ -3226,7 +3242,7 @@ Defines how the SmokePing data should be presented.
 DOC
           _sections => [ qw(overview detail charts multihost hierarchies) ],
           _mandatory => [ qw(overview template detail) ],
-          _vars      => [ qw (template charset htmltitle graphborders) ],
+          _vars      => [ qw (template charset htmltitle graphborders colortext colorbackground colorborder) ],
           template   => 
          {
           _doc => <<DOC,
@@ -3265,6 +3281,28 @@ will be transparent.
 DOC
            _re  => '(yes|no)',
            _re_error =>"this must either be 'yes' or 'no'",
+         },
+         colortext => {
+           _doc => <<DOC,
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
+         },
+         colorborder => {
+           _doc => <<DOC,
+By default, SmokePing will render the border gray, which may be overridden
+here with your own RGB value
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
+         },
+         colorbackground => {
+           _doc => <<DOC,
+By default, SmokePing will render the background light gray, which may be
+overridden here with your own RGB value
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
          },
          charts => {
            _doc => <<DOC,
