@@ -1,10 +1,5 @@
-
-- add favicon (bas64) to basepage.html
-- add "Home"-Link to basepage.html
-
-commit 0216fe558ce9ab2a8cea47144be2baf8144da36e
-2022-01-21 20:20:00 +0800 @rezzorix
-
+- add favicon (bas64) to basepage.html  @rezzorix
+- add "Home"-Link to basepage.html  @rezzorix
  - remove --insecure from curl (wget does not have it!) in configure.ac @Gunni
  - add fix for curl feature checking introduced in curl 7.74 and later @matellis
 
