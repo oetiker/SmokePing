@@ -1,3 +1,5 @@
+- add favicon (bas64) to basepage.html  @rezzorix
+- add "Home"-Link to basepage.html  @rezzorix
  - remove --insecure from curl (wget does not have it!) in configure.ac @Gunni
  - add fix for curl feature checking introduced in curl 7.74 and later @matellis
  - enhancement to extend color handling, making dark templates easier to do @matellis
