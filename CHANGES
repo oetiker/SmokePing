@@ -2,6 +2,7 @@
  - add fix for curl feature checking introduced in curl 7.74 and later @matellis
  - enhancement to extend color handling, making dark templates easier to do @matellis
  - enhancement to remove more borders with graphborders set to no @matellis
+ - add fix for #209 - auto create 'dyndir' structure when saving slave updates @simfishing
 
 2021-08-13 08:12:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
