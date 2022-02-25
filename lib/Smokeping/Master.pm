@@ -6,6 +6,8 @@ use strict;
 use warnings;
 use Fcntl qw(:flock);
 use Digest::HMAC_MD5 qw(hmac_md5_hex);
+use File::Basename qw(dirname);
+use File::Path qw(make_path);
 # keep this in sync with the Slave.pm part
 # only update if you have to force a parallel upgrade
 my $PROTOCOL = "2";
@@ -106,6 +108,24 @@ sub slavedatadir ($) {
     return $dir;
 }
 
+sub make_slavedatadir ($) {
+    my $file = shift;
+    my $dir = dirname($file);
+
+    if (! -d $dir) {
+        make_path($dir, {'error' => \my $err});
+
+        if ($err && @$err) {
+            for my $diag (@$err) {
+                my ($f,$m) = %$diag;
+                warn "Failed to create slave cache directory [$f]: $m";
+            }
+        } else {
+            warn "Slave cache directory $dir created\n";
+        }
+    }
+}
+
 sub save_updates {
     my $cfg = shift;
     my $slave = shift;
@@ -126,6 +146,7 @@ sub save_updates {
         my $file = slavedatadir($cfg) ."/${name}.${slave}.slave_cache";
         for (my $i = 2; $i >= 0; $i--){
             my $fh;
+            make_slavedatadir($file);
             if ( open ($fh, '+>>' , $file) and flock($fh, LOCK_EX) ){
                 my $existing = [];
                 if (! -e $file) { # the reader unlinked it from under us
