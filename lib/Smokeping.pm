@@ -3841,7 +3841,7 @@ DOC
               },
         },
        Slaves => {_doc         => <<END_DOC,
-Your smokeping can remote control other somkeping instances running in slave
+Your smokeping can remote control other smokeping instances running in slave
 mode on different hosts. Use this section to tell your master smokeping about the
 slaves you are going to use.
 END_DOC
