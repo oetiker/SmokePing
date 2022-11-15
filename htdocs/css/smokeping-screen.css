@@ -268,3 +268,8 @@ a#menu-button:hover {
 		left: 250px !important;
 	}
 }
+
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+}

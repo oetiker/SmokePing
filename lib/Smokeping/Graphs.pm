@@ -352,7 +352,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
-                  . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                  . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         } else { # chart mode
             $page .= "<div class=\"panel\">";
@@ -360,7 +360,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
-                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         }
 
