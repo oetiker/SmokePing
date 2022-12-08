@@ -53,7 +53,8 @@ use warnings;
 # Point the lib variables to your implementation
 
 use lib (split /:/, q{}); # PERL5LIB
-use FindBin;use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
+use FindBin;
+use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 
 
 use Smokeping;
