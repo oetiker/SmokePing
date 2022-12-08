@@ -1,3 +1,4 @@
+ - make image responsive @HinataKato
  - add fix for #209 - auto create 'dyndir' structure when saving slave updates @simfishing
  - add favicon (bas64) to basepage.html  @rezzorix
  - add "Home"-Link to basepage.html  @rezzorix
