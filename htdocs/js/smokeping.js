@@ -128,6 +128,10 @@ Event.observe(
     window,
     'load',
     function() {
+       let reload = setTimeout(() => function () {
+          location.reload();
+       }, window.options.step * 1000);
+
         $('menu-button').observe('click', function (e) {
             if ($('sidebar').getStyle('left') == '0px') {
                 $('body').addClassName('sidebar-hidden');
@@ -135,6 +139,20 @@ Event.observe(
             } else {
                 $('body').removeClassName('sidebar-hidden');
                 $('body').addClassName('sidebar-visible');
+            }
+            Event.stop(e);
+        });
+        $('reload-button').observe('click', function (e) {
+            if (localStorage.getItem("noReload")) {
+                localStorage.removeItem("noReload");
+                reload = setTimeout(() => function () {
+                   location.reload();
+                }, window.options.step * 1000);
+                $('reload-button').style.textDecoration = "line-through";
+            } else {
+                clearTimeout(reload);
+                localStorage.setItem("noReload", true);
+               $('reload-button').style.textDecoration = "none";
             }
             Event.stop(e);
         });
