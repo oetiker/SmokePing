@@ -30,6 +30,7 @@
 
 <div class="navbar">
     <div class="navbar-menu"><a id="menu-button" href="#">Toggle Menu</a></div>
+    <div class="navbar-reload"><a id="reload-button" href="#">Auto Refresh</a></div>
     <div class="navbar-user"><div class="icon-person"></div><##authuser##></div>
 </div>
 
