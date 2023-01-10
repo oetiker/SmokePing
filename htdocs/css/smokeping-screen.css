@@ -140,6 +140,17 @@ img {
 	height: 50px;
 	display: inline-block;
 }
+.navbar .navbar-refresh {
+	border-right: 1px solid #afafaf;
+	height: 50px;
+	display: inline-block;
+	position: absolute;
+	padding: 0 10px;
+	line-height: 50px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+}
 .navbar .navbar-user {
 	border-left: 1px solid #afafaf;
 	height: 50px;
