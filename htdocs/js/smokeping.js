@@ -128,7 +128,7 @@ Event.observe(
     window,
     'load',
     function() {
-       let reload = setTimeout(() => function () {
+       let reload = setTimeout(function () {
           location.reload();
        }, window.options.step * 1000);
 
@@ -145,7 +145,7 @@ Event.observe(
         $('reload-button').observe('click', function (e) {
             if (localStorage.getItem("noReload")) {
                 localStorage.removeItem("noReload");
-                reload = setTimeout(() => function () {
+                reload = setTimeout(function () {
                    location.reload();
                 }, window.options.step * 1000);
                 $('reload-button').style.textDecoration = "line-through";
