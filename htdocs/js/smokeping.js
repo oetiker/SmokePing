@@ -128,7 +128,7 @@ Event.observe(
     window,
     'load',
     function() {
-       let reload = setTimeout(function () {
+       let refresh = setTimeout(function () {
           location.reload();
        }, window.options.step * 1000);
 
@@ -142,17 +142,17 @@ Event.observe(
             }
             Event.stop(e);
         });
-        $('reload-button').observe('click', function (e) {
-            if (localStorage.getItem("noReload")) {
-                localStorage.removeItem("noReload");
-                reload = setTimeout(function () {
+        $('refresh-button').observe('click', function (e) {
+            if (localStorage.getItem("noRefresh")) {
+                localStorage.removeItem("noRefresh");
+                refresh = setTimeout(function () {
                    location.reload();
                 }, window.options.step * 1000);
-                $('reload-button').style.textDecoration = "line-through";
+                $('refresh-button').style.textDecoration = "line-through";
             } else {
                 clearTimeout(reload);
-                localStorage.setItem("noReload", true);
-               $('reload-button').style.textDecoration = "none";
+                localStorage.setItem("noRefresh", true);
+               $('refresh-button').style.textDecoration = "none";
             }
             Event.stop(e);
         });
