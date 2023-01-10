@@ -1,3 +1,4 @@
+ - allow to enable/disable autorefresh from ui @Fantros
  - make image responsive @HinataKato
  - add fix for #209 - auto create 'dyndir' structure when saving slave updates @simfishing
  - add favicon (bas64) to basepage.html  @rezzorix
