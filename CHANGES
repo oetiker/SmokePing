@@ -1,3 +1,4 @@
+ - use actual link for form submission @michaelharo
  - allow to enable/disable autorefresh from ui @Fantros
  - make image responsive @HinataKato
  - add fix for #209 - auto create 'dyndir' structure when saving slave updates @simfishing
