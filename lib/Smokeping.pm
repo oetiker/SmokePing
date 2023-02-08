@@ -1663,7 +1663,7 @@ sub load_sortercache($){
 sub hierarchy_switcher($$){
     my $q = shift;
     my $cfg = shift;
-    my $print =$q->start_form(-name=>'hswitch',-method=>'get',-action=>$cfg->{General}{cgiurl});
+    my $print =$q->start_form(-name=>'hswitch',-method=>'get',-action=>cgiurl($q, $cfg));
     if ($cfg->{Presentation}{hierarchies}){
             $print .= "<div class=\"hierarchy\">";
             $print .= "<label for=\"hierarchy\" class=\"hierarchy-label\">Hierarchy:</label>";
