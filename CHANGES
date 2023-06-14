@@ -1,3 +1,6 @@
+
+ - InfluxDB 2.x v1 (compatibility) api doesn't set the "WWW-Authenticate" header (violating rfc7235).
+   Work around this issue by manually setting the Authorization header @HandyMenny
  - use actual link for form submission @michaelharo
  - allow to enable/disable autorefresh from ui @Fantros
  - make image responsive @HinataKato

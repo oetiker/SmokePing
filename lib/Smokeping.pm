@@ -23,6 +23,7 @@ use Smokeping::Graphs;
 use URI::Escape;
 use Time::HiRes;
 use Data::Dumper;
+use MIME::Base64;
 # optional dependencies
 # will be imported in case InfluxDB host is configured
 # InfluxDB::HTTP
@@ -4218,13 +4219,11 @@ sub load_cfg ($;$) {
             );
             if (defined $cfg->{'InfluxDB'}{'username'} && defined $cfg->{'InfluxDB'}{'password'}) {
                 do_log("DBG: Setting credentials for InfluxDB connection");
+                my $username = $cfg->{'InfluxDB'}{'username'};
+                my $password = $cfg->{'InfluxDB'}{'password'};
+                my $basicauth = encode_base64("$username:$password");
                 my $ua = $influx->get_lwp_useragent();
-                $ua->credentials(
-                    $cfg->{'InfluxDB'}{'host'} . ':' . $cfg->{'InfluxDB'}{'port'},
-                    'InfluxDB',
-                    $cfg->{'InfluxDB'}{'username'},
-                    $cfg->{'InfluxDB'}{'password'}
-                );
+                $ua->default_header('Authorization',  "Basic $basicauth");
             }
         }
         $cfg->{__parser} = $parser;
