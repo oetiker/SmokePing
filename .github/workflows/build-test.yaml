@@ -7,37 +7,33 @@ on:
   pull_request:
     branches:
       - master
-jobs:
 
-  build:
-    
+jobs:
+  build:    
     strategy:
       matrix:
         os:
-          - ubuntu-18.04
           - ubuntu-20.04
+          - ubuntu-latest
           # no libssl on windows
           # - windows-latest
       fail-fast: false
-    name: ${{ matrix.os }}
- 
+    name: ${{ matrix.os }} 
     runs-on: ${{ matrix.os }}
 
     steps:
-
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
 
     - name: CPAN Cache
       id: cpan-cache
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: thirdparty
         key: ${{ matrix.os }}-cpan-{{ hashFiles('**/cpanfile') }}
 
     - name: Install dependencies
       run: sudo apt-get install librrds-perl rrdtool dma
-      
 
     - name: Bootstrap
       run: ./bootstrap
@@ -66,4 +62,3 @@ jobs:
     - name: Cache Prep
       run: |
         rm -rf thirdparty/Makefile* thirdparty/work
-  
