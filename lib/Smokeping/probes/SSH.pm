@@ -82,9 +82,14 @@ sub pingone ($){
 
     my $host = $target->{addr};
 
-    my $query = "$self->{properties}{binary} -t $target->{vars}->{keytype}  -p $target->{vars}->{port} $host";
+    my $query = "$self->{properties}{binary} -t $target->{vars}->{keytype}  -p $target->{vars}->{port}";
     my @times;
 
+    # if ipv4/ipv6 proto was specified in the target, add it unless it is "0"
+    if ($target->{vars}->{ssh_af} && $target->{vars}->{ssh_af} ne "0") {
+        $query .= " -$target->{vars}->{ssh_af}";
+    }
+    $query .= " $host";
     # get the user and system times before and after the test
     $self->do_debug("query=$query\n");
     for (my $run = 0; $run < $self->pings; $run++) {
@@ -141,6 +146,12 @@ sub targetvars {
 	       _re => '\d+',
                _example => '5000',
                _default => '22',
+           },
+           ssh_af => {
+               _doc => "Address family (IPv4/IPV6) to use when testing the ssh connection, specify 4 or 6.  Specify 0 to reset to default system preference, instead of inheriting the value from parent sections.",
+	       _re => '\d+',
+               _example => '4',
+               _default => '0',
            },
        })
 }
