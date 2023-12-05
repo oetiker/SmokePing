@@ -24,15 +24,39 @@ the graphs shown in the overview page, except for the size.
 
 sub get_colors ($){
     my $cfg = shift;
+    my @colorList = ();
+    my $colorText = $cfg->{Presentation}{colortext};
+    my $colorBorder = $cfg->{Presentation}{colorborder};
+    my $colorBackground = $cfg->{Presentation}{colorbackground};
 
-    if ($cfg->{Presentation}{graphborders} eq 'no') {
+    # If graphborders set to no, and no color override, then return default colors as before
+    if (($cfg->{Presentation}{graphborders} eq 'no') && !($colorText||$colorBorder||$colorBackground)) {
         return '--border', '0',
                 '--color', 'BACK#ffffff00',
                 '--color', 'CANVAS#ffffff00';
-    }
+    };
 
-    # Use rrdtool defaults
-    return;
+    # If there are any overrides, use them
+    if ($cfg->{Presentation}{graphborders} eq 'no') {
+        push(@colorList, '--border', '0');
+    };
+    if ($colorText) {
+        push(@colorList, '--color', "FONT#${colorText}");
+    };
+    if ($colorBorder) {
+        push(@colorList, '--color', "FRAME#${colorBorder}");
+    };
+    if ($colorBackground) {
+        push(@colorList, '--color', "SHADEA#${colorBackground}");
+        push(@colorList, '--color', "SHADEB#${colorBackground}");
+        push(@colorList, '--color', "BACK#${colorBackground}");
+        push(@colorList, '--color', "CANVAS#${colorBackground}");
+    };
+
+    if (@colorList) { return @colorList[0..$#colorList] };
+
+    # Otherwise use rrdtool defaults
+    return
 }
 
 sub get_multi_detail ($$$$;$){
@@ -271,7 +295,7 @@ sub get_multi_detail ($$$$;$){
                Smokeping::Graphs::get_colors($cfg),
                 @G,
                "COMMENT:$ProbeDesc",
-               'COMMENT:end\: '.$date.'\j';
+               "COMMENT:$date\\j";
 
         my $graphret;
         ($graphret,$xs,$ys) = RRDs::graph @task;
@@ -328,7 +352,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
-                  . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                  . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         } else { # chart mode
             $page .= "<div class=\"panel\">";
@@ -336,7 +360,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
-                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         }
 

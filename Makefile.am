@@ -16,14 +16,9 @@
 
 AUTOMAKE_OPTIONS =  foreign
 
-SUBDIRS = thirdparty doc etc htdocs lib bin
+SUBDIRS = lib thirdparty bin doc etc htdocs
 
-EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE PERL_MODULES VERSION
-
-THIRDPARTY_DIR := $(shell pwd)/thirdparty
+EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE cpanfile VERSION README.md
 
 dist-hook:
 	$(PERL) -i -p -e '"$(PACKAGE_VERSION)" =~ /(\d+)\.(\d+)\.(\d+)/ and $$v = sprintf("%d.%03d%03d",$$1,$$2,$$3) and s/^\$$VERSION\s*=\s*".*?"/\$$VERSION = "$$v"/'  $(distdir)/lib/Smokeping.pm
-
-install-exec-hook:
-	[ ! -d $(THIRDPARTY_DIR)/lib/perl5 ] || $(CP) -fr $(THIRDPARTY_DIR)/lib/perl5/* $(DESTDIR)$(libdir)

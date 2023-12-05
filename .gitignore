@@ -18,4 +18,5 @@ etc/config.dist
 thirdparty/*
 !thirdparty/
 !thirdparty/Makefile.am
-!thirdparty/Makefile.in
+*-*.*.*/
+*.gz
