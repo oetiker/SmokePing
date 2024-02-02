@@ -1,4 +1,5 @@
 
+ - Enhancement to SSHProbe allows specification of IPv4 vs IPv6 transport, #385
  - InfluxDB 2.x v1 (compatibility) api doesn't set the "WWW-Authenticate" header (violating rfc7235).
    Work around this issue by manually setting the Authorization header @HandyMenny
  - use actual link for form submission @michaelharo
