@@ -1718,7 +1718,7 @@ sub display_webpage($$){
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;
 
-    my($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
+    my($filter) = $q->param('filter');
 
     my $tree = $cfg->{Targets};
     if ($hierarchy){
