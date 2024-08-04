@@ -765,7 +765,13 @@ sub target_menu($$$$;$){
             }
    	    };
 		if ($filter){
-			if (($menu and $menu =~ /$filter/i) or ($title and $title =~ /$filter/i)){
+			my $filter_re;
+			if ($cfg->{Presentation}{literalsearch} eq 'yes') {
+				$filter_re = qr/\Q$filter\E/i;
+			} else {
+				$filter_re = qr/$filter/i;
+			}
+			if (($menu and $menu =~ $filter_re) or ($title and $title =~ $filter_re)){
 				push @matches, ["$path$key$suffix",$menu,$class,$menuclass];
 			};
 			push @matches, target_menu($tree->{$key}, $open, "$path$key.",$filter, $suffix);
@@ -1718,7 +1724,12 @@ sub display_webpage($$){
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;
 
-    my($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
+    my $filter;
+    if ($cfg->{Presentation}{literalsearch} eq 'yes') {
+        $filter = $q->param('filter');
+    } else {
+        ($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
+    }
 
     my $tree = $cfg->{Targets};
     if ($hierarchy){
@@ -3243,7 +3254,7 @@ Defines how the SmokePing data should be presented.
 DOC
           _sections => [ qw(overview detail charts multihost hierarchies) ],
           _mandatory => [ qw(overview template detail) ],
-          _vars      => [ qw (template charset htmltitle graphborders colortext colorbackground colorborder) ],
+          _vars      => [ qw (template charset htmltitle graphborders literalsearch colortext colorbackground colorborder) ],
           template   => 
          {
           _doc => <<DOC,
@@ -3279,6 +3290,15 @@ DOC
 By default, SmokePing will render gray border on a light gray background,
 if set to 'no' borders will be hidden and the background and canvas
 will be transparent.
+DOC
+           _re  => '(yes|no)',
+           _re_error =>"this must either be 'yes' or 'no'",
+         },
+         literalsearch => {
+           _doc => <<DOC,
+By default, SmokePing will process filter menu queries as regular
+expressions, if set to 'yes' searches will be treated as literal strings
+instead.
 DOC
            _re  => '(yes|no)',
            _re_error =>"this must either be 'yes' or 'no'",
