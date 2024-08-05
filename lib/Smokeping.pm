@@ -766,7 +766,7 @@ sub target_menu($$$$;$){
    	    };
 		if ($filter){
 			my $filter_re;
-			if ($cfg->{Presentation}{literalsearch} eq 'yes') {
+			if (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes') {
 				$filter_re = qr/\Q$filter\E/i;
 			} else {
 				$filter_re = qr/$filter/i;
@@ -1725,7 +1725,7 @@ sub display_webpage($$){
     $open_orig->[-1] .= '~'.$slave if $slave;
 
     my $filter;
-    if ($cfg->{Presentation}{literalsearch} eq 'yes') {
+    if (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes') {
         $filter = $q->param('filter');
     } else {
         ($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
