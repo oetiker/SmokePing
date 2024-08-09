@@ -12,6 +12,8 @@
  - add fix for curl feature checking introduced in curl 7.74 and later @matellis
  - enhancement to extend color handling, making dark templates easier to do @matellis
  - enhancement to remove more borders with graphborders set to no @matellis
+ - add "literalsearch" option to filter targets using literal strings instead
+ of regex @jlu5
 
 2021-08-13 08:12:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
