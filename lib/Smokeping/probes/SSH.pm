@@ -96,12 +96,19 @@ sub pingone ($){
        my $t0 = [gettimeofday()];
 
 	my $pid = open3($inh,$outh,$errh, $query);
-       while (<$errh>) {
+	# OpenSSH 9.8 compatibility - output is on stdout now
+	while (<$outh>) {
+            if (/$ssh_re/i) {
+		push @times, tv_interval($t0);
+		last;
+            }
+	}
+	while (<$errh>) {
             if (/$ssh_re/i) {
                 push @times, tv_interval($t0);
                 last;
             }
-        }
+	}
 	waitpid $pid,0;
 	my $rc = $?;
 	carp "$query returned with exit code $rc. run with debug enabled to get more information" unless $rc == 0;
