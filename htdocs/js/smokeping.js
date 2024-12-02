@@ -150,7 +150,7 @@ Event.observe(
                 }, window.options.step * 1000);
                 $('refresh-button').style.textDecoration = "line-through";
             } else {
-                clearTimeout(reload);
+                clearTimeout(refresh);
                 localStorage.setItem("noRefresh", true);
                $('refresh-button').style.textDecoration = "none";
             }

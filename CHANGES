@@ -1,3 +1,4 @@
+ - fix error when toggling autorefresh @jlu5
  - Support parsing IPv6 output in OpenSSHJunOSPing Plugin @zimage
  - Enhancement to SSHProbe allows specification of IPv4 vs IPv6 transport, #385
  - InfluxDB 2.x v1 (compatibility) api doesn't set the "WWW-Authenticate" header (violating rfc7235).
