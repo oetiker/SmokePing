@@ -55,7 +55,7 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        my $call = "$self->{properties}{binary} -t dsa,rsa,ecdsa 127.0.0.1";
+        my $call = "$self->{properties}{binary} -t dsa,rsa,ecdsa $self->{properties}{init_host}";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
             print "### parsing ssh-keyscan output...OK\n";
@@ -123,7 +123,12 @@ sub probevars {
 				-x $val or return "ERROR: binary '$val' is not executable";
 				return undef;
 			},
-		},
+                },
+		init_host => {
+			_doc => "Host to use for initialization, defaults to IPv4 localhost 127.0.0.1",
+			_example => '127.0.0.1',
+			_default => '127.0.0.1',
+		}
 	})
 }
 
