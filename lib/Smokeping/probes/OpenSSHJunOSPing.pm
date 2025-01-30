@@ -124,7 +124,7 @@ sub pingone ($$){
     my @times = ();
     for (@output){
     	chomp;
-        /^\d+ bytes from \S+: icmp_seq=\d+ ttl=\d+ time=(\d+\.\d+) ms$/ and push @times,$1;
+        /^\d+ bytes from \S+[:,] icmp_seq=\d+ (?:ttl|hlim)=\d+ time=(\d+\.\d+) ms$/ and push @times,$1;
     }
     @times = map {sprintf "%.10e", $_ / $self->{pingfactor}} sort {$a <=> $b} @times;
     return @times;

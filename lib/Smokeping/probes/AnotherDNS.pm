@@ -85,12 +85,14 @@ sub pingone ($) {
     my $sock = 0;
     
     if ($ipversion == 6) {
+    	require IO::Socket::INET6;
         $sock = IO::Socket::INET6->new(
             "PeerAddr" => $host,
             "PeerPort" => $port,
             "Proto"    => $protocol,
         );
     } else {
+    	require IO::Socket::INET;
         $sock = IO::Socket::INET->new(
             "PeerAddr" => $host,
             "PeerPort" => $port,

@@ -23,8 +23,11 @@ use Smokeping::Graphs;
 use URI::Escape;
 use Time::HiRes;
 use Data::Dumper;
-use InfluxDB::HTTP;
-use InfluxDB::LineProtocol qw(data2line precision=ms);
+use MIME::Base64;
+# optional dependencies
+# will be imported in case InfluxDB host is configured
+# InfluxDB::HTTP
+# InfluxDB::LineProtocol
 
 setlogsock('unix')
    if grep /^ $^O $/xo, ("linux", "openbsd", "freebsd", "netbsd");
@@ -295,9 +298,48 @@ sub sendsnpp ($$){
     }
 }
 
+sub panel_class {
+    if ($cfg->{Presentation}{graphborders} eq 'no') {
+        return 'panel-no-border';
+    } else {
+        return 'panel';
+    }
+}
+
+sub panel_heading_class {
+    if ($cfg->{Presentation}{graphborders} eq 'no') {
+        return 'panel-heading-no-border';
+    } else {
+        return 'panel-heading';
+    }
+}
+
 sub min ($$) {
         my ($a, $b) = @_;
         return $a < $b ? $a : $b;
+}
+
+sub max ($$) {
+    my ($a, $b) = @_;
+    return $a < $b ? $b : $a;
+}
+
+sub display_range ($$) {
+    # Turn inputs into range, i.e. (10,19) is turned into "10-19"
+    my $lower = shift;
+    my $upper = shift;
+    my $ret;
+
+    # Only return actual range when there is a difference, otherwise return just lower bound
+    if ($upper < $lower) {
+        # Edgecase: Happens when $pings is less than 6 since there is no minimum value imposed on it
+        $ret = $upper;
+    } elsif ($upper > $lower) {
+        $ret = "$lower-$upper";
+    } else {
+        $ret = $lower;
+    }
+    return $ret;
 }
 
 sub init_alerts ($){
@@ -723,7 +765,13 @@ sub target_menu($$$$;$){
             }
    	    };
 		if ($filter){
-			if (($menu and $menu =~ /$filter/i) or ($title and $title =~ /$filter/i)){
+			my $filter_re;
+			if (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes') {
+				$filter_re = qr/\Q$filter\E/i;
+			} else {
+				$filter_re = qr/$filter/i;
+			}
+			if (($menu and $menu =~ $filter_re) or ($title and $title =~ $filter_re)){
 				push @matches, ["$path$key$suffix",$menu,$class,$menuclass];
 			};
 			push @matches, target_menu($tree->{$key}, $open, "$path$key.",$filter, $suffix);
@@ -787,6 +835,7 @@ sub fill_template ($$;$){
 
 sub exp2seconds ($) {
     my $x = shift;
+    $x =~/(\d+)s/ && return $1;
     $x =~/(\d+)m/ && return $1*60;
     $x =~/(\d+)h/ && return $1*60*60;
     $x =~/(\d+)d/ && return $1*60*60*24;
@@ -875,6 +924,7 @@ sub get_overview ($$$$){
         my $i = 0;
         my @colors = split /\s+/, $cfg->{Presentation}{multihost}{colors};
         my $ProbeUnit = $probe->ProbeUnit();
+        my $ProbeDesc = $probe->ProbeDesc();
         for my $slave (@slaves){
             $i++;
             my $rrd;
@@ -892,11 +942,23 @@ sub get_overview ($$$$){
                 $probe = $probes->{$tree->{probe}};
                 $pings = $probe->_pings($tree);
                 $label = $tree->{menu};
-                # if there are multiple units ... lets say so ... 
-                if ($ProbeUnit ne $probe->ProbeUnit()){
-                    $ProbeUnit = 'var units';
+
+                # if there are multiple probes ... lets say so ...
+                my $XProbeDesc = $probe->ProbeDesc();
+                if (not $ProbeDesc or $ProbeDesc eq $XProbeDesc){
+                    $ProbeDesc = $XProbeDesc;
                 }
-                
+                else {
+                    $ProbeDesc = "various probes";
+                }
+                my $XProbeUnit = $probe->ProbeUnit();
+                if (not $ProbeUnit or $ProbeUnit eq $XProbeUnit){
+                    $ProbeUnit = $XProbeUnit;
+                }
+                else {
+                    $ProbeUnit = "various units";
+                }
+
                 if ($real_slave){
                     $label .= "<".  $cfg->{Slaves}{$real_slave}{display_name};
                 }
@@ -956,10 +1018,11 @@ sub get_overview ($$$$){
            '--rigid',
            '--lower-limit','0',
            @G,
-           "COMMENT:$date\\r");
+           "COMMENT:$ProbeDesc",
+           "COMMENT:$date\\j");
         my $ERROR = RRDs::error();
-        $page .= "<div class=\"panel\">";
-        $page .= "<div class=\"panel-heading\"><h2>".$phys_tree->{title}."</h2></div>"
+        $page .= "<div class=\"".panel_class()."\">";
+        $page .= "<div class=\"".panel_heading_class()."\"><h2>".$phys_tree->{title}."</h2></div>"
             if $cfg->{Presentation}{htmltitle} eq 'yes';
         $page .= "<div class=\"panel-body\">";
         if (defined $ERROR) {
@@ -1224,15 +1287,24 @@ sub get_detail ($$$$;$){
             my ($num,$col,$txt) = @{$_};
             $lc{$num} = [ $txt, "#".$col ];
         }
-    } else {  
+    } else {
+
         my $p = $pings;
-        %lc =  (0          => ['0',   '#26ff00'],
-                1          => ["1/$p",  '#00b8ff'],
-                2          => ["2/$p",  '#0059ff'],
-                3          => ["3/$p",  '#5e00ff'],
-                4          => ["4/$p",  '#7e00ff'],
-                int($p/2)  => [int($p/2)."/$p", '#dd00ff'],
-                $p-1       => [($p-1)."/$p",    '#ff0000'],
+        # Return either approximate percentage or impose a minimum value
+        my $per01 = max(int(0.01 * $p), 1);
+        my $per05 = max(int(0.05 * $p), 2);
+        my $per10 = max(int(0.10 * $p), 3);
+        my $per25 = max(int(0.25 * $p), 4);
+        my $per50 = max(int(0.50 * $p), 5);
+
+        %lc =  (0         => ['0',                                  '#26ff00'],
+                $per01    => [display_range(1         , $per01),    '#00b8ff'],
+                $per05    => [display_range($per01 + 1, $per05),    '#0059ff'],
+                $per10    => [display_range($per05 + 1, $per10),    '#7e00ff'],
+                $per25    => [display_range($per10 + 1, $per25),    '#ff00ff'],
+                $per50    => [display_range($per25 + 1, $per50),    '#ff5500'],
+                $p-1      => [display_range($per50 + 1, ($p-1)),    '#ff0000'],
+                $p        => ["$p/$p",                              '#a00000']
                 );
     };
     # determine a more 'pastel' version of the ping colours; this is 
@@ -1320,7 +1392,7 @@ sub get_detail ($$$$;$){
             my @losssmoke = ();
             my $last = -1;        
             foreach my $loss (sort {$a <=> $b} keys %lc){
-                next if $loss >= $pings;
+                next if $loss > $pings;
                 my $lvar = $loss; $lvar =~ s/\./d/g ;
                 push @median, 
                    (
@@ -1383,7 +1455,7 @@ sub get_detail ($$$$;$){
             my $timer_start = time();
             my $title = "";
             if ($cfg->{Presentation}{htmltitle} ne 'yes') {
-                $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
+                $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname) . " to $phys_tree->{title}";
             }
             my @task =
                ("${imgbase}${s}_${end}_${start}.png",
@@ -1417,7 +1489,7 @@ sub get_detail ($$$$;$){
                  ()),
                  'HRULE:0#000000',
                  "COMMENT:probe${BS}:       $pings $ProbeDesc every ${step}s",
-                 'COMMENT:end\: '.$date.'\j' );
+                 "COMMENT:$date\\j");
 #       do_log ("***** begin task ***** <br />");
 #       do_log (@task);
 #       do_log ("***** end task ***** <br />");
@@ -1444,14 +1516,14 @@ sub get_detail ($$$$;$){
              return undef;
         } 
         elsif ($mode eq 'n'){ # navigator mode
-           $page .= "<div class=\"panel\">";
+           $page .= "<div class=\"".panel_class()."\">";
            if ($cfg->{Presentation}{htmltitle} eq 'yes') {
                 # TODO we generate this above to, maybe share code or store variable ?
-                $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>";
+                $page .= "<div class=\"".panel_heading_class()."\"><h2>$desc</h2></div>";
             }
            $page .= "<div class=\"panel-body\">";
            $page .= qq|<IMG alt="" id="zoom" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.png">| ;
-           $page .= $q->start_form(-method=>'POST', -id=>'range_form')
+           $page .= $q->start_form(-method=>'POST', -id=>'range_form', -action=>$cfg->{General}{cgiurl})
               . "<p>Time range: "		
               . $q->hidden(-name=>'epoch_start',-id=>'epoch_start')
               . $q->hidden(-name=>'hierarchy',-id=>'hierarchy')
@@ -1472,13 +1544,13 @@ sub get_detail ($$$$;$){
             $t =~ s/$xssBadRx/_/g; 
             for my $slave (@slaves){
                 my $s = $slave ? "~$slave" : "";
-                $page .= "<div class=\"panel\">";
+                $page .= "<div class=\"".panel_class()."\">";
 #           $page .= (time-$timer_start)."<br/>";
 #           $page .= join " ",map {"'$_'"} @task;
                 if ($cfg->{Presentation}{htmltitle} eq 'yes') {
                     # TODO we generate this above to, maybe share code or store variable ?
                     my $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
-                    $page .= "<div class=\"panel-heading\"><h2>$title</h2></div>";
+                    $page .= "<div class=\"".panel_heading_class()."\"><h2>$title</h2></div>";
                 }
                 $page .= "<div class=\"panel-body\">";
                 $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$t.$s.'">'
@@ -1514,8 +1586,8 @@ sub get_charts ($$$){
     }
     if (not defined $open->[1]){
         for my $chart ( keys %charts ){
-            $page .= "<div class=\"panel\">";
-            $page .= "<div class=\"panel-heading\"><h2>$cfg->{Presentation}{charts}{$chart}{title}</h2></div>\n";
+            $page .= "<div class=\"".panel_class()."\">";
+            $page .= "<div class=\"".panel_heading_class()."\"><h2>$cfg->{Presentation}{charts}{$chart}{title}</h2></div>\n";
             if (not defined $charts{$chart}[0]){
                 $page .= "<p>No targets returned by the sorter.</p>"
             } else {
@@ -1548,7 +1620,7 @@ sub get_charts ($$$){
                 last unless ref $tree->{$host} eq 'HASH';
                 $tree = $tree->{$host};
             }       
-            $page .= "<div class=\"panel\">";
+            $page .= "<div class=\"".panel_class()."\">";
             $page .= "<div class=\"panel-heading\"><h2>$rank."; 
             $page .= " ".sprintf($cfg->{Presentation}{charts}{$chart}{format},$chartentry->{value})
                 if ($cfg->{Presentation}{charts}{$chart}{format});
@@ -1598,7 +1670,7 @@ sub load_sortercache($){
 sub hierarchy_switcher($$){
     my $q = shift;
     my $cfg = shift;
-    my $print =$q->start_form(-name=>'hswitch',-method=>'get',-action=>$cfg->{General}{cgiurl});
+    my $print =$q->start_form(-name=>'hswitch',-method=>'get',-action=>cgiurl($q, $cfg));
     if ($cfg->{Presentation}{hierarchies}){
             $print .= "<div class=\"hierarchy\">";
             $print .= "<label for=\"hierarchy\" class=\"hierarchy-label\">Hierarchy:</label>";
@@ -1652,7 +1724,12 @@ sub display_webpage($$){
     my $open_orig = [@$open];
     $open_orig->[-1] .= '~'.$slave if $slave;
 
-    my($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
+    my $filter;
+    if (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes') {
+        $filter = $q->param('filter');
+    } else {
+        ($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
+    }
 
     my $tree = $cfg->{Targets};
     if ($hierarchy){
@@ -1928,7 +2005,7 @@ sub check_alerts {
                             unless (fork) {
                                 $SIG{CHLD} = 'DEFAULT';
                                 if ($edgetrigger) {
-                                   exec $cmd,$_,$line,$loss,$rtt,$tree->{host}, ($what =~/raise/);
+                                   exec $cmd,$_,$line,$loss,$rtt,$tree->{host}, (($what =~/raise/)? 1 : 0);
                                 } else {
                                    exec $cmd,$_,$line,$loss,$rtt,$tree->{host};
                                 }
@@ -2107,8 +2184,8 @@ sub update_rrds($$$$$$) {
     }
 }
 
-sub update_influxdb($$$);
-sub update_influxdb($$$) {
+sub update_influxdb($$$$$);
+sub update_influxdb($$$$$) {
     my $name = shift;
     my $s = shift;
     my $pings = shift;
@@ -2125,7 +2202,7 @@ sub update_influxdb($$$) {
     #do_log("DBG: update->[2]: ".Dumper(\$update->[2]));
     #do_log("DBG: update: ".Dumper(\$update));
     #timestamp is $update->[1] in unix timestamp format
-
+    my $unixtimestamp = $update->[1];
     my @measurements = split(/:/, $update->[2]);
     my $i = 1;
 
@@ -2167,7 +2244,7 @@ sub update_influxdb($$$) {
         $idata{min} = sprintf('%e', $min);
     }
     if (defined $max && $max ne 'U' ){
-        $idata{"max"} = sprintf("%e", $max);
+        $idata{"max"} = sprintf('%e', $max);
     }
 
 
@@ -2177,18 +2254,21 @@ sub update_influxdb($$$) {
     $itags{path} = $name;
     $itags{path} =~ s/$cfg->{General}{datadir}//;
     if ($s ne ""){
-        #master won't have a slave tag value
+        #this is a slave
         $itags{slave} = $s;
+    }
+    else{
+        #to improve filtering in grafana, mark the master
+        $itags{slave} = "master";
     }
 
     #send also probe configuration parameters that are prefixed with influx_. 
     for my $parameter (sort keys %$tree){
         if($parameter=~/^influx_(.+)/){
-            my $tag = $1;
+            my $tag = "tag_".$1;
             #only non-empty parameters get sent
             if($tree->{$parameter} ne ""){
-                # take care not to accidentaly use already used names, like 'host', 'title', 'path', 'slave', 'loss', 'loss_percent'
-                # or it will override the data parsed before
+                #tags will be in the form "tag_location", based on what the user supplied
                 $itags{$tag} = $tree->{$parameter};
             }
         }
@@ -2207,8 +2287,10 @@ sub update_influxdb($$$) {
     } 
 
     #do_debuglog("DBG: idata:".Dumper(\%idata).", itags:".Dumper(\%itags));
+    #convert unixtimestamp from seconds to ms (since rrd have only second precision)
+    $unixtimestamp = $unixtimestamp."000"; #avoid a multiply
 
-    push @influx_data, data2line( $tree->{probe}, \%idata, \%itags);
+    push @influx_data, data2line( $tree->{probe}, \%idata, \%itags, $unixtimestamp);
 
     if(defined $influx){
         #do_debuglog("DBG: About to insert to influxdb: ".Dumper(\@influx_data));
@@ -2218,7 +2300,7 @@ sub update_influxdb($$$) {
             precision => 'ms'
         );
         if(! $insert){
-            do_log("Error inserting measurement into influxdb: $insert")
+            do_log("Error inserting measurement into influxdb: $insert for ".Dumper(\@influx_data))
         }
     }
 }
@@ -3104,7 +3186,7 @@ DOC
 
 	InfluxDB =>
         {
-         _vars => [ qw(host port timeout database) ],
+         _vars => [ qw(host port timeout database username password) ],
          _mandatory => [ qw(host database) ],
          _doc => <<DOC,
 If you want to export data to an InfluxDB database, fill in this section.
@@ -3145,6 +3227,22 @@ DOC
 Database name (where to write the data) within InfluxDB.
 If it doesn't exist, it will be created when writing data.
 DOC
+         },
+         username  =>
+         {
+          _re => '\S+',
+          _doc => <<DOC,
+Username for authentication to InfluxDB.
+If not supplied, no authentication is attempted.
+DOC
+         },
+         password  =>
+         {
+           _re => '\S+',
+           _doc => <<DOC,
+Password for authentication to InfluxDB.
+If not supplied, no authentication is attempted.
+DOC
          }
         },
 
@@ -3156,7 +3254,7 @@ Defines how the SmokePing data should be presented.
 DOC
           _sections => [ qw(overview detail charts multihost hierarchies) ],
           _mandatory => [ qw(overview template detail) ],
-          _vars      => [ qw (template charset htmltitle graphborders) ],
+          _vars      => [ qw (template charset htmltitle graphborders literalsearch colortext colorbackground colorborder) ],
           template   => 
          {
           _doc => <<DOC,
@@ -3195,6 +3293,37 @@ will be transparent.
 DOC
            _re  => '(yes|no)',
            _re_error =>"this must either be 'yes' or 'no'",
+         },
+         literalsearch => {
+           _doc => <<DOC,
+By default, SmokePing will process filter menu queries as regular
+expressions, if set to 'yes' searches will be treated as literal strings
+instead.
+DOC
+           _re  => '(yes|no)',
+           _re_error =>"this must either be 'yes' or 'no'",
+         },
+         colortext => {
+           _doc => <<DOC,
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
+         },
+         colorborder => {
+           _doc => <<DOC,
+By default, SmokePing will render the border gray, which may be overridden
+here with your own RGB value
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
+         },
+         colorbackground => {
+           _doc => <<DOC,
+By default, SmokePing will render the background light gray, which may be
+overridden here with your own RGB value
+DOC
+           _re => '[0-9a-f]{6}',
+           _re_error => 'use rrggbb for color',
          },
          charts => {
            _doc => <<DOC,
@@ -3733,7 +3862,7 @@ DOC
               },
         },
        Slaves => {_doc         => <<END_DOC,
-Your smokeping can remote control other somkeping instances running in slave
+Your smokeping can remote control other smokeping instances running in slave
 mode on different hosts. Use this section to tell your master smokeping about the
 slaves you are going to use.
 END_DOC
@@ -4091,13 +4220,31 @@ sub load_cfg ($;$) {
            load_sorters $cfg->{Presentation}{charts};
         }
         #initiate a connection to InfluxDB (if needed)
-        if(! defined $influx && defined $cfg->{'InfluxDB'}{'host'}){
+        if(! defined $influx && defined $cfg->{'InfluxDB'}{'host'}) {
             do_log("DBG: Setting up a new InfluxDB connection");
+            my $rc = eval
+            {
+              require InfluxDB::HTTP;
+              InfluxDB::HTTP->import();
+              require InfluxDB::LineProtocol;
+              InfluxDB::LineProtocol->import(qw(data2line precision=ms));
+              1;
+            };
+            die "ERROR: Could not import InfluxDB modules, but InfluxDB host was configured: $@\n" if ! $rc;
+
             $influx = InfluxDB::HTTP->new(
                 host => $cfg->{'InfluxDB'}{'host'},
                 port => $cfg->{'InfluxDB'}{'port'},
                 timeout => $cfg->{'InfluxDB'}{'timeout'}
             );
+            if (defined $cfg->{'InfluxDB'}{'username'} && defined $cfg->{'InfluxDB'}{'password'}) {
+                do_log("DBG: Setting credentials for InfluxDB connection");
+                my $username = $cfg->{'InfluxDB'}{'username'};
+                my $password = $cfg->{'InfluxDB'}{'password'};
+                my $basicauth = encode_base64("$username:$password");
+                my $ua = $influx->get_lwp_useragent();
+                $ua->default_header('Authorization',  "Basic $basicauth");
+            }
         }
         $cfg->{__parser} = $parser;
         $cfg->{__last} = $cfmod;

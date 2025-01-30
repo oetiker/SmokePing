@@ -1,4 +1,4 @@
-#  Copyright (C) 2011  Tobi Oetiker
+#  Copyright (C) 2021  Tobi Oetiker
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,10 +22,7 @@ AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR(conftools)
 
 # need this to allow long path names
-AM_INIT_AUTOMAKE([1.9 tar-ustar foreign no-dependencies no-installinfo no-texinfo.tex nostdinc ])
-AM_MAINTAINER_MODE
-
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+AM_INIT_AUTOMAKE([1.9 tar-ustar foreign])
 
 AC_PREFIX_DEFAULT(/opt/$PACKAGE_NAME-$PACKAGE_VERSION)
 
@@ -37,7 +34,7 @@ AC_PATH_PROG(WGET, wget, no)
 URL_CAT="neither curl nor wget found"
 
 if test -x "$CURL"; then
-    URL_CAT="$CURL --location --insecure"
+    URL_CAT="$CURL --location"
 else
     if test -x "$WGET"; then
         URL_CAT="$WGET -O -"
@@ -71,7 +68,7 @@ AC_PATH_PROG(RM, rm, no)
 AC_PATH_PROG(RMDIR, rmdir, no)
 AC_PATH_PROG(MKDIR, mkdir, no)
 AC_PATH_PROG(FIND, find, no)
-AC_PATH_PROG(SENDMAIL, sendmail, /path/to/sendmail, [$PATH$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/usr/lib])
+AC_PATH_PROG(SENDMAIL, sendmail, /path/to/sendmail, $PATH:/usr/sbin:/usr/lib)
 AC_PATH_PROGS(NROFF, [gnroff nroff])
 
 AC_ARG_VAR(GMAKE,   [Path to local GNU Make binary])

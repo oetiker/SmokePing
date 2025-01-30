@@ -50,6 +50,8 @@ AVERAGE  0.5 144   2400
 template = @prefix@/etc/basepage.html.dist
 htmltitle = yes
 graphborders = no
+# If enabled, treat all filter menu queries as literal strings instead of regex
+literalsearch = no
 
 + charts
 

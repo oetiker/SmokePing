@@ -140,6 +140,17 @@ img {
 	height: 50px;
 	display: inline-block;
 }
+.navbar .navbar-refresh {
+	border-right: 1px solid #afafaf;
+	height: 50px;
+	display: inline-block;
+	position: absolute;
+	padding: 0 10px;
+	line-height: 50px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+}
 .navbar .navbar-user {
 	border-left: 1px solid #afafaf;
 	height: 50px;
@@ -181,12 +192,15 @@ a#menu-button:hover {
 	display: inline-block;
 }
 
+.main .panel, .main .panel-no-border {
+	margin: 5px;
+	display: inline-block;
+}
+
 .main .panel {
 	border: 1px solid #d4d4d4;
 	box-shadow: 0 2px 1px -1px rgba(0,0,0,0.1);
 	background: #fff;
-	margin: 5px;
-	display: inline-block;
 }
 
 .main .panel-heading {
@@ -195,7 +209,10 @@ a#menu-button:hover {
 	box-shadow: inset 0 0 1px 1px #fff;
 }
 
-.main .panel-heading h2 {
+.panel-heading-no-border {
+}
+
+.main .panel-heading h2, .main .panel-heading-no-border h2 {
 	margin: 0;
 	padding-left: 10px;
 	line-height: 30px;
@@ -261,4 +278,9 @@ a#menu-button:hover {
 	.sidebar-visible .navbar {
 		left: 250px !important;
 	}
+}
+
+.img-responsive {
+    max-width: 100%;
+    height: auto;
 }

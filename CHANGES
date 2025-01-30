@@ -1,3 +1,60 @@
+ - fix error when toggling autorefresh @jlu5
+ - Support parsing IPv6 output in OpenSSHJunOSPing Plugin @zimage
+ - Enhancement to SSHProbe allows specification of IPv4 vs IPv6 transport, #385
+ - InfluxDB 2.x v1 (compatibility) api doesn't set the "WWW-Authenticate" header (violating rfc7235).
+   Work around this issue by manually setting the Authorization header @HandyMenny
+ - use actual link for form submission @michaelharo
+ - allow to enable/disable autorefresh from ui @Fantros
+ - make image responsive @HinataKato
+ - add fix for #209 - auto create 'dyndir' structure when saving slave updates @simfishing
+ - add favicon (bas64) to basepage.html  @rezzorix
+ - add "Home"-Link to basepage.html  @rezzorix
+ - remove --insecure from curl (wget does not have it!) in configure.ac @Gunni
+ - add fix for curl feature checking introduced in curl 7.74 and later @matellis
+ - enhancement to extend color handling, making dark templates easier to do @matellis
+ - enhancement to remove more borders with graphborders set to no @matellis
+ - add "literalsearch" option to filter targets using literal strings instead
+ of regex @jlu5
+ - OpenSSH 9.8 compatibility for SSH Plugin @ermuller
+
+2021-08-13 08:12:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - release 2.8.2
+ - fix spelling issues in FTPtransfer.pm
+ - add missing README.md to the release archive
+
+2021-08-11 17:12:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - release 2.8.1
+ - fix regression with 'use FindBin' missing from the installed scripts
+
+2021-08-06 15:46:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - release 2.8.0
+ - support for influxdb @mad-ady
+ - AnotherDNS update @parseword
+ - new matcher ConsecutiveLoss @rborgmaster
+ - lots of spelling fixes @jsoref
+ - update FPing commandline @lelutin
+ - better handling of return codes from probe binaries @lelutin
+ - manual page for smokeinfo @lelutin
+ - drop SSHv1 and rsa1 from SSH.pm @Strykar
+ - disable page refresh while zooming @n0rc
+ - overflow scrollbar @bevhost
+ - update url in zoom mode @dekenberg
+ - allow relative time entry for cropper @dekenberg
+ - fix config reload for slaves @stromnet
+ - improved template layout @bevhost
+ - fix edgetrigger functionality @oetiker
+ - fping protocol parameter optional @AID
+ - exploss matcher fixes @dfrli
+ - interface parameter for fping probe @saaly182
+ - pass 6th argument to edgetrigger external alerts @Ryan Rawdon
+ - red background for 100% loss @dagelf
+ - probe target in graph title @Daxtorim
+ - make loss colors more distinctive @Daxtorim
+ - calculate loss buckets based on number of 'pings' @Daxtorim
+
 commit 0992229546c3732d12ac5af348672c58b6ad8e74
 Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Dec 20 11:23:55 2018 +0100
