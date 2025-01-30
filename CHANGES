@@ -1,3 +1,4 @@
+ - Enhancements to SSH.pm probe for #431, allowing configurable start-up test host and doc improvements
  - fix error when toggling autorefresh @jlu5
  - Support parsing IPv6 output in OpenSSHJunOSPing Plugin @zimage
  - Enhancement to SSHProbe allows specification of IPv4 vs IPv6 transport, #385
