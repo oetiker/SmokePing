@@ -138,7 +138,7 @@ sub probevars {
 				-x $val or return "ERROR: binary '$val' is not executable";
 				return undef;
 			},
-    }
+    		},
 		init_host => {
 			_doc => "Host to use for initialization, defaults to IPv4 localhost of 127.0.0.1",
 			_example => '127.0.0.1',
