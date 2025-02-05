@@ -35,8 +35,11 @@ The Probe asks the given host n-times for it's public key, where n is
 the amount specified in the config File.
 
 As part of the initialization, the probe asks 127.0.0.1 for it's public key
-and tries to parse the output. Make sure you have SSH running on the
-localhost as well.
+and tries to parse the output. This is to ensure that the specified ssh-keyscan
+binary provides output in the expected formatm before relying on it.Make sure
+you have SSH running on the localhost as well, or specify an alternative 
+init_host target to test against, that is expected to be available during any 
+smokeping restart.
 DOC
 		authors => <<'DOC',
 Christian Recktenwald <smokeping-contact@citecs.de>
@@ -55,7 +58,7 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        my $call = "$self->{properties}{binary} -t dsa,rsa,ecdsa 127.0.0.1";
+        my $call = "$self->{properties}{binary} -t dsa,rsa,ecdsa $self->{properties}{init_host}";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
             print "### parsing ssh-keyscan output...OK\n";
@@ -135,7 +138,12 @@ sub probevars {
 				-x $val or return "ERROR: binary '$val' is not executable";
 				return undef;
 			},
-		},
+    		},
+		init_host => {
+			_doc => "Host to use for initialization, defaults to IPv4 localhost of 127.0.0.1",
+			_example => '127.0.0.1',
+			_default => '127.0.0.1',
+		}
 	})
 }
 
