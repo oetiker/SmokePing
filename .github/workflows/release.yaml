@@ -32,10 +32,15 @@ jobs:
           # Get current date in YYYY-MM-DD format
           CURRENT_DATE=$(date +%Y-%m-%d)
           
-          # Check first line of CHANGES file
-          FIRST_LINE=$(head -n 1 CHANGES)
+          # Check first line of CHANGES file contains current date using Perl
+          DATE_CHECK=$(perl -ne 'if ($. == 1 && /'"$CURRENT_DATE"'/) { print "yes"; exit; } exit if $. > 1;' CHANGES)
           
-          if [[ "$VERSION_CONTENT" == "$TAG_VERSION" && "$FIRST_LINE" == *"$CURRENT_DATE"* ]]; then
+          echo "Checking conditions:"
+          echo "1. VERSION content ($VERSION_CONTENT) matches tag version ($TAG_VERSION)"
+          echo "2. First line of CHANGES contains today's date ($CURRENT_DATE)"
+          echo "   First line check result: $DATE_CHECK"
+          
+          if [[ "$VERSION_CONTENT" == "$TAG_VERSION" && "$DATE_CHECK" == "yes" ]]; then
             echo "All conditions met!"
             echo "is_valid=true" >> $GITHUB_OUTPUT
           else
@@ -50,13 +55,30 @@ jobs:
       - name: Extract release notes
         id: extract-release-notes
         run: |
-          # Extract the first section of the CHANGES file until the next release entry
-          RELEASE_NOTES=$(awk '/^[0-9]{4}-[0-9]{2}-[0-9]{2}/,/^[0-9]{4}-[0-9]{2}-[0-9]{2}/ {if (NR>1 && /^[0-9]{4}-[0-9]{2}-[0-9]{2}/) exit; print}' CHANGES)
-          # Escape newlines for GitHub Actions
-          RELEASE_NOTES="${RELEASE_NOTES//'%'/'%25'}"
-          RELEASE_NOTES="${RELEASE_NOTES//$'\n'/'%0A'}"
-          RELEASE_NOTES="${RELEASE_NOTES//$'\r'/'%0D'}"
-          echo "release_notes=$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          # Create a temporary file to store the release notes
+          TEMP_FILE=$(mktemp)
+          
+          # Extract the entire first section of CHANGES file using Perl and save to temp file
+          perl -0777 -ne '
+            if (/^((\d{4}-\d{2}-\d{2}).*?)(?=^\d{4}-\d{2}-\d{2}|\z)/ms) {
+              print $1;
+            }
+          ' CHANGES > "$TEMP_FILE"
+          
+          # Use GitHub's approach for multiline outputs
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          cat "$TEMP_FILE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          # Also save the release notes as an artifact for debugging
+          mkdir -p release_artifacts
+          cp "$TEMP_FILE" release_artifacts/release_notes.txt
+          
+      - name: Upload release notes for debugging
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-notes
+          path: release_artifacts/
 
   build-and-release:
     needs: validate-release
@@ -86,8 +108,10 @@ jobs:
         with:
           files: smokeping-${{ needs.validate-release.outputs.version }}.tar.gz
           name: Release v${{ needs.validate-release.outputs.version }}
-          body: ${{ needs.validate-release.outputs.release_notes }}
+          body: |
+            ${{ needs.validate-release.outputs.release_notes }}
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
