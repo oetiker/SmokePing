@@ -75,7 +75,7 @@ jobs:
           cp "$TEMP_FILE" release_artifacts/release_notes.txt
           
       - name: Upload release notes for debugging
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release-notes
           path: release_artifacts/
@@ -86,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up build environment
         run: |
@@ -103,7 +103,7 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: smokeping-${{ needs.validate-release.outputs.version }}.tar.gz
           name: Release v${{ needs.validate-release.outputs.version }}
