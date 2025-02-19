@@ -91,10 +91,9 @@ jobs:
       - name: Set up build environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential autoconf automake
-
+          sudo apt-get install -y build-essential autoconf automake librrds-perl rrdtool dma
       - name: Build project
-        run: |
+        run: |        
           ./bootstrap
           ./configure --enable-maintainer-mode
           make
