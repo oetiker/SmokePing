@@ -18,7 +18,7 @@
 
 
 AC_INIT([smokeping],m4_esyscmd([tr -d '\n' < VERSION]),[tobi@oetiker.ch])
-AC_PREREQ([2.59])
+AC_PREREQ([2.71])
 AC_CONFIG_AUX_DIR(conftools)
 
 # need this to allow long path names
@@ -82,8 +82,7 @@ else
 fi
 
 AC_ARG_ENABLE(pkgonly,
-        [AC_HELP_STRING([--enable-pkgonly],
-                        [Skip all checking])])
+        [AS_HELP_STRING([--enable-pkgonly],[Skip all checking])])
 AC_SUBST(enable_pkgonly)
 
 # $prefix stores the value of the --prefix command line option, or
@@ -96,7 +95,7 @@ if test x$actual_prefix = xNONE; then
 fi
     
 HTDOCSDIR=${actual_prefix}/htdocs
-AC_ARG_WITH(htdocs-dir,AC_HELP_STRING([--with-htdocs-dir=DIR],[Where to install htdocs [PREFIX/htdocs]]), [HTDOCSDIR=$withval])
+AC_ARG_WITH(htdocs-dir,AS_HELP_STRING([--with-htdocs-dir=DIR],[Where to install htdocs [PREFIX/htdocs]]), [HTDOCSDIR=$withval])
 AC_SUBST(HTDOCSDIR)
 
 AC_ARG_VAR(PERL5LIB,   [Colon separated list of perl library directories])
