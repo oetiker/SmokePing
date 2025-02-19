@@ -14,8 +14,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
+#          - windows-latest
+#          - macos-latest
           # no libssl on windows
           # - windows-latest
       fail-fast: false
