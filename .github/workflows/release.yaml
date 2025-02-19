@@ -1,33 +1,39 @@
 name: Create Release
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      confirm_release:
+        description: 'Type "release" to confirm you want to create a release'
+        required: true
+        default: ''
 
 jobs:
-  validate-release:
+  prepare-and-validate:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && inputs.confirm_release == 'release'
     outputs:
       version: ${{ steps.extract-version.outputs.version }}
       release_notes: ${{ steps.extract-release-notes.outputs.release_notes }}
       is_valid: ${{ steps.validate-conditions.outputs.is_valid }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Extract version from tag
+      - name: Extract version from VERSION file
         id: extract-version
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
-          echo "version=$TAG" >> $GITHUB_OUTPUT
+          VERSION_CONTENT=$(cat VERSION)
+          echo "version=$VERSION_CONTENT" >> $GITHUB_OUTPUT
+          echo "Found version: $VERSION_CONTENT"
 
       - name: Validate release conditions
         id: validate-conditions
         run: |
-          # Check if VERSION file contains the same version as the tag
+          # Get version from VERSION file
           VERSION_CONTENT=$(cat VERSION)
-          TAG_VERSION=${{ steps.extract-version.outputs.version }}
           
           # Get current date in YYYY-MM-DD format
           CURRENT_DATE=$(date +%Y-%m-%d)
@@ -36,18 +42,16 @@ jobs:
           DATE_CHECK=$(perl -ne 'if ($. == 1 && /'"$CURRENT_DATE"'/) { print "yes"; exit; } exit if $. > 1;' CHANGES)
           
           echo "Checking conditions:"
-          echo "1. VERSION content ($VERSION_CONTENT) matches tag version ($TAG_VERSION)"
+          echo "1. On master branch: ${{ github.ref == 'refs/heads/master' }}"
           echo "2. First line of CHANGES contains today's date ($CURRENT_DATE)"
           echo "   First line check result: $DATE_CHECK"
           
-          if [[ "$VERSION_CONTENT" == "$TAG_VERSION" && "$DATE_CHECK" == "yes" ]]; then
+          if [[ "$DATE_CHECK" == "yes" ]]; then
             echo "All conditions met!"
             echo "is_valid=true" >> $GITHUB_OUTPUT
           else
             echo "Release conditions not met:"
-            echo "Tag version: v$TAG_VERSION"
-            echo "VERSION file content: $VERSION_CONTENT"
-            echo "CHANGES first line date check: $FIRST_LINE should contain $CURRENT_DATE"
+            echo "CHANGES first line should contain today's date: $CURRENT_DATE"
             echo "is_valid=false" >> $GITHUB_OUTPUT
             exit 1
           fi
@@ -81,17 +85,20 @@ jobs:
           path: release_artifacts/
 
   build-and-release:
-    needs: validate-release
-    if: needs.validate-release.outputs.is_valid == 'true'
+    needs: prepare-and-validate
+    if: needs.prepare-and-validate.outputs.is_valid == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up build environment
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential autoconf automake librrds-perl rrdtool dma
+          
       - name: Build project
         run: |        
           ./bootstrap
@@ -101,14 +108,35 @@ jobs:
           make install
           make dist
 
+      - name: Configure Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+      
+      - name: Create and push tag
+        run: |
+          VERSION=${{ needs.prepare-and-validate.outputs.version }}
+          TAG_NAME="v$VERSION"
+          
+          # Check if tag already exists
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Tag $TAG_NAME already exists"
+            exit 1
+          else
+            echo "Creating tag $TAG_NAME"
+            git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+            git push origin "$TAG_NAME"
+          fi
+
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          files: smokeping-${{ needs.validate-release.outputs.version }}.tar.gz
-          name: Release v${{ needs.validate-release.outputs.version }}
+          tag_name: v${{ needs.prepare-and-validate.outputs.version }}
+          files: smokeping-${{ needs.prepare-and-validate.outputs.version }}.tar.gz
+          name: Release v${{ needs.prepare-and-validate.outputs.version }}
           body: |
-            ${{ needs.validate-release.outputs.release_notes }}
+            ${{ needs.prepare-and-validate.outputs.release_notes }}
           draft: false
           prerelease: false
         env:
