@@ -8,16 +8,3 @@ echo ' -' >> CHANGES.new
 echo >> CHANGES.new
 cat CHANGES >> CHANGES.new && mv CHANGES.new CHANGES
 $EDITOR CHANGES
-./bootstrap
-./configure  --enable-maintainer-mode --prefix=/tmp/smokeping-$$-build
-make
-make clean
-make install
-make dist
-echo READY TO SYNC ?
-read XXX
-scp CHANGES smokeping-$VERSION.tar.gz oposs@freddie:public_html/smokeping/pub
-rm -fr /tmp/smokeping-$$-build
-git tag $VERSION
-echo "run 'git push;git push --tags' to sync github"
-
