@@ -1,5 +1,6 @@
 2025-02-19 14:07:15 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
+ - release 2.8.3
  - Enhancements to SSH.pm probe for #431, allowing configurable start-up test host and doc improvements
  - fix error when toggling autorefresh @jlu5
  - Support parsing IPv6 output in OpenSSHJunOSPing Plugin @zimage
