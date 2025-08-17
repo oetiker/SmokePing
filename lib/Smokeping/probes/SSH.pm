@@ -58,7 +58,7 @@ sub new($$$)
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
         
-        my $call = "$self->{properties}{binary} -t dsa,rsa,ecdsa $self->{properties}{init_host}";
+        my $call = "$self->{properties}{binary} -t rsa,ecdsa $self->{properties}{init_host}";
         my $return = `$call 2>&1`;
         if ($return =~ m/$ssh_re/s){
             print "### parsing ssh-keyscan output...OK\n";
@@ -153,7 +153,7 @@ sub targetvars {
            keytype => {
                _doc => "Type of key, used in ssh-keyscan -t I<keytype>",
 	       _re => "[ecdr]sa*",
-               _example => 'dsa',
+               _example => 'ecdsa',
                _default => 'rsa',
            },
            port => {
