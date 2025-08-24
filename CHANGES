@@ -1,4 +1,5 @@
  - remove dsa and add ed25519 in ssh keyscan by @StalkR and @lelutin
+ - add support for fwmark option in fping 5.2+. Supports 'fwmark' keyword in FPing probe
 
 2025-02-19 14:07:15 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
