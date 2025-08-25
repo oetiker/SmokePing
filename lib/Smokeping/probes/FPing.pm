@@ -69,6 +69,7 @@ sub new($$$)
         my $return = `$binary -C 1 $testhost 2>&1`;
         $self->{enable}{S} = (`$binary -h 2>&1` =~ /\s-S[,\s]/);
         $self->{enable}{O} = (`$binary -h 2>&1` =~ /\s-O[,\s]/);
+        $self->{enable}{fwmark} = (`$binary -h 2>&1` =~ /\s-k[,\s]/);
         croak "ERROR: fping ('$binary -C 1 $testhost') could not be run: $return"
             if $return =~ m/not found/;
         croak "ERROR: FPing must be installed setuid root or it will not work\n" 
@@ -139,6 +140,11 @@ sub ping ($){
     }
     push @params, "-O$self->{properties}{tos}" if $self->{properties}{tos} and $self->{enable}{O};
 
+    if ($self->rounds_count == 1 and $self->{properties}{fwmark} and not $self->{enable}{fwmark}){
+       $self->do_log("WARNING: your fping binary doesn't support fwmark setting (-k), I will ignore any fwmark configurations.");
+    }
+    push @params, "-k$self->{properties}{fwmark}" if $self->{properties}{fwmark} and $self->{enable}{fwmark};
+
     my $pings =  $self->pings;
     if (($self->{properties}{blazemode} || '') eq 'true'){
         $pings++;
@@ -207,6 +213,17 @@ sub probevars {
 			},
 			_doc => "The ping packet size (in the range of 12-64000 bytes).",
 
+        },
+        fwmark => {
+            _re => '\d+|0x[0-9a-zA-Z]+',
+            _example => 1,
+            _sub => sub {
+                my ($val) = @_;
+                return "ERROR: FPing fwmark must be between 1 and 4294967295"
+                    if ( $val < 1 or $val > 4294967295 );
+                return undef;
+            },
+            _doc => "The fwmark (in the range of 1-4294967295).",
 		},
 		blazemode => {
 			_re => '(true|false)',
