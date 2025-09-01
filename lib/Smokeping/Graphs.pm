@@ -155,7 +155,7 @@ sub get_multi_detail ($$$$;$){
         }
         mkdir $cfg->{General}{imgcache}."/__navcache",0755  unless -d  $cfg->{General}{imgcache}."/__navcache";
         # remove old images after one hour
-        my $pattern = $cfg->{General}{imgcache}."/__navcache/*.png";
+        my $pattern = $cfg->{General}{imgcache}."/__navcache/*.svg";
         for (glob $pattern){
                 unlink $_ if time - (stat $_)[9] > 3600;
         }
@@ -165,7 +165,7 @@ sub get_multi_detail ($$$$;$){
         # chart mode 
         mkdir $cfg->{General}{imgcache}."/__chartscache",0755  unless -d  $cfg->{General}{imgcache}."/__chartscache";
         # remove old images after one hour
-        my $pattern = $cfg->{General}{imgcache}."/__chartscache/*.png";
+        my $pattern = $cfg->{General}{imgcache}."/__chartscache/*.svg";
         for (glob $pattern){
                 unlink $_ if time - (stat $_)[9] > 3600;
         }
@@ -282,7 +282,7 @@ sub get_multi_detail ($$$$;$){
         push @task, '--lazy' if $mode eq 's' and $lastheight{$start} == $max->{$start};
 
         push @task,
-               "${imgbase}_${end}_${start}.png",
+               "${imgbase}_${end}_${start}.svg",
                '--start',$realstart,
                ($end ne 'last' ? ('--end',$end) : ()),
                '--height',$cfg->{Presentation}{detail}{height},
@@ -291,7 +291,7 @@ sub get_multi_detail ($$$$;$){
                '--rigid','--upper-limit', $max->{$start},
                '--lower-limit',($cfg->{Presentation}{detail}{logarithmic} ? ($max->{$start} > 0.01) ? '0.001' : '0.0001' : '0'),
                '--vertical-label',$ProbeUnit,
-               '--imgformat','PNG',
+               '--imgformat','SVG',
                Smokeping::Graphs::get_colors($cfg),
                 @G,
                "COMMENT:$ProbeDesc",
@@ -307,15 +307,15 @@ sub get_multi_detail ($$$$;$){
         
 
         if ($mode eq 'a'){ # ajax mode
-             open my $img, "${imgbase}_${end}_${start}.png";
+             open my $img, "${imgbase}_${end}_${start}.svg";
              binmode $img;
-             print "Content-Type: image/png\n";
+             print "Content-Type: image/svg+xml\n";
              my $data;
              read($img,$data,(stat($img))[7]);
              close $img;
              print "Content-Length: ".length($data)."\n\n";
              print $data;
-             unlink "${imgbase}_${end}_${start}.png";
+             unlink "${imgbase}_${end}_${start}.svg";
              return undef;
         } 
 
@@ -325,7 +325,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
 
-           $page .= qq|<IMG id="zoom" alt="" width="$xs" height="$ys" SRC="${imghref}_${end}_${start}.png">| ;
+           $page .= qq|<IMG id="zoom" alt="" width="$xs" height="$ys" SRC="${imghref}_${end}_${start}.svg">| ;
 
            $page .= $q->start_form(-method=>'GET', -id=>'range_form')
               . "<p>Time range: "
@@ -352,7 +352,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
-                  . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png" class="img-responsive">}."</a>" ); #"
+                  . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.svg" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         } else { # chart mode
             $page .= "<div class=\"panel\">";
@@ -360,7 +360,7 @@ sub get_multi_detail ($$$$;$){
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
             $page .= (  qq{<a href="}.lnk($q, (join ".", @$open)).qq{">}
-                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.png" class="img-responsive">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.svg" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         }
 
