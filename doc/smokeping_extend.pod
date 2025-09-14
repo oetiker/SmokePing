@@ -30,7 +30,7 @@ you should too. This document will thus concentrate on the latter case.
 =head1 SKELETON FILE
 
 The L<Smokeping::probes::skel|Smokeping::probes::skel> module is a non-functional probe that is intended
-to make a good basis for a new probe module. Copy the file, 
+to make a good basis for a new probe module. Copy the file,
 C<lib/probes/skel.pm>, to a new name and just fill out the blanks :)
 Note that the names of real probe modules must start with a capital letter.
 
@@ -99,7 +99,7 @@ The variables are declared in a syntax that comes from the module used
 for parsing the configuration file, C<Config::Grammar>. Each variable
 should be a hash that uses the "special variable keys" documented in
 L<Config::Grammar>. See C<Smokeping::probes::skel> and the other
-probes for examples. 
+probes for examples.
 
 For reference, here are the keys the hash should have. Much of this
 is taken straight from the C<Config::Grammar> manual.
@@ -139,7 +139,7 @@ String containing the returned error in case the regular expression
 doesn't match (if not specified, a generic 'syntax error' message will
 be returned).
 
-=item _sub        
+=item _sub
 
 A function pointer. It is called for every value, with the value passed
 as its first argument. If the function returns a defined value it is
@@ -163,7 +163,7 @@ C<Config::Grammar> special section keys are supported.
 If you must do something at probe initialization time, like check that
 the external program you're going to use behaves as you expect, you should
 do it in the C<new> method. You should probably also take care that
-you don't run the tests needlessly while in CGI mode. The usual way to 
+you don't run the tests needlessly while in CGI mode. The usual way to
 do this is to test for $ENV{SERVER_SOFTWARE}. See the C<Smokeping::probes::skel>
 module for an example.
 
@@ -219,7 +219,7 @@ This would be done like this:
 If you want to provide a target-specific C<timeout> setting, you should
 delete the probe-specific variable and be sure to provide a default for
 your target-specific one. See eg. C<Smokeping::probes::AnotherDNS> for an example of
-how this is done. 
+how this is done.
 
 Providing a target-specific C<timeout> will make the timeout in
 C<Smokeping::probes::basefork> be (# of pings * the maximum timeout of all targets)

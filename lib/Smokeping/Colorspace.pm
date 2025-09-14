@@ -8,7 +8,7 @@ Smokeping::Colorspace - Simple Colorspace Conversion methods
 
 =head1 OVERVIEW
 
-This module provides simple colorspace conversion methods, primarily allowing 
+This module provides simple colorspace conversion methods, primarily allowing
 conversion from RGB (red, green, blue) to and from HSL (hue, saturation, luminosity).
 
 =head1 COPYRIGHT
@@ -58,7 +58,7 @@ sub min_max_indexes {
 	my $idx = 0;
 	my ($min_idx, $min, $max_idx, $max);
 	my @l = @_;
-		
+
 	foreach my $i (@l) {
 		if (not defined($min) or ($i < $min)) {
 			$min = $i;
@@ -70,7 +70,7 @@ sub min_max_indexes {
 		}
 		$idx++;
 	}
-	return ($min_idx, $min, $max_idx, $max);	
+	return ($min_idx, $min, $max_idx, $max);
 }
 
 # source for conversion algorithm is:
@@ -149,4 +149,3 @@ sub hsl_to_rgb {
 }
 
 1;
-

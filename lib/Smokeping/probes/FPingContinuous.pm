@@ -2,7 +2,7 @@ package Smokeping::probes::FPingContinuous;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::FPingContinuous>
 
@@ -28,10 +28,10 @@ sub pod_hash {
 Smokeping::probes::FPingContinuous - FPingContinuous Probe for SmokePing
 DOC
 	      description => <<DOC,
-Integrates FPingContinuous as a probe into smokeping. The variable B<binary> must 
-point to your copy of the FPing program.  If it is not installed on 
+Integrates FPingContinuous as a probe into smokeping. The variable B<binary> must
+point to your copy of the FPing program.  If it is not installed on
 your system yet, you can get a slightly enhanced version from L<www.smokeping.org/pub>.
-  
+
 The (optional) B<packetsize> option lets you configure the packetsize for the pings sent.
 
 Continuous output is normally sent to stdout, but you can set B<usestdout> to 'false'
@@ -76,7 +76,7 @@ sub new($$$)
 	$self->{enable}{O} = (`$binary -h 2>&1` =~ /\s-O[,\s]/);
 	croak "ERROR: fping ('$binary -C 1 $testhost') could not be run: $return"
 	    if $return =~ m/not found/;
-	croak "ERROR: FPing must be installed setuid root or it will not work\n" 
+	croak "ERROR: FPing must be installed setuid root or it will not work\n"
 	    if $return =~ m/only.+root/;
 	croak "ERROR: We can only do one ping every 21ms. Either reduce the number of pings or increase the step to fix the issue\n"
 	    if($self->interval() < 20);
@@ -200,7 +200,7 @@ sub run_pinger {
 	  }
 	  ($fping_stdin, $fping_stdout, $fping_stderr, $fping_pid)=$self->run_fping($select);
 	}
-	  
+
 	while(my $data=<$fh>) {
 	  if($data =~ /(\S+)\s+:\s+\[(\d+)\],.+bytes,\s+([0-9\.]+)\s+ms\s+\(/) {
 	    my $address=$1;
@@ -390,7 +390,7 @@ sub probevars {
 			_sub => sub {
 				my ($val) = @_;
 				return "ERROR: FPing packetsize must be between 12 and 64000"
-					if ( $val < 12 or $val > 64000 ); 
+					if ( $val < 12 or $val > 64000 );
 				return undef;
 			},
 			_doc => "The ping packet size (in the range of 12-64000 bytes).",

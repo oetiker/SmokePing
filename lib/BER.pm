@@ -49,7 +49,7 @@ $VERSION = '1.05';
 	     encode_sequence encode_tagged_sequence
 	     encode_string encode_ip_address encode_timeticks
 	     encode_uinteger32 encode_counter32 encode_counter64
-	     encode_gauge32 
+	     encode_gauge32
 	     decode_sequence decode_by_template
 	     pretty_print pretty_print_timeticks
 	     hex_string hex_string_of_type
@@ -254,25 +254,25 @@ sub encode_oid (@) {
 	if $result > 255;
     $result = pack ("C", $result);
     foreach $subid (@oid) {
-	if ( ($subid>=0) && ($subid<128) ){ #7 bits long subid 
+	if ( ($subid>=0) && ($subid<128) ){ #7 bits long subid
 	    $result .= pack ("C", $subid);
 	} elsif ( ($subid>=128) && ($subid<16384) ){ #14 bits long subid
 	    $result .= pack ("CC", 0x80 | $subid >> 7, $subid & 0x7f);
-	} 
+	}
 	elsif ( ($subid>=16384) && ($subid<2097152) ) {#21 bits long subid
 	    $result .= pack ("CCC",
-			     0x80 | (($subid>>14) & 0x7f), 
+			     0x80 | (($subid>>14) & 0x7f),
 			     0x80 | (($subid>>7) & 0x7f),
-			     $subid & 0x7f); 
+			     $subid & 0x7f);
 	} elsif ( ($subid>=2097152) && ($subid<268435456) ){ #28 bits long subid
-	    $result .= pack ("CCCC", 
+	    $result .= pack ("CCCC",
 			     0x80 | (($subid>>21) & 0x7f),
 			     0x80 | (($subid>>14) & 0x7f),
 			     0x80 | (($subid>>7) & 0x7f),
 			     $subid & 0x7f);
 	} elsif ( ($subid>=268435456) && ($subid<4294967296) ){ #32 bits long subid
-	    $result .= pack ("CCCCC", 
-			     0x80 | (($subid>>28) & 0x0f), #mask the bits beyond 32 
+	    $result .= pack ("CCCCC",
+			     0x80 | (($subid>>28) & 0x0f), #mask the bits beyond 32
 			     0x80 | (($subid>>21) & 0x7f),
 			     0x80 | (($subid>>14) & 0x7f),
 			     0x80 | (($subid>>7) & 0x7f),
@@ -459,10 +459,10 @@ sub pretty_uptime_value ($) {
     if ($days == 0){
 	$result = sprintf ("%d:%02d:%02d", $hours, $minutes, $seconds);
     } elsif ($days == 1) {
-	$result = sprintf ("%d day, %d:%02d:%02d", 
+	$result = sprintf ("%d day, %d:%02d:%02d",
 			   $days, $hours, $minutes, $seconds);
     } else {
-	$result = sprintf ("%d days, %d:%02d:%02d", 
+	$result = sprintf ("%d days, %d:%02d:%02d",
 			   $days, $hours, $minutes, $seconds);
     }
     return $result;
@@ -490,7 +490,7 @@ sub pretty_generic_sequence ($) {
 
     my $type = ord substr ($pdu, 0 ,1);
     my $flags = context_flag | constructor_flag;
-    
+
     return error (sprintf ("Tag 0x%x is not a valid sequence tag",$type))
 	unless ($type == (&constructor_flag | &sequence_tag) # sequence
 		|| $type == (0 | $flags) #get_request
@@ -502,12 +502,12 @@ sub pretty_generic_sequence ($) {
 		|| $type == (6 | $flags) #inform_request
 		|| $type == (7 | $flags) #trap2_request
 		);
-    
+
     my $curelem;
     my $pretty_result; # Holds the pretty printed sequence.
     my $pretty_elem;   # Holds the pretty printed current elem.
     my $first_elem = 'true';
-    
+
     # Cut away the first Tag and Length from $packet and then
     # init $rest with that.
     (undef, $rest) = decode_length ($pdu, 1);
@@ -515,16 +515,16 @@ sub pretty_generic_sequence ($) {
     {
 	($curelem,$rest) = decode_generic_tlv($rest);
 	$pretty_elem = pretty_print($curelem);
-	
+
 	$pretty_result .= "\n" if not $first_elem;
 	$pretty_result .= $pretty_elem;
-	
+
 	# The rest of the iterations are not related to the
 	# first element of the sequence so..
 	$first_elem = '' if $first_elem;
     }
     return $pretty_result;
-}    
+}
 
 sub hex_string ($) {
     &hex_string_of_type ($_[0], octet_string_tag);

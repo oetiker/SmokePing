@@ -42,7 +42,7 @@
 ### Mike Fischer <mlf2@tampabay.rr.com>: pass MSG_DONTWAIT to recv()
 ######################################################################
 
-package SNMP_Session;		
+package SNMP_Session;
 
 require 5.002;
 
@@ -190,13 +190,13 @@ sub set_retries {
     my ($session, $retries) = @_;
     croak ("retries ($retries) must be a non-negative integer")
 	unless $retries == int ($retries) && $retries >= 0;
-    $session->{'retries'} = $retries; 
+    $session->{'retries'} = $retries;
 }
 sub set_backoff {
     my ($session, $backoff) = @_;
     croak ("backoff ($backoff) must be a number >= 1.0")
 	unless $backoff == int ($backoff) && $backoff >= 1.0;
-    $session->{'backoff'} = $backoff; 
+    $session->{'backoff'} = $backoff;
 }
 
 sub encode_request_3 ($$$@) {
@@ -430,7 +430,7 @@ sub request_response_5 ($$$$$) {
     }
     # IlvJa
     # Add empty packet to capture_buffer
-    push @{$this->{'capture_buffer'}}, "" 
+    push @{$this->{'capture_buffer'}}, ""
 	if (defined $this->{'capture_buffer'}
 	    and ref $this->{'capture_buffer'} eq 'ARRAY');
     #
@@ -943,7 +943,7 @@ sub receive_request {
     my ($this) = @_;
     my ($remote_addr, $iaddr, $port, $request);
 
-    $remote_addr = recv($this->sock, $this->{'pdu_buffer'}, 
+    $remote_addr = recv($this->sock, $this->{'pdu_buffer'},
 			$this->{'max_pdu_len'}, 0);
     return undef unless $remote_addr;
 

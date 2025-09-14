@@ -12,21 +12,21 @@
 # tSmoke.v04.README
 # - added downtime report (--downtime)
 # - a few tweaks to the calculations to ensure it's consistent
-# 
+#
 # tSmoke.v03.README
 # - Initial Release
-# - The script, started through cron, will cull through a config file and 
-# determine which hosts are down at a point in time (Morning report) and 
+# - The script, started through cron, will cull through a config file and
+# determine which hosts are down at a point in time (Morning report) and
 # send out an smtp message to a mobile phone (for example).
-# 
+#
 # - It will also cull through the same config file and, using an included html
-# file (small change to General section of the config file), send an html 
-# message which shows the availability over the past day, week, month 
+# file (small change to General section of the config file), send an html
+# message which shows the availability over the past day, week, month
 # and quarter.
-# 
-# - It can also show detail data depending on the setting of 
+#
+# - It can also show detail data depending on the setting of
 # command line option "detail".
-# 
+#
 # tSmoke.v02.README
 # - Local testing version
 #-----------------------------------------------
@@ -111,12 +111,12 @@ sub morning_update($) {
 	my $TmpBody = "";
 	my $To = "";
 	if ( $opt{to} ) { $To = $opt{to}; } else { $To = $cfg->{Alerts}{to}; }
-	
+
 	# Get a list of the existing RRD Files
 	my @rrds = split ( /\n/,list_rrds($cfg->{Targets},"","") );
 	my $Count = $#rrds + 1;
 	my $Down = 0;
-	
+
 	foreach my $target (@rrds) {
 		my $Loss = 0;
 		my ($start,$step,$names,$data) = RRDs::fetch "$target","AVERAGE","--start","-300";
@@ -155,14 +155,14 @@ sub weekly_update($) {
 	if ( $opt{to} ) { $To = $opt{to}; } else { $To = $cfg->{Alerts}{to}; }
 
         my $Body ='';
-		
+
 # Calculations Based on the following:
 # RRDs::graph "fake.png",
 #       '--start','-86400',
 #       '-end','-300',
 #	"DEF:loss=${rrd}:loss:AVERAGE",
 #	"CDEF:avail=loss,0,100,IF", or more precisely "CDEF:avail=loss,2,GE,0,100,IF"
-#       and adding in the check for unknown for systems just coming on line 
+#       and adding in the check for unknown for systems just coming on line
 #       "CDEF:avail=loss,UN,0,loss,IF,$pings,GE,0,100,IF"
 	# Arbitrarily a loss of 10% of Pings means the system was down
 	my $pings = $cfg->{Database}{pings} * .1;
@@ -170,7 +170,7 @@ sub weekly_update($) {
 	foreach my $target (@rrds) {
 		# Get an average Availability for each RRD file
 		my $ERR;
-		
+
 		my ($DAverage,$Dxsize,$Dysize) = RRDs::graph "fake.png",
                   "--start","-86400",
                   "--end","-600",
@@ -236,7 +236,7 @@ MAIL_END
                 my $Weekly = DetailSheet(604800);
 		s/<##WEEKDETAIL##>/$Weekly/ig;
                 my $Monthly = DetailSheet(2592000);
-                s/<##MONTHDETAIL##>/$Monthly/ig;                
+                s/<##MONTHDETAIL##>/$Monthly/ig;
                 my $Quarterly = DetailSheet(7776000);
                 s/<##QUARTERDETAIL##>/$Quarterly/ig;
 		$Body .= $_;
@@ -253,7 +253,7 @@ sub update_stats($$$$$) {
         my $WAverage = shift;
         my $MAverage = shift;
         my $QAverage = shift;
-	
+
 	#Enter everything once as it exists
 	#Trim off the rightmost component (hostname) and reenter the code
 	#If there is only one component, this is the final level
@@ -272,7 +272,7 @@ sub update_stats($$$$$) {
 	@$Path = @$Path [ 0 .. $Length - 2 ];
 	update_stats(\@$Path,$DAverage,$WAverage,$MAverage,$QAverage) if $Length > 1;
 }
-    
+
 sub Summary_Sheet() {
   my $Body = '';
 
@@ -366,14 +366,14 @@ sub DetailSheet($) {
 
   my %CornBeef;
   my %CornBeefC;
-  
+
   CASE: {
     %CornBeef = %Daily, %CornBeefC = %DailyC, print "Doing Daily\n", last CASE if $Seconds == 86400;
     %CornBeef = %Weekly, %CornBeefC = %WeeklyC, print "Doing Weekly\n", last CASE if $Seconds == 604800;
     %CornBeef = %Monthly, %CornBeefC = %MonthlyC, print "Doing Monthly\n", last CASE if $Seconds == 2592000;
     %CornBeef = %Quarterly, %CornBeefC = %QuarterlyC, print "Doing Quarterly\n", last CASE if $Seconds == 7776000;
   } # end of CASE block
-  
+
   foreach (sort { $a cmp $b } keys %CornBeef ) {
     next if NumDots ($_) > $opt{detail};
     if ( $_ =~ /\./ ) {
@@ -414,7 +414,7 @@ sub list_rrds($$$$$) {
     foreach my $rrds (keys %{$tree}) {
         if (ref $tree->{$rrds} eq 'HASH'){
 			$prline .= list_rrds( $tree->{$rrds}, $path."/$rrds", $print, $slaves, $nomasterpoll );
-        } 
+        }
         if ($rrds eq 'host' and $tree->{$rrds} !~ m|/| ) {
 			if ( exists( $opt{slaves} ) && $slaves ) {
 				foreach( split( /\s+/, $slaves ) ) {
@@ -431,7 +431,7 @@ sub list_rrds($$$$$) {
 	return $prline;
 }
 
-sub load_cfg ($) { 
+sub load_cfg ($) {
     my $cfgfile = shift;
 #    my $parser = get_parser;
     my $parser = Smokeping::get_parser;
@@ -439,7 +439,7 @@ sub load_cfg ($) {
 }
 
 ###########################################################################
-# The Main Program 
+# The Main Program
 ###########################################################################
 
 sub main($);
@@ -488,7 +488,7 @@ B<tSmoke> [ B<--testmail> | B<--morning> | B<--weekly> | B<--version> | B<--help
  --quiet    Do not print welcome
  --slaves   Enable slave support assumes all slaves unless csv list of slaves
             is added (i.e. '--slaves' or '--slaves=slave1[,slave2...]')
- 
+
 =head1 DESCRIPTION
 
 The B<tSmoke> tool is a commandline tool which interfaces with the SmokePing system.
@@ -567,4 +567,3 @@ Dan McGinn-Combs E<lt>d.mcginn-combs@mindspring.comE<gt>
 Modified for Smokeping official distribution by Niko Tyni E<lt>ntyni@iki.fiE<gt>
 
 =cut
-

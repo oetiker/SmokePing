@@ -5,7 +5,7 @@ package Smokeping::matchers::base;
 Smokeping::matchers::base - Base Class for implementing SmokePing Matchers
 
 =head1 OVERVIEW
- 
+
 This is the base class for writing SmokePing matchers. Every matcher must
 inherit from the base class and provide it's own methods for the 'business'
 logic.
@@ -44,9 +44,9 @@ sub new(@)
     my $self = { param => { @_ } };
     foreach my $key (keys %{$self->{param}}){
 	my $regex = $rules->{$key};
-	croak "key '$key' is not known by this matcher" unless defined $rules->{$key};	
+	croak "key '$key' is not known by this matcher" unless defined $rules->{$key};
 	croak "key '$key' contains invalid data: '$self->{param}{$key}'" unless $self->{param}{$key} =~ m/^$regex$/;
-    }    
+    }
     bless $self, $class;
     return $self;
 }
@@ -75,7 +75,7 @@ be overwritten by a children of the base class.
 
 sub Desc ($) {
     croak "MatcherDesc must be overridden by the subclass";
-}    
+}
 
 =head2 Test
 

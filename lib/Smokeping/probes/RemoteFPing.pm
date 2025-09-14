@@ -2,7 +2,7 @@ package Smokeping::probes::RemoteFPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::RemoteFPing>
 
@@ -22,7 +22,7 @@ DOC
 		description => <<DOC,
 Integrates the remote execution of FPing via ssh/rsh into smokeping.
 The variable B<binary> must point to your copy of the ssh/rsh program.
-The variable B<rbinary> must point to your copy of the fping program 
+The variable B<rbinary> must point to your copy of the fping program
 at the remote end.
 DOC
 		notes => <<'DOC',
@@ -30,7 +30,7 @@ It is important to make sure that you can access the remote machine
 without a password prompt, otherwise this probe will not work properly.
 To test just try something like this:
 
-    $ ssh foo@HostA.foobar.com fping HostB.barfoo.com 
+    $ ssh foo@HostA.foobar.com fping HostB.barfoo.com
 
 The next thing you see must be fping's output.
 
@@ -73,7 +73,7 @@ sub binary {
 	my $port = ($what eq 'rport' ? "-p" : "");
         if (defined $self->{properties}{$what}) {
 		push @ret, $prefix . $port . $self->{properties}{$what};
-        } 
+        }
     }
     return @ret;
 }

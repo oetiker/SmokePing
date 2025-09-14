@@ -2,7 +2,7 @@ package Smokeping::probes::OpenSSHEOSPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::OpenSSHEOSPing>
 
@@ -168,7 +168,7 @@ The (optional) psource option specifies an alternate IP address or
 Interface from which you wish to source your pings from.  Routers
 can have many many IP addresses, and interfaces.  When you ping from a
 router you have the ability to choose which interface and/or which IP
-address the ping is sourced from.  Specifying an IP/interface does not 
+address the ping is sourced from.  Specifying an IP/interface does not
 necessarily specify the interface from which the ping will leave, but
 will specify which address the packet(s) appear to come from.  If this
 option is left out the EOS Device will source the packet automatically

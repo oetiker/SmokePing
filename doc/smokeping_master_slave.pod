@@ -6,7 +6,7 @@ smokeping_master_slave - How to run multiple distributed instances of SmokePing
 
 Normally smokeping probes run their tests from the host where smokeping runs
 to some target host and monitor the latency of the connection between the
-two. 
+two.
 
 The Master/Slave concept enables all smokeping probes to run remotely. The
 use case for this is to measure the overall connectivity in a network. If
@@ -69,7 +69,7 @@ the master its 'hostname'. This together with the shared secret is used to
 authenticate and identify who is who.
 
  *** Slaves ***
- secrets=/etc/smokeping/slavesecrets.conf 
+ secrets=/etc/smokeping/slavesecrets.conf
 
  +slave1
  display_name=erul22
@@ -85,7 +85,7 @@ settings get inherited by lower order targets and can be overwritten
 anywhere in the tree.
 
 A slave will then get the appropriate configuration assigned by the server.
- 
+
  *** Targets ***
  slaves = slave1 slave2
  ...
@@ -96,7 +96,7 @@ A slave will then get the appropriate configuration assigned by the server.
  slaves = slave1
  ...
  +dest3
- ... 
+ ...
 
 The data from the slaves will be stored in F<TargetName~SlaveName.rrd>. So
 the example above would create the following files:

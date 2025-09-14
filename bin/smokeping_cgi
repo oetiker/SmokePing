@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# -*-perl-*-   
+# -*-perl-*-
 
 use strict;
 use warnings;
@@ -50,7 +50,7 @@ Please refer to the installation document for detailed setup instructions.
 
 =head1 SETUP
 
-There is a sample F<htdocs> directory in your smokeping installation root. 
+There is a sample F<htdocs> directory in your smokeping installation root.
 Copy its content to the place where your webserver expects its files.  The
 fcgi script shows the preferred method for running smokeping.  You can also
 run smokeping as a cgi.  But make sure to still use the wrapper as exposing

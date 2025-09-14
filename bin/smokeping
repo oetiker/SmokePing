@@ -9,7 +9,7 @@ use lib (split /:/, q{}); # PERL5LIB
 use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 
 use Smokeping;
- 
+
 Smokeping::main("$FindBin::RealBin/../etc/config");
 
 =head1 NAME
@@ -42,7 +42,7 @@ B<smokeping> [ B<--email> | B<--makepod> | B<--version> | B<--restart> ]
 
  --restart    Restart SmokePing
 
- --reload     Reload configuration in the running process without interrupting 
+ --reload     Reload configuration in the running process without interrupting
               any probes
 
  --nodaemon    Do no daemonize the process (no fork)
@@ -103,7 +103,7 @@ This gives
 
  /A
 
-and 
+and
 
  /B, /B/C
 
@@ -117,13 +117,13 @@ Multiple B<--filter> arguments can be used to assemble complex filters:
 
   --filter=/A --filter=/B
 
-would include all the targets 
+would include all the targets
 
   --filter=/A --filter=/B --filter=!/B/C
 
 would include all but /B/C.
 
-The B<--makepod> does get used internally to produce the 
+The B<--makepod> does get used internally to produce the
 L<documentation on the SmokePing configuration file|smokeping_config>.
 
 Please refer to L<the installation document|smokeping_install> for detailed setup instructions.

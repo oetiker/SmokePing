@@ -6,10 +6,10 @@ with RMON-like thresholds
 
 =head1 DESCRIPTION
 
-Match against exponential weighted average of last samples, thus new values 
-are more valuable as old ones. Two thresholds - rising and falling - produce 
-hysteresis loop like in RMON alert subsystem. If the average reaches the 
-"rising" threshold, matcher go to the "match" state and hold It until the 
+Match against exponential weighted average of last samples, thus new values
+are more valuable as old ones. Two thresholds - rising and falling - produce
+hysteresis loop like in RMON alert subsystem. If the average reaches the
+"rising" threshold, matcher go to the "match" state and hold It until the
 average drops under the "falling" threshold.
 
 Call the matcher with the following sequence:
@@ -30,7 +30,7 @@ Arguments:
            <falling> - take "no match" state.
 
 Note:
- If the actual history is less then <hist> value then this value is taken 
+ If the actual history is less then <hist> value then this value is taken
  as the actual history.
 
 =head1 COPYRIGHT
@@ -83,7 +83,7 @@ sub new(@) {
 # how many values should we require before raising?
 sub Length($) {
     my $self = shift;
-    return $self->{param}{hist};    # 
+    return $self->{param}{hist};    #
 }
 
 sub Desc ($) {
@@ -99,8 +99,8 @@ sub Test($$) {
     my $fast = ($self->{param}{fast} || 0); # use last <fast> samples for fast alerts
 
     return undef if scalar(@{ $data->{loss}}) <= $skip+1;
-    
-    # calculate alpha factor to obtain 1% significance 
+
+    # calculate alpha factor to obtain 1% significance
     # of the old probes at the <hist> boundary
     my $alfa = 1-0.01**(1/$hist);
 
@@ -116,34 +116,34 @@ sub Test($$) {
     foreach $loss ( @{ $data->{loss} } ) {
         # If there's an S in the array anywhere, return prevmatch
         next if ( $loss =~ /S/ or $loss =~ /U/);
-        
+
         # update the filter
         $result = (1-$alfa)*$result+$alfa*$loss;
         $sum += $loss;
         $num++;
-        if ($fast) { 
+        if ($fast) {
             $rising_cnt = ($loss >= $rising) ? $rising_cnt + 1 : 0;
             $falling_cnt = ($loss <= $falling) ? $falling_cnt + 1 : 0;
         }
     }
 
     return undef if $num == 0;
-    
-    # 
+
+    #
     if ($fast) {
         return 1 if $rising_cnt >= $fast;
         return "" if $falling_cnt >= $fast;
     }
     # correct filter result as if it was initialized with "average"
     $result += ($sum/$num)*((1-$alfa)**$num);
-    
+
     my $res = (($result >= $rising) or ($data->{prevmatch} and $result >= $falling));
 
     # some debug stuff
     if (0) {
         my $d = `date`;
         chomp $d;
-        my $array = join ":", @{ $data->{loss}}; 
+        my $array = join ":", @{ $data->{loss}};
         `echo $d $data->{target} $array $result. >> /tmp/matcher.log` if $rising == 0;
     }
     return $res;

@@ -2,7 +2,7 @@ package Smokeping::probes::EchoPingHttp;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::EchoPingHttp>
 
@@ -70,21 +70,21 @@ sub proto_args {
 
 	# -A : ignore cache
 	my $ignore = $target->{vars}{ignore_cache};
-	$ignore = 1 
-		if (defined $ignore and $ignore ne "no" 
+	$ignore = 1
+		if (defined $ignore and $ignore ne "no"
 			and $ignore ne "0");
 	push @args, "-A" if $ignore;
 
 	# -a : force cache to revalidate the data
 	my $revalidate = $target->{vars}{revalidate_data};
-	$revalidate= 1 if (defined $revalidate and $revalidate ne "no" 
+	$revalidate= 1 if (defined $revalidate and $revalidate ne "no"
 		and $revalidate ne "0");
 	push @args, "-a" if $revalidate;
 
     # -R : accept HTTP redirects
 	my $accept_redirects = $target->{vars}{accept_redirects};
-	$accept_redirects= 1 if (defined $accept_redirects 
-        and $accept_redirects ne "no" 
+	$accept_redirects= 1 if (defined $accept_redirects
+        and $accept_redirects ne "no"
 		and $accept_redirects ne "0");
 	push @args, "-R" if $accept_redirects;
 
@@ -125,14 +125,14 @@ DOC
 		},
 		revalidate_data => {
 			_doc => <<DOC,
-The echoping(1) "-a" option: force the proxy to revalidate data with original 
+The echoping(1) "-a" option: force the proxy to revalidate data with original
 server. Enabled if the value is anything other than 'no' or '0'.
 DOC
 			_example => 'no',
 		},
         accept_redirects => {
             _doc => <<DOC,
-The echoping(1) "-R" option: Accept  HTTP  status  codes  3xx (redirections) 
+The echoping(1) "-R" option: Accept  HTTP  status  codes  3xx (redirections)
 as normal responses instead of treating them as errors. Note that this option
 is only available starting with Echoping 6.
 

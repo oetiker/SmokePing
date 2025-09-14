@@ -2,7 +2,7 @@ package Smokeping::probes::AnotherDNS;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::AnotherDNS>
 
@@ -36,7 +36,7 @@ Like DNS, but uses Net::DNS and Time::HiRes instead of dig. This probe does
 other resolver do by default. If operating as caching Nameserver, BIND (and
 maybe others) expect clients to retry the request if the answer is not in the
 cache. So, ask the nameserver for something that he is authoritative for if you
-want measure the network packet loss correctly. 
+want measure the network packet loss correctly.
 
 If you have a really fast network and nameserver, you will notice that this
 probe reports the query time in microsecond resolution. :-)
@@ -83,7 +83,7 @@ sub pingone ($) {
     }
 
     my $sock = 0;
-    
+
     if ($ipversion == 6) {
     	require IO::Socket::INET6;
         $sock = IO::Socket::INET6->new(
@@ -203,18 +203,18 @@ DOC
 		},
 		expect_text => {
 			_doc => <<DOC,
-A string that should be present in the DNS answer. This can be used 
-to verify that an A record contains the expected IP address, a PTR 
-record reflects the expected hostname, etc. If the query returns 
+A string that should be present in the DNS answer. This can be used
+to verify that an A record contains the expected IP address, a PTR
+record reflects the expected hostname, etc. If the query returns
 multiple records, any single match will pass the test.
 DOC
 			_example => '192.168.50.60',
 		},
 		require_nxdomain => {
 			_doc => <<DOC,
-Set to 1 if NXDOMAIN should be interpreted as success instead of 
-failure. This reverses the normal behavior of the probe. Example uses 
-include testing a DNS firewall, verifying that a mail server IP is 
+Set to 1 if NXDOMAIN should be interpreted as success instead of
+failure. This reverses the normal behavior of the probe. Example uses
+include testing a DNS firewall, verifying that a mail server IP is
 not listed on a DNSBL, or other scenarios where NXDOMAIN is desired.
 DOC
 			_default => 0,
@@ -233,7 +233,7 @@ DOC
 		},
 		ipversion => {
 			_doc => <<DOC,
-The IP protocol used. Possible values are "4" and "6". 
+The IP protocol used. Possible values are "4" and "6".
 Passed to echoping(1) as the "-4" or "-6" options.
 DOC
 			_example => 4,
@@ -244,4 +244,3 @@ DOC
 }
 
 1;
-

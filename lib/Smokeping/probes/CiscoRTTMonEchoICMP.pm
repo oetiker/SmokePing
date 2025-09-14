@@ -2,7 +2,7 @@ package Smokeping::probes::CiscoRTTMonEchoICMP;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::CiscoRTTMonEchoICMP>
 
@@ -30,7 +30,7 @@ sub pod_hash {
 Smokeping::probes::CiscoRTTMonEchoICMP - Probe for SmokePing
 DOC
 		description => <<DOC,
-A probe for smokeping, which uses the ciscoRttMon MIB functionality ("Service Assurance Agent", "SAA") of Cisco IOS to measure ICMP echo ("ping") roundtrip times between a Cisco router and any IP address. 
+A probe for smokeping, which uses the ciscoRttMon MIB functionality ("Service Assurance Agent", "SAA") of Cisco IOS to measure ICMP echo ("ping") roundtrip times between a Cisco router and any IP address.
 DOC
 		notes => <<DOC,
 ${e}head2 IOS VERSIONS
@@ -49,8 +49,8 @@ To install this probe copy ciscoRttMonMIB.pm files to (\$SMOKEPINGINSTALLDIR)/li
 The router(s) must be configured to allow read/write SNMP access. Sufficient is:
 
 	snmp-server community RTTCommunity RW
- 
-If you want to be a bit more restrictive with SNMP write access to the router, then consider configuring something like this 
+
+If you want to be a bit more restrictive with SNMP write access to the router, then consider configuring something like this
 
 	access-list 2 permit 10.37.3.5
 	snmp-server view RttMon ciscoRttMonMIB included
@@ -59,7 +59,7 @@ If you want to be a bit more restrictive with SNMP write access to the router, t
 The above configuration grants SNMP read-write only to 10.37.3.5 (the smokeping host) and only to the ciscoRttMon MIB tree. The probe does not need access to SNMP variables outside the RttMon tree.
 DOC
 		bugs => <<DOC,
-The probe sends unnecessary pings, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all pings in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*5+3 seconds (5 secs is the ping timeout value hardcoded into this probe). 
+The probe sends unnecessary pings, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all pings in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*5+3 seconds (5 secs is the ping timeout value hardcoded into this probe).
 DOC
 		see_also => <<DOC,
 L<http://oss.oetiker.ch/smokeping/>
@@ -70,7 +70,7 @@ The best source for background info on SAA is Cisco's documentation on L<http://
 L<ftp://ftp.cisco.com/pub/mibs/v2/CISCO-RTTMON-MIB.my>
 DOC
 		authors => <<DOC,
-Joerg.Kummer at Roche.com 
+Joerg.Kummer at Roche.com
 DOC
 	}
 }
@@ -95,19 +95,19 @@ sub ProbeDesc($){
     return "CiscoRTTMonEchoICMP";
 }
 
-sub pingone ($$) { 
+sub pingone ($$) {
     my $self = shift;
     my $target = shift;
 
     my $pings = $self->pings($target) || 20;
     my $tos   = $target->{vars}{tos};
-    my $bytes = $target->{vars}{packetsize}; 
+    my $bytes = $target->{vars}{packetsize};
 
-    # use the process ID as as row number to make this poll distinct on the router; 
+    # use the process ID as as row number to make this poll distinct on the router;
     my $row=$$;
 
-    if (defined 
-        StartRttMibEcho($target->{vars}{ioshost}.":::::2", $target->{addr}, 
+    if (defined
+        StartRttMibEcho($target->{vars}{ioshost}.":::::2", $target->{addr},
         $bytes, $pings, $target->{vars}{iosint}, $tos, $row, $target->{vars}{vrf}))
 	{
         # wait for the series to finish
@@ -122,7 +122,7 @@ sub pingone ($$) {
 	}
     else {
         return ();
-    } 
+    }
 }
 
 sub StartRttMibEcho ($$$$$$){
@@ -152,10 +152,10 @@ sub StartRttMibEcho ($$$$$$){
 	#############################################################
 	# rttMonCtrlAdminStatus - 1:active 2:notInService 3:notReady 4:createAndGo 5:createAndWait 6:destroy
 	#delete data from former measurements
-	#return undef unless defined 
+	#return undef unless defined
 	#  &snmpset($host, "rttMonCtrlAdminStatus.$row",'integer', 	6);
 
-	############################################################# 
+	#############################################################
 	# Check RTTMon version and supported protocols
     	$SNMP_Session::suppress_warnings = 10; # be silent
 	(my $version)=&snmpget ($host, "rttMonApplVersion");
@@ -166,7 +166,7 @@ sub StartRttMibEcho ($$$$$$){
 	Smokeping::do_log ("$host supports $version\n");
     	$SNMP_Session::suppress_warnings = 0; # report errors
 
-	# echo(1), pathEcho(2), fileIO(3), script(4), udpEcho(5), tcpConnect(6), http(7), 
+	# echo(1), pathEcho(2), fileIO(3), script(4), udpEcho(5), tcpConnect(6), http(7),
 	# dns(8), jitter(9), dlsw(10), dhcp(11), ftp(12)
 	my $udpEchoSupported=0==1;
 	snmpmaptable ($host,
@@ -181,7 +181,7 @@ sub StartRttMibEcho ($$$$$$){
 	#setup the new data row
 
 	my @params=();
-	push @params,  
+	push @params,
 		"rttMonCtrlAdminStatus.$row",		'integer', 	5,
 		"rttMonCtrlAdminRttType.$row",		'integer',	1,
 		"rttMonEchoAdminProtocol.$row",		'integer',	2,
@@ -206,8 +206,8 @@ sub StartRttMibEcho ($$$$$$){
 		push @params, 	"rttMonEchoAdminTOS.$row",		'integer',	$tos;
 		push @params, 	"rttMonCtrlAdminNvgen.$row",		'integer',	2;
 
-		# the router (or this script) doesn't check whether the IP address is one of 
-		# the router's IP address, i.e. the router might send packets, but never 
+		# the router (or this script) doesn't check whether the IP address is one of
+		# the router's IP address, i.e. the router might send packets, but never
 		# gets ping replies..
 		if (defined $sourceip) {
 			push @params, 	"rttMonEchoAdminSourceAddress.$row",		'octetstring',	$encoded_source;
@@ -217,12 +217,12 @@ sub StartRttMibEcho ($$$$$$){
 		Smokeping::do_log ("Warning this host does not support ToS or iosint\n");
 	}
 
-	return undef unless defined 
+	return undef unless defined
 	   &snmpset($host, @params);
 
 	#############################################################
 	# and go !
-	return undef unless defined 
+	return undef unless defined
 	   &snmpset($host, "rttMonCtrlAdminStatus.$row",'integer',1);
 
 	return 1;
@@ -230,7 +230,7 @@ sub StartRttMibEcho ($$$$$$){
 
 
 # RttResponseSense values
-# 1:ok 2:disconnected 3:overThreshold 4:timeout 5:busy 6:notConnected 7:dropped 8:sequenceError 
+# 1:ok 2:disconnected 3:overThreshold 4:timeout 5:busy 6:notConnected 7:dropped 8:sequenceError
 # 9:verifyError 10:applicationSpecific 11:dnsServerTimeout 12:tcpConnectTimeout 13:httpTransactionTimeout
 #14:dnsQueryError 15:httpError 16:error
 
@@ -275,7 +275,7 @@ execute the pings, as well as the SNMP community string on the router.
 DOC
 		},
         timeout => {
-             _re => '\d+', 
+             _re => '\d+',
              _example => 15,
              _default => $pingtimeout+10,
              _doc => "How long a single RTTMonEcho ICMP 'ping' take at maximum plus 10 seconds to spare. Since we control our own timeout the only purpose of this is to not have us killed by the ping method from basefork.",
@@ -318,7 +318,7 @@ The packetsize parameter lets you configure the packetsize for the pings
 sent. The minimum is 8, the maximum 16392. Use the same number as with
 fping, if you want the same packet sizes being used on the network.
 DOC
-			_default => 56, 
+			_default => 56,
 			_re => '\d+',
 			_sub => sub {
 				my $val = shift;
@@ -331,4 +331,3 @@ DOC
 }
 
 1;
-

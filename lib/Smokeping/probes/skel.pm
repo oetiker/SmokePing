@@ -2,7 +2,7 @@ package Smokeping::probes::skel;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::skel>
 
@@ -15,7 +15,7 @@ to generate the POD document.
 =cut
 
 use strict;
-use base qw(Smokeping::probes::basefork); 
+use base qw(Smokeping::probes::basefork);
 # or, alternatively
 # use base qw(Smokeping::probes::base);
 use Carp;
@@ -63,10 +63,10 @@ sub probevars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::probevars, {
 		#_mandatory => [ 'binary' ],
-		#binary => { 
+		#binary => {
 		#	_doc => "The location of your pingpong binary.",
 		#	_example => '/usr/bin/pingpong',
-		#	_sub => sub { 
+		#	_sub => sub {
 		#		my $val = shift;
         	#		return "ERROR: pingpong 'binary' does not point to an executable"
             	#			unless -f $val and -x _;

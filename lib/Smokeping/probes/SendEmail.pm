@@ -18,7 +18,7 @@ package Smokeping::probes::SendEmail;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::skel>
 
@@ -31,7 +31,7 @@ to generate the POD document.
 =cut
 
 use strict;
-use base qw(Smokeping::probes::basefork); 
+use base qw(Smokeping::probes::basefork);
 use Carp;
 use Sys::Hostname;
 use Time::HiRes;
@@ -132,7 +132,7 @@ sub pingone ($){
 	# Get Hostname
 	my $hostname = hostname();
 
-	
+
 	# Send a mail as many times as requested
 	for (1..$count) {
 		# Start counting time
@@ -152,7 +152,7 @@ sub pingone ($){
 
 		# If user specified a bodysize for the probe, send the request number of characters instead of the default content.
 		if ($bodysize > 0) {
-			my $nbLines = $bodysize / 80;	
+			my $nbLines = $bodysize / 80;
 			for (1..$nbLines) {
 				$smtp->datasend(sprintf("%s\n", "A" x 79));
 			}

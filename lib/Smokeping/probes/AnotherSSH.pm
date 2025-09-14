@@ -2,7 +2,7 @@ package Smokeping::probes::AnotherSSH;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::AnotherSSH>
 
@@ -28,8 +28,8 @@ sub pod_hash {
 Smokeping::probes::AnotherSSH - Another SSH probe
 DOC
 		description => <<DOC,
-Latency measurement using SSH. This generates Logfile messages on the other 
-Host, so get permission from the owner first! 
+Latency measurement using SSH. This generates Logfile messages on the other
+Host, so get permission from the owner first!
 DOC
 		authors => <<'DOC',
 Christoph Heine <Christoph.Heine@HaDiKo.DE>
@@ -54,13 +54,13 @@ sub pingone ($) {
     my $target = shift;
 
     my $host       = $target->{addr};
-    
-    # Time 
+
+    # Time
     my $mininterval = $target->{vars}{mininterval};
-    
+
     # Our greeting string.
     my $greeting  = $target->{vars}{greeting};
-    
+
     # Interval to measure
     my $interval = $target->{vars}{interval};
 
@@ -69,9 +69,9 @@ sub pingone ($) {
 
     #Timeout for the select() calls.
     my $timeout = $target->{vars}{timeout};
-    
+
     my @times; # Result times
-        
+
     my $t0;
     for ( my $run = 0 ; $run < $self->pings($target) ; $run++ ) {
     	if (defined $t0) {
@@ -80,29 +80,29 @@ sub pingone ($) {
 		sleep $timeleft if $timeleft > 0;
 	}
     	my ($t1,$t2,$t3); # Timestamps.
-	
+
 	#Temporary variables to play with.
 	my $ready;
 	my $buf;
 	my $nbytes;
-	
+
     	my $proto = getprotobyname('tcp');
 	my $iaddr = gethostbyname($host);
 	my $sin = sockaddr_in( $port, $iaddr );
 	socket( Socket_Handle, PF_INET, SOCK_STREAM, $proto );
-	
+
 	# Make the Socket non-blocking
     	my $flags = fcntl( Socket_Handle, F_GETFL, 0 ) or do {
 		$self->do_debug("Can't get flags for socket: $!");
 		close(Socket_Handle);
 		next;
 	 };
-	
+
 	fcntl( Socket_Handle, F_SETFL, $flags | O_NONBLOCK ) or do {
 		$self->do_debug("Can't make socket nonblocking: $!");
 		close(Socket_Handle); next;
 	};
-	
+
 	my $sel = IO::Select->new( \*Socket_Handle );
 
 	# connect () and measure the Time.
@@ -110,12 +110,12 @@ sub pingone ($) {
 	connect( Socket_Handle, $sin );
 	($ready) = $sel->can_read($timeout);
 	$t1 = [gettimeofday()];
-	
+
 	if(not defined $ready) {
 		$self->do_debug("Timeout!");
 		close(Socket_Handle); next;
 	 }
-	$nbytes = sysread( Socket_Handle, $buf, 1500 );	
+	$nbytes = sysread( Socket_Handle, $buf, 1500 );
 	if (not defined $nbytes or $nbytes <= 0) {
 		$self->do_debug("Read nothing and Connection closed!");
 		close(Socket_Handle); next;
@@ -125,7 +125,7 @@ sub pingone ($) {
 		$self->do_debug("Not an SSH Server");
 		close(Socket_Handle); next;
 	}
-	
+
 	($ready) = $sel->can_write($timeout);
 	if (not defined($ready)) {
 		$self->do_debug("Huh? Can't write.");
@@ -153,7 +153,7 @@ sub pingone ($) {
 		$self->do_debug("You should never see this message.\n The universe will now collapse. Goodbye!\n");
 	}
 
-	
+
     }
     @times =
       map { sprintf "%.10e", $_ } sort { $a <=> $b } grep { $_ ne "-" } @times;
@@ -174,7 +174,7 @@ sub targetvars {
 	return $class->_makevars($class->SUPER::targetvars, {
 		greeting => {
 			_doc => <<DOC,
-Greeting string to send to the SSH Server. This will appear in the Logfile. 
+Greeting string to send to the SSH Server. This will appear in the Logfile.
 Use this to make clear, who you are and what you are doing to avoid confusion.
 
 Also, don't use something that is a valid version string. This probe assumes
@@ -199,7 +199,7 @@ Interval between connect() and the greeting string from the host.
 
 ${e}item established
 
-Interval between our greeting message and the end of the connection 
+Interval between our greeting message and the end of the connection
 because of Protocol mismatch. This is the default.
 
 ${e}item complete
@@ -212,8 +212,8 @@ DOC
 
 			_sub => sub {
 				my $interval = shift;
-    				if(not ( $interval eq "connect" 
-				      or $interval eq "established" 
+    				if(not ( $interval eq "connect"
+				      or $interval eq "established"
 				      or $interval eq "complete")) {
    					return "ERROR: Invalid interval parameter";
 				}
@@ -235,4 +235,3 @@ DOC
 }
 
 1;
-

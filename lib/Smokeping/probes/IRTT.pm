@@ -2,7 +2,7 @@ package Smokeping::probes::IRTT;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::IRTT>
 
@@ -15,7 +15,7 @@ to generate the POD document.
 =cut
 
 use strict;
-use base qw(Smokeping::probes::basefork); 
+use base qw(Smokeping::probes::basefork);
 #use Data::Dumper;
 use IPC::Open2 qw(open2);
 use JSON::PP qw(decode_json);
@@ -83,18 +83,18 @@ sub probevars ($) {
 	my $class = shift;
 	my $pv = $class->_makevars($class->SUPER::probevars, {
 		_mandatory => [ 'binary' ],
-		binary => { 
+		binary => {
 			_doc => "The location of your irtt binary.",
 			_default => '/usr/bin/irtt',
 			_example => '/usr/local/bin/irtt',
-			_sub => sub { 
+			_sub => sub {
 				my $val = shift;
         			return "ERROR: irtt 'binary' does not point to an executable"
             				unless -f $val and -x _;
 				return undef;
 			},
 		},
-		tmpdir => { 
+		tmpdir => {
 			_doc => "A temporary directory in which to place files for writeto/readfrom.",
 			_default => '/tmp/smokeping-irtt',
 		},
@@ -407,7 +407,7 @@ sub run_irtt ($$) {
 	waitpid $pid,0;
 	close $inh;
 	close $outh;
-	
+
 	# write json output atomically if writeto set (empty for errors)
 	if ($tv->{writeto}) {
 		path($p->{tmpdir}, $tv->{writeto})->spew($out);

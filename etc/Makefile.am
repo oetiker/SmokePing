@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-EXTRA_DIST = basepage.html.dist config.dist smokemail.dist smokeping_secrets.dist tmail.dist 
+EXTRA_DIST = basepage.html.dist config.dist smokemail.dist smokeping_secrets.dist tmail.dist
 
 etcdir = $(sysconfdir)
 etc_DATA = $(EXTRA_DIST)

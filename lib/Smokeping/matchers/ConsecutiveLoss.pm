@@ -142,11 +142,11 @@ sub Test($$) {
         if ( $loss =~ /S/ ) { return $data->{prevmatch}; }
 
         if ( $data->{prevmatch} ) {
-            
+
             # Alert has already been raised.  Evaluate and count consecutive loss values that are below threshold.
             if ( $loss < $self->{param}{pctlossclear} ) { $count++; }
         } else {
-            
+
             # Alert is not raised.  Evaluate and count consecutive loss values that are above threshold.
             if ( $loss >= $self->{param}{pctlossraise} ) { $count++; }
         }

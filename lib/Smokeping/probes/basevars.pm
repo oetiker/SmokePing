@@ -2,7 +2,7 @@ package Smokeping::probes::basevars;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::basevars>
 
@@ -37,12 +37,12 @@ ${e}item addr
 
 The address of the target.
 
-${e}item vars 
+${e}item vars
 
 A hash containing variables defined in the corresponding
 config section.
 
-${e}item tree 
+${e}item tree
 
 The unique index that `probe::base' uses for targets.
 
@@ -55,7 +55,7 @@ DOC
 Niko Tyni <ntyni@iki.fi>
 DOC
 	bugs => <<DOC,
-Uses `Smokeping::probes::base' internals too much to be a derived class, but 
+Uses `Smokeping::probes::base' internals too much to be a derived class, but
 I didn't want to touch the base class directly.
 DOC
 	see_also => <<DOC,
@@ -68,7 +68,7 @@ sub add($$)
 {
     my $self = shift;
     my $tree = shift;
-    
+
     $self->{target_count}++;
     $self->{targets}{$tree} = shift;
     $self->{vars}{$tree} = { %{$self->{properties}}, %$tree };

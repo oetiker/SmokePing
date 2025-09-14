@@ -24,7 +24,7 @@ Smokeping::RRDtools - Tools for RRD file handling
  print "Create arguments didn't match: $comparison\n" if $comparison;
 
  Smokeping::RRDtools::tuneds($file, \@create);
- 
+
 =head1 DESCRIPTION
 
 This module offers three functions, C<info2create>, C<compare> and
@@ -44,7 +44,7 @@ interesting RRD file, and a reference to an argument list that could be fed
 to C<RRDs::create>. The function will then simply compare the result of
 C<info2create> with this argument list. It will return an array of two values:
 C<(fatal, text)> where  C<fatal> is 1 if it found a fatal difference, and 0 if not.
-The C<text> will contain an error message if C<fatal == 1> and a possible warning 
+The C<text> will contain an error message if C<fatal == 1> and a possible warning
 message if C<fatal == 0>. If C<fatal == 0> and C<text> is C<undef>, all the
 arguments matched.
 
@@ -105,7 +105,7 @@ sub info2create {
 	my $file = shift;
 	my @create;
 	# check for Perl version 5.8.0, it's buggy
-	# no more v-strings 
+	# no more v-strings
         my $buggy_perl_version = 1 if abs($] - 5.008000) < .0000005;
 
 	my $info = RRDs::info($file);
@@ -115,7 +115,7 @@ sub info2create {
 		unless $info->{rrd_version} eq '0001'
 		or     $info->{rrd_version} eq '0003';
 	my $cf = $info->{"rra[0].cf"};
-	die("$file: no RRAs found?") 
+	die("$file: no RRAs found?")
 		unless defined $cf;
 	my @fetch = RRDs::fetch($file, $cf, "-s 0", "-e 0");
 	$error = RRDs::error;
@@ -170,7 +170,7 @@ sub compare {
 	}
 	return (1, "Wrong value of step: $file has $step, create string has $step2")
 		unless $step == $step2;
-	
+
 	my $dscount = grep /^DS/, @create;
 	my $dscount2 = grep /^DS/, @create2;
 	return (1, "Different number of data sources: $file has $dscount2, create string has $dscount")
@@ -220,6 +220,6 @@ sub tuneds {
 	                RRDs::tune $file,"--maximum","$ds[1]:$ds[5]" unless $ds[5] eq $ds2[5];
 	       }
 	}
-}	
-		                        
+}
+
 1;

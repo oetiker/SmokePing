@@ -2,7 +2,7 @@ package Smokeping::probes::FPing6;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::FPing6>
 
@@ -58,5 +58,5 @@ sub ProbeDesc($){
     my $bytes = $self->{properties}{packetsize}||56;
     return "IPv6-ICMP Echo Pings ($bytes Bytes)";
 }
-  
+
 1;

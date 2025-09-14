@@ -77,7 +77,7 @@ sub Length($)
 
 sub Desc ($) {
     croak "Find changes in median latency";
-}    
+}
 
 sub Test($$)
 {   my $self = shift;

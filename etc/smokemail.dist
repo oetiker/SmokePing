@@ -1,9 +1,9 @@
 From: <##FROM##>
 To:   <##TO##>
 Subject: SmokePing Agent
-  
+
 Hi,
-  
+
 Please execute the attached Perl Script on your computer. It will register
 your IP with SmokePing. You have to rerun this script at least every time
 your IP changes. You can run the script as often as you want.
@@ -15,7 +15,7 @@ downloading ActivePerl from www.activestate.com
 As soon as you have run the SmokePing Agent, the SmokePing server will
 start monitoring your host. Check out:
 <##URL##>?target=<##PATH##>
-  
+
 Cheers
 <##OWNER##>
 

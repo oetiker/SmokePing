@@ -2,7 +2,7 @@ package Smokeping::probes::EchoPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::EchoPing>
 
@@ -26,7 +26,7 @@ sub pod_hash {
 Smokeping::probes::EchoPing - an echoping(1) probe for SmokePing
 DOC
 		overview => <<DOC,
-Measures TCP or UDP echo (port 7) roundtrip times for SmokePing. Can also be 
+Measures TCP or UDP echo (port 7) roundtrip times for SmokePing. Can also be
 used as a base class for other echoping(1) probes.
 DOC
 		description => <<DOC,
@@ -37,7 +37,7 @@ Should we test the availability of the service at startup? After that it's
 too late to complain.
 
 The location of the echoping binary should probably be a global variable
-instead of a probe-specific one. As things are, every EchoPing -derived probe 
+instead of a probe-specific one. As things are, every EchoPing -derived probe
 has to declare it if the default ($DEFAULTBIN) isn't correct.
 DOC
 		authors => <<'DOC',
@@ -163,7 +163,7 @@ sub make_commandline {
 	my $host = $self->make_host($target);
 	push @args, $self->proto_args($target);
 	push @args, $self->count_args($count);
-	
+
 	return ($self->{properties}{binary}, @args, $host, @post_args);
 }
 
@@ -180,7 +180,7 @@ sub pingone {
 	my @times;
 
 	open(P, "$cmd 2>&1 |") or carp("fork: $!");
-	
+
 	my @output;
 	while (<P>) {
 		chomp;
@@ -260,7 +260,7 @@ sub targetvars {
 		},
 		ipversion => {
 			_doc => <<DOC,
-The IP protocol used. Possible values are "4" and "6". 
+The IP protocol used. Possible values are "4" and "6".
 Passed to echoping(1) as the "-4" or "-6" options.
 DOC
 			_example => 4,

@@ -23,7 +23,7 @@ created example configuration files.
 
 =head1 BUGS
 
-This module uses more or less internal functions from L<Smokeping.pm|Smokeping>. It's a 
+This module uses more or less internal functions from L<Smokeping.pm|Smokeping>. It's a
 separate module only because the latter is much too big already.
 
 It should be possible to include POD markup in the configuration explanations
@@ -97,7 +97,7 @@ All the examples can be found in the C<examples> directory in the
 Smokeping documentation. Note that the DNS names in the examples are
 non-functional.
 
-Details of the syntax and all the variables are found in 
+Details of the syntax and all the variables are found in
 L<smokeping_config> and in the documentation of the
 corresponding probe, if applicable.
 
@@ -170,7 +170,7 @@ sub make {
 		writecfg($cfgfile, $template, $h);
 		if ($check) {
 			local $Smokeping::cfg = undef;
-			eval { 
+			eval {
 				Smokeping::verify_cfg($cfgfile);
 			};
 			die("Syntax check for $cfgfile failed: $@") if $@;
@@ -270,7 +270,7 @@ host = myhost3.mysite2.example
 host = myhost4.mysite2.example
 DOC
 			probedoc => <<DOC,
-Here we have just one probe, fping, pinging four hosts. 
+Here we have just one probe, fping, pinging four hosts.
 
 The fping probe is using the default parameters, some of them supplied
 from the Database section ("step" and "pings"), and some of them by
@@ -377,7 +377,7 @@ This example demonstrates the concept of probe instances. The FPingLarge
 and FPingNormal probes are independent of each other, they just use
 the same module, FPing. FPingNormal uses the default parameters, and
 so does FPingLarge except for the 5 kilobyte packetsize. Both use the
-same fping binary, and its path is configured FPing top section. 
+same fping binary, and its path is configured FPing top section.
 
 The 'offset' parameters make sure the probes don't run at the same time -
 FPingNormal is run every 'full' 5 minutes (eg. 8:00, 8:05, 8:10 and so on,
@@ -449,7 +449,7 @@ variables. We use the Curl probe for this.
 
 Every probe supports at least some probe-specific variables. The values
 of these variables are common to all the targets of the probe, and
-they can only be configured in the Probes section. In this case, 
+they can only be configured in the Probes section. In this case,
 the probe-specific variables are "binary" and "step".
 
 Target-specific variables are supported by most probes, the most notable
@@ -457,7 +457,7 @@ exception being the FPing probe and its derivatives. Target-specific
 variables can have different values for different targets. They can be
 configured in both Probes and Targets sections. The values assigned in the
 Probes section function become default values that can be overridden
-in the Targets section. 
+in the Targets section.
 
 The documentation of each probe states which of its variables are
 probe-specific and which are target-specific.
@@ -480,7 +480,7 @@ remark = Welcome to this SmokePing website.
 
 + HTTP
 menu = http
-title = HTTP latency 
+title = HTTP latency
 
 ++ myhost1
 menu = myhost1
@@ -522,7 +522,7 @@ server, and it's in a non-standard port (8080).
 The "urlformat" variable is specified for the whole FTP branch
 as "ftp://%host%/". For the HTTP branch, the default from the
 Probes section is used, except for myhost3, which overrides
-it to tag the port number into the URL. 
+it to tag the port number into the URL.
 
 The myhost3 assignment could just as well have included the hostname
 verbatim (ie. urlformat = http://myhost3.example:8080/) instead of
@@ -564,7 +564,7 @@ remark = Welcome to this SmokePing website.
 + MyServers
 
 menu = My Servers
-title = My Servers 
+title = My Servers
 
 ++ www-server
 menu = www-server
@@ -576,7 +576,7 @@ host = www-server.example
 menu = http
 title = Web Server (www-server) / HTTP
 probe = EchoPingHttp
-host = www-server.example 
+host = www-server.example
 # default url is /
 
 +++ https

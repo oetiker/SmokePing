@@ -133,14 +133,14 @@ did anything.
 The way Smokeping creates the self-referring links was changed. The old
 behaviour used the script name but not the host part, resulting in links
 like S<<a href="/path/smokeping.cgi?foo=bar">>. The new behaviour uses the
-C<cgiurl> variable: the links are always absolute like 
+C<cgiurl> variable: the links are always absolute like
 S<<a href="http://some.host/path/smokeping.cgi?foo=bar">>.
 
 =head1 2.0.1 to 2.0.2
 
 =head2 Edge-triggered alerts
 
-The alert notifications can now optionally be sent only when the state of 
+The alert notifications can now optionally be sent only when the state of
 the alert changes. This means that only the first match of the alert
 generates a notification, subsequent matches don't. When the alert is
 cleared, ie. there's no match anymore, another notification is sent.
@@ -278,7 +278,7 @@ This probe is also now derived from FPing and supports all the variables FPing d
 The URL that will be used is now specified with the variable C<urlformat> instead
 of C<url>. The new variable can (and usually should) include a placeholder
 for the C<host> variable of each target as C<%host%>, eg. C<urlformat = http://%host%/>.
-The new variable is mandatory. 
+The new variable is mandatory.
 
 The change was made to fix the confusing situation where the C<host> variable
 was required for each actual target, but it didn't actually have any effect
@@ -347,7 +347,7 @@ in the C<host> variable, like it is with all the other probes.
 
 The recommended version for CGI::Carp is now at least 1.24, included in
 CGI.pm-2.82 and the Perl standard distribution starting from 5.8.1.
-See L<the smokeping_install document|smokeping_install>. 
+See L<the smokeping_install document|smokeping_install>.
 
 =head1 1.38 to 1.40
 
