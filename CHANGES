@@ -1,3 +1,4 @@
+ - fix AnotherCurl.pm to use --help all  @Strykar
  - remove dsa and add ed25519 in ssh keyscan by @StalkR and @lelutin
  - add support for fwmark option in fping 5.2+. Supports 'fwmark' keyword in FPing probe
  - switch graphs from PNG to SVG, to handle automatically both low- and hi-dpi screens
