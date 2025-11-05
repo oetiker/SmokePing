@@ -2,7 +2,7 @@ package Smokeping::probes::TCPPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::FPing>
 
@@ -34,19 +34,19 @@ The (optional) port option lets you configure the port for the pings sent.
 The TCPPing manpage has the following to say on this topic:
 
 The problem is that with the widespread use of firewalls on the modern Internet,
-many of the packets that traceroute(8) sends out end up being filtered, 
-making it impossible to completely trace the path to the destination. 
-However, in many cases, these firewalls will permit inbound TCP packets to specific 
-ports that hosts sitting behind the firewall are listening for connections on. 
-By sending out TCP SYN packets instead of UDP or ICMP ECHO packets, 
+many of the packets that traceroute(8) sends out end up being filtered,
+making it impossible to completely trace the path to the destination.
+However, in many cases, these firewalls will permit inbound TCP packets to specific
+ports that hosts sitting behind the firewall are listening for connections on.
+By sending out TCP SYN packets instead of UDP or ICMP ECHO packets,
 tcptraceroute is able to bypass the most common firewall filters.
 
-It is worth noting that tcptraceroute never completely establishes a TCP connection 
-with the destination host. If the host is not listening for incoming connections, 
-it will respond with an RST indicating that the port is closed. If the host instead 
-responds with a SYN|ACK, the port is known to be open, and an RST is sent by 
-the kernel tcptraceroute is running on to tear down the connection without completing 
-three-way handshake. This is the same half-open scanning technique that nmap(1) uses 
+It is worth noting that tcptraceroute never completely establishes a TCP connection
+with the destination host. If the host is not listening for incoming connections,
+it will respond with an RST indicating that the port is closed. If the host instead
+responds with a SYN|ACK, the port is known to be open, and an RST is sent by
+the kernel tcptraceroute is running on to tear down the connection without completing
+three-way handshake. This is the same half-open scanning technique that nmap(1) uses
 when passed the -sS flag.
 DOC
                 authors => <<'DOC',
@@ -87,10 +87,10 @@ sub probevars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::probevars, {
 		_mandatory => [ 'binary' ],
-		binary => { 
+		binary => {
 			_doc => "The location of your tcpping script.",
 			_example => '/usr/bin/tcpping',
-			_sub => sub { 
+			_sub => sub {
 				my $val = shift;
 
         			return "ERROR: TCPPing 'binary' does not point to an executable"
@@ -116,7 +116,7 @@ sub targetvars {
 				my $val = shift;
 
 				return "ERROR: TCPPing port must be between 0 and 65535"
-					if $val and ( $val < 0 or $val > 65535 ); 
+					if $val and ( $val < 0 or $val > 65535 );
 
 				return undef;
 			},

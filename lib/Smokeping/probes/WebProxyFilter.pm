@@ -2,7 +2,7 @@ package Smokeping::probes::WebProxyFilter;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::WebProxyFilter>
 
@@ -40,7 +40,7 @@ expects to get the firewalls 'site-prohibited' page. Any other response (or
 a real loss) gets logged as a loss and can be used to trigger an alarm.
 
 The probe tries to be nice to the firewall and waits at least X seconds
-between starting filetransfers, where X is the value of the probe 
+between starting filetransfers, where X is the value of the probe
 specific `min_interval' variable ($DEFAULTINTERVAL by default).
 
 Many variables can be specified either in the probe or in the target definition,
@@ -57,7 +57,7 @@ DOC
 }
 
 sub ProbeDesc ($) {
-        my $self = shift;  
+        my $self = shift;
 	return sprintf("HTTP GETs");
 }
 
@@ -88,7 +88,7 @@ sub pingone {
 		$self->do_log("ERROR There are more host addresses ($targcount) than ping slots ($pingcount), either increase the pings or reduce the targets.\n");
 		return;
 	}
-	
+
 	for (1..$pingcount) {
 		if (defined $elapsed) {
 			my $timeleft = $mininterval - $elapsed;
@@ -132,11 +132,11 @@ sub probevars {
 		maxsize => {
 			_default => 2000,
 			_doc => "How much of the webpage should be retrieved."
-		},			
-			
-	});	
+		},
+
+	});
 }
-		
+
 sub targetvars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::targetvars, {
@@ -164,7 +164,7 @@ DOC
 			_re => '[^\s.]+(?:\.[^\s.]+)*(\s*,[^\s.]+(?:\.[^\s.]+)*)*',
 			_example => 'www.playboy.com, www.our-competition.com',
 		},
-		
+
 	});
 }
 

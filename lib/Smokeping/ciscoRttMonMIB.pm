@@ -39,7 +39,7 @@ snmpmapOID("rttMonCtrlAdminStatus", 		"1.3.6.1.4.1.9.9.42.1.2.1.1.9");
 snmpmapOID("rttMonCtrlAdminNvgen", 		"1.3.6.1.4.1.9.9.42.1.2.1.1.10");
 
 
-#1. For echo, pathEcho and dlsw operations 
+#1. For echo, pathEcho and dlsw operations
 # cisco(9).ciscoMgmt(9).ciscoRttMonMIB(42).ciscoRttMonObjects(1).rttMonCtrl(2).rttMonEchoAdminTable(2).rttMonEchoAdminEntry (1)
 snmpmapOID("rttMonEchoAdminProtocol",      		"1.3.6.1.4.1.9.9.42.1.2.2.1.1");
 snmpmapOID("rttMonEchoAdminTargetAddress",      	"1.3.6.1.4.1.9.9.42.1.2.2.1.2");

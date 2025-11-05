@@ -5,7 +5,7 @@ package Smokeping::sorters::base;
 Smokeping::sorters::base - Base Class for implementing SmokePing Sorters
 
 =head1 OVERVIEW
- 
+
 Sorters are at the core of the SmokePing Charts feature, where the most
 interesting graphs are presented on a single page. The Sorter decides which
 graphs are considered interesting.
@@ -59,7 +59,7 @@ sub new(@)
     my $self = { param => { @_ } };
     foreach my $key (keys %{$self->{param}}){
 	my $regex = $rules->{$key};
-	croak "key '$key' is not known by this sorter" unless defined $rules->{$key};	
+	croak "key '$key' is not known by this sorter" unless defined $rules->{$key};
 	croak "key '$key' contains invalid data: '$self->{param}{$key}'" unless $self->{param}{$key} =~ m/^$regex$/;
     }
     bless $self, $class;
@@ -75,13 +75,13 @@ be overwritten by a children of the base class.
 
 sub Desc ($) {
     croak "Sorter::Desc must be overridden by the subclass";
-}    
+}
 
 =head2 SortTree
 
 Returns an array of 'targets'. It is up to the sorter to decide how many
 entries the list should contain. If the list is empty, the whole entry will
-be suppressed in the webfrontend. 
+be suppressed in the webfrontend.
 
 The method gets access to all the targets in the system, together with the
 last data set acquired for each target.

@@ -2,7 +2,7 @@ package Smokeping::probes::AnotherCurl;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::AnotherCurl>
 
@@ -120,7 +120,7 @@ DOC
 		extrare=> {
 			_doc => <<DOC,
 The regexp used to split the extraargs string into an argument list,
-in the "/regexp/" notation.  This contains just the space character 
+in the "/regexp/" notation.  This contains just the space character
 (" ") by default, but if you need to specify any arguments containing spaces,
 you can set this variable to a different value.
 DOC
@@ -216,7 +216,7 @@ sub test_usage {
 
 	my $arghashref = $self->features;
 	my %arghash = %$arghashref;
-        my $curl_man = `$bin --help all`;
+  my $curl_man = `$bin --help all`;
         
 	for my $feature (keys %arghash) {
 		next if $curl_man =~ /\Q$arghash{$feature}/;
@@ -288,7 +288,7 @@ sub make_commandline {
 	push @args, ("-o", "/dev/null") for (@urls);
 	push @args, $self->proto_args($target);
 	push @args, $self->extra_args($target);
-	
+
 	return ($self->{properties}{binary}, @args, @urls);
 }
 
@@ -342,14 +342,14 @@ sub pingone {
 			$why .= " [signal $signal]" if $signal;
 
 			# only log warnings on the first ping of the first ping round
-			my $function = ($self->rounds_count == 1 and $i == 0) ? 
+			my $function = ($self->rounds_count == 1 and $i == 0) ?
 				"do_log" : "do_debug";
 
 			$self->$function(qq(WARNING: curl exited $why on $t->{addr}));
 		}
 		push @times, $val if defined $val;
 	}
-	
+
 	# carp("Got @times") if $self->debug;
 	return sort { $a <=> $b } @times;
 }

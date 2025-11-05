@@ -65,7 +65,7 @@ sub new(@) {
 
 sub Desc ($) {
     return "The Max sorter sorts the targets by Max RTT.";
-}    
+}
 
 sub CalcValue($) {
     my $self = shift;

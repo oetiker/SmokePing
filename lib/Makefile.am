@@ -22,7 +22,7 @@ AUTOMAKE_OPTIONS =  foreign
 PM :=  $(wildcard *.pm)
 
 SP :=  $(wildcard Smokeping/*.pm)
-       
+
 SORT := $(wildcard Smokeping/sorters/*.pm)
 
 PROBE := $(wildcard Smokeping/probes/*.pm)

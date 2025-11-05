@@ -82,7 +82,7 @@ title = Top Median Roundtrip Time
 menu = by Median
 format = Median RTT %f seconds
 
-+ overview 
++ overview
 
 width = 600
 height = 50
@@ -147,4 +147,3 @@ host = james.address
 menu = Multihost
 title = James and James as seen from Boomer
 host = /Test/James /Test/James~boomer
-

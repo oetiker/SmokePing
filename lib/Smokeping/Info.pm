@@ -26,9 +26,9 @@ sub __flatten_targets {
     my $probes = shift;
     my $root = shift;
     my $prefix = shift;
-    my @paths;    
-    for my $target ( sort {$root->{$a}{_order} <=> $root->{$b}{_order}} 
-                     grep { ref $root->{$_} eq 'HASH' }  keys %$root ) {        
+    my @paths;
+    for my $target ( sort {$root->{$a}{_order} <=> $root->{$b}{_order}}
+                     grep { ref $root->{$_} eq 'HASH' }  keys %$root ) {
         push @paths,  __flatten_targets($probes,$root->{$target},$prefix.'/'.$target);
     };
     if (exists $root->{host} and not $root->{host} =~ m|/|){
@@ -188,7 +188,7 @@ Ave, Cambridge, MA 02139, USA.
 
 =head1 AUTHOR
 
-Tobias Oetiker E<lt>tobi@oetiker.chE<gt>, development sponsored by Swisscom Hospitality 
+Tobias Oetiker E<lt>tobi@oetiker.chE<gt>, development sponsored by Swisscom Hospitality
 
 =cut
 

@@ -2,7 +2,7 @@ package Smokeping::probes::Qstat;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::Qstat>
 
@@ -27,7 +27,7 @@ sub pod_hash {
 Smokeping::probes::Qstat - Qstat Probe for SmokePing
 DOC
               description => <<DOC,
-Integrates Qstat as a probe into smokeping. The variable B<binary> must 
+Integrates Qstat as a probe into smokeping. The variable B<binary> must
 point to your copy of the Qstat program.
 
 Make sure to set your pings to 10, most Quake servers seem to throttle
@@ -105,7 +105,7 @@ sub pinghost($$) {
     } else {
       push @params, $address;
     }
-            
+
     my @cmd = (
                     $self->binary,
 		    @params);

@@ -63,7 +63,7 @@ L<http://www.openssh.org/>
 
 You need this for the SSH probe.
 
-=item Webserver 
+=item Webserver
 
 L<http://httpd.apache.org/>
 

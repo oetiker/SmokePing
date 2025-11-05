@@ -2,7 +2,7 @@ package Smokeping::probes::OpenSSHJunOSPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::OpenSSHJunOSPing>
 
@@ -80,7 +80,7 @@ sub ProbeDesc($){
     if (defined (my $tos = $self->{properties}{tos})){
         $ret = " tos $tos";
     }
-    return $ret.")";    
+    return $ret.")";
 }
 
 sub pingone ($$){
@@ -104,7 +104,7 @@ sub pingone ($$){
         $source,
         $login ? ( user => $login ) : (),
         $password ? ( password => $password ) : (),
-        timeout => 60 
+        timeout => 60
     );
     if ($ssh->error) {
         warn "OpenSSHJunOSPing connecting $source: ".$ssh->error."\n";
@@ -178,7 +178,7 @@ The (optional) psource option specifies an alternate IP address or
 Interface from which you wish to source your pings from.  Routers
 can have many many IP addresses, and interfaces.  When you ping from a
 router you have the ability to choose which interface and/or which IP
-address the ping is sourced from.  Specifying an IP/interface does not 
+address the ping is sourced from.  Specifying an IP/interface does not
 necessarily specify the interface from which the ping will leave, but
 will specify which address the packet(s) appear to come from.  If this
 option is left out the JunOS Device will source the packet automatically

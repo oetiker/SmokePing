@@ -2,7 +2,7 @@ package Smokeping::probes::DNS;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::DNS>
 
@@ -53,7 +53,7 @@ sub new($$$)
 
     # no need for this if we run as a cgi
     unless ( $ENV{SERVER_SOFTWARE} ) {
-        
+
         my $call = "$self->{properties}{binary} localhost";
         my $return = `$call 2>&1`;
         if ($return =~ m/$dig_re/s){
@@ -71,10 +71,10 @@ sub probevars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::probevars, {
 		_mandatory => [ 'binary' ],
-		binary => { 
+		binary => {
 			_doc => "The location of your dig binary.",
 			_example => '/usr/bin/dig',
-			_sub => sub { 
+			_sub => sub {
 				my $val = shift;
         			return "ERROR: DNS 'binary' does not point to an executable"
             				unless -f $val and -x _;

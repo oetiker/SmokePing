@@ -68,7 +68,7 @@ sub new(@) {
 
 sub Desc ($) {
     return "The Median sorter sorts the targets by Median RTT.";
-}    
+}
 
 sub CalcValue($) {
     my $self = shift;

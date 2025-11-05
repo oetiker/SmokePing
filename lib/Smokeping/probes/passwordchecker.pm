@@ -2,7 +2,7 @@ package Smokeping::probes::passwordchecker;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::passwordchecker>
 
@@ -115,10 +115,10 @@ sub new {
 	        if (defined $self->{properties}{passwordfile}) {
 			my @stat = stat($self->{properties}{passwordfile});
 			my $mode = $stat[2];
-			carp("Warning: password file $self->{properties}{passwordfile} is world-readable\n") 
+			carp("Warning: password file $self->{properties}{passwordfile} is world-readable\n")
 				if defined $mode and $mode & 04;
-				
-			open(P, "<$self->{properties}{passwordfile}") 
+
+			open(P, "<$self->{properties}{passwordfile}")
 				or croak("Error opening specified password file $self->{properties}{passwordfile}: $!");
 			while (<P>) {
 				chomp;

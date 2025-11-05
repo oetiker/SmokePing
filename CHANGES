@@ -92,7 +92,7 @@ Author: Alexander Koch <alex@meersau.de>
 Date:   Tue Oct 9 12:54:27 2018 +0200
 
     Do not show whole page if in ajax display mode
-    
+
     After sending the PNG file in get_detail the returned
     undef was not honored. Now checks for undef and will
     return also.
@@ -114,22 +114,22 @@ Author: Gabriel Filion <lelutin@users.noreply.github.com>
 Date:   Wed Aug 29 04:09:04 2018 -0400
 
     FPing: create new parameter to force using IPv4 or IPv6 fixes#95 (#125)
-    
+
     * FPing: create new parameter to force using IPv4 or IPv6 fixes#95
-    
+
     Starting with FPing 3.16, the IPv6 functionality was merged in the main
     binary and fping now respects the system-wide setting for address
     resolution. This means that when we add a target that has both an A
     record and a AAAA record, the probe tests the IPv6 address by default.
-    
+
     This breaks the expectation that the FPing probe tests IPv4 and that the
     FPing6 probe checks IPv6.
-    
+
     To restore this, we can now add a parameter to the probes to force the
     protocol version to be 4 or 6.
-    
+
     * FPing: set default value for protocol
-    
+
     This ensures we have a meaningful default value. It was suggested by
     Tobias Oetiker.
 
@@ -138,7 +138,7 @@ Author: diorgesl <diorgesl@gmail.com>
 Date:   Thu Jul 19 02:29:02 2018 -0400
 
     Added rport option (#121)
-    
+
     Added the option to specify the port of the remote host
 
 commit 8a528b13d85414eb9162bc045c0e222049a721bd
@@ -158,12 +158,12 @@ Author: Pete Heist <pete@eventide.io>
 Date:   Mon Mar 5 08:12:11 2018 +0100
 
     Improve handling of one-way delay and documentation (#111)
-    
+
     * Initial revision of IRTT probe.
-    
+
     * Return 0 values for negative one-way delays. Improve documentation
     and fix some white space issues.
-    
+
     * Add Path::Tiny to PERL_MODULES and update IRTT probe doc.
     ew.
 
@@ -245,14 +245,14 @@ Author: Rick van der Zwet <info@rickvanderzwet.nl>
 Date:   Fri Jan 19 10:45:26 2018 +0100
 
     Fix ipv6 in multigraph (#108)
-    
+
     * Fix rendering multigraph with host ipv6 address
-    
+
     A host IPv6 adress in [RFC5952] representation contains colons which
     should be escaped in legends since colons are part of rddtool syntax.
-    
+
     [RFC5952]: https://tools.ietf.org/html/rfc5952
-    
+
     * Fix rendering minigrah with host ipv6 address
 
 commit 44682b6d3aec8d2063adae4dca1ce251c44e2fed
@@ -278,45 +278,45 @@ Author: Nick <nick@xfce.org>
 Date:   Thu Jun 22 08:35:33 2017 +0200
 
     Improve mobile support (#89)
-    
+
     * Move javascript under the fold.
-    
+
     Render speed optimization.
-    
+
     * Move css to separate file.
-    
+
     Becomes a bit too much in the basepage and since js is
     included as well, this should be just fine.
-    
+
     * Make the site work a lot better on mobile devices
-    
+
     Set viewport, auto hide sidemenu and some margin changes
     to make it a bit nicer..
-    
+
     * Remove the no-cache pragma's.
-    
+
     Not valid html anymore, instead this should be in the header
     so in the smokeping config for nginx/apache.
-    
+
     * Add css for printing pages.
-    
+
     * Fix typo in css.
-    
+
     * Use utf-8 charset by default.
-    
+
     Recommended by w3.org.
-    
+
     * Remove border=0 and add alt=""
-    
+
     An attempt to make everything html complaint...
-    
+
     * Use cgiurl in hswitch form.
-    
+
     Action was empty, which is not valid, use the absolute path
     to the site here.
-    
+
     * Uptimize the cropper.js file.
-    
+
     * Add panel for navigator graph.
 
 commit 38bd70634c960c76203c30e58e55825fe080d809
@@ -324,39 +324,39 @@ Author: Nick <nick@xfce.org>
 Date:   Wed Jun 21 11:54:09 2017 +0200
 
     Nick (#88)
-    
+
     * Add panel block around zoom image.
-    
+
     * Update basebase to hide menu and make it more spaceious
-    
+
     Add navbar and move stuff around a bit to give it some
     more free space for the menu and contents.
-    
+
     Use the prototype framework to toggle the sidebar.
-    
+
     * Move javascript files around
-    
+
     Mv files so we actully know which file belongs
     to what library.
-    
+
     * Update js prototype to 1.7.3.
-    
+
     * Update js script.aculo.us to 1.9.0.
-    
+
     * Update js cropper to 1.2.2.
-    
+
     * Add option graphborders
-    
+
     If option is set to 'no' borders will be hidden and
     background and canvas will be transparent.
-    
+
     Use central function for this, so all generated
     pngs look identical.
-    
+
     * Add new options to config.dist.
-    
+
     * Fix compiler warnings.
-    
+
     Apparently Switch adviced not to be used...
 
 commit 0088c1b4fef363b09ff992223a4c50f32e4067ea
@@ -364,13 +364,13 @@ Author: Martin DiViaio <martindiv@yahoo.com>
 Date:   Fri Jun 16 03:40:33 2017 -0400
 
     Fix unitialized value warnings when rrd returns undef. Add slave support (#42)
-    
+
     Got rid of the warning that happens when RRD returns 'undef' in the math on line 125.
-    
+
     Added support for slave rrd files using a cli option. If option exists all slaves are used. If a csv list of slaves is submitted with the option then only those slaves are used. Exact name match is required.
-    
+
     Added regex substitution for a '~' in the rrd name to make it readable as 'host from server' in morning email.
-    
+
     Added support for 'nomasterpoll' but only if processing for slaves. Having 'nomasterpoll' set for a host and no slaves configured for it is technically a configuration error, isn't it? If so, then this will show up as a 'down host' in the morning email this way.
 
 commit afb95d5dd350c7dddbcf2fce5a31f970ebe26304
@@ -378,13 +378,13 @@ Author: Nick <nick@xfce.org>
 Date:   Fri Jun 16 09:38:12 2017 +0200
 
     Improve smokeping dashboard (#87)
-    
+
     * Generate unordered list for menu html
-    
+
     List are much easier to style with css
-    
+
     * Add div blocks around images in html layout
-    
+
     <div class="panel">
       <div class="panel-heading">
         <h2>Title</h2>
@@ -393,37 +393,37 @@ Date:   Fri Jun 16 09:38:12 2017 +0200
         IMG or content
       </div>
     </div>
-    
+
     * Add config option htmltitle to render in div headings
-    
+
     If the option is set to yes; the title is not rendered in
     the rrd image, but added to the html panel as a h2 heading.
-    
+
     * Update filter html
-    
+
     Use a label instead of a div and use classes since this is a
     bit more obvious for styling.
-    
+
     * Use label for hierarchy popup
-    
+
     And add classes for consistency.
-    
+
     * Properly close the div tag
-    
+
     Fix for previous commit
-    
+
     * Add alt to rddtool and smokeping logos
-    
+
     2 errors less in html validator...
-    
+
     * Initial commit of new basepage
-    
+
     * Smaller smokeping and rrdtool logos.
-    
+
     Update the rrdlogo to the one currently used on
     the website (with background that matches the
     sidebar) and make both 100x30px.
-    
+
     * Complete sidebar css.
 
 commit 48eb6391d95f0ddc53d632729f998dcec6edd472
@@ -431,9 +431,9 @@ Author: Ivan Zahariev <famzah@users.noreply.github.com>
 Date:   Mon May 22 17:41:37 2017 +0300
 
     Display the master host "display_name" in the chart title (#85)
-    
+
     When having multiple slaves, and in general, it is more clear if all chart titles contain an explicit "from XYZ" label where XYZ is either the master host name or the slave's name. This gives us an immediate insight for source of the ping check. Otherwise we need to remember that if "from" is missing, then this comes from the master host. This brings inconsistency in the user experience.
-    
+
     You can also consider the case when the CGI is behind a web reverse proxy. The user opens "https://web-proxy-server/smokeping.cgi?target=dc1.myhost" but the chart titles don't show a "from". In such a case, the user must know which is the actual master host which did the ping check. This could become even harder to remember if we have multiple instances of SmokePing.
 
 commit 5ce690e3aaece79a57404f73a47caa62c4f9cbb4
@@ -447,13 +447,13 @@ Author: Simon Arlott <lp0@users.noreply.github.com>
 Date:   Tue Apr 18 15:53:43 2017 +0100
 
     Call RRDs::fetch() with a zero length time period (#81)
-    
+
     The default fetch time period (1 day) can be very slow when the RRD
     file is not in the filesystem cache.
-    
+
     The info2create function doesn't even use the data, it's just trying
     to get the DS definition.
-    
+
     Specify a start and time of 0 so that no data is retrieved.
 
 commit 4ea88bc384f6852fba891b62973286df67189dec
@@ -461,13 +461,13 @@ Author: 有张纸 <fanyeren@gmail.com>
 Date:   Mon Apr 3 22:11:08 2017 +0800
 
     Update Smokeping.pm (#76)
-    
+
     * Update Smokeping.pm
-    
+
     add support for smtp authentication
-    
+
     * Update Smokeping.pm
-    
+
     add doc for username and userpass
 
 commit 21f4715f6f06c5165bf3e46b5731f34edab67db6
@@ -475,19 +475,19 @@ Author: runout-at <markus@runout.at>
 Date:   Mon Apr 3 15:20:52 2017 +0200
 
     add xmpp/jabber alerts (#78)
-    
+
     * add xmpp alerts
-    
+
     lets have alerts sent to xmpp/jabber servers/accounts/chatrooms
     needs sendxmpp installed. (it's similar to sendmail)
-    
+
     Example for the Alerts config:
     to = xmpp:-t -u <sending_user> -j <jabberserver_of_sender> -p <passwort> <receiving_user>@<jabberserver_of_receiver>
-    
+
     * bugfix
-    
+
     * more lines where xmpp: is needed
-    
+
     fix using xmpp: in alertee,...
 
 commit f993798d1597a0302c13ed972c7a7855068e85d9
@@ -496,7 +496,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Mar 8 06:06:52 2017 +0100
 
     Merge pull request #75 from bobbwest/master
-    
+
     Fix white-on-white CSS bug with filter
 
 commit 7fa161250dbb3cedb2a65c139ce50355705f3865
@@ -511,7 +511,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Jan 5 02:52:21 2017 -0500
 
     Merge pull request #70 from rborgmaster/patch-1
-    
+
     Update CheckLoss.pm
 
 commit 88c736037559772e1623a46d6946f94d50678542
@@ -520,7 +520,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Jan 5 02:51:58 2017 -0500
 
     Merge pull request #71 from rborgmaster/patch-2
-    
+
     Update CheckLatency.pm
 
 commit 716ffcf3abfc90350203f525ebc090dba2687fd0
@@ -528,7 +528,7 @@ Author: rborgmaster <rickard@borgmaster.se>
 Date:   Wed Jan 4 20:49:38 2017 +0100
 
     Update CheckLatency.pm
-    
+
     Address issue #69
 
 commit 77253c3c3cf158cabb1a0503dec1186c6fd49ff1
@@ -536,7 +536,7 @@ Author: rborgmaster <rickard@borgmaster.se>
 Date:   Wed Jan 4 20:42:17 2017 +0100
 
     Update CheckLoss.pm
-    
+
     Adress issuse #69
 
 commit 3479284f786fb7683ef6dab442447903f42a10a0
@@ -564,7 +564,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu May 12 10:59:12 2016 +0200
 
     Merge pull request #59 from fgtb/master
-    
+
     re: issue #58
 
 commit e260302502f7ac8be18a7007b4b33ca9e1bdb371
@@ -573,7 +573,7 @@ Author: fgtb <github.20.fgt@recursor.net>
 Date:   Mon May 9 17:31:50 2016 +0100
 
     Merge pull request #1 from fgtb/fgtb-patch-1
-    
+
     Update OpenSSHJunOSPing.pm
 
 commit 52976eaedbaa64a22685d28668b260507c2e52ff
@@ -588,7 +588,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Apr 28 11:34:13 2016 +0200
 
     Merge pull request #54 from dne/auth-dns
-    
+
     Add support for probing authoritative nameservers to AnotherDNS
 
 commit f3d2aee6f8dfdcf152756cc555a9b47106ba853d
@@ -597,7 +597,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Apr 13 17:20:03 2016 +0200
 
     Merge pull request #57 from mpawlik/master
-    
+
     Add support for ldaps in LDAP probe.
 
 commit e4c34a2b4949bf80167e8f26283e61540c63d479
@@ -612,7 +612,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Sat Apr 2 09:09:22 2016 +0200
 
     Merge pull request #56 from NickHibma/master
-    
+
     More details on mailtemplate
 
 commit cf8d202ef5315bc6920f4be8ba0df9e6208274c2
@@ -626,7 +626,7 @@ Author: Daniel Néri <dne@mayonnaise.net>
 Date:   Sat Feb 20 18:12:10 2016 +0100
 
     AnotherDNS: Add 'authoritative' option
-    
+
     When enabled, send non-recursive queries (RD=0) and require
     authoritative answers (AA=1).
 
@@ -642,7 +642,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Mon Feb 8 10:56:42 2016 +0100
 
     Merge pull request #52 from mdiehm/patch-1
-    
+
     Add even a little more valuable data to the syslog
 
 commit f9ba6432cf0d73832e77931d47cf231fa5083f3f
@@ -650,7 +650,7 @@ Author: mdiehm <md@mailq.de>
 Date:   Fri Jan 29 10:38:00 2016 +0100
 
     Add even a little more valuable data to the syslog
-    
+
     Maybe some of this data is also wanted in the mail - esp. ratio number and prevmatch?
 
 commit 4a103866e3e7df3d09185df397d13d4f9cde44af
@@ -659,7 +659,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Jan 28 09:53:05 2016 +0100
 
     Merge pull request #51 from mdiehm/patch-1
-    
+
     Little more verbose syslog-message in Smokeping.pm
 
 commit 361c0179c60de6c05c5ba5231a7d5b82cdda3f38
@@ -680,7 +680,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Tue Dec 22 13:20:34 2015 +0100
 
     Merge pull request #49 from mmazur/high_precision_sleep_timer
-    
+
     Add high precision timer for sleeps between steps
 
 commit 3a8546ba52448c54ca522027a599fb05039c19af
@@ -688,7 +688,7 @@ Author: Mariusz Mazur <mmazur@pld-linux.org>
 Date:   Tue Dec 22 12:08:52 2015 +0100
 
     Add high precision timer for sleeps between steps
-    
+
     This code does two things:
     1. Calculates sleep time till next step start as a float instead of an
     integer, so next probe starts much more precisely when it should instead
@@ -699,7 +699,7 @@ Date:   Tue Dec 22 12:08:52 2015 +0100
      - probe took 60.1s
      - old code would sleep for 60s (and skip a step)
      - new code notices it's only 100ms overdue, so it runs the probe anyway.
-    
+
     This patch allows me to run fping every minute (step 60) with each run
     taking almost a minute (120 pings total, one every 500ms) for constant
     link monitoring.
@@ -710,7 +710,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Fri Nov 27 08:37:18 2015 +0100
 
     Merge pull request #47 from eskyuu/master
-    
+
      - Add the FPingContinuous probe
 
 commit 707a9ca656bb75e15c84baf056d82b58fff43651
@@ -744,7 +744,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Jun 11 23:56:36 2015 +0200
 
     Merge pull request #39 from mad-ady/master
-    
+
     Remove RRD max limit of 180 - so that the RRD can store values larger…
 
 commit 60419834f224a0735094fd4ad0aac8eac3b15289
@@ -772,7 +772,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Fri Apr 3 01:58:14 2015 +0200
 
     Merge pull request #35 from fenner/master
-    
+
     Minor markup fixes.
 
 commit 367e874034d424171ee1b6b11644fddbf52f0fa0
@@ -794,7 +794,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Mar 4 10:55:16 2015 +0100
 
     Merge pull request #34 from slesru/patch-1
-    
+
     Update TelnetIOSPing.pm
 
 commit 003ad71f44772265732374a9c66974f75c6f13a0
@@ -802,7 +802,7 @@ Author: slesru <slesru@yahoo.com>
 Date:   Wed Mar 4 13:32:48 2015 +0400
 
     Update TelnetIOSPing.pm
-    
+
     added VRF support
 
 commit 258a01011604dd3d65d6be4148cdbb745ccbbf0b
@@ -829,7 +829,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Mon Feb 16 17:42:52 2015 +0100
 
     Merge pull request #28 from SaaldjorMike/fix-typo
-    
+
     Fixed typo in comment
 
 commit 34a95b6c5d745ee53d4671911fbeba07d7696bc4
@@ -838,7 +838,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Mon Feb 16 17:42:37 2015 +0100
 
     Merge pull request #27 from cgull/traceroute_ping
-    
+
     New TraceroutePing probe module
 
 commit 692002997e1ba98601c977a4050f31440793c8d7
@@ -896,7 +896,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Tue Nov 18 11:39:15 2014 -0800
 
     Merge pull request #24 from jbfavre/feat_add_custom_curl_probe
-    
+
     Add a custom Curl probe.
 
 commit 9e8c5705c5cf4cbdf179e8630019b15e4f3a5fd1
@@ -905,7 +905,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Tue Nov 18 11:38:13 2014 -0800
 
     Merge pull request #26 from skoef/master
-    
+
     bugfixed AnotherDNS
 
 commit 56f9e7d452a770405b13cee1c70b9309a46fcb5a
@@ -950,7 +950,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Oct 29 09:03:10 2014 +0100
 
     suync up
-    
+
     Merge branch 'master' of github.com:oetiker/SmokePing
 
 commit 57b3aa5b4c863417b720413c76eb26c6b03fd2bc
@@ -970,14 +970,14 @@ Author: Jean Baptiste Favre <jean-baptiste.favre@blablacar.com>
 Date:   Tue Oct 14 11:34:20 2014 +0200
 
     Add a custom Curl probe.
-    
+
     Update curl output to support all timers (see bellow).
-    
+
     Add new configuration option 'write_out'.
     This option designate which timer information we want to get from curl output.
-    
+
     'write_out' can take one of the following values:
-    
+
     * time_namelookup
     * time_redirect
     * time_connect
@@ -985,7 +985,7 @@ Date:   Tue Oct 14 11:34:20 2014 +0200
     * time_pretransfer
     * time_starttransfer
     * time_total
-    
+
     Default behaviour is the same than current Curl probe: total - DNS
 
 commit 7467c476624b666bfbe752801af5d86a22c7ae15
@@ -994,7 +994,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Fri Aug 1 11:44:56 2014 +0200
 
     Merge pull request #22 from felderado/master
-    
+
     Support Net::DNS 0.75+
 
 commit 0672331840d935b3a03d75b6cb0af5f7ed818a32
@@ -1002,7 +1002,7 @@ Author: felderado <github@feld.me>
 Date:   Mon Jul 14 09:58:10 2014 -0500
 
     Update AnotherDNS.pm
-    
+
     &Net::DNS::PACKETSZ has been removed from Net::DNS and was not officially part of the API. Set packet size to 512, which was default value for &Net::DNS::PACKETSZ anyway.
 
 commit a3e3e36f7c41171b1a437cb2d47fa05785e36c2c
@@ -1011,7 +1011,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Mon Feb 17 00:17:31 2014 +0100
 
     Merge pull request #18 from jimpop-at-gmail-dot-com/master
-    
+
     Added IPv6 (ipversion) and TCP (protocol) support
 
 commit e4f9b6093694f76b55fa2cecc9499977b98e3db4
@@ -1026,7 +1026,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Nov 14 21:16:21 2013 -0800
 
     Merge pull request #15 from fenner/master
-    
+
     DismanPing updates: don't return stale data, log more helpful errors, and rename weird variable
 
 commit 3e1e3cc5ac714f6193336d35297dbb3fa54b5c89
@@ -1035,7 +1035,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Nov 14 21:13:19 2013 -0800
 
     Merge pull request #17 from hufman/feature-qstat
-    
+
     Adds a Qstat probe plugin
 
 commit d0f28aaa3c1c691dde4d5656c7727d538bd64f50
@@ -1087,7 +1087,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Sep 4 11:46:30 2013 -0700
 
     Merge pull request #16 from Bluewind/working
-    
+
     Misc fixes
 
 commit ebf63a98adae5ea84d044b73a03612a9fd75af26
@@ -1095,7 +1095,7 @@ Author: Florian Pritz <bluewind@xinu.at>
 Date:   Wed Sep 4 19:20:06 2013 +0200
 
     Fix wrong hardcoded path in fcgi example file
-    
+
     Signed-off-by: Florian Pritz <bluewind@xinu.at>
 
 commit fec626d9e26dbdce91db6eed42d898eb671a7906
@@ -1103,9 +1103,9 @@ Author: Florian Pritz <bluewind@xinu.at>
 Date:   Wed Sep 4 19:19:28 2013 +0200
 
     Fix syntax error in POD
-    
+
     Possible perl 5.18 related, I didn't look into that.
-    
+
     Signed-off-by: Florian Pritz <bluewind@xinu.at>
 
 commit 34af662d2dfe8be1cc433a2395186dc20c25d9cf
@@ -1119,7 +1119,7 @@ Author: Bill Fenner <fenner@aristanetworks.com>
 Date:   Tue Apr 16 07:44:45 2013 -0700
 
     A probe to use the EOS "ping" cli command
-    
+
     Based on OpenSSHJunOSPing, this probe ssh's to a
     device and uses the EOS "ping" command to collect
     data.
@@ -1171,7 +1171,7 @@ Author: Bill Fenner <fenner@aristanetworks.com>
 Date:   Tue Feb 5 08:53:34 2013 -0800
 
     Don't reuse $t, even if perl scoping rules allow it.
-    
+
     Reusing $t to iterate over the ping results is just confusing,
     especially since one line later we assign to the other $t.
     Use a new locally-scoped $result variable instead.
@@ -1181,7 +1181,7 @@ Author: Bill Fenner <fenner@aristanetworks.com>
 Date:   Tue Feb 5 07:00:26 2013 -0800
 
     Empty out any RTTs from the last round.
-    
+
     If we don't empty the hash before starting this round, then if we get
     an SNMP error for a target, we'll report his results from the
     previous round.
@@ -1192,7 +1192,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Thu Nov 8 00:03:34 2012 -0800
 
     Merge pull request #9 from couloum/master
-    
+
     new probe SendEmail
 
 commit 7719ba573effcbd0ac35203c0c6f5ebf79921ee6
@@ -1215,10 +1215,10 @@ Date:   Wed Oct 24 21:04:53 2012 +0200
     As spotted by Gert Doering, rand() gives the same results in each
     pinger subprocess. This is because they all inherit the same RNG state
     from their parent.
-    
+
     Fix this undesired behaviour by reseeding the RNG with the current time
     and the process ID.
-    
+
     The argument of srand() shouldn't really matter much on modern Perls,
     but we're not very concerned about the quality of the random numbers
     either, and time()+$$ should make sure it's different for each process.
@@ -1229,7 +1229,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Sep 12 22:02:34 2012 -0700
 
     Merge pull request #8 from jweather/master
-    
+
     add "expect" parameter to Curl.pm
 
 commit 75dcab25f99f7f074514e9d184c6de268fd18601
@@ -1317,7 +1317,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Sat Mar 24 13:00:28 2012 -0700
 
     Merge pull request #6 from mcdarren/integration
-    
+
     HTTP auth user template support
 
 commit 11cf1d954dc92e4d4f2a8dc8fed729f0ef04bf7a
@@ -1332,7 +1332,7 @@ Author: Darren Murphy <darren@victoriajd.com>
 Date:   Fri Mar 23 13:10:55 2012 +0800
 
     Template support for HTTP auth user
-    
+
     * Updated doc
     * Added section to basepage.html.dist
 
@@ -1427,22 +1427,22 @@ Date:   Sat Dec 3 12:58:33 2011 +0100
 
     From: Chris Wilson <chris@aptivate.org>
     Date: Fri, 2 Dec 2011 20:38:26 +0000 (GMT)
-    
+
     I tried to use the tcpping probe but it didn't work for me (centos 5). It seems
     that the tcptraceroute output format has changed or there is a problem with the
     script's ability to parse options. It also doesn't report tcptraceroute errors
     properly or have much in the way of debugging support. And it required
     smokeping to be run as root.
-    
+
     I think I have fixed these issues, and posted updated versions here:
-    
+
     https://github.com/aptivate/network-scripts/blob/master/TCPPing.pm
     https://github.com/aptivate/network-scripts/blob/master/tcpping
-    
+
     I hope that you will consider these for inclusion in your projects. Richard,
     are you still maintaining tcpping? If not, is it worth merging this
     functionality into the TCPPing module?
-    
+
     (integrated the TCPPing.pm for now -- tobi)
 
 commit 0f421fbf603b2427a6c010cdd375bf40b3aacabb
@@ -1517,7 +1517,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Sun Oct 30 03:32:45 2011 -0700
 
     Merge pull request #4 from twilde/master
-    
+
     Automatically configure config.dist paths
 
 commit 89f91c4e71fa85bc992cabe001da01d762770fdd
@@ -1538,7 +1538,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Sat Oct 29 16:11:04 2011 -0700
 
     Merge pull request #3 from twilde/master
-    
+
     Make $prefix available for HTDOCSDIR
 
 commit c72affb3a8387d606eb837bd9b47e238aa6edec3
@@ -1546,7 +1546,7 @@ Author: Tim Wilde <github@krellis.org>
 Date:   Sat Oct 29 22:08:51 2011 +0000
 
     Make $prefix available for HTDOCSDIR
-    
+
     Code lifted from the Tor Project's configure.in
 
 commit 81d0718bbb09fbf098a84f16278d51d9058e63ec
@@ -1615,7 +1615,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Oct 5 22:58:18 2011 -0700
 
     Merge pull request #2 from twilde/master
-    
+
     Minor documentation nit-pickery
 
 commit 8643c2fa2b5955ffda759d0fbf735a84e68d2da8
@@ -1636,7 +1636,7 @@ Author: Tobias Oetiker <tobi@oetiker.ch>
 Date:   Wed Oct 5 13:10:03 2011 -0700
 
     Merge pull request #1 from mcdarren/34d6cd69e4b075ba732c44ebdad25cf4db744e7b
-    
+
     Some minor document fixes
 
 commit 34d6cd69e4b075ba732c44ebdad25cf4db744e7b
@@ -2064,7 +2064,7 @@ Author: Niko Tyni <ntyni@iki.fi>
 Date:   Sun Dec 13 12:01:07 2009 +0000
 
     make the build system compatible with HTML::Parser >= 3.64
-    
+
      reported as Debian bug #560562
 
 commit 0763259d1aeab109b9396e486ff2e106147174e1
@@ -2110,7 +2110,7 @@ Author: Niko Tyni <ntyni@iki.fi>
 Date:   Fri Feb 13 07:46:16 2009 +0000
 
     From: Jeremy Laidman <jlaidman *rebel-it.com.au>
-    
+
     > Please consider including the patch below.  It allows specifying a parameter
     > of "allowreject" in the Radius probe configuration.  When allowreject=true,
     > rejected RADIUS authentications are treated as OK.  This means I can test
@@ -3427,7 +3427,7 @@ Author: Niko Tyni <ntyni@iki.fi>
 Date:   Sat Oct 27 13:00:42 2007 +0000
 
     * removed all the 'live' tests from the echoping probes --niko
-    
+
     * log a warning message on the first 'round' of pinging if curl or
       echoping exits with non-zero status --niko
 
@@ -3576,7 +3576,7 @@ Author: Niko Tyni <ntyni@iki.fi>
 Date:   Thu Sep 13 20:43:39 2007 +0000
 
     * include the prototype.js license for completeness -- niko
-    
+
     [ apologies for the license nitpicking; Debian requires that all the
       applicable licenses are included instead of referrals to their possibly
       volatile locations on the web, and I think the requirement makes sense. ]
@@ -4846,7 +4846,7 @@ Date:   Wed Jul 12 17:32:39 2006 +0000
 
     * pass 'prevmatch' to alert matcher plugins.
       -- niko, from Dylan Vanderhoof <DylanV *semaphore.com>
-    
+
     (add to trunk as well)
 
 commit d1830b25c0f16ffe684b75ce0c5e4bd2b3f552bb
@@ -7531,13 +7531,13 @@ Date:   Sun Mar 6 17:41:33 2005 +0000
 
     * trunk/website/bin/nestfix.pl:
        + renamed to branches/2.0/util/fix-pod2html.pl
-    
+
     * branches/2.0/Makefile:
        + fix pod2html output with util/fix-pod2html.pl
-    
+
     * branches/2.0/util/fix-pod2html.pl:
        + v1.4: insert the "N" letter into <a href="#xxx"> too.
-    
+
     * trunk/website/bin/pod2wml.sh:
        + use fix-pod2html.pl from branches/2.0
 
@@ -7646,7 +7646,7 @@ Date:   Fri Feb 18 13:04:12 2005 +0000
     * graph fixes for small numbers of pings -- Chris Wilson <chris *aidworld.org>
     * fix the LDAP probe killing the CGI with perl <5.6 -- Peter Farmer <pfarmer *hashbang.org.uk>
     * make the LDAP probe work withouth IO::Socket::SSL -- niko
-    
+
     * make Curl description shorter -- Chris Wilson <chris *aidworld.org>
     * use CGI::Carp for CGI error handling
       - remove the now unnecessary kludge from AnotherDNS

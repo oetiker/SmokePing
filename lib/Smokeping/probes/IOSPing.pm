@@ -2,7 +2,7 @@ package Smokeping::probes::IOSPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::IOSPing>
 
@@ -42,7 +42,7 @@ eg:
     ip rcmd remote-host smoke 192.168.1.2 smoke enable
     !
 
-Some IOS devices have a maximum of 5 VTYs available, so be careful not to 
+Some IOS devices have a maximum of 5 VTYs available, so be careful not to
 hit a limit with the 'forks' variable.
 
 ${e}head2 Password authentication
@@ -118,35 +118,35 @@ sub pingone ($$){
     #
     # Other hardware or versions of IOS may need adjustments here.
     #
-    # Protocol [ip]: 
+    # Protocol [ip]:
     print { $inh } "\n";
-    # Target IP address: 
+    # Target IP address:
     print { $inh } $target->{addr},"\n";
-    # Repeat count [5]: 
+    # Repeat count [5]:
     print { $inh } $pings,"\n";
-    # Datagram size [100]: 
+    # Datagram size [100]:
     print { $inh } $bytes,"\n";
-    # Timeout in seconds [2]: 
+    # Timeout in seconds [2]:
     print { $inh } "\n";
-    # Extended commands [n]: 
+    # Extended commands [n]:
     print { $inh } "y\n";
-    # Source address or interface: 
+    # Source address or interface:
     print { $inh } "".($target->{vars}{iosint} || "") ,"\n";
          # Added by Mars Wei to make
          # Source address an option
-    # Type of service [0]: 
+    # Type of service [0]:
     print { $inh } "\n";
-    # Set DF bit in IP header? [no]: 
+    # Set DF bit in IP header? [no]:
     print { $inh } "\n";
-    # Validate reply data? [no]: 
+    # Validate reply data? [no]:
     print { $inh } "\n";
-    # Data pattern [0xABCD]: 
+    # Data pattern [0xABCD]:
     print { $inh } "\n";
-    # Loose, Strict, Record, Timestamp, Verbose[none]: 
+    # Loose, Strict, Record, Timestamp, Verbose[none]:
     print { $inh } "V\n";
-    # Loose, Strict, Record, Timestamp, Verbose[V]: 
+    # Loose, Strict, Record, Timestamp, Verbose[V]:
     print { $inh } "\n";
-    # Sweep range of sizes [n]: 
+    # Sweep range of sizes [n]:
     print { $inh } "\n";
     #
     # Type escape sequence to abort.
@@ -198,7 +198,7 @@ sub probevars {
 The binary option specifies the path of the binary to be used to
 connect to the IOS device.  Commonly used binaries are /usr/bin/rsh
 and /usr/bin/remsh, although any script or binary should work if can
-be called as 
+be called as
 
     /path/to/binary [ -l user ] router ping
 

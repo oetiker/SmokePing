@@ -2,7 +2,7 @@ package Smokeping::probes::base;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::base>
 
@@ -62,7 +62,7 @@ sub new($$)
 {
     my $this   = shift;
     my $class   = ref($this) || $this;
-    my $self = { properties => shift, cfg => shift, 
+    my $self = { properties => shift, cfg => shift,
     name => shift,
     targets => {}, rtts => {}, addrlookup => {}, rounds_count => 0};
     bless $self, $class;
@@ -73,7 +73,7 @@ sub add($$)
 {
     my $self = shift;
     my $tree = shift;
-    
+
     $self->{target_count}++; # increment this anyway
     return if defined $tree->{nomasterpoll} and $tree->{nomasterpoll} eq "yes";
     $self->{targets}{$tree} = shift;
@@ -90,11 +90,11 @@ sub round ($) {
 
 sub ProbeDesc ($) {
     return "Probe which does not override the ProbeDesc method";
-}    
+}
 
 sub ProbeUnit ($) {
     return "Seconds";
-}    
+}
 
 # this is a read-only variable that should get incremented by
 # the ping() method
@@ -128,10 +128,10 @@ sub target2dynfile ($$) {
 sub rrdupdate_string($$)
 {   my $self = shift;
     my $tree = shift;
-#    print "$tree -> ", join ",", @{$self->{rtts}{$tree}};print "\n";    
+#    print "$tree -> ", join ",", @{$self->{rtts}{$tree}};print "\n";
     # skip invalid addresses
     my $pings = $self->_pings($tree);
-    return "U:${pings}:".(join ":", map {"U"} 1..($pings+1)) 
+    return "U:${pings}:".(join ":", map {"U"} 1..($pings+1))
         unless defined $self->{rtts}{$tree} and @{$self->{rtts}{$tree}} > 0;
     my $entries = scalar @{$self->{rtts}{$tree}};
     my @times = @{$self->{rtts}{$tree}};
@@ -173,7 +173,7 @@ sub addresses($)
 	       my $ip;
 	       chomp($ip = <D>);
 	       close D;
-	       
+
 	       if ( open D, "<$dynbase.snmp" ) {
 		   my $snmp = <D>;
 		   chomp($snmp);
@@ -189,11 +189,11 @@ sub addresses($)
 	       next;
 	   }
 	}
-        $self->{addrlookup}{$target} = () 
+        $self->{addrlookup}{$target} = ()
                 unless defined $self->{addrlookup}{$target};
         push @{$self->{addrlookup}{$target}}, $tree;
 	push @{$addresses}, $target;
-    };    
+    };
     return $addresses;
 }
 

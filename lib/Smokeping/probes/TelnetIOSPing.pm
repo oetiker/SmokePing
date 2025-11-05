@@ -2,7 +2,7 @@ package Smokeping::probes::TelnetIOSPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::TelnetIOSPing>
 
@@ -27,7 +27,7 @@ sub pod_hash {
 Smokeping::probes::TelnetIOSPing - Cisco IOS Probe for SmokePing
 DOC
 		description => <<DOC,
-Integrates Cisco IOS as a probe into smokeping.  Uses the telnet protocol 
+Integrates Cisco IOS as a probe into smokeping.  Uses the telnet protocol
 to run a ping from an IOS device (source) to another device (host).
 This probe basically uses the "extended ping" of the Cisco IOS.  You have
 the option to specify which interface the ping is sourced from as well.
@@ -141,7 +141,7 @@ sub pingone ($$){
     my $vrf ="";
     if ( defined ($target->{vars}{vrf}) ) {
     	$vrf = " vrf $target->{vars}{vrf}";
-    }	
+    }
     # do NOT call superclass ... the ping method MUST be overridden
     my %upd;
     my @args = ();
@@ -200,7 +200,7 @@ sub pingone ($$){
 
      $telnet->prompt('/[\@\w\-\.]+[>#][ ]*$/');
      @output = $telnet->cmd("n");
-     
+
      #$telnet->waitfor('/[\@\w\-\.]+[>#][ ]*$/');
      $telnet->print("quit");
      $telnet->close;
@@ -258,7 +258,7 @@ The (optional) psource option specifies an alternate IP address or
 Interface from which you wish to source your pings from.  Routers
 can have many many IP addresses, and interfaces.  When you ping from a
 router you have the ability to choose which interface and/or which IP
-address the ping is sourced from.  Specifying an IP/interface does not 
+address the ping is sourced from.  Specifying an IP/interface does not
 necessarily specify the interface from which the ping will leave, but
 will specify which address the packet(s) appear to come from.  If this
 option is left out the IOS Device will source the packet automatically
@@ -287,7 +287,7 @@ DOC
 The vrf option allows you to specify the vrf for ping
 DOC
 			_example => 'VRF1',
-		},	
+		},
 	});
 }
 

@@ -62,7 +62,7 @@ GENEX= PERL5LIB=$(PERL5LIB) $(PERL) -I../thirdparty/lib/perl5  -I../lib -mSmokep
 Smokeping.3: ../lib/Smokeping.pm
 	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
-Smokeping_Examples.3: ../lib/Smokeping/Examples.pm        
+Smokeping_Examples.3: ../lib/Smokeping/Examples.pm
 	$(AM_V_GEN)$(POD2MAN) --section 3 > $@
 
 Smokeping_RRDtools.3: ../lib/Smokeping/RRDtools.pm
@@ -121,4 +121,3 @@ EXAMPLES := $(wildcard examples/config.*)
 
 etcdir = $(sysconfdir)/examples
 etc_DATA = $(EXAMPLES)
-

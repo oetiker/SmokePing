@@ -2,7 +2,7 @@ package Smokeping::probes::EchoPingLDAP;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::EchoPingLDAP>
 
@@ -20,7 +20,7 @@ sub pod_hash {
 Smokeping::probes::EchoPingLDAP - an echoping(1) probe for SmokePing
 DOC
 		overview => <<DOC,
-Measures LDAP roundtrip times for SmokePing with the echoping_ldap plugin. 
+Measures LDAP roundtrip times for SmokePing with the echoping_ldap plugin.
 DOC
 		authors => <<'DOC',
 Niko Tyni <ntyni@iki.fi>
@@ -31,7 +31,7 @@ The I<fill>, I<size> and I<udp> EchoPing variables are not valid.
 Plugins, including echoping_ldap, are available starting with echoping version 6.
 DOC
 		see_also => <<DOC,
-L<Smokeping::probes::EchoPing>, 
+L<Smokeping::probes::EchoPing>,
 L<Smokeping::probes::EchoPingPlugin>
 DOC
 	}
@@ -50,7 +50,7 @@ sub plugin_args {
 
     my $base = $target->{vars}{ldap_base};
     push @args, "-b $base" if $base;
-    
+
     my $scope = $target->{vars}{ldap_scope};
     push @args, "-s $scope" if $scope;
 

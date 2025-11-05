@@ -2,7 +2,7 @@ package Smokeping::probes::basefork;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::basefork>
 
@@ -37,22 +37,22 @@ between targets.
 DOC
 	description => <<DOC,
 Not all pinger programs support testing multiple hosts in a single go like
-fping(1). If the measurement takes long enough, there may be not enough time 
+fping(1). If the measurement takes long enough, there may be not enough time
 perform all the tests in the time available. For example, if the test takes
-30 seconds, measuring ten hosts already fills up the SmokePing default 
+30 seconds, measuring ten hosts already fills up the SmokePing default
 five minute step.
 
 Thus, it may be necessary to do some of the tests concurrently. This module
-defines the B<ping> method that forks the requested number of concurrent 
+defines the B<ping> method that forks the requested number of concurrent
 processes and calls the B<pingone> method that derived classes must provide.
 
 The B<pingone> method is called with one argument: a hash containing
 the target that is to be measured. The contents of the hash are
 described in I<Smokeping::probes::basevars>(3pm).
 
-The number of concurrent processes is determined by the probe-specific 
-variable `forks' and is $DEFAULTFORKS by default. If there are more 
-targets than this value, another round of forks is done after the first 
+The number of concurrent processes is determined by the probe-specific
+variable `forks' and is $DEFAULTFORKS by default. If there are more
+targets than this value, another round of forks is done after the first
 processes are finished. This continues until all the targets have been
 tested.
 
@@ -64,7 +64,7 @@ by the maximum number of pings). The probe itself can also provide
 another default value if desired by modifying the _default value of
 the timeout variable.
 
-If the child isn't finished when the timeout occurs, it 
+If the child isn't finished when the timeout occurs, it
 will be killed along with any processes it has started.
 
 The number of pings sent can be specified in the target-specific variable
@@ -105,14 +105,14 @@ sub probevars {
 	my $h = $class->SUPER::probevars;
 	delete $h->{pings};
 	return $class->_makevars($h, {
-		forks => { 
-			_re => '\d+', 
+		forks => {
+			_re => '\d+',
 			_example => 5,
 			_doc => "Run this many concurrent processes at maximum",
 			_default => $DEFAULTFORKS,
 		},
 		timeout => {
-			_re => '\d+', 
+			_re => '\d+',
 			_example => 15,
 			_default => 5,
 			_doc => "How long a single 'ping' takes at maximum",
@@ -124,7 +124,7 @@ sub targetvars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::targetvars, {
 		pings => {
-			_re => '\d+', 
+			_re => '\d+',
 			_sub => sub {
 				my $val = shift;
 				return "ERROR: The pings value must be at least 3."
@@ -188,7 +188,7 @@ sub ping {
 
 				unless (defined $pid) {
 					$self->do_log("cannot fork: $!");
-					$self->fatal("bailing out") 
+					$self->fatal("bailing out")
 						if $sleep_count++ > 6;
 					sleep 10;
 				}
@@ -231,7 +231,7 @@ sub ping {
 		for my $handle (@left) {
 			$self->do_log("$targetlookup{$handle}{addr}: timeout ($timeout s) reached, killing the probe.");
 
-			# we kill the child's process group (negative signal) 
+			# we kill the child's process group (negative signal)
 			# this should finish off the actual pinger process as well
 
 			my $pid = $pidlookup{$handle};

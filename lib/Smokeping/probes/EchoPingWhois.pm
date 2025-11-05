@@ -2,7 +2,7 @@ package Smokeping::probes::EchoPingWhois;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::EchoPingWhois>
 
@@ -20,7 +20,7 @@ sub pod_hash {
 Smokeping::probes::EchoPingWhois - an echoping(1) probe for SmokePing
 DOC
 		overview => <<DOC,
-Measures whois roundtrip times for SmokePing with the echoping_whois plugin. 
+Measures whois roundtrip times for SmokePing with the echoping_whois plugin.
 DOC
 		authors => <<'DOC',
 Niko Tyni <ntyni@iki.fi>
@@ -31,7 +31,7 @@ The I<fill>, I<size> and I<udp> EchoPing variables are not valid.
 Plugins, including echoping_whois, are available starting with echoping version 6.
 DOC
 		see_also => <<DOC,
-L<Smokeping::probes::EchoPing>, 
+L<Smokeping::probes::EchoPing>,
 L<Smokeping::probes::EchoPingPlugin>
 DOC
 	}

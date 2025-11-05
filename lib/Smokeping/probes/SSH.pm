@@ -2,7 +2,7 @@ package Smokeping::probes::SSH;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::SSH>
 
@@ -37,8 +37,8 @@ the amount specified in the config File.
 As part of the initialization, the probe asks 127.0.0.1 for it's public key
 and tries to parse the output. This is to ensure that the specified ssh-keyscan
 binary provides output in the expected formatm before relying on it.Make sure
-you have SSH running on the localhost as well, or specify an alternative 
-init_host target to test against, that is expected to be available during any 
+you have SSH running on the localhost as well, or specify an alternative
+init_host target to test against, that is expected to be available during any
 smokeping restart.
 DOC
 		authors => <<'DOC',

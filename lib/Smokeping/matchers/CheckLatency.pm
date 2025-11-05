@@ -12,7 +12,7 @@ Call the matcher with the following sequence:
  edgetrigger = yes
  pattern =  CheckLatency(l=>latency to check against,x=>num samples required for a match)
 
-This will create a matcher which checks for "l" latency or greater over "x" samples before raising, 
+This will create a matcher which checks for "l" latency or greater over "x" samples before raising,
 and will hold the alert until "x" samples under "l" before clearing
 
 =head1 COPYRIGHT

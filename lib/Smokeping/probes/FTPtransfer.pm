@@ -2,7 +2,7 @@ package Smokeping::probes::FTPtransfer;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::FTPtransfer>
 
@@ -46,7 +46,7 @@ format of this file (summary: colon-separated triplets of the form
 `<host>:<username>:<password>')
 
 The probe tries to be nice to the server and waits at least X seconds
-between starting filetransfers, where X is the value of the probe 
+between starting filetransfers, where X is the value of the probe
 specific `min_interval' variable ($DEFAULTINTERVAL by default).
 
 Many variables can be specified either in the probe or in the target definition,
@@ -78,7 +78,7 @@ sub _get_filename ($) {
 }
 
 sub ProbeDesc ($) {
-        my $self = shift;  
+        my $self = shift;
         my $srcfile = $self->{properties}{srcfile};
         my $destfile = $self->{properties}{destfile} || _get_filename $self->{properties}{srcfile};
         my $mode = $self->{properties}{mode};
@@ -105,12 +105,12 @@ sub pingone {
 	my $mode = $self->{properties}{mode};
 	my $username = $vars->{username};
 
-	$self->do_log("Missing FTP username for $host"), return 
+	$self->do_log("Missing FTP username for $host"), return
 		unless defined $username;
 
 	my $password = $self->password($host, $username) || $vars->{password};
 
-	$self->do_log("Missing FTP password for $host/$username"), return 
+	$self->do_log("Missing FTP password for $host/$username"), return
 		unless defined $password;
 
 	my @options = ();
@@ -127,7 +127,7 @@ sub pingone {
 			my $timeleft = $mininterval - $elapsed;
 			sleep $timeleft if $timeleft > 0;
 		}
-		my $ftp = Net::FTP->new($host, @options) or 
+		my $ftp = Net::FTP->new($host, @options) or
 			$self->do_log("Problem with $host: ftp session $@"), return;
 		$ftp->login($username,$password) or
  		        $self->do_log("Problem with $host: ftp login ".$ftp->message), return;
@@ -135,11 +135,11 @@ sub pingone {
 		my $ok;
 		my $size;
 		if ($mode eq 'get'){
-			$ok = $ftp->get($srcfile,$destfile) or 
+			$ok = $ftp->get($srcfile,$destfile) or
         	                $self->do_log("Problem with $host: ftp get ".$ftp->message);
 			$size = -s $destfile;
 		} else {
-			$ok = $ftp->put($srcfile,$destfile) or 
+			$ok = $ftp->put($srcfile,$destfile) or
         	                $self->do_log("Problem with $host: ftp put ".$ftp->message);
 			$size = -s $srcfile;
 		}
@@ -193,7 +193,7 @@ DOC
 			_example => 'get',
 			_re => '(put|get)',
 		},
-		
+
 		min_interval => {
                         _default => $DEFAULTINTERVAL,
                         _doc => "The minimum interval between each starting ftp sessions in seconds.",
@@ -201,7 +201,7 @@ DOC
 		},
 	});
 }
-		
+
 sub targetvars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::targetvars, {
@@ -233,7 +233,7 @@ sub targetvars {
 			_example => 'yes',
 		}
 
-		
+
 	});
 }
 

@@ -68,7 +68,7 @@ sub new(@) {
 
 sub Desc ($) {
     return "The Standard Deviation sorter sorts the targets by Standard Deviation.";
-}    
+}
 
 sub CalcValue($) {
     my $self = shift;

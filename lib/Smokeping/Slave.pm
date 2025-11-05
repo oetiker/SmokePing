@@ -46,7 +46,7 @@ sub get_results {
         if (ref $tree->{$prop} eq 'HASH'){
             my $subres = get_results $slave_cfg, $cfg, $probes, $tree->{$prop}, $name."/$prop", $justthisprobe;
             push @{$results}, @{$subres};
-        } 
+        }
         next unless defined $probe;
         next if defined $justthisprobe and $probe ne $justthisprobe;
         my $probeobj = $probes->{$probe};
@@ -58,8 +58,8 @@ sub get_results {
     }
     return $results;
 }
-         
-sub submit_results {    
+
+sub submit_results {
     my $slave_cfg = shift;
     my $cfg = shift;
     my $myprobe = shift;
@@ -67,9 +67,9 @@ sub submit_results {
     my $store = $slave_cfg->{cache_dir}."/data";
     $store .= "_$myprobe" if $myprobe;
     $store .= ".cache";
-    my $restore = -f $store ? retrieve $store : []; 
+    my $restore = -f $store ? retrieve $store : [];
     unlink $store;
-    my $new =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, '', $myprobe);    
+    my $new =  get_results($slave_cfg, $cfg, $probes, $cfg->{Targets}, '', $myprobe);
     push @$restore, @$new;
     my $data_dump = join("\n",@{$restore}) || "";
     my $ua = LWP::UserAgent->new(
@@ -123,7 +123,7 @@ sub submit_results {
             $config->{General}{piddir} = $slave_cfg->{pid_dir};
             Smokeping::do_log("Sent data to Server and got new config in response.");
             return $config;
-        }                       
+        }
     } else {
         # ok did not manage to get our data to the server.
         # we store the result so that we can try again later.

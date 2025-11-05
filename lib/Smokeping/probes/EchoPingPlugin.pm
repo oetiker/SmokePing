@@ -2,7 +2,7 @@ package Smokeping::probes::EchoPingPlugin;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::EchoPingPlugin>
 
@@ -96,7 +96,7 @@ DOC
         },
         pluginargs => {
             _doc => <<DOC,
-Any extra arguments needed by the echoping plugin specified with the 
+Any extra arguments needed by the echoping plugin specified with the
 I<pluginname> variable. These are generally provided by the subclass probe.
 DOC
             _example => "-p plugin_specific_arg",

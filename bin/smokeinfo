@@ -23,8 +23,8 @@ sub main()
     if($opt{man})      { pod2usage(-exitstatus => 0, -verbose => 2) }
     if($opt{version})  { print "smokeinfo $Revision\n"; exit(0) }
     if($opt{noaction}) { die "ERROR: don't know how to \"no-action\".\n" }
-    my $config = shift @ARGV;    
-	    
+    my $config = shift @ARGV;
+
     my $si = Smokeping::Info->new($config);
     my $nodes = $si->fetch_nodes(pattern=>$opt{filter},mode=>$opt{mode});
     my @rows = qw(med_avg med_min med_max med_now loss_avg loss_max loss_now);
@@ -50,7 +50,7 @@ smokeinfo - poll smokeping site for numeric information
 B<smokeinfo> path/to/config.cfg [I<options>]
 
   --start x			rrd graph start time. (default now-24h)
-                                
+
   --end y			rrd graph end time. (default now)
 
   --filter pattern     	        search pattern for node selection
@@ -76,13 +76,13 @@ SmokeInfo is a simple frontend to the L<Smokeping::Info> module. It provides
 access to numeric data stored in the rrd files.
 
 Note that --start and --end are passed directly to rrd graph. This means
-they work on the same syntax. 
+they work on the same syntax.
 
 =head2 Examples
 
 Get all data all nodes
 
- smokeinfo etc/config 
+ smokeinfo etc/config
 
 Only show nodes directly under /Customers
 
@@ -140,4 +140,3 @@ S<Tobi Oetiker E<lt>tobi@oetiker.chE<gt>>
 # End:
 #
 # vi: sw=4 et
-

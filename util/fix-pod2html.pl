@@ -7,7 +7,7 @@ use HTML::Parser;
 # v1.0: defer </dd> and </dt> tags until
 # the next <dd>, <dt> or </dl>
 
-# v1.1: don't nest any <a> elements; 
+# v1.1: don't nest any <a> elements;
 # end one before beginning another
 
 # v1.2: insert <dd> tags if <dl> occurs
@@ -51,7 +51,7 @@ sub startsub {
 	}
         print $text;
 }
-                
+
 
 sub endsub {
         my $tag = shift;

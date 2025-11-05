@@ -51,17 +51,17 @@ sub get_targets {
             $ok = 1 if $key eq 'host';
             $return{$key} = $trg->{$key};
         }
-    }           
+    }
     $return{nomasterpoll} = 'no'; # slaves poll always
     return ($ok ? \%return : undef);
 }
-    
+
 sub extract_config {
     my $cfg = shift;
     my $slave = shift;
     # get relevant Targets
     my %slave_config;
-    $slave_config{Database} = dclone $cfg->{Database}; 
+    $slave_config{Database} = dclone $cfg->{Database};
     $slave_config{General}  = dclone $cfg->{General};
     $slave_config{Probes}   = dclone $cfg->{Probes};
     $slave_config{Targets}  = get_targets($cfg->{Targets},$slave);
@@ -166,7 +166,7 @@ sub save_updates {
                 map {
                     push @{$existing}, [ $slave, $_->[0], $_->[1] ];
                 } @{$u{$name}};
-                nstore($existing, $file.$$);               
+                nstore($existing, $file.$$);
                rename $file.$$,$file;
                 flock($fh, LOCK_UN);
                 close $fh;
@@ -179,7 +179,7 @@ sub save_updates {
             warn "Could not update $file, giving up for now.";
             close $fh;
         }
-    }         
+    }
 };
 
 =head3 get_slaveupdates
@@ -207,14 +207,14 @@ sub get_slaveupdates {
             unlink $file;
             flock $fh, LOCK_UN;
             if ($@) { #error
-                warn "Loading $file: $@";  
+                warn "Loading $file: $@";
                 close $fh;
                 return $empty;
             }
         } else {
             warn "Could not lock $file. Will skip and try again in the next round. No harm done!\n";
         }
-        close $fh;        
+        close $fh;
         return $data;
     }
     return $empty;
@@ -236,7 +236,7 @@ sub get_secret {
             close $hand;
             return $1;
         }
-    } else { 
+    } else {
         print "Content-Type: text/plain\n\n";
         print "WARNING: Opening secrets file $cfg->{Slaves}{secrets}: $!\n";
         return '__HORRIBLE_INLINE_SIGNALING__';
@@ -259,7 +259,7 @@ sub answer_slave {
     return if $secret eq '__HORRIBLE_INLINE_SIGNALING__';
     if (not $secret){
         print "Content-Type: text/plain\n\n";
-        print "WARNING: No secret found for slave ${slave}\n";       
+        print "WARNING: No secret found for slave ${slave}\n";
         return;
     }
     my $protocol = $q->param('protocol') || '?';
@@ -268,7 +268,7 @@ sub answer_slave {
         print "WARNING: I expected protocol $PROTOCOL and got $protocol from slave ${slave}. I will skip this.\n";
         return;
     }
-        
+
     my $key = $q->param('key');
     my $data = $q->param('data');
     my $config_time = $q->param('config_time');
@@ -284,10 +284,10 @@ sub answer_slave {
         print "Content-Type: text/plain\n\n";
         print "WARNING: Data from $slave was signed with $key which does not match our expectation\n";
         return;
-    }     
+    }
     # does the client need new config ?
     if ($config_time < $cfg->{__last}){
-        my $config = extract_config $cfg, $slave;    
+        my $config = extract_config $cfg, $slave;
         if ($config){
             print "Content-Type: application/smokeping-config\n";
             print "Protocol: $PROTOCOL\n";
@@ -300,9 +300,9 @@ sub answer_slave {
         }
     } else {
         print "Content-Type: text/plain\n\nOK\n";
-    };       
+    };
     return;
-}   
+}
 
 
 1;

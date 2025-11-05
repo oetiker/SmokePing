@@ -2,7 +2,7 @@ package Smokeping::probes::Radius;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::Radius>
 
@@ -33,7 +33,7 @@ DOC
 		description => <<DOC,
 This probe measures RADIUS (RFC 2865) authentication latency for SmokePing.
 
-The username to be tested is specified in either the probe-specific or the 
+The username to be tested is specified in either the probe-specific or the
 target-specific variable `username', with the target-specific one overriding
 the probe-specific one.
 
@@ -84,16 +84,16 @@ sub new {
 	        if (defined $self->{properties}{secretfile}) {
                         my @stat = stat($self->{properties}{secretfile});
                         my $mode = $stat[2];
-                        carp("Warning: secret file $self->{properties}{secretfile} is world-readable\n") 
+                        carp("Warning: secret file $self->{properties}{secretfile} is world-readable\n")
                                 if defined $mode and $mode & 04;
-			open(S, "<$self->{properties}{secretfile}") 
+			open(S, "<$self->{properties}{secretfile}")
 				or croak("Error opening specified secret file $self->{properties}{secretfile}: $!");
 			while (<S>) {
 				chomp;
 				next unless /\S/;
 				next if /^\s*#/;
 				my ($host, $secret) = split;
-				carp("Line $. in $self->{properties}{secretfile} is invalid"), next 
+				carp("Line $. in $self->{properties}{secretfile} is invalid"), next
 					unless defined $host and defined $secret;
 				$self->secret($host, $secret);
 			}
@@ -109,7 +109,7 @@ sub secret {
 	my $self = shift;
 	my $host = shift;
 	my $newval = shift;
-	
+
 	$self->{secret}{$host} = $newval if defined $newval;
 	return $self->{secret}{$host};
 }
@@ -122,7 +122,7 @@ sub pingone {
 	my $mininterval = $vars->{mininterval};
 	my $username = $vars->{username};
 	my $secret = $self->secret($host);
-	if (defined $vars->{secret} and 
+	if (defined $vars->{secret} and
 	    $vars->{secret} ne ($self->{properties}{secret}||"")) {
 		$secret = $vars->{secret};
 	}
@@ -135,10 +135,10 @@ sub pingone {
        $allowreject=(defined($allowreject)
                and $allowreject eq "true");
 
-	$self->do_log("Missing RADIUS secret for $host"), return 
+	$self->do_log("Missing RADIUS secret for $host"), return
 		unless defined $secret;
 
-	$self->do_log("Missing RADIUS username for $host"), return 
+	$self->do_log("Missing RADIUS username for $host"), return
 		unless defined $username;
 
 	my $password = $self->password($host, $username);
@@ -148,7 +148,7 @@ sub pingone {
 	}
 	$password ||= $self->{properties}{password};
 
-	$self->do_log("Missing RADIUS password for $host/$username"), return 
+	$self->do_log("Missing RADIUS password for $host/$username"), return
 		unless defined $password;
 
 	my $port = $vars->{port};
@@ -217,7 +217,7 @@ DOC
 		},
 	});
 }
-		
+
 sub targetvars {
 	my $class = shift;
 	return $class->_makevars($class->SUPER::targetvars, {

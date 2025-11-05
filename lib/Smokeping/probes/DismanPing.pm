@@ -2,7 +2,7 @@ package Smokeping::probes::DismanPing;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::DismanPing>
 
@@ -51,7 +51,7 @@ all colliding names.
 
 ${e}head2 CONFIGURATION
 
-This probe requires read/write access to the pingCtlTable.  
+This probe requires read/write access to the pingCtlTable.
 It also requires read-only access to the pingResultsTable and the
 pingHistoryTable.  The DISMAN-PING-MIB is structured such that
 it is possible to restrict by pingCtlOwnerIndex.  This probe
@@ -69,7 +69,7 @@ from the manager at B<192.0.2.134>.
             oid .1.3.6.1.2.1.80 include;
         }
         community pinger {
-            view pingMIB;   
+            view pingMIB;
             authorization read-write;
             clients {
                 192.0.2.134/32;
@@ -381,7 +381,7 @@ sub ping($) {
             );
             Smokeping::do_debuglog( "DismanPing: table download returned "
                     . ( defined($ret) ? $ret : "undef" ) );
-            
+
             # Make sure we have exactly pings results.
             # Fewer are probably an implementation problem (we asked for
             #  15, it said the test was done, but didn't return 15).
@@ -399,7 +399,7 @@ sub ping($) {
                         . " results, taking last $t->{vars}{pings}" );
                 @times = @times[ $#times - $t->{vars}{pings} .. $#times ];
             }
-            
+
             if (@times) {
                 my (@goodtimes) = ();
                 foreach my $result (@times) {
@@ -435,7 +435,7 @@ sub idx ($) {
     my $testname =  substr($t->{vars}{host} . ' ICMP ping',0,32);
     return join( ".",
         length($ownerindex), unpack( "C*", $ownerindex ),
-        length($testname),   unpack( "C*", $testname ) 
+        length($testname),   unpack( "C*", $testname )
     );
 }
 

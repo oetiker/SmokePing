@@ -52,7 +52,7 @@ $VERSION = '1.13';
 
 # The OID numbers from RFC1213 (MIB-II) and RFC1315 (Frame Relay)
 # are pre-loaded below.
-%SNMP_util::OIDS = 
+%SNMP_util::OIDS =
   (
     'iso' => '1',
     'org' => '1.3',
@@ -93,9 +93,9 @@ $VERSION = '1.13';
     'ifMtu' => '1.3.6.1.2.1.2.2.1.4',
     'ifSpeed' => '1.3.6.1.2.1.2.2.1.5',
     'ifPhysAddress' => '1.3.6.1.2.1.2.2.1.6',
-    'ifAdminHack' => '1.3.6.1.2.1.2.2.1.7',  
+    'ifAdminHack' => '1.3.6.1.2.1.2.2.1.7',
     'ifAdminStatus' => '1.3.6.1.2.1.2.2.1.7',
-    'ifOperHack' => '1.3.6.1.2.1.2.2.1.8',             
+    'ifOperHack' => '1.3.6.1.2.1.2.2.1.8',
     'ifOperStatus' => '1.3.6.1.2.1.2.2.1.8',
     'ifLastChange' => '1.3.6.1.2.1.2.2.1.9',
     'at' => '1.3.6.1.2.1.3',
@@ -418,7 +418,7 @@ sub snmpopen ($$$) {
     or ($SNMP_util::LHost ne $nlhost)
     or ($SNMP_util::IPv4only ne $v4onlystr)) {
     if (defined($SNMP_util::Session)) {
-      $SNMP_util::Session->close();    
+      $SNMP_util::Session->close();
       undef $SNMP_util::Session;
       undef $SNMP_util::Host;
       undef $SNMP_util::Version;
@@ -610,7 +610,7 @@ sub snmpwalk_flg ($$@) {
   # walk goes on.
   # @vars stays static while @avars may shrink as we reach end
   # of walk for individual variables during PDU exchange.
-   
+
   @avars = @vars;
 
   # IlvJa
@@ -689,7 +689,7 @@ sub snmpwalk_flg ($$@) {
 	      $upo = "";
 	      last;
 	    }
-	  }	
+	  }
 	  if (length($upo) and exists($revOIDS{$upo})) {
 	    $upo = $revOIDS{$upo} . $inst;
 	  } else {
@@ -705,7 +705,7 @@ sub snmpwalk_flg ($$@) {
 	      $tempo = "";
 	      last;
 	    }
-	  }	
+	  }
 	  if (length($tempo) and exists($revOIDS{$tempo})) {
 	    $var = $revOIDS{$tempo};
 	  } else {
@@ -1062,7 +1062,7 @@ sub snmpmapOID(@)
     $RevNeeded = 1;
     print "snmpmapOID: $txt => $oid\n" if $SNMP_util::Debug;
   }
-  
+
   return undef;
 }
 

@@ -2,7 +2,7 @@ package Smokeping::probes::LDAP;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::LDAP>
 
@@ -20,7 +20,7 @@ use Net::LDAP;
 use Time::HiRes qw(gettimeofday sleep);
 use base qw(Smokeping::probes::passwordchecker);
 
-# don't bail out if IO::Socket::SSL 
+# don't bail out if IO::Socket::SSL
 # can't be loaded, just warn
 # about it when doing starttls
 
@@ -42,7 +42,7 @@ DOC
 		description => <<DOC,
 This probe measures LDAP query latency for SmokePing.
 The query is specified by the target-specific variable `filter' and,
-optionally, by the target-specific variable `base'. The attributes 
+optionally, by the target-specific variable `base'. The attributes
 queried can be specified in the comma-separated list `attrs'.
 
 The TCP port of the LDAP server and the LDAP version to be used can
@@ -71,7 +71,7 @@ DOC
 There should be a way of specifying TLS options, such as the certificates
 involved etc.
 
-The probe has an ugly way of working around the fact that the 
+The probe has an ugly way of working around the fact that the
 IO::Socket::SSL class complains if start_tls() is done more than once
 in the same program. But It Works For Me (tm).
 DOC
@@ -114,8 +114,8 @@ sub targetvars {
 		},
 		start_tls => {
 			_doc => "If true, encrypt the connection with the starttls command. Disabled by default.",
-			_sub => sub { 
-				my $val = shift; 
+			_sub => sub {
+				my $val = shift;
 				return "ERROR: start_tls defined but IO::Socket::SSL couldn't be loaded"
 					if $val and not $havessl;
 				return undef;
@@ -222,7 +222,7 @@ sub pingone {
 	my $attrsref = @attrs ? \@attrs : undef;
 
 	my @times;
-	
+
 	my $start;
 	for (1..$self->pings($target)) {
 		if (defined $start) {
@@ -259,7 +259,7 @@ sub pingone {
 			$ldap->unbind;
 			next;
 		};
-		$mesg = $ldap->search(base => $base, filter => $filter, 
+		$mesg = $ldap->search(base => $base, filter => $filter,
 		                      attrs => $attrsref, scope => $scope);
 		$mesg->code and do {
 			$self->do_log("filter error on $host: " . $mesg->error);

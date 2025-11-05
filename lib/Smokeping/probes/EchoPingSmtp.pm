@@ -2,7 +2,7 @@ package Smokeping::probes::EchoPingSmtp;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::EchoPingSmtp>
 

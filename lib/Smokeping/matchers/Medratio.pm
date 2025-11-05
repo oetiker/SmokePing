@@ -98,14 +98,14 @@ use Carp;
 
 sub Desc ($) {
     croak "Detect changes in median latency";
-}    
+}
 
 sub Test($$)
 {   my $self = shift;
-    my $data = shift; # @{$data->{rtt}} and @{$data->{loss}}    
+    my $data = shift; # @{$data->{rtt}} and @{$data->{loss}}
     my $len =  $self->Length;
     my $rlen = scalar @{$data->{rtt}};
-    return undef 
+    return undef
 	if $rlen < $len
            or (defined $data->{rtt}[-$len] and $data->{rtt}[-$len] eq 'S');
     my $ac = $self->{param}{historic};

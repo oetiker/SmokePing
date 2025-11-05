@@ -2,7 +2,7 @@ package Smokeping::probes::NFSping;
 
 =head1 301 Moved Permanently
 
-This is a Smokeping probe module. Please use the command 
+This is a Smokeping probe module. Please use the command
 
 C<smokeping -man Smokeping::probes::NFSping>
 
@@ -26,7 +26,7 @@ sub pod_hash {
 Smokeping::probes::NFSping - NFSping Probe for SmokePing
 DOC
               description => <<DOC,
-Integrates NFSping as a probe into smokeping. The variable B<binary> must 
+Integrates NFSping as a probe into smokeping. The variable B<binary> must
 point to your copy of the NFSping program.
 
 NFSping can be downloaded from:
@@ -107,7 +107,7 @@ sub ping ($){
     if (($self->{properties}{tcp} || '') eq 'true'){
 	push @params, "-T";
     }
-    
+
 
     my $pings =  $self->pings;
     if (($self->{properties}{blazemode} || '') eq 'true'){
@@ -129,7 +129,7 @@ sub ping ($){
         my @times = split /\s+/;
         my $ip = shift @times;
         next unless ':' eq shift @times; #drop the colon
-        if (($self->{properties}{blazemode} || '') eq 'true'){     
+        if (($self->{properties}{blazemode} || '') eq 'true'){
              shift @times;
         }
         @times = map {sprintf "%.10e", $_ / $self->{pingfactor}} sort {$a <=> $b} grep /^\d/, @times;
@@ -194,7 +194,7 @@ DOC
 			_doc => <<DOC,
 The nfsping "-i" parameter, but in (probably fractional) seconds rather than
 milliseconds, for consistency with other Smokeping probes. This is the
-interval between pings to successive targets. 
+interval between pings to successive targets.
 DOC
 		},
 	});

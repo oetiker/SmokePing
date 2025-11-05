@@ -12,7 +12,7 @@ Call the matcher with the following sequence:
  edgetrigger = yes
  pattern =  CheckLoss(l=>loss to check against,x=>num samples required for a match)
 
-This will create a matcher which checks for "l" loss or greater over "x" samples before raising, 
+This will create a matcher which checks for "l" loss or greater over "x" samples before raising,
 and will hold the alert until "x" samples under "l" before clearing
 
 =head1 COPYRIGHT
@@ -76,7 +76,7 @@ sub Test($$) {
     my $count  = 0;
     my $loss;
     my $x = min($self->{param}{x}, scalar @{ $data->{loss} });
-    
+
     #Iterate thru last x number of samples, starting with the most recent
     for (my $i=1;$i<=$x;$i++) {
         $loss = $data->{loss}[$_-$i];

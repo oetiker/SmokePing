@@ -93,7 +93,7 @@ actual_prefix=$prefix
 if test x$actual_prefix = xNONE; then
     actual_prefix=$ac_default_prefix
 fi
-    
+
 HTDOCSDIR=${actual_prefix}/htdocs
 AC_ARG_WITH(htdocs-dir,AS_HELP_STRING([--with-htdocs-dir=DIR],[Where to install htdocs [PREFIX/htdocs]]), [HTDOCSDIR=$withval])
 AC_SUBST(HTDOCSDIR)
@@ -148,7 +148,7 @@ AC_OUTPUT
         cat <<NOTES
 
 ** Ready to install Smokeping ******************************
-   
+
    Settings:
 
      PERL5LIB = ${PERL5LIB:-"not set"}
