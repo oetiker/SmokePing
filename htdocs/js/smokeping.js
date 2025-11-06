@@ -108,7 +108,7 @@ function changeRRDImage(coords,dimensions){
     EndEpoch  =  Math.ceil(EndEpoch + (SelectRight - (RRDImgWidth - RRDRight) ) * DivEpoch / RRDImgUsable * RightFactor);
 
 
-    $('zoom').src = myURL + '?displaymode=a;start=' + StartEpoch + ';end=' + EndEpoch + ';target=' + Target + ';hierarchy=' + Hierarchy;    
+    $('zoom').src = myURL + '?displaymode=a&start=' + StartEpoch + '&end=' + EndEpoch + '&target=' + Target + '&hierarchy=' + Hierarchy;    
 
     myCropper.setParams();
 
@@ -119,7 +119,7 @@ if($('range_form') != null && $('range_form').length){
     $form = $(this);
         var cgiurl = $form.action.split("?");
         var action = $form.serialize().split("&");
-        action = action.map(i=> i + ';');
+        action = action.map(i=> i + '&');
         $form.action = cgiurl[0] + "?" + action[4] + action[5] + action[6] + action[3];
     }));
 }

@@ -351,7 +351,7 @@ sub get_multi_detail ($$$$;$){
             $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>"
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
-            $page .= ( qq{<a href="?displaymode=n;start=$startstr;end=now;}."target=".$q->param('target').'">'
+            $page .= ( qq{<a href="?displaymode=n&start=$startstr&end=now&}."target=".$q->param('target').'">'
                   . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.svg" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         } else { # chart mode
