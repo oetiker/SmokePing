@@ -1553,7 +1553,7 @@ sub get_detail ($$$$;$){
                     $page .= "<div class=\"".panel_heading_class()."\"><h2>$title</h2></div>";
                 }
                 $page .= "<div class=\"panel-body\">";
-                $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n;start=$startstr;end=now;}."target=".$t.$s.'">'
+                $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n&start=$startstr&end=now&}."target=".$t.$s.'">'
                       . qq{<IMG ALT="" SRC="${imghref}${s}_${end}_${start}.svg">}."</a>" ); #"
                 $page .= "</div></div>\n";
             }
