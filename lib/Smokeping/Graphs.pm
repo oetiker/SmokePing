@@ -326,8 +326,12 @@ sub get_multi_detail ($$$$;$){
             $page .= "<div class=\"panel-body\">";
 
            $page .= qq|<IMG id="zoom" alt="" width="$xs" height="$ys" SRC="${imghref}_${end}_${start}.svg">| ;
-
-           $page .= $q->start_form(-method=>'GET', -id=>'range_form')
+ 
+           $page .= $q->start_form(
+                 -method => 'GET',
+                 -id     => 'range_form',
+                 -action => Smokeping::cgiurl($q, $cfg),
+             )
               . "<p>Time range: "
               . $q->textfield(-name=>'start',-default=>$startstr)
               . "&nbsp;&nbsp;to&nbsp;&nbsp;".$q->textfield(-name=>'end',-default=>$endstr)

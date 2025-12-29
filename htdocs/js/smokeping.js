@@ -116,11 +116,21 @@ function changeRRDImage(coords,dimensions){
 
 if($('range_form') != null && $('range_form').length){
     $('range_form').on('submit', (function() {
-    $form = $(this);
-        var cgiurl = $form.action.split("?");
+        $form = $(this);
+
+        // IMPORTANT: avoid using `$form.action` as the base URL.
+        // Browsers expose it as an absolute URL even when the HTML `action`
+        // attribute is relative/empty, which breaks `linkstyle=relative`.
+        // Prefer the literal attribute value; if missing, treat it as empty.
+        var actionAttr = $form.readAttribute('action');
+        var cgiurl = ((actionAttr === null) ? '' : actionAttr).split("?");
+
         var action = $form.serialize().split("&");
         action = action.map(i=> i + '&');
-        $form.action = cgiurl[0] + "?" + action[4] + action[5] + action[6] + action[3];
+
+        // Preserve the existing ordering logic, but write back a relative action
+        // when the configured linkstyle resolves to relative.
+        $form.writeAttribute('action', cgiurl[0] + "?" + action[4] + action[5] + action[6] + action[3]);
     }));
 }
 
