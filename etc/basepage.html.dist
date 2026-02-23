@@ -60,6 +60,7 @@
 <script src="js/scriptaculous/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
 <script src="js/cropper/cropper.js" type="text/javascript"></script>
 <script src="js/smokeping.js" type="text/javascript"></script>
+<script src="js/traceping.js" type="text/javascript"></script>
 
 </body>
 </html>

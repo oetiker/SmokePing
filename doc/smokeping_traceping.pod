@@ -1,0 +1,75 @@
+=head1 NAME
+
+smokeping_traceping - Traceroute History for SmokePing
+
+=head1 OVERVIEW
+
+SmokePing can optionally collect and store traceroute data for all monitored
+targets. This allows you to view current and historical routing paths directly
+in the SmokePing web interface.
+
+=head1 DESCRIPTION
+
+When enabled, SmokePing periodically runs traceroutes to all configured targets
+and stores the results in a SQLite database. The web interface shows a
+"Traceroute" panel on each target's detail page with the latest route and
+access to historical data.
+
+This feature is entirely optional. If not configured, SmokePing behaves
+exactly as before.
+
+=head1 REQUIREMENTS
+
+=over
+
+=item * L<DBI> and L<DBD::SQLite> Perl modules
+
+=item * The C<traceroute> command available in PATH
+
+=back
+
+=head1 CONFIGURATION
+
+Add the following variables to the B<*** General ***> section of your
+SmokePing configuration:
+
+ *** General ***
+ # ... existing config ...
+ traceping_db = /var/lib/smokeping/traceping.sqlite
+ traceping_interval = 300
+ traceping_retention_days = 365
+
+=over
+
+=item B<traceping_db>
+
+Path to the SQLite database file. The file will be created automatically
+if it does not exist. When this variable is not set, traceroute history
+is disabled.
+
+=item B<traceping_interval>
+
+Interval in seconds between traceroute rounds. Default: 300 (5 minutes).
+
+=item B<traceping_retention_days>
+
+Number of days to keep traceroute history. Older records are automatically
+deleted. Default: 365.
+
+=back
+
+=head1 WEB INTERFACE
+
+When traceroute history is enabled, the detail page for each target will
+show a "Traceroute" panel below the graphs. This panel displays the most
+recent traceroute output for that target.
+
+=head1 AUTHOR
+
+Oscar Centelles E<lt>ocentelles@gmail.comE<gt>
+
+=head1 SEE ALSO
+
+L<smokeping_config(5)>, L<smokeping(1)>
+
+=cut

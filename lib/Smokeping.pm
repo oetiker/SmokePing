@@ -2828,7 +2828,8 @@ DOC
          [ qw(owner imgcache imgurl datadir dyndir pagedir piddir sendmail offset
               smokemail cgiurl mailhost mailuser mailpass snpphost contact display_name
               syslogfacility syslogpriority concurrentprobes changeprocessnames tmail
-              changecgiprogramname linkstyle precreateperms ) ],
+              changecgiprogramname linkstyle precreateperms
+              traceping_db traceping_interval traceping_retention_days ) ],
 
          _mandatory =>
          [ qw(owner imgcache imgurl datadir piddir
@@ -2978,6 +2979,35 @@ specified directory permission bits. The value is interpreted as an
 octal value, eg. 775 for rwxrwxr-x etc.
 
 If unset, the directories will be created dynamically with umask 022.
+DOC
+         },
+         traceping_db =>
+         {
+          _doc => <<DOC,
+Path to an SQLite database file for storing traceroute history.
+When set, SmokePing will periodically run traceroutes to all targets
+and store the results, making routing history available in the web UI.
+If not set, traceroute history is disabled and SmokePing behaves as usual.
+DOC
+          _example => '/var/lib/smokeping/traceping.sqlite',
+         },
+         traceping_interval =>
+         {
+          _re => '\d+',
+          _re_error => 'traceping_interval must be a number (seconds)',
+          _default => '300',
+          _doc => <<DOC,
+Interval in seconds between traceroute collection rounds. Default is 300 (5 minutes).
+DOC
+         },
+         traceping_retention_days =>
+         {
+          _re => '\d+',
+          _re_error => 'traceping_retention_days must be a number',
+          _default => '365',
+          _doc => <<DOC,
+Number of days to retain traceroute history. Records older than this will be
+automatically cleaned up. Default is 365 days.
 DOC
          },
      linkstyle =>
@@ -4421,6 +4451,21 @@ sub cgi ($$) {
                 do_cgilog("Updating DYNAMIC address failed: $ret");
         } else {
                 print $q->header; # no HTML output on success
+        }
+    } elsif ($q->param('traceping_target')) {
+        # Traceroute history AJAX request
+        print $q->header('text/html');
+        if ($cfg->{General}{traceping_db}) {
+            eval {
+                require Smokeping::Traceping;
+                Smokeping::Traceping->init($cfg) unless Smokeping::Traceping->is_enabled();
+                print Smokeping::Traceping->cgi_handler($q);
+            };
+            if ($@) {
+                print "Traceroute history not available: $@";
+            }
+        } else {
+            print "Traceroute history not configured.";
         }
     } else {
         if (not $q->param('displaymode') or $q->param('displaymode') ne 'a'){ #in ayax mode we do not issue a header YET
