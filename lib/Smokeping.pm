@@ -2058,6 +2058,50 @@ XMPPALERT
                             warn "Command sendxmpp not found. Try 'apt-get install sendxmpp' to install it. xmpp message with arg line $xmpparg could not be sent";
                         }
                     }
+                    elsif ( $addr =~ /^telegram:(.+)/ ) {
+                        my $chat_id = $1;
+                        my $bot_token = $cfg->{Alerts}{telegram_bot_token};
+                        if ($bot_token) {
+                            my $telegramalert = <<TELEGRAMALERT;
+<b>[SmokePing]</b> Alert <b>$_</b> $what
+
+<b>Target:</b> $line
+<b>URL:</b> $urlline
+
+<b>Pattern:</b> $alert->{pattern}
+
+<b>Data (old --&gt; now)</b>
+$loss
+$rtt
+
+<b>Comment:</b> $alert->{comment}
+TELEGRAMALERT
+                            eval {
+                                require HTTP::Tiny;
+                                require JSON::PP;
+                                my $http = HTTP::Tiny->new(timeout => 10);
+                                my $payload = JSON::PP::encode_json({
+                                    chat_id    => $chat_id,
+                                    text       => $telegramalert,
+                                    parse_mode => 'HTML',
+                                    disable_web_page_preview => JSON::PP::true,
+                                });
+                                my $resp = $http->post(
+                                    "https://api.telegram.org/bot${bot_token}/sendMessage",
+                                    {
+                                        content => $payload,
+                                        headers => { 'Content-Type' => 'application/json' },
+                                    }
+                                );
+                                do_log("Telegram alert sent to chat $chat_id: ".$resp->{status}) unless $resp->{success};
+                            };
+                            if ($@) {
+                                warn "Telegram alert failed: $@. Ensure HTTP::Tiny and JSON::PP are installed.";
+                            }
+                        } else {
+                            warn "Telegram alert target '$chat_id' configured but 'telegram_bot_token' is not set in the Alerts section.";
+                        }
+                    }
                     else {
                                     push @to, $addr;
                     }
@@ -2579,7 +2623,7 @@ of the parent node, circular dependencies are not possible.
 DOC
            },
 
-           alertee => { _re => '^(?:\|.+|.+@\S+|snpp:.+|xmpp:.+)(?:\s*,\s*(?:\|.+|.+@\S+|snpp:.+|xmpp:.+))*$',
+           alertee => { _re => '^(?:\|.+|.+@\S+|snpp:.+|xmpp:.+|telegram:.+)(?:\s*,\s*(?:\|.+|.+@\S+|snpp:.+|xmpp:.+|telegram:.+))*$',
                         _re_error => 'the alertee must be an email address here',
                         _doc => <<DOC },
 If you want to have alerts for this target and all targets below it go to a particular address
@@ -3738,7 +3782,7 @@ A complete example
 DOC
 
              _sections => [ '/[^\s,]+/' ],
-             _vars => [ qw(to from edgetrigger mailtemplate) ],
+             _vars => [ qw(to from edgetrigger mailtemplate telegram_bot_token) ],
              _mandatory => [ qw(to from)],
              to => { _doc => <<DOC,
 Either an email address to send alerts to, or the name of a program to
@@ -3748,8 +3792,11 @@ whenever an alert matches, using the following 5 arguments
 (except if B<edgetrigger> is 'yes'; see below):
 B<name-of-alert>, B<target>, B<loss-pattern>, B<rtt-pattern>, B<hostname>.
 You can also provide a comma separated list of addresses and programs.
+
+To send alerts via B<Telegram>, use C<telegram:CHAT_ID> as the address
+and set the B<telegram_bot_token> variable in the Alerts section.
 DOC
-                        _re => '(\|.+|.+@\S+|snpp:|xmpp:)',
+                        _re => '(\|.+|.+@\S+|snpp:|xmpp:|telegram:)',
                         _re_error => 'put an email address or the name of a program here',
                       },
              from => { _doc => 'who should alerts appear to be coming from ?',
@@ -3806,12 +3853,28 @@ DOC
                              return undef;
                           },
                        },
+              telegram_bot_token => {
+                      _doc => <<DOC,
+The Telegram Bot API token, obtained from \@BotFather on Telegram.
+Required when using C<telegram:CHAT_ID> as an alert target.
+Set the B<to> field to C<telegram:YOUR_CHAT_ID> and provide the bot token here.
+
+Example:
+
+ *** Alerts ***
+ to = telegram:-1001234567890
+ from = smokealert\@company.xy
+ telegram_bot_token = 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+
+DOC
+                       _example => '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11',
+                       },
              '/[^\s,]+/' => {
                   _vars => [ qw(type pattern comment to edgetrigger mailtemplate priority) ],
                   _inherited => [ qw(edgetrigger mailtemplate) ],
                   _mandatory => [ qw(type pattern comment) ],
                   to => { _doc => 'Similar to the "to" parameter on the top-level except that  it will only be used IN ADDITION to the value of the toplevel parameter. Same rules apply.',
-                        _re => '(\|.+|.+@\S+|snpp:|xmpp:)',
+                        _re => '(\|.+|.+@\S+|snpp:|xmpp:|telegram:)',
                         _re_error => 'put an email address or the name of a program here',
                           },
 
