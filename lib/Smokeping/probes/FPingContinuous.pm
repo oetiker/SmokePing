@@ -74,6 +74,7 @@ sub new($$$)
 	my $return = `$binary -C 1 $testhost 2>&1`;
 	$self->{enable}{S} = (`$binary -h 2>&1` =~ /\s-S[,\s]/);
 	$self->{enable}{O} = (`$binary -h 2>&1` =~ /\s-O[,\s]/);
+	$self->{enable}{fwmark} = (`$binary -h 2>&1` =~ /\s-k[,\s]/);
 	croak "ERROR: fping ('$binary -C 1 $testhost') could not be run: $return"
 	    if $return =~ m/not found/;
 	croak "ERROR: FPing must be installed setuid root or it will not work\n"
@@ -90,6 +91,10 @@ sub new($$$)
 	    $self->{pingfactor} = 1000; # Gives us a good-guess default
 	    warn "### assuming you are using an fping copy reporting in milliseconds\n";
 	}
+
+        # fping only has -4 and -6 switches starting with 3.16 and the binary refuses
+        # to run if the switches are passed in to older versions.
+        $self->{enable}{proto} = (`$binary -v 2>&1` =~ /Version (3.1[6-9]|[4-9])/);
     };
 
     return $self;
@@ -276,9 +281,11 @@ sub run_fping {
     my $outh = gensym;
     my $errh = gensym;
     my @params = () ;
+    push @params, "-$self->{properties}{protocol}" if $self->{properties}{protocol} and $self->{enable}{proto};
     push @params, "-b$self->{properties}{packetsize}" if $self->{properties}{packetsize};
     push @params, "-t" . int(1000 * $self->{properties}{timeout}) if $self->{properties}{timeout};
     push @params, "-p" . int(1000 * $self->{properties}{hostinterval}) if $self->{properties}{hostinterval};
+    push @params, "--iface=$self->{properties}{interface}" if $self->{properties}{interface};
     if ($self->rounds_count == 1 and $self->{properties}{sourceaddress} and not $self->{enable}{S}){
        $self->do_log("WARNING: your fping binary doesn't support source address setting (-S), I will ignore any sourceaddress configurations - see  http://bugs.debian.org/198486.");
     }
@@ -288,6 +295,11 @@ sub run_fping {
        $self->do_log("WARNING: your fping binary doesn't support type of service setting (-O), I will ignore any tos configurations.");
     }
     push @params, "-O$self->{properties}{tos}" if $self->{properties}{tos} and $self->{enable}{O};
+
+    if ($self->rounds_count == 1 and $self->{properties}{fwmark} and not $self->{enable}{fwmark}){
+       $self->do_log("WARNING: your fping binary doesn't support fwmark setting (-k), I will ignore any fwmark configurations.");
+    }
+    push @params, "-k$self->{properties}{fwmark}" if $self->{properties}{fwmark} and $self->{enable}{fwmark};
 
     my @cmd = (
 	            $self->binary,
@@ -396,6 +408,22 @@ sub probevars {
 			_doc => "The ping packet size (in the range of 12-64000 bytes).",
 
 		},
+		protocol => {
+			_re => '[46]',
+			_example => 4,
+			_doc => "The IP protocol to use (IPv4 or IPv6).",
+		},
+		fwmark => {
+			_re => '\d+|0x[0-9a-zA-Z]+',
+			_example => 1,
+			_sub => sub {
+				my ($val) = @_;
+				return "ERROR: FPing fwmark must be between 1 and 4294967295"
+					if ( $val < 1 or $val > 4294967295 );
+				return undef;
+			},
+			_doc => "The fwmark (in the range of 1-4294967295).",
+		},
 		usestdout => {
 			_re => '(true|false)',
 			_example => 'false',
@@ -440,6 +468,10 @@ Set the type of service (TOS) of outgoing ICMP packets.
 You need at laeast fping-2.4b2_to3-ipv6 for this to work. Find
 a copy on www.smokeping.org/pub.
 DOC
+		},
+		interface => {
+			_example => 'eth0',
+			_doc => "The name of the network interface to perform the ping on.",
 		},
 	});
 }
