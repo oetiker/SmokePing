@@ -60,7 +60,7 @@ If you want to be a bit more restrictive with SNMP write access to the router, t
 The above configuration grants SNMP read-write only to 10.37.3.5 (the smokeping host) and only to the ciscoRttMon MIB tree. The probe does not need access to SNMP variables outside the RttMon tree.
 DOC
 		bugs => <<DOC,
-The probe does unnecessary DNS queries, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows to set a total time for all queries in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*5+3 seconds (5 secs is the timeout value hardcoded into this probe).
+The probe does unnecessary DNS queries, i.e. more than configured in the "pings" variable, because the RTTMon MIB only allows one to set a total time for all queries in one measurement run (one "life"). Currently the probe sets the life duration to "pings"*5+3 seconds (5 secs is the timeout value hardcoded into this probe).
 DOC
 		see_also => <<DOC,
 L<http://oss.oetiker.ch/smokeping/>
