@@ -2501,26 +2501,33 @@ DOC
                 /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ && return undef;
                 /^[0-9a-f]{0,4}(\:[0-9a-f]{0,4}){0,6}\:[0-9a-f]{0,4}$/i && return undef;
                 m|(?:/$KEYD_RE)+(?:~$KEYD_RE)?(?: (?:/$KEYD_RE)+(?:~$KEYD_RE))*| && return undef;
-                my $addressfound = 0;
-                my @tried;
-                if ($havegetaddrinfo) {
-                    my @ai;
-                    @ai = getaddrinfo( $_, "" );
-                    unless ($addressfound = scalar(@ai) > 5) {
-                        do_debuglog("WARNING: Hostname '$_' does currently not resolve to an IPv6 address\n");
-                        @tried = qw{IPv6};
+                # Skip DNS validation in CGI mode: the lookups block on DNS
+                # timeouts during network outages, causing 40+ second page loads
+                # or gateway timeouts (see GH#101, GH#366). The warning below is
+                # already suppressed in CGI mode, so there is no benefit to
+                # performing the lookups there.
+                unless ($cgimode) {
+                    my $addressfound = 0;
+                    my @tried;
+                    if ($havegetaddrinfo) {
+                        my @ai;
+                        @ai = getaddrinfo( $_, "" );
+                        unless ($addressfound = scalar(@ai) > 5) {
+                            do_debuglog("WARNING: Hostname '$_' does currently not resolve to an IPv6 address\n");
+                            @tried = qw{IPv6};
+                        }
                     }
-                }
-                unless ($addressfound) {
-                   unless ($addressfound = gethostbyname( $_ )) {
-                        do_debuglog("WARNING: Hostname '$_' does currently not resolve to an IPv4 address\n");
-                        push @tried, qw{IPv4};
-                   }
-                }
-                unless ($addressfound) {
-                   # do not bomb, as this could be temporary
-                   my $tried = join " or ", @tried;
-                   warn "WARNING: Hostname '$_' does currently not resolve to an $tried address\n" unless $cgimode;
+                    unless ($addressfound) {
+                       unless ($addressfound = gethostbyname( $_ )) {
+                            do_debuglog("WARNING: Hostname '$_' does currently not resolve to an IPv4 address\n");
+                            push @tried, qw{IPv4};
+                       }
+                    }
+                    unless ($addressfound) {
+                       # do not bomb, as this could be temporary
+                       my $tried = join " or ", @tried;
+                       warn "WARNING: Hostname '$_' does currently not resolve to an $tried address\n";
+                    }
                 }
                 return undef;
             }

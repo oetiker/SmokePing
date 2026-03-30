@@ -1,3 +1,4 @@
+ - skip DNS validation during CGI/web requests to prevent page load hangs and gateway timeouts during network outages @svenvg93
  - corrects the behaviour of the navigator mode graphs to respect linkstyle=relative @MattKobayashi
  - Replace semicolons with ampersands in URL parameters @svenvg93
  - fix AnotherCurl.pm to use --help all  @Strykar
