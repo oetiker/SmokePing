@@ -1,5 +1,5 @@
  - make FPingContinuous configuration more consistent with FPing by supporting protocol, interface and fwmark
-2026-03-31 Marc López <@MarcLopezB>
+2026-03-31 10:48:53 +0200 Marc López <@MarcLopezB>
 
  - skip DNS validation during CGI/web requests to prevent page load hangs and gateway timeouts during network outages @svenvg93
  - corrects the behaviour of the navigator mode graphs to respect linkstyle=relative @MattKobayashi
