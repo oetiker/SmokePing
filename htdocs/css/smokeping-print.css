@@ -1,6 +1,6 @@
 body, html {
-	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-	font-size: 12px;
+	font-family: "Inter", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
 }
 img {
 	border: 0;
@@ -12,5 +12,5 @@ img {
 	page-break-inside: avoid;
 }
 .panel h2 {
-	font-size: 12px;
+	font-size: 13px;
 }

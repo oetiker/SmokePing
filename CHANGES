@@ -1,3 +1,4 @@
+ - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
  - skip DNS validation during CGI/web requests to prevent page load hangs and gateway timeouts during network outages @svenvg93
  - corrects the behaviour of the navigator mode graphs to respect linkstyle=relative @MattKobayashi
  - Replace semicolons with ampersands in URL parameters @svenvg93
