@@ -11,17 +11,19 @@ use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/
 # don't bother with zombies
 $SIG{CHLD} = 'IGNORE';
 
-use CGI::Carp qw(fatalsToBrowser);
-
 use Smokeping;
-
-use CGI::Fast;
+use Smokeping::Request;
 
 my $cfg = (shift @ARGV) || "$FindBin::Bin/../etc/config";
 
-
-while (my $q = new CGI::Fast) {
-   Smokeping::cgi($cfg,$q);
+# use FastCGI loop if available, otherwise run as plain CGI
+if (eval { require CGI::Fast; 1 }) {
+    while (my $q = CGI::Fast->new) {
+        Smokeping::cgi($cfg, $q);
+    }
+} else {
+    my $q = Smokeping::Request->new;
+    Smokeping::cgi($cfg, $q);
 }
 
 =head1 NAME

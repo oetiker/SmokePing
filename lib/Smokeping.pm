@@ -2,7 +2,8 @@
 package Smokeping;
 
 use strict;
-use CGI;
+use warnings;
+use Smokeping::Request;
 use Getopt::Long;
 use Pod::Usage;
 use Digest::MD5 qw(md5_base64);
