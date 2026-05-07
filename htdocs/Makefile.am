@@ -16,21 +16,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 JS = js/smokeping.js \
-    js/prototype.js \
-    js/cropper/cropper.js \
-    js/cropper/licence.txt \
-    js/cropper/marqueeVert.gif \
-    js/cropper/cropper.uncompressed.js \
-    js/cropper/cropper.css \
-    js/cropper/marqueeHoriz.gif \
-    js/scriptaculous/controls.js \
-    js/scriptaculous/slider.js \
-    js/scriptaculous/sound.js \
-    js/scriptaculous/effects.js \
-    js/scriptaculous/unittest.js \
-    js/scriptaculous/builder.js \
-    js/scriptaculous/scriptaculous.js \
-    js/scriptaculous/dragdrop.js \
     css/smokeping-print.css \
     css/smokeping-screen.css
 
