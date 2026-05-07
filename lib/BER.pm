@@ -36,6 +36,7 @@ package BER;
 require 5.002;
 
 use strict;
+use warnings;
 use vars qw(@ISA @EXPORT $VERSION $pretty_print_timeticks
 	    %pretty_printer %default_printer $errmsg);
 use Exporter;

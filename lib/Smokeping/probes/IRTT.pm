@@ -15,6 +15,7 @@ to generate the POD document.
 =cut
 
 use strict;
+use warnings;
 use base qw(Smokeping::probes::basefork);
 #use Data::Dumper;
 use IPC::Open2 qw(open2);

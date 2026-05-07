@@ -98,6 +98,7 @@ RRDs(3)
 =cut
 
 use strict;
+use warnings;
 use RRDs;
 
 # take an RRD file and make a create list out of it

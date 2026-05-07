@@ -1,6 +1,7 @@
 # -*- perl -*-
 package Smokeping::Examples;
 use strict;
+use warnings;
 use Smokeping;
 
 =head1 NAME
@@ -63,6 +64,7 @@ Niko Tyni <ntyni@iki.fi>
 =cut
 
 use strict;
+use warnings;
 
 sub read_config_template {
 	my $file = "../etc/config.dist";

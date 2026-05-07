@@ -15,6 +15,7 @@ to generate the POD document.
 =cut
 
 use strict;
+use warnings;
 use Smokeping::probes::passwordchecker;
 use Net::LDAP;
 use Time::HiRes qw(gettimeofday sleep);

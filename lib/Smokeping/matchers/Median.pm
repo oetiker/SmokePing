@@ -51,6 +51,7 @@ Tobias Oetiker <tobi@oetiker.ch>
 =cut
 
 use strict;
+use warnings;
 use base qw(Smokeping::matchers::base);
 use vars qw($VERSION);
 $VERSION = 1.0;

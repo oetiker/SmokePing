@@ -22,6 +22,7 @@ use Smokeping;
 $VERSION = 1.0;
 
 use strict;
+use warnings;
 
 sub pod_hash {
     return {

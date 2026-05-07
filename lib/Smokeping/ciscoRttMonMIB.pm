@@ -6,10 +6,12 @@
 #
 
 package Smokeping::ciscoRttMonMIB;
+use strict;
+use warnings;
 
 require 5.004;
 
-use vars qw($VERSION);
+use vars qw($VERSION @ISA);
 use Exporter;
 
 use BER;

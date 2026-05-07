@@ -36,6 +36,7 @@ package SNMP_util;
 require 5.004;
 
 use strict;
+use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 use Exporter;
 use Carp;

@@ -80,6 +80,7 @@ Based on the CheckLoss/Checklatency matchers by Dylan Vanderhoof 2006.
 =cut
 
 use strict;
+use warnings;
 use base qw(Smokeping::matchers::base);
 use vars qw($VERSION);
 $VERSION = 1.0;

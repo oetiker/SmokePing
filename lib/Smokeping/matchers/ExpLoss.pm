@@ -62,6 +62,7 @@ Veniamin Konoplev E<lt>vkonoplev@acm.orgE<gt>
 =cut
 
 use strict;
+use warnings;
 use base qw(Smokeping::matchers::base);
 use vars qw($VERSION);
 $VERSION = 1.0;

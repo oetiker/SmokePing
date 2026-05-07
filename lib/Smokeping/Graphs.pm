@@ -1,6 +1,7 @@
 # -*- perl -*-
 package Smokeping::Graphs;
 use strict;
+use warnings;
 use Smokeping;
 
 =head1 NAME
@@ -30,14 +31,14 @@ sub get_colors ($){
     my $colorBackground = $cfg->{Presentation}{colorbackground};
 
     # If graphborders set to no, and no color override, then return default colors as before
-    if (($cfg->{Presentation}{graphborders} eq 'no') && !($colorText||$colorBorder||$colorBackground)) {
+    if ((($cfg->{Presentation}{graphborders} // '') eq 'no') && !($colorText||$colorBorder||$colorBackground)) {
         return '--border', '0',
                 '--color', 'BACK#ffffff00',
                 '--color', 'CANVAS#ffffff00';
     };
 
     # If there are any overrides, use them
-    if ($cfg->{Presentation}{graphborders} eq 'no') {
+    if (($cfg->{Presentation}{graphborders} // '') eq 'no') {
         push(@colorList, '--border', '0');
     };
     if ($colorText) {
@@ -124,23 +125,23 @@ sub get_multi_detail ($$$$;$){
         $imgbase = $cfg->{General}{imgcache}."/".(join "/", @dirs)."/${file}";
         $imghref = $cfg->{General}{imgurl}."/".(join "/", @dirs)."/${file}";
         @tasks = @{$cfg->{Presentation}{detail}{_table}};
-        if (open (HG,"<${imgbase}.maxheight")){
-            while (<HG>){
+        if (open (my $hgfh, '<', "${imgbase}.maxheight")){
+            while (<$hgfh>){
                 chomp;
                 my @l = split / /;
                 $lastheight{$l[0]} = $l[1];
             }
-            close HG;
+            close $hgfh;
         }
         for my $rrd (@hosts){
              my $newmax = Smokeping::findmax($cfg, $cfg->{General}{datadir}.$rrd.".rrd");
              map {$max->{$_} = $newmax->{$_} if not $max->{$_} or $newmax->{$_} > $max->{$_} } keys %{$newmax};
         }
-        if (open (HG,">${imgbase}.maxheight")){
+        if (open (my $hgfh, '>', "${imgbase}.maxheight")){
              foreach my $size (keys %{$max}){
-                 print HG "$size $max->{$size}\n";
+                 print $hgfh "$size $max->{$size}\n";
              }
-             close HG;
+             close $hgfh;
         }
     }
     elsif ($mode eq 'n' or $mode eq 'a') {
@@ -307,7 +308,7 @@ sub get_multi_detail ($$$$;$){
 
 
         if ($mode eq 'a'){ # ajax mode
-             open my $img, "${imgbase}_${end}_${start}.svg";
+             open my $img, '<', "${imgbase}_${end}_${start}.svg";
              binmode $img;
              print "Content-Type: image/svg+xml\n";
              my $data;

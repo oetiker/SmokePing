@@ -1,5 +1,9 @@
 # provide backward compatibility for Config::Grammar
 package Smokeping::Config;
+use strict;
+use warnings;
+
+our @ISA;
 
 BEGIN {
     require Config::Grammar;

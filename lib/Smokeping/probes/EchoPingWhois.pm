@@ -38,6 +38,7 @@ DOC
 }
 
 use strict;
+use warnings;
 use base qw(Smokeping::probes::EchoPingPlugin);
 use Carp;
 

@@ -25,6 +25,7 @@ use Carp;
 $VERSION = 1.0;
 
 use strict;
+use warnings;
 
 =head2 new
 

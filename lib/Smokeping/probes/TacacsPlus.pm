@@ -14,6 +14,7 @@ to generate the POD document.
 
 =cut
 use strict;
+use warnings;
 use base qw(Smokeping::probes::passwordchecker);
 use Authen::TacacsPlus;
 use Time::HiRes qw(gettimeofday sleep);

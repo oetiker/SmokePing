@@ -43,7 +43,7 @@ fi
 
 AC_SUBST(URL_CAT)
 
-ac_perl_version="5.10.1"
+ac_perl_version="5.24.0"
 
 if test "x$PERL" != "x"; then
   AC_MSG_CHECKING(for perl version greater than or equal to $ac_perl_version)

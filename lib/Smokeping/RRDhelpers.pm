@@ -13,6 +13,7 @@ and effects on rrd files.
 =cut
 
 use strict;
+use warnings;
 use RRDs;
 
 =head2 IMPLEMENTATION

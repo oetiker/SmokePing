@@ -47,6 +47,7 @@ package SNMP_Session;
 require 5.002;
 
 use strict;
+use warnings;
 use Exporter;
 use vars qw(@ISA $VERSION @EXPORT $errmsg
 	    $suppress_warnings
