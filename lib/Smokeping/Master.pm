@@ -255,7 +255,14 @@ sub answer_slave {
     my $cfg = shift;
     my $q = shift;
     my $slave = $q->param('slave');
+    # validate slave name before any file operations
+    if (not defined $slave or not ref $cfg->{Slaves}{$slave} eq 'HASH'){
+        print "Content-Type: text/plain\n\n";
+        print "WARNING: I don't know the slave ${slave} ignoring it";
+        return;
+    }
     my $secret = get_secret($cfg,$slave);
+    return unless defined $secret;
     return if $secret eq '__HORRIBLE_INLINE_SIGNALING__';
     if (not $secret){
         print "Content-Type: text/plain\n\n";
@@ -272,11 +279,6 @@ sub answer_slave {
     my $key = $q->param('key');
     my $data = $q->param('data');
     my $config_time = $q->param('config_time');
-    if (not ref $cfg->{Slaves}{$slave} eq 'HASH'){
-        print "Content-Type: text/plain\n\n";
-        print "WARNING: I don't know the slave ${slave} ignoring it";
-        return;
-    }
     # lets make sure the we share a secret
     if (hmac_md5_hex($data,$secret) eq $key){
         save_updates $cfg, $slave, $data;

@@ -139,13 +139,6 @@ sub Test($$) {
 
     my $res = (($result >= $rising) or ($data->{prevmatch} and $result >= $falling));
 
-    # some debug stuff
-    if (0) {
-        my $d = `date`;
-        chomp $d;
-        my $array = join ":", @{ $data->{loss}};
-        `echo $d $data->{target} $array $result. >> /tmp/matcher.log` if $rising == 0;
-    }
     return $res;
 }
 

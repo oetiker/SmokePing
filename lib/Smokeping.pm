@@ -93,6 +93,17 @@ my $DEFAULTPRIORITY = 'info'; # default syslog priority
 my $logging = 0; # keeps track of whether we have a logging method enabled
 my $influx = undef; # a handle to the InfluxDB::HTTP object (if any)
 
+sub _escapeHTML {
+    my $str = shift;
+    return '' unless defined $str;
+    $str =~ s/&/&amp;/g;
+    $str =~ s/</&lt;/g;
+    $str =~ s/>/&gt;/g;
+    $str =~ s/"/&quot;/g;
+    $str =~ s/'/&#39;/g;
+    return $str;
+}
+
 sub find_libdir {
     # find the directory where the probe and matcher modules are located
     # by looking for 'Smokeping/probes/FPing.pm' in @INC
@@ -206,9 +217,8 @@ sub make_cgi_directories {
     while (my ($k, $v) = each %$targets) {
         next if ref $v ne "HASH";
         if ( ! -d "$dir/$k" ) {
-            my $saved = umask 0;
-            mkdir "$dir/$k", oct($perms);
-            umask $saved;
+            mkdir "$dir/$k";
+            chmod oct($perms), "$dir/$k";
         }
         make_cgi_directories($targets->{$k}, "$dir/$k", $perms);
     }
@@ -769,7 +779,7 @@ sub target_menu($$$$;$){
 			if (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes') {
 				$filter_re = qr/\Q$filter\E/i;
 			} else {
-				$filter_re = qr/$filter/i;
+				$filter_re = eval { qr/$filter/i } || qr/\Q$filter\E/i;
 			}
 			if (($menu and $menu =~ $filter_re) or ($title and $title =~ $filter_re)){
 				push @matches, ["$path$key$suffix",$menu,$class,$menuclass];
@@ -787,7 +797,7 @@ sub target_menu($$$$;$){
                  $menuextra = '';
              }
 
-          	$print .= qq{<li class="$class"><a class="$menuclass" href="$path$key$suffix">$menu</a>\n};
+          	$print .= qq{<li class="$class"><a class="$menuclass" href="$path$key$suffix">}._escapeHTML($menu).qq{</a>\n};
      	    if ($key eq $current){
         	    my $prline = target_menu $tree->{$key}, $open, "$path$key.",$filter, $suffix;
 	            $print .= $prline
@@ -805,7 +815,7 @@ sub target_menu($$$$;$){
 			$print .= qq{<ul class="menu">\n};
 			for my $entry (sort {$a->[1] cmp $b->[1] } grep {ref $_ eq 'ARRAY'} @matches) {
 				my ($href,$menu,$class,$menuclass) = @{$entry};
-				$print .= qq{<li class="$class"><a class="$menuclass" href="$href">$menu</a></li>\n};
+				$print .= qq{<li class="$class"><a class="$menuclass" href="$href">}._escapeHTML($menu).qq{</a></li>\n};
 			}
 			$print .= "</ul>\n";
 		}
@@ -1026,7 +1036,7 @@ sub get_overview ($$$$){
             if $cfg->{Presentation}{htmltitle} eq 'yes';
         $page .= "<div class=\"panel-body\">";
         if (defined $ERROR) {
-                $page .= "ERROR: $ERROR<br>".join("<br>", map {"'$_'"} @G);
+                $page .= "ERROR: "._escapeHTML($ERROR)."<br>".join("<br>", map {_escapeHTML("'$_'")} @G);
         } else {
          $page.="<A HREF=\"".lnk($q, (join ".", @$open, ${prop}))."\">".
             "<IMG ALT=\"\" WIDTH=\"$xs\" HEIGHT=\"$ys\" ".
@@ -1499,7 +1509,7 @@ sub get_detail ($$$$;$){
  #             die "<div>INFO:".join("<br/>",@task)."</div>";
               my $ERROR = RRDs::error();
               if ($ERROR) {
-                  return "<div>ERROR: $ERROR</div><div>".join("<br/>",@task)."</div>";
+                  return "<div>ERROR: "._escapeHTML($ERROR)."</div><div>".join("<br/>", map { _escapeHTML($_) } @task)."</div>";
               };
         }
 
@@ -1553,7 +1563,7 @@ sub get_detail ($$$$;$){
 #           $page .= join " ",map {"'$_'"} @task;
                 if ($cfg->{Presentation}{htmltitle} eq 'yes') {
                     # TODO we generate this above to, maybe share code or store variable ?
-                    my $title = "$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname);
+                    my $title = _escapeHTML("$desc from " . ($s ? $cfg->{Slaves}{$slave}{display_name}: $cfg->{General}{display_name} || hostname));
                     $page .= "<div class=\"".panel_heading_class()."\"><h2>$title</h2></div>";
                 }
                 $page .= "<div class=\"panel-body\">";
@@ -1671,10 +1681,15 @@ sub load_sortercache($){
     return ( $found ? \%cache : undef )
 }
 
-sub hierarchy_switcher($$){
+sub hierarchy_switcher($$$){
     my $q = shift;
     my $cfg = shift;
+    my $target = shift;
     my $print =$q->start_form(-name=>'hswitch',-method=>'get',-action=>cgiurl($q, $cfg));
+    if ($target) {
+        my $escaped = _escapeHTML($target);
+        $print .= qq{<input type="hidden" name="target" value="$escaped" />};
+    }
     if ($cfg->{Presentation}{hierarchies}){
             $print .= "<div class=\"hierarchy\">";
             $print .= "<label for=\"hierarchy\" class=\"hierarchy-label\">Hierarchy:</label>";
@@ -1710,6 +1725,7 @@ sub display_webpage($$){
     my $q = shift;
     my $targ = '';
     my $t = $q->param('target');
+    $t = substr($t, 0, 500) if defined $t && length($t) > 500;
     if ( $t and $t !~ /\.\./ and $t =~ /(\S+)/){
         $targ = $1;
         $targ =~ s/$xssBadRx/_/g;
@@ -1720,7 +1736,8 @@ sub display_webpage($$){
             unless defined $cfg->{Slaves}{$slave};
         $slave = $1;
     }
-    my $hierarchy = $q->param('hierarchy');
+    my $hierarchy = $q->param('hierarchy') // '';
+    $hierarchy = substr($hierarchy, 0, 200) if length($hierarchy) > 200;
     $hierarchy =~ s/$xssBadRx/_/g;
     die "ERROR: unknown hierarchy $hierarchy\n"
         if $hierarchy and not $cfg->{Presentation}{hierarchies}{$hierarchy};
@@ -1729,10 +1746,13 @@ sub display_webpage($$){
     $open_orig->[-1] .= '~'.$slave if $slave;
 
     my $filter;
+    my $raw_filter = $q->param('filter') // '';
+    $raw_filter = substr($raw_filter, 0, 200) if length($raw_filter) > 200;
     if (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes') {
-        $filter = $q->param('filter');
+        $filter = $raw_filter;
+        $filter =~ s/$xssBadRx/_/g;
     } else {
-        ($filter) = ($q->param('filter') and $q->param('filter') =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
+        ($filter) = ($raw_filter =~ m{([- _0-9a-zA-Z\+\*\(\)\|\^\[\]\.\$]+)});
     }
 
     my $tree = $cfg->{Targets};
@@ -1799,36 +1819,44 @@ sub display_webpage($$){
     my $page = fill_template
       ($cfg->{Presentation}{template},
        {
-        menu => hierarchy_switcher($q,$cfg).
+        menu => hierarchy_switcher($q,$cfg,$targ).
 		target_menu( $menu_root,
                              [@$open], #copy this because it gets changed
                              cgiurl($q, $cfg) ."?${hierarchy_arg}${filter_arg}target=",
 		             $filter
 			   ),
-        title => $charts ? "" : $display_tree->{title},
-        remark => $charts ? "" : ($display_tree->{remark} || ''),
+        title => $charts ? "" : _escapeHTML($display_tree->{title} || ''),
+        remark => $charts ? "" : _escapeHTML($display_tree->{remark} || ''),
         overview => $charts ? get_charts($cfg,$q,$open) : get_overview( $cfg,$q,$tree,$open),
         body => $charts ? "" : $getdetailoutput,
-        target_ip => $charts ? "" : ($display_tree->{host} || ''),
-        owner => $cfg->{General}{owner},
-        contact => $cfg->{General}{contact},
+        target_ip => $charts ? "" : _escapeHTML($display_tree->{host} || ''),
+        owner => _escapeHTML($cfg->{General}{owner} || ''),
+        contact => _escapeHTML($cfg->{General}{contact} || ''),
 
         author => '<A HREF="https://tobi.oetiker.ch/">Tobi&nbsp;Oetiker</A> and Niko&nbsp;Tyni',
-        smokeping => '<A HREF="https://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'.$readversion.'</A>',
+        smokeping => '<A HREF="https://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'">SmokePing-'._escapeHTML($readversion).'</A>',
 
         step => $step,
-        rrdlogo => '<A HREF="https://oss.oetiker.ch/rrdtool/"><img alt="RRDtool" src="'.$cfg->{General}{imgurl}.'/rrdtool.png"></a>',
-        smokelogo => '<A HREF="https://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img alt="Smokeping" src="'.$cfg->{General}{imgurl}.'/smokeping.png"></a>',
-        authuser => $authuser,
+        rrdlogo => '<A HREF="https://oss.oetiker.ch/rrdtool/"><img alt="RRDtool" src="'._escapeHTML($cfg->{General}{imgurl}).'/rrdtool.png"></a>',
+        smokelogo => '<A HREF="https://oss.oetiker.ch/smokeping/counter.cgi/'.$VERSION.'"><img alt="Smokeping" src="'._escapeHTML($cfg->{General}{imgurl}).'/smokeping.png"></a>',
+        authuser => _escapeHTML($authuser),
        }
        );
     my $expi = $cfg->{Database}{step} > 120 ? $cfg->{Database}{step} : 120;
-    print $q->header(-type=>'text/html',
+    my $header = $q->header(-type=>'text/html',
                      -expires=>'+'.$expi.'s',
                      -charset=> ( $cfg->{Presentation}{charset} || 'utf-8'),
                      -Content_length => length($page),
                      );
-    print $page || "<HTML><BODY>ERROR: Reading page template".$cfg->{Presentation}{template}."</BODY></HTML>";
+    my $security_headers = join("\r\n",
+        "X-Content-Type-Options: nosniff",
+        "X-Frame-Options: SAMEORIGIN",
+        "X-XSS-Protection: 1; mode=block",
+        "Referrer-Policy: strict-origin-when-cross-origin",
+    );
+    $header =~ s/\r\n\r\n$/\r\n$security_headers\r\n\r\n/;
+    print $header;
+    print $page || "<HTML><BODY>ERROR: Reading page template "._escapeHTML($cfg->{Presentation}{template})."</BODY></HTML>";
 
 }
 
@@ -4464,7 +4492,7 @@ sub gen_page  ($$$) {
                               [@$open], #copy this because it gets changed
                               "", '',".html"),
           title => $tree->{title},
-          remark => ($tree->{remark} || ''),
+          remark => _escapeHTML($tree->{remark} || ''),
           overview => get_overview( $cfg,$q,$tree,$open ),
           body => get_detail( $cfg,$q,$tree,$open ),
           target_ip => ($tree->{host} || ''),
