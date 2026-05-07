@@ -1,24 +1,47 @@
-requires 'FCGI';
-requires 'CGI';
-requires 'CGI::Fast';
+requires 'perl', '5.024000';
+
+# Core dependencies - main daemon, CGI, and master/slave operation
 requires 'Config::Grammar';
-requires 'Socket6';
-requires 'IO::Socket::SSL';
 requires 'Digest::HMAC_MD5';
-requires 'Net::Telnet';
-requires 'Net::OpenSSH';
-requires 'Net::SNMP';
-requires 'Net::LDAP';
-requires 'Net::DNS';
-requires 'IO::Pty';
-requires 'LWP';
-requires 'Authen::Radius';
-requires 'Path::Tiny';
-requires 'MIME::Base64';
-requires 'InfluxDB::HTTP';
-requires 'InfluxDB::LineProtocol';
-# JSON::MaybeXS and Object::Result are required by InfluxDB::HTTP but were not
-# listed in that lib's dependencies, so we need to cover for them here.
+requires 'LWP::UserAgent';
+requires 'RRDs';
+requires 'URI::Escape';
+
+# Probe: AnotherDNS
+recommends 'Net::DNS';
+recommends 'IO::Socket::INET6';
+
+# Probe: LDAP
+recommends 'Net::LDAP';
+recommends 'IO::Socket::SSL';
+
+# Probe: Radius
+recommends 'Authen::Radius';
+
+# Probe: TacacsPlus
+recommends 'Authen::TacacsPlus';
+
+# Probe: OpenSSHEOSPing, OpenSSHJunOSPing
+recommends 'Net::OpenSSH';
+
+# Probe: TelnetIOSPing, TelnetJunOSPing
+recommends 'Net::Telnet';
+
+# Probe: IRTT
+recommends 'JSON::PP';
+recommends 'Path::Tiny';
+
+# Built-in web server (run.sh)
+recommends 'Mojolicious';
+
+# CGI FastCGI mode
+recommends 'CGI::Fast';
+recommends 'FCGI';
+
+# InfluxDB export support
+recommends 'InfluxDB::HTTP';
+recommends 'InfluxDB::LineProtocol';
+# These are required by InfluxDB::HTTP but missing from its own dependencies.
 # See: https://github.com/raphaelthomas/InfluxDB-HTTP/issues/10
-requires 'JSON::MaybeXS';
-requires 'Object::Result';
+recommends 'JSON::MaybeXS';
+recommends 'Object::Result';

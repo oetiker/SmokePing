@@ -20,3 +20,5 @@ thirdparty/*
 !thirdparty/Makefile.am
 *-*.*.*/
 *.gz
+local-rrdtool/
+test-install/

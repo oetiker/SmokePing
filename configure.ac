@@ -50,7 +50,7 @@ if test "x$PERL" != "x"; then
   $PERL -e "use $ac_perl_version;" >/dev/null 2>&1
   if test $? -ne 0; then
     AC_MSG_RESULT(no);
-    AC_MSG_ERROR(at least version 5.10.1 is required to run mojolicious)
+    AC_MSG_ERROR(at least perl version $ac_perl_version is required)
   else
     AC_MSG_RESULT(ok);
   fi
@@ -115,6 +115,18 @@ if test "$enable_pkgonly" != yes; then
     fi
 fi
 
+if test "$enable_pkgonly" != yes; then
+    for module in Config::Grammar Digest::HMAC_MD5 LWP::UserAgent URI::Escape Mojolicious; do
+        AC_MSG_CHECKING([checking for $module perl module])
+        if ${PERL} -e "use $module" 2>/dev/null; then
+            AC_MSG_RESULT([Ok])
+        else
+            AC_MSG_RESULT([Failed])
+            mod_ok=0
+        fi
+    done
+fi
+
 if test x$mod_ok = x0; then
    cat <<NOTES
 
@@ -135,6 +147,12 @@ if test x$mod_ok = x0; then
 
    if you install rrdtool from source into a non-standard location
    set PERL5LIB accordingly.
+
+   Other required Perl modules can be installed via cpanm:
+
+      cpanm --installdeps .
+
+   (requires the cpanfile shipped with this distribution)
 NOTES
    exit 1
 fi

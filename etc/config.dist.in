@@ -30,6 +30,12 @@ type = loss
 pattern = >0%,*12*,>0%,*12*,>0%
 comment = loss 3 times  in a row
 
++rttdetect
+type = rtt
+# in seconds
+pattern = >0.1,>0.1,>0.1
+comment = delay above 100ms 3 times in a row
+
 *** Database ***
 
 step     = 300
@@ -99,6 +105,10 @@ unison_tolerance = 2
 "Last 10 Days"    10d
 "Last 360 Days"   360d
 
++ multihost
+
+colors = 004586 ff420e ffde20 579d1c 7e0021 83caff 314004 aecf00 4b1f6f ff950e c5000b 0084d1
+
 #+ hierarchies
 #++ owner
 #title = Host Owner
@@ -109,17 +119,27 @@ unison_tolerance = 2
 
 + FPing
 
-binary = /usr/sbin/fping
+binary = /usr/bin/fping
 
-*** Slaves ***
-secrets=@prefix@/etc/smokeping_secrets.dist
-+boomer
-display_name=boomer
-color=0000ff
++ DNS
 
-+slave2
-display_name=another
-color=00ff00
+binary = /usr/bin/dig
+pings = 5
+step = 300
+
++ Curl
+
+binary = /usr/bin/curl
+pings = 5
+step = 300
+
+# Uncomment if tcpping is installed
+#+ TCPPing
+#
+#binary = /usr/bin/tcpping
+#pings = 5
+#forks = 10
+#step = 300
 
 *** Targets ***
 
@@ -130,20 +150,105 @@ title = Network Latency Grapher
 remark = Welcome to the SmokePing website of xxx Company. \
          Here you will learn all about the latency of our network.
 
-+ Test
-menu= Targets
-#parents = owner:/Test/James location:/
++ InternetSites
+menu = Internet Sites
+title = ICMP Latency to Popular Sites
 
-++ James
-
-menu = James
-title =James
+++ GoogleDNS
+menu = Google DNS
+title = Google Public DNS 8.8.8.8
+host = 8.8.8.8
 alerts = someloss
-slaves = boomer slave2
-host = james.address
 
-++ MultiHost
+++ GoogleSearch
+menu = Google
+title = Google Search
+host = www.google.com
 
-menu = Multihost
-title = James and James as seen from Boomer
-host = /Test/James /Test/James~boomer
+++ CloudflareDNS
+menu = Cloudflare DNS
+title = Cloudflare Public DNS 1.1.1.1
+host = 1.1.1.1
+
+++ OpenDNS
+menu = OpenDNS
+title = OpenDNS 208.67.222.222
+host = 208.67.222.222
+
++ DNSProbes
+probe = DNS
+menu = DNS Latency
+title = DNS Query Latency
+
+++ GoogleDNS
+menu = Google DNS
+title = DNS latency to Google Public DNS
+host = 8.8.8.8
+lookup = www.google.com
+
+++ CloudflareDNS
+menu = Cloudflare DNS
+title = DNS latency to Cloudflare
+host = 1.1.1.1
+lookup = www.google.com
+
+++ Quad9DNS
+menu = Quad9 DNS
+title = DNS latency to Quad9
+host = 9.9.9.9
+lookup = www.google.com
+
+++ LocalDNS
+menu = Local DNS
+title = DNS latency to local resolver
+host = 127.0.0.1
+lookup = www.google.com
+
++ HTTPLatency
+probe = Curl
+menu = HTTP Latency
+title = HTTP/HTTPS Response Latency
+
+++ Google
+menu = Google
+title = HTTPS latency to Google
+host = www.google.com
+urlformat = https://%host%/
+
+++ Cloudflare
+menu = Cloudflare
+title = HTTPS latency to Cloudflare
+host = www.cloudflare.com
+urlformat = https://%host%/
+insecure_ssl = 1
+
+++ Wikipedia
+menu = Wikipedia
+title = HTTPS latency to Wikipedia
+host = www.wikipedia.org
+urlformat = https://%host%/
+
+++ GitHub
+menu = GitHub
+title = HTTPS latency to GitHub
+host = github.com
+urlformat = https://%host%/
+
++ MultiProbe
+menu = Stack Graphs
+title = Multi-Probe Comparison Graphs
+
+++ DNSComparison
+menu = DNS Resolvers
+title = DNS Resolver Comparison (stacked)
+host = /DNSProbes/GoogleDNS /DNSProbes/CloudflareDNS /DNSProbes/Quad9DNS /DNSProbes/LocalDNS
+
+++ HTTPComparison
+menu = HTTP Sites
+title = HTTPS Latency Comparison (stacked)
+host = /HTTPLatency/Google /HTTPLatency/Cloudflare /HTTPLatency/Wikipedia /HTTPLatency/GitHub
+
+++ PublicDNSAll
+menu = Public DNS All
+title = Public DNS: ICMP vs DNS Query (stacked)
+host = /InternetSites/GoogleDNS /InternetSites/CloudflareDNS /InternetSites/OpenDNS /DNSProbes/GoogleDNS /DNSProbes/CloudflareDNS /DNSProbes/Quad9DNS

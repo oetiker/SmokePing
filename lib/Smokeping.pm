@@ -24,6 +24,7 @@ use URI::Escape;
 use Time::HiRes;
 use Data::Dumper;
 use MIME::Base64;
+use Fcntl qw(:flock);
 # optional dependencies
 # will be imported in case InfluxDB host is configured
 # InfluxDB::HTTP
@@ -4104,9 +4105,15 @@ sub daemonize_me ($) {
     if ($pid) {
         exit;
     } else {
-        if(open(PIDFILE,">$pidfile")){
-        print PIDFILE "$$\n";
-        close PIDFILE;
+        if(open(my $pidfh, '>>', $pidfile)){
+            flock($pidfh, LOCK_EX | LOCK_NB)
+                or die "Another SmokePing instance is already running (could not lock $pidfile)\n";
+            truncate($pidfh, 0);
+            seek($pidfh, 0, 0);
+            print $pidfh "$$\n";
+            $pidfh->autoflush(1);
+            # keep $pidfh open so the lock persists for the lifetime of the process
+            $Smokeping::pidfh = $pidfh;
         } else {
           warn "creating $pidfile: $!\n";
         };
@@ -4419,17 +4426,25 @@ sub cgi ($$) {
     umask 022;
     load_cfg $cfgfile;
     initialize_cgilog();
+    my $remote = $ENV{REMOTE_ADDR} || '-';
+    my $method = $ENV{REQUEST_METHOD} || 'GET';
+    my $target = $q->param('target') || '-';
+    my $mode   = $q->param('displaymode') || 's';
     if ($q->param(-name=>'slave')) { # a slave is calling in
+        warn "[smokeping] $remote $method slave=" . $q->param('slave') . "\n";
         Smokeping::Master::answer_slave($cfg,$q);
     } elsif ($q->param(-name=>'secret') && $q->param(-name=>'target') ) {
         my $ret = update_dynaddr $cfg,$q;
         if (defined $ret and $ret ne "") {
+                warn "[smokeping] $remote $method dynaddr target=$target FAILED: $ret\n";
                 print $q->header(-status => "404 Not Found");
                 do_cgilog("Updating DYNAMIC address failed: $ret");
         } else {
+                warn "[smokeping] $remote $method dynaddr target=$target OK\n";
                 print $q->header; # no HTML output on success
         }
     } else {
+        warn "[smokeping] $remote $method target=$target mode=$mode\n";
         if (not $q->param('displaymode') or $q->param('displaymode') ne 'a'){ #in ayax mode we do not issue a header YET
         }
         display_webpage $cfg,$q;
