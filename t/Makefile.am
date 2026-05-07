@@ -1,4 +1,4 @@
-# Copyright (C) 2011 Tobias Oetiker
+# Copyright (C) 2024 Tobias Oetiker
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,11 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-AUTOMAKE_OPTIONS =  foreign
+AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = lib thirdparty bin doc etc htdocs t
+TESTS_FILES = 01_request.t 02_utils.t 03_colorspace.t 04_sorters.t 05_matchers.t
 
-EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE cpanfile VERSION README.md
+EXTRA_DIST = $(TESTS_FILES)
 
-dist-hook:
-	$(PERL) -i -p -e '"$(PACKAGE_VERSION)" =~ /(\d+)\.(\d+)\.(\d+)/ and $$v = sprintf("%d.%03d%03d",$$1,$$2,$$3) and s/^\$$VERSION\s*=\s*".*?"/\$$VERSION = "$$v"/'  $(distdir)/lib/Smokeping.pm
+check-local:
+	$(PERL) -I$(top_srcdir)/lib -I$(top_srcdir)/thirdparty/lib/perl5 -MTest::Harness -e 'runtests(@ARGV)' $(srcdir)/01_request.t $(srcdir)/02_utils.t $(srcdir)/03_colorspace.t $(srcdir)/04_sorters.t $(srcdir)/05_matchers.t
