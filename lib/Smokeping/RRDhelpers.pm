@@ -31,8 +31,8 @@ sub get_stddev{
     my $start = shift;
     my $end = shift;
     my $step = shift;
-    my ($realstart,$realstep,$names,$array) = RRDs::fetch $rrd, $cf, '--start',$start, '--end',$end,($step ? ('--resolution',$step):());
-    if (my $err = RRDs::error){
+    my ($realstart,$realstep,$names,$array) = RRDs::fetch($rrd, $cf, '--start',$start, '--end',$end,($step ? ('--resolution',$step):()));
+    if (my $err = RRDs::error()){
         warn $err
     };
     my $idx = 0;

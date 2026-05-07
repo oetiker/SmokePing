@@ -109,16 +109,15 @@ sub info2create {
         my $buggy_perl_version = 1 if abs($] - 5.008000) < .0000005;
 
 	my $info = RRDs::info($file);
-	my $error = RRDs::error;
+	my $error = RRDs::error();
 	die("RRDs::info $file: ERROR: $error") if $error;
 	die("$file: unknown RRD version: $info->{rrd_version}")
-		unless $info->{rrd_version} eq '0001'
-		or     $info->{rrd_version} eq '0003';
+		unless $info->{rrd_version} =~ /^000[1-5]$/;
 	my $cf = $info->{"rra[0].cf"};
 	die("$file: no RRAs found?")
 		unless defined $cf;
 	my @fetch = RRDs::fetch($file, $cf, "-s 0", "-e 0");
-	$error = RRDs::error;
+	$error = RRDs::error();
 	die("RRDs::fetch $file $cf: ERROR: $error") if $error;
 	my @ds = @{$fetch[2]};
 
@@ -206,18 +205,18 @@ sub tuneds {
 	while (@create){
 	       my @ds = split /:/, shift @create;
 	       my @ds2 = split /:/, shift @create2;
-	       next unless $ds[1] eq $ds2[1] and $ds[2] eq $ds[2];
+	       next unless $ds[1] eq $ds2[1] and $ds[2] eq $ds2[2];
 	       if ($ds[3] ne $ds2[3]){
 	       		warn "## Updating $file DS:$ds[1] heartbeat $ds2[3] -> $ds[3]\n";
-	  	        RRDs::tune $file,"--heartbeat","$ds[1]:$ds[3]" unless $ds[3] eq $ds2[3];
+	  	        RRDs::tune($file,"--heartbeat","$ds[1]:$ds[3]") unless $ds[3] eq $ds2[3];
 	       }
 	       if ($ds[4] ne $ds2[4]){
 	       		warn "## Updating $file DS:$ds[1] minimum $ds2[4] -> $ds[4]\n";
-	 	        RRDs::tune $file,"--minimum","$ds[1]:$ds[4]" unless $ds[4] eq $ds2[4];
+	 	        RRDs::tune($file,"--minimum","$ds[1]:$ds[4]") unless $ds[4] eq $ds2[4];
 	       }
 	       if ($ds[5] ne $ds2[5]){
 	       		warn "## Updating $file DS:$ds[1] maximum $ds2[5] -> $ds[5]\n";
-	                RRDs::tune $file,"--maximum","$ds[1]:$ds[5]" unless $ds[5] eq $ds2[5];
+	                RRDs::tune($file,"--maximum","$ds[1]:$ds[5]") unless $ds[5] eq $ds2[5];
 	       }
 	}
 }

@@ -1003,8 +1003,8 @@ sub get_overview ($$$$){
                   "GPRINT:avmsr$i:%5.1lf %s am/as\\l";
 
         }
-        my ($graphret,$xs,$ys) = RRDs::graph
-          ($cfg->{General}{imgcache}.$dir."/${prop}_mini.svg",
+        my ($graphret,$xs,$ys) = RRDs::graph(
+           $cfg->{General}{imgcache}.$dir."/${prop}_mini.svg",
     #       '--lazy',
            '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
            '--title',$cfg->{Presentation}{htmltitle} ne 'yes' ? $phys_tree->{title} : '',
@@ -1046,8 +1046,8 @@ sub findmax ($$) {
     for (@{$cfg->{Presentation}{detail}{_table}}) {
         my ($desc,$start) = @{$_};
         $start = exp2seconds($start);
-        my ($graphret,$xs,$ys) = RRDs::graph
-          ("dummy", '--start', -$start,
+        my ($graphret,$xs,$ys) = RRDs::graph(
+           "dummy", '--start', -$start,
            '--width',$cfg->{Presentation}{overview}{width},
            '--end','-'.int($start / $cfg->{Presentation}{detail}{width}),
            "DEF:maxping=${rrd}:median:AVERAGE",
@@ -1236,8 +1236,8 @@ sub get_detail ($$$$;$){
 	$q->param('epoch_end',parse_datetime($q->param('end')));
     my $title = $q->param('title') || ("Navigator Graph".$name);
     @tasks = ([$title, parse_datetime($q->param('start')),parse_datetime($q->param('end'))]);
-        my ($graphret,$xs,$ys) = RRDs::graph
-          ("dummy",
+        my ($graphret,$xs,$ys) = RRDs::graph(
+           "dummy",
            '--start', $tasks[0][1],
            '--end',$tasks[0][2],
            "DEF:maxping=${base_rrd}.rrd:median:AVERAGE",
@@ -1260,8 +1260,8 @@ sub get_detail ($$$$;$){
         $imgbase = $cfg->{General}{imgcache}."/__chartscache/".(join ".", @dirs).".${file}";
         $imghref = $cfg->{General}{imgurl}."/__chartscache/".(join ".", @dirs).".${file}";
 
-        my ($graphret,$xs,$ys) = RRDs::graph
-          ("dummy",
+        my ($graphret,$xs,$ys) = RRDs::graph(
+           "dummy",
            '--start', time()-3600,
            '--end', time(),
            "DEF:maxping=${base_rrd}.rrd:median:AVERAGE",
@@ -1495,7 +1495,7 @@ sub get_detail ($$$$;$){
 #       do_log ("***** end task ***** <br />");
 
               my $graphret;
-              ($graphret,$xs{$s},$ys{$s}) = RRDs::graph @task;
+              ($graphret,$xs{$s},$ys{$s}) = RRDs::graph(@task);
  #             die "<div>INFO:".join("<br/>",@task)."</div>";
               my $ERROR = RRDs::error();
               if ($ERROR) {
@@ -2172,7 +2172,7 @@ sub update_rrds($$$$$$) {
                        $update->[1].":".$update->[2]
                     );
                 do_debuglog("Calling RRDs::update(@rrdupdate)");
-                RRDs::update ( @rrdupdate );
+                RRDs::update(@rrdupdate);
                 my $ERROR = RRDs::error();
                 do_log "RRDs::update ERROR: $ERROR\n" if $ERROR;
 

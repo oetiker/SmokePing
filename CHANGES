@@ -1,3 +1,4 @@
+ - fix RRDs 1.9+ compatibility: add parentheses to all RRDs function calls, fix version check regex and RRDtools comparison typo
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
  - make FPingContinuous configuration more consistent with FPing by supporting protocol, interface and fwmark
 2026-03-31 10:48:53 +0200 Marc López <@MarcLopezB>

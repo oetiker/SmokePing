@@ -177,8 +177,8 @@ sub get_multi_detail ($$$$;$){
     if ($mode =~ /[anc]/){
         my $val = 0;
         for my $host (@hosts){
-            my ($graphret,$xs,$ys) = RRDs::graph
-            ("dummy",
+            my ($graphret,$xs,$ys) = RRDs::graph(
+            "dummy",
             '--start', $tasks[0][1],
             '--end', $tasks[0][2],
             "DEF:maxping=$cfg->{General}{datadir}${host}.rrd:median:AVERAGE",
@@ -298,7 +298,7 @@ sub get_multi_detail ($$$$;$){
                "COMMENT:$date\\j";
 
         my $graphret;
-        ($graphret,$xs,$ys) = RRDs::graph @task;
+        ($graphret,$xs,$ys) = RRDs::graph(@task);
         #  print "<div>INFO:".join("<br/>",@task)."</div>";
         my $ERROR = RRDs::error();
         if ($ERROR) {
