@@ -84,7 +84,7 @@ my %opt;
 
 BEGIN {
   $havegetaddrinfo = 0;
-  eval 'use Socket6';
+  eval { require Socket6; Socket6->import() };
   $havegetaddrinfo = 1 unless $@;
 }
 
@@ -142,10 +142,12 @@ sub load_probe ($$$$) {
         # just in case, make sure we have the module loaded. unless
         # we are running as slave, this will already be the case
         # after reading the config file
-        eval 'require Smokeping::probes::'.$modname;
+        my $probeclass = "Smokeping::probes::$modname";
+        (my $probefile = $probeclass) =~ s|::|/|g;
+        eval { require "$probefile.pm" };
         die "$@\n" if $@;
         my $rv;
-        eval '$rv = Smokeping::probes::'.$modname.'->new( $properties,$cfg,$name);';
+        eval { $rv = $probeclass->new( $properties,$cfg,$name) };
         die "$@\n" if $@;
         die "Failed to load Probe $name (module $modname)\n" unless defined $rv;
         return $rv;
@@ -354,10 +356,14 @@ sub init_alerts ($){
             my $arg = $2;
             die "ERROR: matcher $matcher: all matchers start with a capital letter since version 2.0\n"
                 unless $matcher =~ /^[A-Z]/;
-            eval 'require Smokeping::matchers::'.$matcher;
+            my $matchclass = "Smokeping::matchers::$matcher";
+            (my $matchfile = $matchclass) =~ s|::|/|g;
+            eval { require "$matchfile.pm" };
             die "Matcher '$matcher' could not be loaded: $@\n" if $@;
             my $hand;
-            eval "\$hand = Smokeping::matchers::$matcher->new($arg)";
+            my @margs = eval "($arg)";
+            die "ERROR: Matcher '$matcher' could not parse arguments $arg:\n$@\n" if $@;
+            eval { $hand = $matchclass->new(@margs) };
             die "ERROR: Matcher '$matcher' could not be instantiated\nwith arguments $arg:\n$@\n" if $@;
             $x->{minlength} = $hand->Length;
             $x->{maxlength} = $x->{minlength};
@@ -864,6 +870,33 @@ sub brighten_webcolor {
     return Smokeping::Colorspace::rgb_to_web(@rgb);
 }
 
+sub get_param_width ($$) {
+    my $q = shift;
+    my $default = shift;
+    my $w = $q->param('width');
+    return $default unless defined $w and $w =~ /^\d+$/;
+    $w = int($w);
+    $w = 200  if $w < 200;
+    $w = 3000 if $w > 3000;
+    return $w;
+}
+
+# RRDtool --width sets the data area; the total image is wider due to
+# y-axis labels and margins (~97px).  Subtract this overhead so the
+# resulting SVG fits the browser container without img-responsive
+# scaling it down (which would shrink the text).
+sub get_rrd_width ($$) {
+    my $q = shift;
+    my $default = shift;
+    my $w = get_param_width($q, $default);
+    return $default if $w == $default;  # no URL override
+    my $rrd_overhead = 97;
+    $w = $w - $rrd_overhead;
+    $w = 200 if $w < 200;
+    return $w;
+}
+
+
 sub get_overview ($$$$){
     my $cfg = shift;
     my $q = shift;
@@ -1003,13 +1036,19 @@ sub get_overview ($$$$){
                   "GPRINT:avmsr$i:%5.1lf %s am/as\\l";
 
         }
+        # Scale overview time range proportionally with width
+        my $ov_range = exp2seconds($cfg->{Presentation}{overview}{range});
+        my $ov_default_w = $cfg->{Presentation}{overview}{width};
+        my $ov_actual_w = get_param_width($q, $ov_default_w);
+        $ov_range = int($ov_range * $ov_actual_w / $ov_default_w) if $ov_actual_w > $ov_default_w;
+
         my ($graphret,$xs,$ys) = RRDs::graph
           ($cfg->{General}{imgcache}.$dir."/${prop}_mini.svg",
     #       '--lazy',
-           '--start','-'.exp2seconds($cfg->{Presentation}{overview}{range}),
+           '--start','-'.$ov_range,
            '--title',$cfg->{Presentation}{htmltitle} ne 'yes' ? $phys_tree->{title} : '',
            '--height',$cfg->{Presentation}{overview}{height},
-           '--width',$cfg->{Presentation}{overview}{width},
+           '--width',get_rrd_width($q, $ov_default_w),
            '--vertical-label', $ProbeUnit,
            '--imgformat','SVG',
            Smokeping::Graphs::get_colors($cfg),
@@ -1029,8 +1068,8 @@ sub get_overview ($$$$){
                 $page .= "ERROR: $ERROR<br>".join("<br>", map {"'$_'"} @G);
         } else {
          $page.="<A HREF=\"".lnk($q, (join ".", @$open, ${prop}))."\">".
-            "<IMG ALT=\"\" WIDTH=\"$xs\" HEIGHT=\"$ys\" ".
-            "SRC=\"".$cfg->{General}{imgurl}.$dir."/${prop}_mini.svg\"></A>";
+            "<IMG ALT=\"\" class=\"img-responsive\" ".
+            "SRC=\"".$cfg->{General}{imgurl}.$dir."/${prop}_mini.svg?width=${ov_actual_w}\"></A>";
         }
         $page .="</div></div>\n";
     }
@@ -1360,10 +1399,20 @@ sub get_detail ($$$$;$){
         $end ||= 'last';
         $start = exp2seconds($start) if $mode =~ /[s]/;
 
-        my $startstr = $start =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $start : time-$start)) : $start;
+        # Scale time range proportionally when display is wider than
+        # the configured default so that wider browsers show a longer
+        # time span instead of zooming into the same span.
+        my $display_start = $start;
+        if ($mode eq 's') {
+            my $default_w = $cfg->{Presentation}{detail}{width};
+            my $actual_w = get_param_width($q, $default_w);
+            $display_start = int($start * $actual_w / $default_w) if $actual_w > $default_w;
+        }
+
+        my $startstr = $display_start =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $display_start : time-$display_start)) : $display_start;
         my $endstr   = $end =~ /^\d+$/ ? POSIX::strftime("%Y-%m-%d %H:%M",localtime($mode eq 'n' ? $end : time)) : $end;
 
-        my $realstart = ( $mode =~ /[sc]/ ? '-'.$start : $start);
+        my $realstart = ( $mode =~ /[sc]/ ? '-'.$display_start : $start);
 
         for my $slave (@slaves){
             my $s = $slave ? "~$slave" : "";
@@ -1463,7 +1512,7 @@ sub get_detail ($$$$;$){
                '--start',$realstart,
                ($end ne 'last' ? ('--end',$end) : ()),
                '--height',$cfg->{Presentation}{detail}{height},
-               '--width',$cfg->{Presentation}{detail}{width},
+               '--width',get_rrd_width($q, $cfg->{Presentation}{detail}{width}),
                '--title',$title,
                '--rigid',
                '--upper-limit', $max->{$s}{$start},
@@ -1557,15 +1606,17 @@ sub get_detail ($$$$;$){
                     $page .= "<div class=\"".panel_heading_class()."\"><h2>$title</h2></div>";
                 }
                 $page .= "<div class=\"panel-body\">";
+                my $svg_w = get_param_width($q, $cfg->{Presentation}{detail}{width});
                 $page .= ( qq{<a href="}.cgiurl($q,$cfg)."?".hierarchy($q).qq{displaymode=n&start=$startstr&end=now&}."target=".$t.$s.'">'
-                      . qq{<IMG ALT="" SRC="${imghref}${s}_${end}_${start}.svg">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}${s}_${end}_${start}.svg?width=${svg_w}" class="img-responsive">}."</a>" ); #"
                 $page .= "</div></div>\n";
             }
         } else { # chart mode
             $page .= qq{<div class="panel-body">};
             my $href= (split /~/, (join ".", @$open))[0]; #/ # the link is 'slave free'
+            my $svg_w = get_param_width($q, $cfg->{Presentation}{detail}{width});
             $page .= (  qq{<a href="}.lnk($q, $href).qq{">}
-                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.svg">}."</a>" ); #"
+                      . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.svg?width=${svg_w}" class="img-responsive">}."</a>" ); #"
             $page .= "</div>";
 
         }
@@ -1868,9 +1919,13 @@ sub load_sorters($){
         my $arg = $2;
         die "ERROR: sorter $sorter: all sorters start with a capital letter\n"
             unless $sorter =~ /^[A-Z]/;
-        eval 'require Smokeping::sorters::'.$sorter;
+        my $sortclass = "Smokeping::sorters::$sorter";
+        (my $sortfile = $sortclass) =~ s|::|/|g;
+        eval { require "$sortfile.pm" };
         die "Sorter '$sorter' could not be loaded: $@\n" if $@;
-        $x->{__obj} = eval "Smokeping::sorters::$sorter->new($arg)";
+        my @sargs = eval "($arg)";
+        die "ERROR: sorter $sorter: could not parse arguments $arg: $@\n" if $@;
+        $x->{__obj} = eval { $sortclass->new(@sargs) };
         die "ERROR: sorter $sorter: instantiation with Smokeping::sorters::$sorter->new($arg): $@\n"
            if $@;
     }
@@ -4143,7 +4198,7 @@ sub daemonize_me ($) {
                 # so trap this inside 'eval'
                 # even this apparently isn't enough for older versions that try to
                 # find out whether they are inside an eval...oh well.
-                eval 'CGI::Carp::set_progname($0 . " [client " . ($ENV{REMOTE_ADDR}||"(unknown)") . "]")';
+                eval { CGI::Carp::set_progname($0 . " [client " . ($ENV{REMOTE_ADDR}||"(unknown)") . "]") };
         }
 
         sub initialize_filelog ($){
@@ -4531,7 +4586,7 @@ sub pod2man {
 }
 
 sub maybe_require {
-        # like eval "require $class", but tries to
+        # like require $file, but tries to
         # fake missing classes by adding them to %INC.
         # This rocks when we're building the documentation
         # so we don't need to have the external modules
@@ -4539,20 +4594,20 @@ sub maybe_require {
 
         my $class = shift;
 
+        my $file = $class;
+        $file =~ s,::,/,g;
+        $file .= ".pm";
+
         # don't do the kludge unless we're building documentation
         unless (exists $opt{makepod} or exists $opt{man}) {
-                eval "require $class";
+                eval { require $file };
                 die  "require $class failed: $@" if $@;
                 return;
         }
 
         my %faked;
 
-        my $file = $class;
-        $file =~ s,::,/,g;
-        $file .= ".pm";
-
-        eval "require $class";
+        eval { require $file };
 
         while ($@ =~ /Can't locate (\S+)\.pm/) {
                 my $missing = $1;
@@ -4562,7 +4617,7 @@ sub maybe_require {
                 $missing =~ s,/,::,;
 
                 delete $INC{"$file"}; # so we can redo the require()
-                eval "require $class";
+                eval { require $file };
                 last unless $@;
         }
         die "require $class failed: $@" if $@;

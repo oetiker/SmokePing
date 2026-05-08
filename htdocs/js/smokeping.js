@@ -134,7 +134,66 @@ if($('range_form') != null && $('range_form').length){
     }));
 }
 
-Event.observe( 
+// ── Dynamic graph width ────────────────────────────────
+(function () {
+    var resizeTimer;
+    var PADDING = 18;        // panel-body padding (8px each side) + border slack
+    var MIN_WIDTH = 200;
+    var MAX_WIDTH = 3000;
+
+    function clamp(w) {
+        return Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, w));
+    }
+
+    function getContentWidth() {
+        var panel = document.querySelector('.main .panel-body');
+        if (panel) return panel.clientWidth - PADDING;
+        var main = document.querySelector('.main');
+        if (main) return main.clientWidth - 40; // 20px padding each side
+        return 0;
+    }
+
+    function currentUrlWidth() {
+        var m = location.search.match(/[?&]width=(\d+)/);
+        return m ? parseInt(m[1], 10) : 0;
+    }
+
+    function buildWidthUrl(w) {
+        var url = location.href;
+        if (/[?&]width=\d+/.test(url)) {
+            return url.replace(/([?&]width=)\d+/, '$1' + w);
+        }
+        return url + (url.indexOf('?') === -1 ? '?' : '&') + 'width=' + w;
+    }
+
+    function recordWidth() {
+        var w = clamp(getContentWidth());
+        if (w <= 0) return;
+        if (history.replaceState) {
+            history.replaceState(null, '', buildWidthUrl(w));
+        }
+    }
+
+    // First visit without width param: reload once so server generates
+    // graphs at the correct size. On subsequent loads width is already set.
+    var w = clamp(getContentWidth());
+    if (w > 0 && currentUrlWidth() === 0) {
+        var imgs = document.querySelectorAll('.panel-body img, .panel-body svg');
+        for (var i = 0; i < imgs.length; i++) {
+            imgs[i].style.display = 'none';
+        }
+        location.replace(buildWidthUrl(w));
+    }
+
+    // On resize: just update the URL, SVGs scale via CSS.
+    // The next auto-refresh will regenerate at the correct width.
+    Event.observe(window, 'resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(recordWidth, 500);
+    });
+})();
+
+Event.observe(
     window,
     'load',
     function() {
