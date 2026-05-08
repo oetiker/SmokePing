@@ -330,9 +330,10 @@ a#menu-button svg {
 
 .main .panel,
 .main .panel-no-border {
-	margin: 6px;
-	display: inline-block;
-	vertical-align: top;
+	margin: 6px 0;
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .main .panel {
@@ -370,6 +371,18 @@ a#menu-button svg {
 
 .main .panel-body {
 	padding: 8px;
+	overflow: hidden;
+}
+
+/* All graph images scale to panel width, overriding HTML width/height attributes */
+.main .panel-body img,
+.main .panel-body svg,
+.overview img,
+.details img {
+	max-width: 100%;
+	width: 100% !important;
+	height: auto !important;
+	display: block;
 }
 
 /* ── Overview & Details containers ───────────────────── */
@@ -418,7 +431,7 @@ a#menu-button svg {
 
 .sidebar-hidden .main,
 .sidebar-hidden .footer {
-	padding-left: 0 !important;
+	padding-left: 20px !important;
 }
 
 .sidebar-hidden .navbar {
@@ -442,9 +455,10 @@ a#menu-button svg {
 	}
 
 	.main {
-		padding-left: 0;
+		padding-left: 20px;
 		margin-left: 0;
-		width: calc(100% - 40px);
+		width: 100%;
+		box-sizing: border-box;
 	}
 
 	.footer {
@@ -462,9 +476,11 @@ a#menu-button svg {
 
 /* ── Misc ─────────────────────────────────────────────── */
 
-.img-responsive {
+.img-responsive,
+img[src$=".svg"] {
 	max-width: 100%;
 	height: auto;
+	display: block;
 }
 
 /* --- Modern enhancements (backward compatible) --- */
