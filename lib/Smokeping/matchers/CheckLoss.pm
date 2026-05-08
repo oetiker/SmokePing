@@ -43,7 +43,7 @@ Dylan Vanderhoof <dylanv@semaphore.com>
 
 use strict;
 use base qw(Smokeping::matchers::base);
-use vars qw($VERSION);
+our $VERSION;
 $VERSION = 1.0;
 use Carp;
 use List::Util qw(min max);

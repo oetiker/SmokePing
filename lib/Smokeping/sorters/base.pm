@@ -34,7 +34,7 @@ Every sorter must provide the following methods:
 
 =cut
 
-use vars qw($VERSION);
+our $VERSION;
 use Carp;
 
 $VERSION = 1.0;

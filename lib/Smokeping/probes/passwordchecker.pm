@@ -118,9 +118,9 @@ sub new {
 			carp("Warning: password file $self->{properties}{passwordfile} is world-readable\n")
 				if defined $mode and $mode & 04;
 
-			open(P, "<$self->{properties}{passwordfile}")
+			open(my $pw_fh, '<', $self->{properties}{passwordfile})
 				or croak("Error opening specified password file $self->{properties}{passwordfile}: $!");
-			while (<P>) {
+			while (<$pw_fh>) {
 				chomp;
 				next unless /\S/;
 				next if /^\s*#/;
@@ -128,7 +128,7 @@ sub new {
 				carp("Line $. in $self->{properties}{passwordfile} is invalid"), next unless defined $host and defined $username and defined $password;
 				$self->password($host, $username, $password);
 			}
-			close P;
+			close $pw_fh;
 	        }
 	}
 

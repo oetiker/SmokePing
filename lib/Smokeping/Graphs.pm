@@ -124,23 +124,23 @@ sub get_multi_detail ($$$$;$){
         $imgbase = $cfg->{General}{imgcache}."/".(join "/", @dirs)."/${file}";
         $imghref = $cfg->{General}{imgurl}."/".(join "/", @dirs)."/${file}";
         @tasks = @{$cfg->{Presentation}{detail}{_table}};
-        if (open (HG,"<${imgbase}.maxheight")){
-            while (<HG>){
+        if (open(my $hg_fh, '<', "${imgbase}.maxheight")){
+            while (<$hg_fh>){
                 chomp;
                 my @l = split / /;
                 $lastheight{$l[0]} = $l[1];
             }
-            close HG;
+            close $hg_fh;
         }
         for my $rrd (@hosts){
              my $newmax = Smokeping::findmax($cfg, $cfg->{General}{datadir}.$rrd.".rrd");
              map {$max->{$_} = $newmax->{$_} if not $max->{$_} or $newmax->{$_} > $max->{$_} } keys %{$newmax};
         }
-        if (open (HG,">${imgbase}.maxheight")){
+        if (open(my $hg_out, '>', "${imgbase}.maxheight")){
              foreach my $size (keys %{$max}){
-                 print HG "$size $max->{$size}\n";
+                 print $hg_out "$size $max->{$size}\n";
              }
-             close HG;
+             close $hg_out;
         }
     }
     elsif ($mode eq 'n' or $mode eq 'a') {
@@ -307,7 +307,7 @@ sub get_multi_detail ($$$$;$){
 
 
         if ($mode eq 'a'){ # ajax mode
-             open my $img, "${imgbase}_${end}_${start}.svg";
+             open(my $img, '<', "${imgbase}_${end}_${start}.svg");
              binmode $img;
              print "Content-Type: image/svg+xml\n";
              my $data;

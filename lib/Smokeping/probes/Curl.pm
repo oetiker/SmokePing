@@ -308,13 +308,13 @@ sub pingone {
 	my $count = $self->pings($t);
 
 	for (my $i = 0 ; $i < $count; $i++) {
-		open(P, "-|") or exec @cmd;
+		open(my $cmd_fh, '-|') or exec @cmd;
 
 		my $val;
 		my $expectOK = 1;
 		$expectOK = 0 if ($t->{vars}{expect} ne "");
 
-		while (<P>) {
+		while (<$cmd_fh>) {
 			chomp;
 			if (!$expectOK and index($_, $t->{vars}{expect}) != -1) {
 			    $expectOK = 1;
@@ -327,7 +327,7 @@ sub pingone {
 				$self->do_debug("curl output: '$_', result: $val");
 			};
 		}
-		close P;
+		close $cmd_fh;
 		if ($?) {
 			my $status = $? >> 8;
 			my $signal = $? & 127;

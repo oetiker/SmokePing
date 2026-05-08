@@ -9,7 +9,7 @@ package Smokeping::ciscoRttMonMIB;
 
 require 5.004;
 
-use vars qw($VERSION);
+our $VERSION;
 use Exporter;
 
 use BER;

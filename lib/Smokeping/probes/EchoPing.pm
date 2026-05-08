@@ -179,15 +179,15 @@ sub pingone {
 
 	my @times;
 
-	open(P, "$cmd 2>&1 |") or carp("fork: $!");
+	open(my $cmd_fh, '-|', "$cmd 2>&1") or carp("fork: $!");
 
 	my @output;
-	while (<P>) {
+	while (<$cmd_fh>) {
 		chomp;
 		push @output, $_;
 		/^Elapsed time: (\d+\.\d+) seconds/ and push @times, $1;
 	}
-	close P;
+	close $cmd_fh;
 	if ($?) {
 		my $status = $? >> 8;
 		my $signal = $? & 127;

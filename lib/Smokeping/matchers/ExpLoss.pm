@@ -63,7 +63,7 @@ Veniamin Konoplev E<lt>vkonoplev@acm.orgE<gt>
 
 use strict;
 use base qw(Smokeping::matchers::base);
-use vars qw($VERSION);
+our $VERSION;
 $VERSION = 1.0;
 use Carp;
 

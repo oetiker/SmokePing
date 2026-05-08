@@ -51,7 +51,7 @@ Tobias Oetiker <tobi@oetiker.ch>
 
 use strict;
 use base qw(Smokeping::sorters::base);
-use vars qw($VERSION);
+our $VERSION;
 $VERSION = 1.0;
 use Carp;
 

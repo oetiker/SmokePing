@@ -10,7 +10,7 @@ package Smokeping::pingMIB;
 
 require 5.004;
 
-use vars qw($VERSION);
+our $VERSION;
 use Exporter;
 
 use BER;

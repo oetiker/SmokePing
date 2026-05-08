@@ -83,7 +83,7 @@ Tobias Oetiker <tobi@oetiker.ch>
 
 =cut
 
-use vars qw($VERSION);
+our $VERSION;
 
 
 $VERSION = 1.0;

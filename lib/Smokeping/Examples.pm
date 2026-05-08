@@ -71,15 +71,15 @@ sub read_config_template {
 		probes => "",   # the Probes section, without the *** Probes *** line
 		targets => "",   # the Targets section, without the *** Targets *** line
 	};
-	open(F, "<$file") or die("open template configuration file $file for reading: $!");
+	open(my $cfg_fh, '<', $file) or die("open template configuration file $file for reading: $!");
 	my %found;
-	while (<F>) {
+	while (<$cfg_fh>) {
 		/\*\*\*\s*(Probes|Targets)\s*\*\*\*/ and $found{$1} = 1, next;
 		$h->{common}   .= $_ and next unless $found{Probes};
 		$h->{probes}   .= $_ and next unless $found{Targets};
 		$h->{targets}  .= $_;
 	}
-	close F;
+	close $cfg_fh;
 	return $h;
 }
 
@@ -185,9 +185,9 @@ sub writemanual {
 	my $text = shift;
 	my $filename = "smokeping_examples.pod";
 	print "\t$filename ...\n";
-	open(F, ">$filename") or die("open $filename for writing: $!");
-	print F $text;
-	close F;
+	open(my $out_fh, '>', $filename) or die("open $filename for writing: $!");
+	print $out_fh $text;
+	close $out_fh;
 }
 
 sub genpod {
@@ -212,8 +212,8 @@ sub writecfg {
 	my $file = shift;
 	my $template = shift;
 	my $h = shift;
-	open(F, ">$file") or die("open $file for writing: $!");
-	print F <<DOC;
+	open(my $out_fh, '>', $file) or die("open $file for writing: $!");
+	print $out_fh <<DOC;
 # This Smokeping example configuration file was automatically generated.
 #
 # Everything up to the Probes section is derived from a common template file.
@@ -222,17 +222,17 @@ sub writecfg {
 # This example is included in the smokeping_examples document.
 
 DOC
-	print F $template->{common};
-	print F "# (The actual example starts here.)\n";
-	print F "\n*** Probes ***\n\n";
-	print F join("\n", map { "# $_" } split(/\n/, $h->{probedoc} || 'No probedoc found!'));
-	print F "\n\n";
-	print F $h->{probes};
-	print F "\n*** Targets ***\n\n";
-	print F join("\n", map { "# $_" } split(/\n/, $h->{targetdoc} || 'No targetdoc found'));
-	print F "\n\n";
-	print F $h->{targets};
-	close F;
+	print $out_fh $template->{common};
+	print $out_fh "# (The actual example starts here.)\n";
+	print $out_fh "\n*** Probes ***\n\n";
+	print $out_fh join("\n", map { "# $_" } split(/\n/, $h->{probedoc} || 'No probedoc found!'));
+	print $out_fh "\n\n";
+	print $out_fh $h->{probes};
+	print $out_fh "\n*** Targets ***\n\n";
+	print $out_fh join("\n", map { "# $_" } split(/\n/, $h->{targetdoc} || 'No targetdoc found'));
+	print $out_fh "\n\n";
+	print $out_fh $h->{targets};
+	close $out_fh;
 }
 
 sub examples {

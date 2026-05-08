@@ -84,9 +84,9 @@ sub new {
                         my $mode = $stat[2];
                         carp("Warning: secret file $self->{properties}{secretfile} is world-readable\n")
                                 if defined $mode and $mode & 04;
-			open(S, "<$self->{properties}{secretfile}")
+			open(my $secret_fh, '<', $self->{properties}{secretfile})
 				or croak("Error opening specified secret file $self->{properties}{secretfile}: $!");
-			while (<S>) {
+			while (<$secret_fh>) {
 				chomp;
 				next unless /\S/;
 				next if /^\s*#/;
@@ -95,7 +95,7 @@ sub new {
 					unless defined $host and defined $secret;
 				$self->secret($host, $secret);
 			}
-			close S;
+			close $secret_fh;
 	        }
 
 	}

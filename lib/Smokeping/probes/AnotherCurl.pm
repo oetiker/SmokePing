@@ -304,11 +304,11 @@ sub pingone {
 	my $count = $self->pings($t);
 
 	for (my $i = 0 ; $i < $count; $i++) {
-		open(P, "-|") or exec @cmd;
+		open(my $cmd_fh, '-|') or exec @cmd;
 
 		my $val;
 
-		while (<P>) {
+		while (<$cmd_fh>) {
 			chomp;
 			/^Total: (\d+\.\d+) DNS: (\d+\.\d+) Redirect: (\d+\.\d+) Connect: (\d+\.\d+) Appconnect: (\d+\.\d+) Pretransfert: (\d+\.\d+) Starttransfert: (\d+\.\d+)?/ and do {
 				# Total: time_total
@@ -334,7 +334,7 @@ sub pingone {
 				$self->do_debug("curl output: '$_', result: $val");
 			};
 		}
-		close P;
+		close $cmd_fh;
 		if ($?) {
 			my $status = $? >> 8;
 			my $signal = $? & 127;

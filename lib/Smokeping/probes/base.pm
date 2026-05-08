@@ -14,7 +14,7 @@ to generate the POD document.
 
 =cut
 
-use vars qw($VERSION);
+our $VERSION;
 use Carp;
 use lib qw(..);
 use Smokeping;
@@ -169,19 +169,19 @@ sub addresses($)
         my $target = $self->{targets}{$tree};
         if ($target =~ m|/|) {
 	   my $dynbase = $self->target2dynfile($target);
-	   if ( open D, "<$dynbase.adr" ) {
+	   if ( open(my $adr_fh, '<', "$dynbase.adr") ) {
 	       my $ip;
-	       chomp($ip = <D>);
-	       close D;
+	       chomp($ip = <$adr_fh>);
+	       close $adr_fh;
 
-	       if ( open D, "<$dynbase.snmp" ) {
-		   my $snmp = <D>;
+	       if ( open(my $snmp_fh, '<', "$dynbase.snmp") ) {
+		   my $snmp = <$snmp_fh>;
 		   chomp($snmp);
 		   if ($snmp ne Smokeping::snmpget_ident $ip) {
 		       # something fishy snmp properties do not match, skip this address
 		       next;
 		   }
-                   close D;
+                   close $snmp_fh;
 	       }
 	       $target = $ip;
 	   } else {

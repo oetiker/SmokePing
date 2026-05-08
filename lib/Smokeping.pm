@@ -75,7 +75,7 @@ use Smokeping::Examples;
 use Smokeping::RRDtools;
 
 # global persistent variables for speedy
-use vars qw($cfg $probes $VERSION $havegetaddrinfo $cgimode);
+our ($cfg, $probes, $VERSION, $havegetaddrinfo, $cgimode);
 
 $VERSION="2.006000";
 
@@ -241,24 +241,24 @@ sub update_dynaddr ($$){
     my $prevaddress = "?";
     my $snmp = snmpget_ident $address;
     if (-r "$file.adr" and not -z "$file.adr"){
-        open(D, "<$file.adr")
+        open(my $adr_fh, '<', "$file.adr")
           or return "Error opening $file.adr: $!\n";
-        chomp($prevaddress = <D>);
-        close D;
+        chomp($prevaddress = <$adr_fh>);
+        close $adr_fh;
     }
 
     if ( $prevaddress ne $address){
-        open(D, ">$file.adr.new")
+        open(my $adr_out, '>', "$file.adr.new")
           or return "Error writing $file.adr.new: $!";
-        print D $address,"\n";
-        close D;
+        print $adr_out $address,"\n";
+        close $adr_out;
         rename "$file.adr.new","$file.adr";
     }
     if ( $snmp ) {
-        open (D, ">$file.snmp.new")
+        open(my $snmp_fh, '>', "$file.snmp.new")
           or return "Error writing $file.snmp.new: $!";
-        print D $snmp,"\n";
-        close D;
+        print $snmp_fh $snmp,"\n";
+        close $snmp_fh;
         rename "$file.snmp.new", "$file.snmp";
     } elsif ( -f "$file.snmp") { unlink "$file.snmp" };
 
@@ -279,9 +279,9 @@ sub sendmail ($$$){
         $smtp->dataend();
         $smtp->quit;
     } elsif ($cfg->{General}{sendmail} or -x "/usr/lib/sendmail"){
-        open (M, "|-") || exec (($cfg->{General}{sendmail} || "/usr/lib/sendmail"),"-f",$from,$to);
-        print M $body;
-        close M;
+        open(my $mail_fh, '|-') || exec (($cfg->{General}{sendmail} || "/usr/lib/sendmail"),"-f",$from,$to);
+        print $mail_fh $body;
+        close $mail_fh;
     } else {
         warn "ERROR: not sending mail to $to, as all methods failed\n";
     }
@@ -654,32 +654,32 @@ sub enable_dynamic($$$$){
             $usepath =~ s/\.$//;
             my $secret = int(rand 1000000);
             my $md5 = md5_base64($secret);
-            open C, "<$cfgfile" or die "ERROR: Reading $cfgfile: $!\n";
-            open G, ">$cfgfile.new" or die "ERROR: Writing $cfgfile.new: $!\n";
+            open(my $cfg_fh, '<', $cfgfile) or die "ERROR: Reading $cfgfile: $!\n";
+            open(my $cfg_out, '>', "$cfgfile.new") or die "ERROR: Writing $cfgfile.new: $!\n";
             my $section ;
             my @goal = split /\./, $usepath;
             my $indent = "+";
             my $done;
-            while (<C>){
-                $done && do { print G; next };
+            while (<$cfg_fh>){
+                $done && do { print $cfg_out $_; next };
                 /^\s*\Q*** Targets ***\E\s*$/ && do{$section = 'match'};
                 @goal && $section && /^\s*\Q${indent}\E\s*\Q$goal[0]\E/ && do {
                     $indent .= "+";
                     shift @goal;
                 };
                 (not @goal) && /^\s*host\s*=\s*DYNAMIC$/ && do {
-                    print G "host = DYNAMIC/$md5\n";
+                    print $cfg_out "host = DYNAMIC/$md5\n";
                     $done = 1;
                     next;
                 };
-                print G;
+                print $cfg_out $_;
             }
-            close G;
+            close $cfg_out;
             rename "$cfgfile.new", $cfgfile;
-            close C;
+            close $cfg_fh;
             my $body;
-            open SMOKE, $cfg->{General}{smokemail} or die "ERROR: can't read $cfg->{General}{smokemail}: $!\n";
-            while (<SMOKE>){
+            open(my $smoke_fh, '<', $cfg->{General}{smokemail}) or die "ERROR: can't read $cfg->{General}{smokemail}: $!\n";
+            while (<$smoke_fh>){
                 s/<##PATH##>/$usepath/ig;
                 s/<##SECRET##>/$secret/ig;
                 s/<##URL##>/$cfg->{General}{cgiurl}/;
@@ -688,7 +688,7 @@ sub enable_dynamic($$$$){
                 s/<##TO##>/$email/;
                 $body .= $_;
             }
-            close SMOKE;
+            close $smoke_fh;
 
 
             my $mail;
@@ -827,9 +827,9 @@ sub fill_template ($$;$){
     if ($template){
         my $line = $/;
         undef $/;
-        open I, $template or return undef;
-        $data = <I>;
-        close I;
+        open(my $tmpl_fh, '<', $template) or return undef;
+        $data = <$tmpl_fh>;
+        close $tmpl_fh;
         $/ = $line;
     }
     foreach my $tag (keys %{$subst}) {
@@ -1236,20 +1236,20 @@ sub get_detail ($$$$;$){
         @tasks = @{$cfg->{Presentation}{detail}{_table}};
         for my $slave (@slaves){
             my $s =  $slave ? "~$slave" : "";
-            if (open (HG,"<${imgbase}.maxheight$s")){
-                 while (<HG>){
+            if (open(my $hg_fh, '<', "${imgbase}.maxheight$s")){
+                 while (<$hg_fh>){
                      chomp;
                      my @l = split / /;
                      $lastheight{$s}{$l[0]} = $l[1];
                  }
-                 close HG;
+                 close $hg_fh;
              }
              $max->{$s} = findmax $cfg, $base_rrd.$s.".rrd";
-             if (open (HG,">${imgbase}.maxheight$s")){
+             if (open(my $hg_out, '>', "${imgbase}.maxheight$s")){
                  foreach my $size (keys %{$max->{$s}}){
-                     print HG "$s $max->{$s}{$size}\n";
+                     print $hg_out "$s $max->{$s}{$size}\n";
                  }
-                 close HG;
+                 close $hg_out;
              }
         }
     }
@@ -2105,9 +2105,9 @@ Comment: $alert->{comment}
 
 XMPPALERT
                         if (-x "/usr/bin/sendxmpp"){
-                            open (M, "|-") || exec ("/usr/bin/sendxmpp $xmpparg");
-                            print M $xmppalert;
-                            close M;
+                            open(my $xmpp_fh, '|-') || exec ("/usr/bin/sendxmpp $xmpparg");
+                            print $xmpp_fh $xmppalert;
+                            close $xmpp_fh;
                         }
                         else {
                             warn "Command sendxmpp not found. Try 'apt-get install sendxmpp' to install it. xmpp message with arg line $xmpparg could not be sent";
@@ -2211,9 +2211,9 @@ sub update_rrds($$$$$$) {
                 my $s = $update->[0] ? "~".$update->[0] : "";
                 if ( $tree->{rawlog} ){
                         my $file =  POSIX::strftime $tree->{rawlog},localtime($update->[1]);
-                    if (open LOG,">>$name$s.$file.csv"){
-                            print LOG time,"\t",join("\t",split /:/,$update->[2]),"\n";
-                                close LOG;
+                    if (open(my $log_fh, '>>', "$name$s.$file.csv")){
+                            print $log_fh time,"\t",join("\t",split /:/,$update->[2]),"\n";
+                                close $log_fh;
                             } else {
                                 do_log "Warning: failed to open $name$s.$file for logging: $!\n";
                             }
@@ -4119,8 +4119,8 @@ sub kill_smoke ($$) {
   my $pidfile = shift;
   my $signal = shift;
     if (defined $pidfile){
-        if ( -f $pidfile && open PIDFILE, "<$pidfile" ) {
-            <PIDFILE> =~ /(\d+)/;
+        if ( -f $pidfile && open(my $pid_fh, '<', $pidfile) ) {
+            <$pid_fh> =~ /(\d+)/;
             my $pid = $1;
             if ($signal == SIGINT || $signal == SIGTERM) {
                 kill $signal, $pid if kill 0, $pid;
@@ -4132,7 +4132,7 @@ sub kill_smoke ($$) {
                         unless kill 0, $pid;
                 kill $signal, $pid;
             }
-            close PIDFILE;
+            close $pid_fh;
         } else {
             die "ERROR: Can not read pid from $pidfile: $!\n";
         };
@@ -4143,9 +4143,9 @@ sub daemonize_me ($) {
   my $pidfile = shift;
     if (defined $pidfile){
         if (-f $pidfile ) {
-            open PIDFILE, "<$pidfile";
-            <PIDFILE> =~ /(\d+)/;
-            close PIDFILE;
+            open(my $pid_fh, '<', $pidfile);
+            <$pid_fh> =~ /(\d+)/;
+            close $pid_fh;
             my $pid = $1;
             die "ERROR: I Quit! Another copy of $0 ($pid) seems to be running.\n".
               "       Check $pidfile\n"
@@ -4159,9 +4159,9 @@ sub daemonize_me ($) {
     if ($pid) {
         exit;
     } else {
-        if(open(PIDFILE,">$pidfile")){
-        print PIDFILE "$$\n";
-        close PIDFILE;
+        if(open(my $pid_fh, '>', $pidfile)){
+        print $pid_fh "$$\n";
+        close $pid_fh;
         } else {
           warn "creating $pidfile: $!\n";
         };
@@ -4248,9 +4248,9 @@ sub daemonize_me ($) {
         }
 
         sub do_filelog ($){
-                open X,">>$use_filelog" or return;
-                print X scalar localtime(time)," - ",shift,"\n";
-                close X;
+                open(my $log_fh, '>>', $use_filelog) or return;
+                print $log_fh scalar localtime(time)," - ",shift,"\n";
+                close $log_fh;
         }
 
         sub do_log (@){
@@ -4505,8 +4505,8 @@ sub gen_page  ($$$) {
 
     $name = @$open ? join('.', @$open) . ".html" : "index.html";
 
-    die "Can not open $cfg-{General}{pagedir}/$name for writing: $!" unless
-      open PAGEFILE, ">$cfg->{General}{pagedir}/$name";
+    open(my $page_fh, '>', "$cfg->{General}{pagedir}/$name")
+      or die "Can not open $cfg->{General}{pagedir}/$name for writing: $!";
 
     my $step = $probes->{$tree->{probe}}->step();
     my $readversion = "?";
@@ -4533,8 +4533,8 @@ sub gen_page  ($$$) {
           authuser => $authuser,
          });
 
-    print PAGEFILE $page || "<HTML><BODY>ERROR: Reading page template ".$cfg->{Presentation}{template}."</BODY></HTML>";
-    close PAGEFILE;
+    print $page_fh $page || "<HTML><BODY>ERROR: Reading page template ".$cfg->{Presentation}{template}."</BODY></HTML>";
+    close $page_fh;
 
     foreach my $key (keys %$tree) {
         my $value = $tree->{$key};
@@ -4575,9 +4575,9 @@ sub pages ($) {
 
 sub pod2man {
         my $string = shift;
-        my $pid = open(P, "-|");
+        my $pid = open(my $pod_fh, '-|');
         if ($pid) {
-                pod2usage(-verbose => 2, -input => \*P);
+                pod2usage(-verbose => 2, -input => $pod_fh);
                 exit 0;
         } else {
                 print $string;
@@ -5052,10 +5052,10 @@ sub gen_imgs ($){
   }
   if (not -r $cfg->{General}{imgcache}."/rrdtool.png" or
       (defined $modulemodtime and $modulemodtime > (stat _)[9])){
-open W, ">".$cfg->{General}{imgcache}."/rrdtool.png"
+open(my $img_fh, '>', $cfg->{General}{imgcache}."/rrdtool.png")
    or do { warn "WARNING: creating $cfg->{General}{imgcache}/rrdtool.png: $!\n"; return 0 };
-binmode W;
-print W unpack ('u', <<'UUENC');
+binmode $img_fh;
+print $img_fh unpack ('u', <<'UUENC');
 &B5!.1PT*
 "&@H`
 M````#4E(1%(```!D````'@@#````[85+P0```;Q03%1%3$Q,;8_U;I#X2TM+
@@ -5111,15 +5111,15 @@ M9P8`,"T)&R@)=!)'[**16D((T%J"DF2Y4$!0HK4`D10]0,Z++2+GCWX]L!.Q
 MX\]:K:KJN4UCI^)JQU.#GR^%0[/JJRL![FK)\HSC]T,P,_UJCF9?`'&L38BX
 /N=]>`````$E%3D2N0F""
 UUENC
-close W;
+close $img_fh;
 }
 
   if (not -r $cfg->{General}{imgcache}."/smokeping.png" or
       (defined $modulemodtime and $modulemodtime > (stat _)[9])){
-open W, ">".$cfg->{General}{imgcache}."/smokeping.png"
+open(my $img_fh, '>', $cfg->{General}{imgcache}."/smokeping.png")
    or do { warn "WARNING: creating $cfg->{General}{imgcache}/smokeping.png: $!\n"; return 0};
-binmode W;
-print W unpack ('u', <<'UUENC');
+binmode $img_fh;
+print $img_fh unpack ('u', <<'UUENC');
 &B5!.1PT*
 "&@H`
 M````#4E(1%(```!D````'@@#````[85+P0```A-03%1%3$Q,____3DY._W\`
@@ -5170,7 +5170,7 @@ M>>-_.0C1;-^Y\?0Z/;9F0]M:_?:VG1%L^H:V;5ADQX8-"];_-F0'%HE(0[U>
 M^FF,(MO7O5Z-;X0+([\+^4;T)R#<M`EJ%F"_`SFU\-M]N!EM"T]]6!O!_DX^
 5`F@QYX#.PQY?`````$E%3D2N0F""
 UUENC
-close W;
+close $img_fh;
 }
 }
 
