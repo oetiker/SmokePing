@@ -1,3 +1,4 @@
+ - replace string eval with block eval and dispatch tables for safer dynamic module loading @oetiker
  - avoid full page reload on browser resize; update graph width silently for next refresh cycle @oetiker
  - fix graphs disappearing after small browser resizes or sidebar toggle @oetiker
  - clean up CSS: remove duplicate rules, use CSS variables for dark mode @oetiker

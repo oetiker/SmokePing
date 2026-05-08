@@ -26,7 +26,7 @@ use base qw(Smokeping::probes::passwordchecker);
 
 my $havessl = 0;
 
-eval "use IO::Socket::SSL;";
+eval { require IO::Socket::SSL; IO::Socket::SSL->import() };
 $havessl = 1 unless $@;
 
 my $DEFAULTINTERVAL = 1;

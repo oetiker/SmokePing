@@ -102,8 +102,15 @@ sub new(@)
                 percentage=>'\d+(\.\d+)?' };
 
     my $self  = $class->SUPER::new($rules,@_);
-    $self->{param}{sub} = eval "sub {\$_[0] ".$self->{param}{comparator}." \$_[1]}";
-    croak "compiling comparator $self->{param}{comparator}: $@" if $@;
+    my %comparators = (
+        '<'  => sub { $_[0] <  $_[1] },
+        '>'  => sub { $_[0] >  $_[1] },
+        '<=' => sub { $_[0] <= $_[1] },
+        '>=' => sub { $_[0] >= $_[1] },
+        '==' => sub { $_[0] == $_[1] },
+    );
+    $self->{param}{sub} = $comparators{$self->{param}{comparator}}
+        or croak "unknown comparator $self->{param}{comparator}";
     $self->{param}{value} = $self->{param}{percentage}/100;
     return $self;
 }
