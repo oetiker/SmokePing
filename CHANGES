@@ -1,3 +1,9 @@
+ - avoid full page reload on browser resize; update graph width silently for next refresh cycle @oetiker
+ - fix graphs disappearing after small browser resizes or sidebar toggle @oetiker
+ - clean up CSS: remove duplicate rules, use CSS variables for dark mode @oetiker
+ - wider browser windows now show longer time spans instead of zooming into the same period @oetiker
+ - render RRD graphs at browser content width for sharper display on wide screens @oetiker
+ - fix graph panels and images to scale responsively to browser width instead of fixed pixel size @oetiker
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
  - make FPingContinuous configuration more consistent with FPing by supporting protocol, interface and fwmark
 2026-03-31 10:48:53 +0200 Marc López <@MarcLopezB>
