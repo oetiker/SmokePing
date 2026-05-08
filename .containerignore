@@ -1,0 +1,13 @@
+.git
+.github
+autom4te.cache
+rrdtool-*
+local-rrdtool
+test-install
+thirdparty/lib
+thirdparty/carton
+thirdparty/cache
+thirdparty/touch
+cpanfile.snapshot
+config.log
+config.status

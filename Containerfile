@@ -3,7 +3,7 @@ FROM debian:bookworm-slim
 ENV DEBIAN_FRONTEND=noninteractive
 ENV SMOKEPING_PREFIX=/opt/smokeping
 
-# System dependencies: build tools + runtime
+# Layer 1: System dependencies (cached unless Containerfile changes)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # Build tools
     make gcc autoconf automake perl curl ca-certificates \
@@ -25,41 +25,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6-dev libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install cpanm
+# Layer 2: Perl deps from CPAN (cached unless cpanfile changes)
 RUN curl -sL https://cpanmin.us | perl - App::cpanminus
-
-# Copy source
-COPY . /build/smokeping
-WORKDIR /build/smokeping
-
-# Install remaining Perl deps not available as system packages
-# Note: InfluxDB::HTTP, InfluxDB::LineProtocol, Object::Result are optional
-# (only needed for InfluxDB integration) and skipped here.
+COPY cpanfile /tmp/cpanfile
 RUN cpanm --notest --quiet \
     Net::OpenSSH \
     IO::Pty \
     Config::Grammar \
     FCGI
 
-# Build and install SmokePing
+# Layer 3: Build SmokePing from source (rebuilds on code changes)
+COPY . /build/smokeping
+WORKDIR /build/smokeping
 # Skip thirdparty (deps handled via apt/cpanm) and doc (no man pages needed)
 RUN ./configure --prefix=${SMOKEPING_PREFIX} --enable-pkgonly \
-    && for dir in lib bin etc htdocs; do make -C $dir install; done
+    && for dir in lib bin etc htdocs; do make -C $dir install; done \
+    && mkdir -p ${SMOKEPING_PREFIX}/data ${SMOKEPING_PREFIX}/cache ${SMOKEPING_PREFIX}/var \
+    && rm -rf /build
 
-# Create required directories
-RUN mkdir -p \
-    ${SMOKEPING_PREFIX}/data \
-    ${SMOKEPING_PREFIX}/cache \
-    ${SMOKEPING_PREFIX}/var
-
-# Install container-specific config files
+# Layer 4: Container config (rebuilds only on config changes)
 COPY container/smokeping-config ${SMOKEPING_PREFIX}/etc/config
 COPY container/lighttpd.conf /etc/lighttpd/lighttpd.conf
 COPY container/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-# Clean up build directory
-RUN rm -rf /build
 
 EXPOSE 4265
 
