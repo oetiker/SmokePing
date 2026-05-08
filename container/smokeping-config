@@ -1,0 +1,291 @@
+*** General ***
+
+owner    = SmokePing
+contact  = admin@localhost
+mailhost = localhost
+# NOTE: do not put the Image Cache below cgi-bin
+imgcache = /opt/smokeping/cache
+imgurl   = cache
+datadir  = /opt/smokeping/data
+piddir   = /opt/smokeping/var
+cgiurl   = http://localhost:4265/smokeping.cgi
+smokemail = /opt/smokeping/etc/smokemail.dist
+tmail = /opt/smokeping/etc/tmail.dist
+syslogfacility = local0
+
+*** Alerts ***
+to = admin@localhost
+from = smokeping@localhost
+
++someloss
+type = loss
+pattern = >0%,*12*,>0%,*12*,>0%
+comment = loss 3 times in a row
+
++highlatency
+type = rtt
+pattern = >200,>200,>200
+comment = high latency 3 times in a row
+
++packetloss
+type = loss
+pattern = ==0%,==0%,==0%,==0%,>20%,>20%,>20%
+comment = sudden packet loss after stability
+
+*** Database ***
+
+step     = 300
+pings    = 20
+
+AVERAGE  0.5   1  28800
+AVERAGE  0.5  12   9600
+    MIN  0.5  12   9600
+    MAX  0.5  12   9600
+AVERAGE  0.5 144   2400
+    MAX  0.5 144   2400
+    MIN  0.5 144   2400
+
+*** Presentation ***
+
+template = /opt/smokeping/etc/basepage.html.dist
+htmltitle = yes
+graphborders = no
+
++ charts
+
+menu = Charts
+title = The most interesting destinations
+
+++ stddev
+sorter = StdDev(entries=>4)
+title = Top Standard Deviation
+menu = Std Deviation
+format = Standard Deviation %f
+
+++ max
+sorter = Max(entries=>5)
+title = Top Max Roundtrip Time
+menu = by Max
+format = Max Roundtrip Time %f seconds
+
+++ loss
+sorter = Loss(entries=>5)
+title = Top Packet Loss
+menu = Loss
+format = Packets Lost %f
+
+++ median
+sorter = Median(entries=>5)
+title = Top Median Roundtrip Time
+menu = by Median
+format = Median RTT %f seconds
+
++ overview
+
+width = 600
+height = 50
+range = 10h
+
++ detail
+
+width = 600
+height = 200
+unison_tolerance = 2
+
+"Last 3 Hours"    3h
+"Last 30 Hours"   30h
+"Last 10 Days"    10d
+"Last 360 Days"   360d
+
+*** Probes ***
+
++ FPing
+
+binary = /usr/bin/fping
+
++ DNS
+binary = /usr/bin/dig
+lookup = smtp.gmail.com
+
+*** Targets ***
+
+probe = FPing
+
+menu = Top
+title = Network Latency Grapher
+remark = SmokePing Demo - monitoring network latency across the globe
+
++ Local
+
+menu = Local
+title = Local Network
+
+++ Localhost
+menu = Localhost
+title = Localhost Loopback
+host = localhost
+
++ DNS_Resolvers
+
+menu = DNS Resolvers
+title = Public DNS Resolvers
+
+++ GooglePrimary
+menu = Google 8.8.8.8
+title = Google Public DNS (Primary)
+host = 8.8.8.8
+
+++ GoogleSecondary
+menu = Google 8.8.4.4
+title = Google Public DNS (Secondary)
+host = 8.8.4.4
+
+++ CloudflarePrimary
+menu = Cloudflare 1.1.1.1
+title = Cloudflare DNS (Primary)
+host = 1.1.1.1
+
+++ CloudflareSecondary
+menu = Cloudflare 1.0.0.1
+title = Cloudflare DNS (Secondary)
+host = 1.0.0.1
+
+++ Quad9
+menu = Quad9 9.9.9.9
+title = Quad9 DNS
+host = 9.9.9.9
+
+++ OpenDNS
+menu = OpenDNS
+title = Cisco OpenDNS
+host = 208.67.222.222
+
++ CloudProviders
+
+menu = Cloud Providers
+title = Major Cloud Providers
+
+++ AWS
+menu = AWS
+title = Amazon Web Services
+host = ec2.amazonaws.com
+
+++ Azure
+menu = Azure
+title = Microsoft Azure
+host = azure.microsoft.com
+
+++ GCP
+menu = Google Cloud
+title = Google Cloud Platform
+host = cloud.google.com
+
+++ Hetzner
+menu = Hetzner
+title = Hetzner Cloud
+host = www.hetzner.com
+
+++ DigitalOcean
+menu = DigitalOcean
+title = DigitalOcean
+host = www.digitalocean.com
+
++ Europe
+
+menu = Europe
+title = European Targets
+
+++ SwitchCH
+menu = SWITCH (CH)
+title = SWITCH - Swiss Education Network
+host = www.switch.ch
+
+++ DENIC
+menu = DENIC (DE)
+title = DENIC - German Domain Registry
+host = www.denic.de
+
+++ RIPE
+menu = RIPE NCC
+title = RIPE Network Coordination Centre
+host = www.ripe.net
+
+++ BBC
+menu = BBC (UK)
+title = BBC United Kingdom
+host = www.bbc.co.uk
+
+++ LeMonde
+menu = Le Monde (FR)
+title = Le Monde France
+host = www.lemonde.fr
+
++ NorthAmerica
+
+menu = North America
+title = North American Targets
+
+++ MIT
+menu = MIT
+title = Massachusetts Institute of Technology
+host = web.mit.edu
+
+++ Stanford
+menu = Stanford
+title = Stanford University
+host = www.stanford.edu
+
+++ NASA
+menu = NASA
+title = NASA
+host = www.nasa.gov
+
+++ GitHub
+menu = GitHub
+title = GitHub
+host = github.com
+
++ AsiaPacific
+
+menu = Asia Pacific
+title = Asia Pacific Targets
+
+++ NII_Japan
+menu = NII (JP)
+title = National Institute of Informatics Japan
+host = www.nii.ac.jp
+
+++ AARNet
+menu = AARNet (AU)
+title = Australian Academic Research Network
+host = www.aarnet.edu.au
+
+++ KRNIC
+menu = KRNIC (KR)
+title = Korea Network Information Center
+host = www.nic.or.kr
+
++ CDN
+
+menu = CDN / Services
+title = Content Delivery & Web Services
+
+++ Akamai
+menu = Akamai
+title = Akamai CDN
+host = www.akamai.com
+
+++ Fastly
+menu = Fastly
+title = Fastly CDN
+host = www.fastly.com
+
+++ Wikipedia
+menu = Wikipedia
+title = Wikipedia
+host = www.wikipedia.org
+
+++ StackOverflow
+menu = StackOverflow
+title = Stack Overflow
+host = stackoverflow.com
