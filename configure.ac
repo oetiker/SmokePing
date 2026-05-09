@@ -139,7 +139,7 @@ NOTES
    exit 1
 fi
 
-AC_CONFIG_FILES([Makefile bin/Makefile doc/Makefile htdocs/Makefile etc/Makefile lib/Makefile thirdparty/Makefile etc/config.dist])
+AC_CONFIG_FILES([Makefile bin/Makefile doc/Makefile htdocs/Makefile etc/Makefile lib/Makefile thirdparty/Makefile t/Makefile etc/config.dist])
 
 AC_SUBST(VERSION)
 

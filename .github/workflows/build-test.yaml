@@ -45,6 +45,9 @@ jobs:
       - name: Make
         run: make
 
+      - name: Check
+        run: make check
+
       - name: Dist
         run: make dist
 
