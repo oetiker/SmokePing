@@ -466,3 +466,142 @@ a#menu-button svg {
 	max-width: 100%;
 	height: auto;
 }
+
+/* --- Modern enhancements (backward compatible) --- */
+
+/* Smooth transitions for interactive elements */
+.sidebar ul.menu li {
+	transition: background 0.15s ease, border-color 0.15s ease;
+}
+.sidebar ul.menu li a {
+	transition: color 0.15s ease;
+}
+
+/* Rounded panels */
+.main .panel {
+	border-radius: 4px;
+	overflow: hidden;
+}
+.main .panel-heading {
+	border-radius: 4px 4px 0 0;
+}
+
+/* Better filter input styling */
+.sidebar .filter-text input {
+	transition: background-color 0.2s ease;
+}
+.sidebar .filter-text input:focus {
+	background-color: #1a1a1a;
+	outline: 1px solid #67c2ef;
+}
+
+/* Navbar transition for mobile toggle */
+.navbar {
+	transition: left 0.4s ease;
+}
+
+/* Improved footer spacing */
+.footer {
+	transition: padding-left 0.4s ease;
+	clear: both;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+/* Cropper (zoom) area styling */
+.imgCrop_clickArea {
+	cursor: crosshair;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+	body {
+		background: #1a1a2e;
+		color: #e0e0e0;
+	}
+	.sidebar {
+		background: #16213e;
+		border-right: 1px solid #0f3460;
+	}
+	.sidebar-header {
+		border-bottom-color: #0f3460;
+	}
+	.sidebar .filter-text input {
+		background-color: #0f3460;
+		color: #e0e0e0;
+	}
+	.sidebar ul.menu li.menuopen,
+	.sidebar ul.menu li:hover,
+	.sidebar ul.menu li.menuactive {
+		border-color: #0f3460;
+		background: #0a1628;
+	}
+	.sidebar ul.menu li ul {
+		background: #0a1628;
+	}
+	.navbar {
+		background: linear-gradient(#1a1a2e, #16213e);
+		border-bottom-color: #0f3460;
+		text-shadow: none;
+	}
+	.navbar .navbar-menu,
+	.navbar .navbar-refresh,
+	.navbar .navbar-user {
+		border-color: #0f3460;
+	}
+	a#menu-button {
+		filter: invert(1);
+	}
+	.navbar .navbar-user .icon-person {
+		filter: invert(1);
+		opacity: 0.7;
+	}
+	.main .panel {
+		background: #16213e;
+		border-color: #0f3460;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	}
+	.main .panel-heading {
+		background: #1a1a2e;
+		border-bottom-color: #0f3460;
+		box-shadow: none;
+	}
+	.main .panel-heading h2,
+	.main .panel-heading-no-border h2 {
+		color: #e0e0e0;
+	}
+	.footer {
+		border-top-color: #0f3460;
+	}
+	.footer, .footer a {
+		color: #8a8a8a;
+	}
+	a#refresh-button {
+		color: #e0e0e0;
+	}
+}
+
+/* Small screen improvements */
+@media (max-width: 600px) {
+	h1 {
+		font-size: 22px;
+		line-height: 24px;
+	}
+	h2 {
+		font-size: 14px;
+	}
+	.main {
+		margin: 5px;
+	}
+	.main .panel, .main .panel-no-border {
+		margin: 3px 0;
+		display: block;
+	}
+	.footer p {
+		display: block;
+		margin: 3px 10px;
+	}
+	.footer p.footer-right {
+		float: none;
+	}
+}
