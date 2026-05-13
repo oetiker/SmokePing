@@ -16,7 +16,7 @@
 
 AUTOMAKE_OPTIONS =  foreign
 
-SUBDIRS = lib thirdparty bin doc etc htdocs
+SUBDIRS = lib thirdparty bin doc etc htdocs t
 
 EXTRA_DIST = COPYRIGHT CHANGES CONTRIBUTORS LICENSE cpanfile VERSION README.md
 

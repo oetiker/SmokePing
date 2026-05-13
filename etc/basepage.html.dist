@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1gQSFA8qQC+y8wAAAB10RVh0Q29tbWVudABDcmVhdGVkIHdpdGggVGhlIEdJTVDvZCVuAAABd0lEQVQoz5WSy07CQBSGTzuF6Y1buQSiCYSgYli7MC54AZc+gC/CE7kzrPQBjDsNIdF4I8oCwr1gO51OOy4aAbGS+K/OTM6X85/5R2g0GvAfSesHjPyj3LyasrIKxch3fXHiSN0Fvv4wbCZuAobsnld7Scw4wIhEhiSCEc/IbgqzZicTMuG0NEpi9jhRLzuZOUXBJRK4ITOfr1yIy6oYIwDQ7KSX3QDgcWFgR9ZtrwCLIQAoJ8j2pVG9Xg8qDsJe0j5MWcW4g5FvMUQ8cRvQXeAplXY0mlfpftI+zpu1tBURed/CHhdCAADoWfiml3gxlYUraZKXVdxKwq6lPx8mqvM97QcQaEalV1O57cffTGVXdzKKa8isNdI3l/6tzly+eM4BQDlOQl4pVEECLDSHUowUNCqsdedVelYZAEB7rIUkfVKYHaQs4okTIjEuJKJePMoCY1fvRghwN9R9gIJKs4orCtxm6Gmq3I/01lDnob+1PdbWR/+lL5mtm+fskIeBAAAAAElFTkSuQmCC" rel="icon" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SmokePing Latency Page for <##title##></title>
@@ -17,7 +18,9 @@
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="logo">
-            <##smokelogo##>
+            <img id="custom-logo" src="img/custom-logo.png" alt="Logo"
+                 onerror="this.style.display='none';document.getElementById('default-logo').style.display='inline-block'">
+            <span id="default-logo" style="display:none"><##smokelogo##></span>
         </div>
     </div>
 
@@ -33,9 +36,18 @@
 </div>
 
 <div class="navbar">
-    <div class="navbar-menu"><a id="menu-button" href="#">Toggle Menu</a></div>
-    <div class="navbar-refresh"><a id="refresh-button" href="#">Auto Refresh</a></div>
-    <div class="navbar-user"><div class="icon-person"></div><##authuser##></div>
+    <div class="navbar-menu">
+        <a id="menu-button" href="#" title="Toggle Menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </a>
+    </div>
+    <div class="navbar-refresh"><a id="refresh-button" href="#" title="Toggle Auto Refresh">Auto Refresh</a></div>
+    <div class="navbar-user">
+        <div class="icon-person">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <##authuser##>
+    </div>
 </div>
 
 <div class="main">
