@@ -198,9 +198,7 @@ sub get_multi_detail ($$$$;$){
         my $sigtime = ($end and $end =~ /^\d+$/) ? $end : time;
         my $date = $cfg->{Presentation}{detail}{strftime} ?
                    POSIX::strftime($cfg->{Presentation}{detail}{strftime}, localtime($sigtime)) : scalar localtime($sigtime);
-        if ( $RRDs::VERSION >= 1.199908 ){
-            $date =~ s|:|\\:|g;
-        }
+        $date =~ s|:|\\:|g;
         $end ||= 'last';
         $start = Smokeping::exp2seconds($start) if $mode =~ /[s]/;
 

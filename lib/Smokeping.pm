@@ -876,9 +876,7 @@ sub get_overview ($$$$){
         POSIX::strftime($cfg->{Presentation}{overview}{strftime},
                         localtime(time)) : scalar localtime(time);
 
-    if ( $RRDs::VERSION >= 1.199908 ){
-            $date =~ s|:|\\:|g;
-    }
+    $date =~ s|:|\\:|g;
     foreach my $prop (sort {exists $tree->{$a}{_order} ? ($tree->{$a}{_order} <=> $tree->{$b}{_order}) : ($a cmp $b)}
                       grep {  ref $tree->{$_} eq 'HASH' and not /^__/ }
                       keys %$tree) {
@@ -1341,11 +1339,8 @@ sub get_detail ($$$$;$){
                 );
     }
 
-    my $BS = '';
-    if ( $RRDs::VERSION >= 1.199908 ){
-        $ProbeDesc =~ s|:|\\:|g;
-        $BS = '\\';
-    }
+    $ProbeDesc =~ s|:|\\:|g;
+    my $BS = '\\';
 
     for (@tasks) {
         my ($desc,$start,$end) = @{$_};
@@ -1354,9 +1349,7 @@ sub get_detail ($$$$;$){
         my $sigtime = ($end and $end =~ /^\d+$/) ? $end : time;
         my $date = $cfg->{Presentation}{detail}{strftime} ?
                    POSIX::strftime($cfg->{Presentation}{detail}{strftime}, localtime($sigtime)) : scalar localtime($sigtime);
-        if ( $RRDs::VERSION >= 1.199908 ){
-            $date =~ s|:|\\:|g;
-        }
+        $date =~ s|:|\\:|g;
         $end ||= 'last';
         $start = exp2seconds($start) if $mode =~ /[s]/;
 
