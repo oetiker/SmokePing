@@ -1,3 +1,4 @@
+ - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - add a smoke test harness covering module loads and the shipped config parser, wired into `make check` @Strykar
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
  - make FPingContinuous configuration more consistent with FPing by supporting protocol, interface and fwmark
