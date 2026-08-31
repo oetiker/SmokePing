@@ -1918,6 +1918,95 @@ sub rfc2822timedate($) {
         $mday, $rfc2822_months[$mon], $year + 1900, $hour, $min, $sec);
 }
 
+# $lastsuccess helper function for check_alerts()
+sub last_success_from_rrd {
+    my ($rrdfile) = @_;
+    return undef unless -r $rrdfile;
+    my @ranges = (
+        "-24h",
+        "-7d",
+        "-30d",
+        "-90d",
+        "-365d",
+    );
+
+    my $info = RRDs::info($rrdfile);
+    my $err = RRDs::error;
+    if ($err) {
+        do_log("RRD info failed for $rrdfile: $err");
+        return undef;
+    }
+
+    my $maxloss = $info->{'ds[loss].max'};
+    return undef unless defined $maxloss;
+    my ($last_success_time, $last_success_loss);
+
+    RANGE:
+    foreach my $range (@ranges) {
+        my ($start, $step, $names, $data) = RRDs::fetch($rrdfile, "AVERAGE", "-s", $range);
+        my $err = RRDs::error;
+        next if $err;
+        my %ds;
+        @ds{@$names} = (0 .. $#$names);
+        next unless exists $ds{loss};
+        my $lossidx = $ds{loss};
+        for (my $i = $#$data; $i >= 0; $i--) {
+            my $loss = $data->[$i][$lossidx];
+            next unless defined $loss;
+            # first success we find going backwards = last success
+            if (!defined $last_success_time && $loss < $maxloss) {
+                $last_success_time = $start + ($i * $step);
+                $last_success_loss  = $loss;
+            }
+        }
+        last RANGE if defined $last_success_time;
+    }
+
+    # Now get CURRENT loss from most recent sample (quick fetch)
+    my ($start, $step, $names, $data) = RRDs::fetch($rrdfile, "AVERAGE", "-s", "-10m");
+    my $err2 = RRDs::error;
+    return undef if $err2;
+
+    my %ds;
+    @ds{@$names} = (0 .. $#$names);
+
+    my $current_loss;
+    if (exists $ds{loss}) {
+        for (my $i = $#$data; $i >= 0; $i--) {
+            my $loss = $data->[$i][$ds{loss}];
+            next unless defined $loss;
+            $current_loss = $loss;
+            last;
+        }
+    }
+
+    return {
+        last_success_time => $last_success_time,
+        last_success_loss => $last_success_loss,
+        current_loss      => $current_loss,
+        max_loss          => $maxloss,
+    };
+}
+
+# Outage Duration Helper function for check_alerts()
+sub format_duration {
+    my $seconds = shift;
+    my $days = int($seconds / 86400);
+    $seconds %= 86400;
+    my $hours = int($seconds / 3600);
+    $seconds %= 3600;
+
+    my $mins = int($seconds / 60);
+    my @out;
+
+    push @out, "${days}d" if $days;
+    push @out, "${hours}h" if $hours;
+    push @out, "${mins}m";
+
+    return join(" ", @out);
+}
+
+
 sub check_alerts {
     my $cfg = shift;
     my $tree = shift;
@@ -1931,7 +2020,7 @@ sub check_alerts {
     my $s = "";
     if ($slave) {
         $s = '~'.$slave
-    }
+    } 
     if ( $tree->{alerts} ) {
                 my $priority_done;
         $tree->{'stack'.$s} = {loss=>['S'],rtt=>['S']} unless defined $tree->{'stack'.$s};
@@ -1945,7 +2034,7 @@ sub check_alerts {
             shift @{$x->{loss}};
             shift @{$x->{rtt}};
             }
-        for (sort { ($cfg->{Alerts}{$a}{priority}||0)
+        for (sort { ($cfg->{Alerts}{$a}{priority}||0)  
                     <=> ($cfg->{Alerts}{$b}{priority}||0)} @{$tree->{alerts}}) {
             my $alert = $cfg->{Alerts}{$_};
             if ( not $alert ) {
@@ -1959,7 +2048,7 @@ sub check_alerts {
             my $prevmatch = $tree->{'prevmatch'.$s}{$_} || 0;
 
             # add the current state of an edge triggered alert to the
-                    # data passed into a matcher, which allows for somewhat
+                    # data passed into a matcher, which allows for somewhat 
                 # more intelligent alerting due to state awareness.
                 $x->{prevmatch} = $prevmatch;
                 my $priority = $alert->{priority};
@@ -1986,12 +2075,27 @@ sub check_alerts {
                 $line .= " [from $slave]" if $slave;
                 my $lossratio = "$loss/$pings";
                 my $loss = "loss: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0f%%", $_ :$_):"U" } @{$x->{loss}};
-                my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}};
+                my $rtt = "rtt: ".join ", ",map {defined $_ ? (/^\d/ ? sprintf "%.0fms", $_*1000 :$_):"U" } @{$x->{rtt}}; 
                         my $time = time;
                 do_log("Alert $_ $what for $line $loss(${lossratio})  $rtt prevmatch: $prevmatch comment: $alert->{comment}");
                 my @stamp = localtime($time);
                 my $stamp = localtime($time);
                 my @to;
+                my $rrd = $name;
+                $rrd .= ".rrd" unless $rrd =~ /\.rrd$/;
+
+                my $rrd_data = last_success_from_rrd($rrd);
+                my $menu  = $tree->{menu}  || $name;
+                my $title = $tree->{title} || $menu;
+                my $lastsuccess = $rrd_data && $rrd_data->{last_success_time} ? scalar localtime($rrd_data->{last_success_time}) : "Never";
+                my $current_loss = defined $rrd_data->{current_loss} ? $rrd_data->{current_loss} : "Unknown";
+                my $max_loss = defined $rrd_data->{max_loss} ? $rrd_data->{max_loss} : "Unknown";
+                my $downtime = "Unknown";
+
+                if ($rrd_data && $rrd_data->{last_success_time}) {
+                    $downtime = format_duration(time - $rrd_data->{last_success_time});
+                }
+
                 foreach my $addr (map {$_ ? (split /\s*,\s*/,$_) : ()} $cfg->{Alerts}{to},$tree->{alertee},$alert->{to}){
                     next unless $addr;
                     if ( $addr =~ /^\|(.+)/) {
@@ -2019,7 +2123,7 @@ $_ $what on $line
 $loss
 $rtt
 SNPPALERT
-                    }
+                    } 
                     elsif ( $addr =~ /^xmpp:(.+)/ ) {
                         my $xmpparg = "$1 -s '[Smokeping] Alert'";
                         my $xmppalert = <<XMPPALERT;
@@ -2063,6 +2167,17 @@ Subject: [SmokeAlert] <##ALERT##> <##WHAT##> on <##LINE##>
 
 Alert "<##ALERT##>" <##WHAT##> for <##URL##>
 
+Target: <##TARGET##>
+Menu: <##MENU##>
+Title: <##TITLE##>
+Host: <##HOST##>
+Last Successful Ping: <##LASTSUCCESS##>
+
+Current Loss: <##CURRENTLOSS##>/<##MAXLOSS##>
+Outage Duration: <##DOWNTIME##>
+
+URL: <##URL##>
+
 Pattern
 -------
 <##PAT##>
@@ -2080,15 +2195,23 @@ DOC
 
                             my $mail = fill_template($alert->{mailtemplate},
                               {
-                                          ALERT => $_,
-                                          WHAT  => $what,
-                                          LINE  => $line,
-                                          URL   => $urlline,
-                                              STAMP => $stamp,
-                                  PAT   => $alert->{pattern},
-                              LOSS  => $loss,
-                              RTT   => $rtt,
-                              COMMENT => $alert->{comment}
+                                          ALERT            => $_,
+                                          WHAT             => $what,
+                                          LINE             => $line,
+                                          HOST             => $tree->{host},
+                                          TARGET           => $line,
+                                          MENU             => $menu,
+                                          TITLE            => $title,
+                                          URL              => $urlline,
+                                          STAMP            => $stamp,
+                                          LASTSUCCESS      => $lastsuccess,
+                                          CURRENTLOSS      => $current_loss,
+                                          MAXLOSS          => $max_loss,
+                                          DOWNTIME         => $downtime,
+                                          PAT              => $alert->{pattern},
+                                          LOSS             => $loss,
+                                          RTT              => $rtt,
+                                          COMMENT          => $alert->{comment}
                                       },$default_mail) || "Subject: smokeping failed to open mailtemplate '$alert->{mailtemplate}'\n\nsee subject\n";
                     my $rfc2822stamp = rfc2822timedate($time);
                     my $to = join ",",@to;
