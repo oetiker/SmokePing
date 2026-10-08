@@ -1362,7 +1362,10 @@ sub get_detail ($$$$;$){
             my $s = $slave ? "~$slave" : "";
             my $swidth = $max->{$s}{$start} / $cfg->{Presentation}{detail}{height};
             my $rrd = $base_rrd.$s.".rrd";
-            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime) || 0;
+            my $stddev_step = ($mode ne 'c' and $realstart =~ /^-?\d+$/)
+                ? int(($realstart < 0 ? -$realstart : $sigtime - $realstart) / $cfg->{Presentation}{detail}{width})
+                : undef;
+            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime,$stddev_step) || 0;
             my @median = ("DEF:median=${rrd}:median:AVERAGE",
                           "CDEF:ploss=loss,$pings,/,100,*",
                           "VDEF:avmed=median,AVERAGE",

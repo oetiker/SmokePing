@@ -1,3 +1,4 @@
+ - fetch std dev data at the graph's resolution, so long high-resolution RRAs no longer make detail pages slow and memory hungry @notprolands
  - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - add a smoke test harness covering module loads and the shipped config parser, wired into `make check` @Strykar
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93

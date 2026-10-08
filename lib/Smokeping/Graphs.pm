@@ -249,7 +249,10 @@ sub get_multi_detail ($$$$;$){
 
             push @colors, $medc;
             my $sdc = $medc;
-            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime) || 0;
+            my $stddev_step = ($mode ne 'c' and $realstart =~ /^-?\d+$/)
+                ? int(($realstart < 0 ? -$realstart : $sigtime - $realstart) / $cfg->{Presentation}{detail}{width})
+                : undef;
+            my $stddev = Smokeping::RRDhelpers::get_stddev($rrd,'median','AVERAGE',$realstart,$sigtime,$stddev_step) || 0;
             $sdc =~ s/^(......).*/${1}30/;
             push @G,
                 "DEF:median$i=${rrd}:median:AVERAGE",
