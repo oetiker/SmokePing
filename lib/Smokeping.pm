@@ -2,7 +2,7 @@
 package Smokeping;
 
 use strict;
-use CGI;
+use CGI qw(escapeHTML);
 use Getopt::Long;
 use Pod::Usage;
 use Digest::MD5 qw(md5_base64);
@@ -1492,7 +1492,7 @@ sub get_detail ($$$$;$){
  #             die "<div>INFO:".join("<br/>",@task)."</div>";
               my $ERROR = RRDs::error();
               if ($ERROR) {
-                  return "<div>ERROR: $ERROR</div><div>".join("<br/>",@task)."</div>";
+                  return "<div>ERROR: ".escapeHTML($ERROR)."</div><div>".join("<br/>",map {escapeHTML($_)} @task)."</div>";
               };
         }
 
@@ -1512,7 +1512,7 @@ sub get_detail ($$$$;$){
            $page .= "<div class=\"".panel_class()."\">";
            if ($cfg->{Presentation}{htmltitle} eq 'yes') {
                 # TODO we generate this above to, maybe share code or store variable ?
-                $page .= "<div class=\"".panel_heading_class()."\"><h2>$desc</h2></div>";
+                $page .= "<div class=\"".panel_heading_class()."\"><h2>".escapeHTML($desc)."</h2></div>";
             }
            $page .= "<div class=\"panel-body\">";
            $page .= qq|<IMG alt="" id="zoom" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.svg">| ;
@@ -1786,7 +1786,7 @@ sub display_webpage($$){
 
     my $display_tree = $tree->{__tree_link} ? $tree->{__tree_link} : $tree;
 
-    my $authuser = $ENV{REMOTE_USER} || 'Guest';
+    my $authuser = escapeHTML($ENV{REMOTE_USER} || 'Guest');
     my $getdetailoutput = get_detail( $cfg,$q,$tree,$open_orig );
     return if not defined $getdetailoutput;
     my $page = fill_template
