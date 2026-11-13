@@ -1,3 +1,4 @@
+ - harden master/slave authentication: match slave names literally, check the slave is configured before reading secrets, compare MACs in constant time @somethingwithproof
  - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - add a smoke test harness covering module loads and the shipped config parser, wired into `make check` @Strykar
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
