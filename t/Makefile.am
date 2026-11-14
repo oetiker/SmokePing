@@ -17,7 +17,10 @@ TESTS = \
     01-load-probes.t \
     02-load-matchers.t \
     03-load-sorters.t \
-    04-config-parse.t
+    04-config-parse.t \
+    08-slave-cache.t \
+    09-reload.t \
+    10-slave-reload.t
 
 # Tests run as executable Perl scripts via their shebang. PERL5LIB points
 # at the in-tree library and at the Carton-installed CPAN deps under

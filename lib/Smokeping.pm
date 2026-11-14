@@ -4772,25 +4772,25 @@ RESTART:
                 $gothup = 0;
                 my $oldprobes = $probes;
                 if ($slave_mode) {
-                    load_cfg_slave(\%opt);
+                    $reloading = 0, next unless reload_cfg_slave(\%opt);
                 } else {
                     $reloading = 0, next unless reload_cfg($cfgfile);
                 }
                 do_debuglog("Restarting probe processes " . join(",", keys %probepids) . ".");
                 kill SIGHUP, $_ for (keys %probepids);
                 my $i=0;
+                my %termsent;
                 while (keys %probepids) {
                         sleep 1;
                         if ($i % 10 == 0) {
                                 do_log("Waiting for child processes to terminate.");
                         }
                         $i++;
-                        my %termsent;
                         for (keys %probepids) {
                                 my $step = $oldprobes->{$probepids{$_}}->step;
-                                if ($i > $step) {
+                                if ($i > $step and not exists $termsent{$_}) {
                                         do_log("Child process $_ took over its step value to terminate, killing it with SIGTERM");
-                                        if (kill SIGTERM, $_ == 0 and exists $probepids{$_}) {
+                                        if (kill(SIGTERM, $_) == 0 and exists $probepids{$_}) {
                                                 do_log("Fatal: Child process $_ has disappeared? This shouldn't happen. Giving up.");
                                                 exit 1;
                                         } else {
@@ -4908,8 +4908,8 @@ KID:
                     exit 1;
                 }
                 if (!$multiprocessmode) {
-                    load_cfg_slave(\%opt);
-                    last;
+                    last if reload_cfg_slave(\%opt);
+                    $gothup = 0;
                 }
              }
         } else {
@@ -4941,7 +4941,10 @@ KID:
                         do_log($warn);
                 }
         }
-        last if checkhup($multiprocessmode, $gothup) && reload_cfg($cfgfile);
+        if (checkhup($multiprocessmode, $gothup)) {
+                last if reload_cfg($cfgfile);
+                $gothup = 0; # keep running with the old config
+        }
     }
     $0 =~ s/ \[$myprobe\]$// if $changeprocessnames;
     goto RESTART;
@@ -4960,6 +4963,19 @@ sub checkhup ($$) {
                 }
         }
         return 0;
+}
+
+# Fetch a new configuration from the master. If that fails keep the
+# current configuration and probes, as reload_cfg does on a master.
+sub reload_cfg_slave ($) {
+        my $opt = shift;
+        my ($oldcfg, $oldprobes) = ($cfg, $probes);
+        do_log("Reloading slave configuration.");
+        my $slave_cfg = eval { load_cfg_slave($opt) };
+        return $slave_cfg if $slave_cfg;
+        do_log("Reloading slave configuration failed: $@");
+        ($cfg, $probes) = ($oldcfg, $oldprobes);
+        return;
 }
 
 sub reload_cfg ($) {
