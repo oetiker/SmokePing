@@ -2,7 +2,7 @@
 package Smokeping;
 
 use strict;
-use CGI;
+use CGI qw(escapeHTML);
 use Getopt::Long;
 use Pod::Usage;
 use Digest::MD5 qw(md5_base64);
@@ -630,6 +630,33 @@ sub init_target_tree ($$$$) {
     }
 };
 
+# Menu filters come from the request and are matched against every menu
+# entry. Unless literalsearch is set they are regular expressions; filters
+# that are long, use many quantifiers or do not compile are matched literally
+# instead, which keeps the cost of a search bounded.
+sub filter_regex ($$) {
+    my ($cfg, $filter) = @_;
+    my $quantifiers = () = $filter =~ /[*+]/g;
+    unless (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes'
+            or length($filter) > 64 or $quantifiers > 3) {
+        my $re = eval { qr/$filter/i };
+        return $re if $re;
+    }
+    return qr/\Q$filter\E/i;
+}
+
+# Secret for a DYNAMIC host: 128 bits from the system random source.
+our $random_source = '/dev/urandom';
+sub random_secret () {
+    if (open my $fh, '<:raw', $random_source) {
+        my $got = read $fh, my $buf, 16;
+        close $fh;
+        return unpack 'H*', $buf if defined $got and $got == 16;
+    }
+    # no /dev/urandom: fall back to Perl's generator
+    return join '', map { sprintf '%04x', int rand 65536 } 1 .. 8;
+}
+
 sub enable_dynamic($$$$);
 sub enable_dynamic($$$$){
     my $cfg = shift;
@@ -646,7 +673,7 @@ sub enable_dynamic($$$$){
         } else {
             my $usepath = $path;
             $usepath =~ s/\.$//;
-            my $secret = int(rand 1000000);
+            my $secret = random_secret();
             my $md5 = md5_base64($secret);
             open C, "<$cfgfile" or die "ERROR: Reading $cfgfile: $!\n";
             open G, ">$cfgfile.new" or die "ERROR: Writing $cfgfile.new: $!\n";
@@ -765,12 +792,7 @@ sub target_menu($$$$;$){
             }
    	    };
 		if ($filter){
-			my $filter_re;
-			if (($cfg->{Presentation}{literalsearch} || 'no') eq 'yes') {
-				$filter_re = qr/\Q$filter\E/i;
-			} else {
-				$filter_re = qr/$filter/i;
-			}
+			my $filter_re = filter_regex($cfg, $filter);
 			if (($menu and $menu =~ $filter_re) or ($title and $title =~ $filter_re)){
 				push @matches, ["$path$key$suffix",$menu,$class,$menuclass];
 			};
@@ -1492,7 +1514,7 @@ sub get_detail ($$$$;$){
  #             die "<div>INFO:".join("<br/>",@task)."</div>";
               my $ERROR = RRDs::error();
               if ($ERROR) {
-                  return "<div>ERROR: $ERROR</div><div>".join("<br/>",@task)."</div>";
+                  return "<div>ERROR: ".escapeHTML($ERROR)."</div><div>".join("<br/>",map {escapeHTML($_)} @task)."</div>";
               };
         }
 
@@ -1512,7 +1534,7 @@ sub get_detail ($$$$;$){
            $page .= "<div class=\"".panel_class()."\">";
            if ($cfg->{Presentation}{htmltitle} eq 'yes') {
                 # TODO we generate this above to, maybe share code or store variable ?
-                $page .= "<div class=\"".panel_heading_class()."\"><h2>$desc</h2></div>";
+                $page .= "<div class=\"".panel_heading_class()."\"><h2>".escapeHTML($desc)."</h2></div>";
             }
            $page .= "<div class=\"panel-body\">";
            $page .= qq|<IMG alt="" id="zoom" width="$xs{''}" height="$ys{''}" SRC="${imghref}_${end}_${start}.svg">| ;
@@ -1746,10 +1768,11 @@ sub display_webpage($$){
        $cfg->{__sortercachekeeptime} = time + 60;
     };
     if (not $charts){
+       # every step of the path must be a target section; other keys
+       # (host, probe, ...) are not pages
        for (@$open) {
          die "ERROR: Section '$_' does not exist (display webpage)."  # .(join "", map {"$_=$ENV{$_}"} keys %ENV)."\n"
-                 unless exists $tree->{$_};
-         last unless  ref $tree->{$_} eq 'HASH';
+                 unless ref $tree->{$_} eq 'HASH';
          $tree = $tree->{$_};
        }
     }
@@ -1786,7 +1809,7 @@ sub display_webpage($$){
 
     my $display_tree = $tree->{__tree_link} ? $tree->{__tree_link} : $tree;
 
-    my $authuser = $ENV{REMOTE_USER} || 'Guest';
+    my $authuser = escapeHTML($ENV{REMOTE_USER} || 'Guest');
     my $getdetailoutput = get_detail( $cfg,$q,$tree,$open_orig );
     return if not defined $getdetailoutput;
     my $page = fill_template
@@ -2376,6 +2399,7 @@ sub get_parser () {
         next unless s/\.pm$//;
         push @matcherlist, $_;
     }
+    closedir D;
 
     die("Can't find sorter module directory") unless defined $sorterdir;
     opendir(D, $sorterdir) or die("opendir $sorterdir: $!");
@@ -2384,6 +2408,7 @@ sub get_parser () {
         next unless s/\.pm$//;
         push @sorterlist, $_;
     }
+    closedir D;
 
     # The target-specific vars of each probe
     # We need to store them to relay information from Probes section to Target section
@@ -3302,7 +3327,9 @@ DOC
            _doc => <<DOC,
 By default, SmokePing will process filter menu queries as regular
 expressions, if set to 'yes' searches will be treated as literal strings
-instead.
+instead. Queries longer than 64 characters, with more than three '*' or
+'+' quantifiers, or that are not valid regular expressions are always
+treated as literal strings.
 DOC
            _re  => '(yes|no)',
            _re_error =>"this must either be 'yes' or 'no'",
