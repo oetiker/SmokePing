@@ -18,7 +18,8 @@ TESTS = \
     02-load-matchers.t \
     03-load-sorters.t \
     04-config-parse.t \
-    06-web-escaping.t
+    06-web-escaping.t \
+    07-web-input.t
 
 # Tests run as executable Perl scripts via their shebang. PERL5LIB points
 # at the in-tree library and at the Carton-installed CPAN deps under

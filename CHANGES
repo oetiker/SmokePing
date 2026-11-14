@@ -1,3 +1,4 @@
+ - harden web input: bound the cost of regex menu filters, reject target paths that are not target sections, use 128-bit secrets for DYNAMIC hosts, and close directory handles left open by the config parser (which broke DYNAMIC address updates on Perl 5.28+) @somethingwithproof
  - harden the web UI: HTML-escape the navigator title, RRD error output and REMOTE_USER, and build the multi-host navigator link from the resolved target @somethingwithproof
  - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - add a smoke test harness covering module loads and the shipped config parser, wired into `make check` @Strykar
