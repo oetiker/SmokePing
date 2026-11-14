@@ -1,3 +1,4 @@
+ - fix probe sample bookkeeping: DismanPing kept one history row too many (RRDs::update then rejected the round), extra samples are now trimmed instead of producing a negative loss, a 0 ms median is no longer recorded as unknown, and DismanPing no longer writes its owner index to stderr @somethingwithproof
  - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - add a smoke test harness covering module loads and the shipped config parser, wired into `make check` @Strykar
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
