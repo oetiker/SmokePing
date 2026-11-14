@@ -230,9 +230,11 @@ Read the secrets file and figure the secret for the slave which is talking to us
 sub get_secret {
     my $cfg = shift;
     my $slave = shift;
+    return unless defined $slave and length $slave;
     if (open my $hand, "<", $cfg->{Slaves}{secrets}){
         while (<$hand>){
-            next unless /^${slave}:(\S+)/;
+            # the slave name comes from the client, so match it literally
+            next unless /^\Q${slave}\E:(\S+)/;
             close $hand;
             return $1;
         }
@@ -242,6 +244,20 @@ sub get_secret {
         return '__HORRIBLE_INLINE_SIGNALING__';
     }
     return;
+}
+
+=head3 secure_eq(a,b)
+
+Compare two strings in time that does not depend on where they differ.
+
+=cut
+
+sub secure_eq {
+    my ($x, $y) = @_;
+    return 0 unless defined $x and defined $y and length $x == length $y;
+    my $diff = 0;
+    $diff |= ord(substr($x, $_, 1)) ^ ord(substr($y, $_, 1)) for 0 .. length($x) - 1;
+    return $diff == 0;
 }
 
 =head3 answer_slave
@@ -255,8 +271,15 @@ sub answer_slave {
     my $cfg = shift;
     my $q = shift;
     my $slave = $q->param('slave');
+    # only look up secrets for slaves that are actually configured
+    if (not defined $slave or not ref $cfg->{Slaves}{$slave} eq 'HASH'){
+        $slave = '' unless defined $slave;
+        print "Content-Type: text/plain\n\n";
+        print "WARNING: I don't know the slave ${slave} ignoring it";
+        return;
+    }
     my $secret = get_secret($cfg,$slave);
-    return if $secret eq '__HORRIBLE_INLINE_SIGNALING__';
+    return if defined $secret and $secret eq '__HORRIBLE_INLINE_SIGNALING__';
     if (not $secret){
         print "Content-Type: text/plain\n\n";
         print "WARNING: No secret found for slave ${slave}\n";
@@ -272,13 +295,8 @@ sub answer_slave {
     my $key = $q->param('key');
     my $data = $q->param('data');
     my $config_time = $q->param('config_time');
-    if (not ref $cfg->{Slaves}{$slave} eq 'HASH'){
-        print "Content-Type: text/plain\n\n";
-        print "WARNING: I don't know the slave ${slave} ignoring it";
-        return;
-    }
     # lets make sure the we share a secret
-    if (hmac_md5_hex($data,$secret) eq $key){
+    if (secure_eq(hmac_md5_hex($data,$secret), $key)){
         save_updates $cfg, $slave, $data;
     } else {
         print "Content-Type: text/plain\n\n";
