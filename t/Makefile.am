@@ -17,15 +17,14 @@ TESTS = \
     01-load-probes.t \
     02-load-matchers.t \
     03-load-sorters.t \
-    04-config-parse.t \
-    08-slave-cache.t \
-    09-reload.t \
-    10-slave-reload.t
+    04-config-parse.t
 
 # Tests run as executable Perl scripts via their shebang. PERL5LIB points
 # at the in-tree library and at the Carton-installed CPAN deps under
 # thirdparty/, so `make check` works after `make` has populated either.
 TESTS_ENVIRONMENT = \
     PERL5LIB="$(abs_top_srcdir)/lib:$(abs_top_srcdir)/thirdparty/lib/perl5:$$PERL5LIB"
+
+TESTS += 08-slave-cache.t 09-reload.t 10-slave-reload.t
 
 EXTRA_DIST = $(TESTS) lib/SPTest.pm

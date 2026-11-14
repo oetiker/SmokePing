@@ -1,6 +1,6 @@
+ - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - fix daemon reloads: send SIGTERM only to the overdue child (a precedence bug signalled the whole process group), keep the old config when a slave cannot load the one pushed by its master, and stop retrying a failed single-process reload every round @somethingwithproof
  - fix slave cache handling: keep updates when the cache file is replaced between open and lock, and match slave names exactly @somethingwithproof
- - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - add a smoke test harness covering module loads and the shipped config parser, wired into `make check` @Strykar
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
  - make FPingContinuous configuration more consistent with FPing by supporting protocol, interface and fwmark
