@@ -1,6 +1,7 @@
  - drop old rrd version check, incompatible with rrdtool 1.10 and later versioning @rosario
  - add a smoke test harness covering module loads and the shipped config parser, wired into `make check` @Strykar
  - modernize web UI with updated CSS design system, SVG icons, sticky footer, and custom logo support via img/custom-logo.png @svenvg93
+ - harden the web UI: HTML-escape the navigator title, RRD error output and REMOTE_USER, and build the multi-host navigator link from the resolved target @somethingwithproof
  - make FPingContinuous configuration more consistent with FPing by supporting protocol, interface and fwmark
 2026-03-31 10:48:53 +0200 Marc López <@MarcLopezB>
 

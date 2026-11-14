@@ -300,7 +300,7 @@ sub get_multi_detail ($$$$;$){
         #  print "<div>INFO:".join("<br/>",@task)."</div>";
         my $ERROR = RRDs::error();
         if ($ERROR) {
-            return "<div>ERROR: $ERROR</div><div>".join("<br/>",@task)."</div>";
+            return "<div>ERROR: ".CGI::escapeHTML($ERROR)."</div><div>".join("<br/>",map {CGI::escapeHTML($_)} @task)."</div>";
         };
 
 
@@ -353,7 +353,7 @@ sub get_multi_detail ($$$$;$){
             $page .= "<div class=\"panel-heading\"><h2>$desc</h2></div>"
                 if $cfg->{Presentation}{htmltitle} eq 'yes';
             $page .= "<div class=\"panel-body\">";
-            $page .= ( qq{<a href="?displaymode=n&start=$startstr&end=now&}."target=".$q->param('target').'">'
+            $page .= ( qq{<a href="?}.Smokeping::hierarchy($q).qq{displaymode=n&start=$startstr&end=now&}."target=".join('.', @$open).'">'
                   . qq{<IMG ALT="" SRC="${imghref}_${end}_${start}.svg" class="img-responsive">}."</a>" ); #"
             $page .= "</div></div>\n";
         } else { # chart mode

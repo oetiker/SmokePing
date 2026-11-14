@@ -26,3 +26,6 @@ TESTS_ENVIRONMENT = \
     PERL5LIB="$(abs_top_srcdir)/lib:$(abs_top_srcdir)/thirdparty/lib/perl5:$$PERL5LIB"
 
 EXTRA_DIST = $(TESTS) lib/SPTest.pm
+
+TESTS += 06-web-escaping.t
+EXTRA_DIST += lib/SPWeb.pm
