@@ -397,7 +397,7 @@ sub ping($) {
                 Smokeping::do_log( "DismanPing: $t->{vars}{host} returned "
                         . scalar(@times)
                         . " results, taking last $t->{vars}{pings}" );
-                @times = @times[ $#times - $t->{vars}{pings} .. $#times ];
+                @times = @times[ $#times - $t->{vars}{pings} + 1 .. $#times ];
             }
 
             if (@times) {
@@ -431,7 +431,6 @@ sub ping($) {
 sub idx ($) {
     my $t = shift;
     my $ownerindex = substr($t->{vars}{ownerindex} || 'SP on '.hostname(),0,32);
-    print STDERR $ownerindex;
     my $testname =  substr($t->{vars}{host} . ' ICMP ping',0,32);
     return join( ".",
         length($ownerindex), unpack( "C*", $ownerindex ),

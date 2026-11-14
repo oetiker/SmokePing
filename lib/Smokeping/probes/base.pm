@@ -135,8 +135,18 @@ sub rrdupdate_string($$)
         unless defined $self->{rtts}{$tree} and @{$self->{rtts}{$tree}} > 0;
     my $entries = scalar @{$self->{rtts}{$tree}};
     my @times = @{$self->{rtts}{$tree}};
+    if ($entries > $pings) {
+        # The RRD has room for $pings samples, and RRDs::update rejects
+        # the whole update otherwise. The samples are sorted, so drop
+        # the extra ones evenly from both ends to keep the median.
+        $self->do_log("Warning: got $entries answers for $pings pings from $tree->{addr}, keeping $pings");
+        my $low = int(($entries - $pings) / 2);
+        @times = @times[$low .. $low + $pings - 1];
+        $entries = $pings;
+    }
     my $loss = $pings - $entries;
-    my $median = $times[int($entries/2)] || 'U';
+    my $median = $times[int($entries/2)];
+    $median = 'U' unless defined $median;
     # shift the data into the middle of the times array
     my $lowerloss = int($loss/2);
     my $upperloss = $loss - $lowerloss;
