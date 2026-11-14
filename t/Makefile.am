@@ -25,4 +25,6 @@ TESTS = \
 TESTS_ENVIRONMENT = \
     PERL5LIB="$(abs_top_srcdir)/lib:$(abs_top_srcdir)/thirdparty/lib/perl5:$$PERL5LIB"
 
+TESTS += 08-slave-cache.t 09-reload.t 10-slave-reload.t
+
 EXTRA_DIST = $(TESTS) lib/SPTest.pm

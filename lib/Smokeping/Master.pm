@@ -43,7 +43,7 @@ sub get_targets {
         # master
         next if $key eq 'host' and $trg->{$key} eq 'DYNAMIC';
         next if $key eq 'host' and $trg->{$key} =~ m|^/|; # skip multi targets
-        next if $key eq 'host' and not ( defined $trg->{slaves} and $trg->{slaves} =~ /\b${slave}\b/);
+        next if $key eq 'host' and not ( defined $trg->{slaves} and grep { $_ eq $slave } split /\s+/, $trg->{slaves});
         if (ref $trg->{$key} eq 'HASH'){
             $return{$key} = get_targets ($trg->{$key},$slave);
             $ok = 1 if defined $return{$key};
@@ -126,6 +126,13 @@ sub make_slavedatadir ($) {
     }
 }
 
+sub same_cache_file {
+    my ($fh, $file) = @_;
+    my @opened = stat $fh;
+    my @current = stat $file;
+    return @opened && @current && $opened[0] == $current[0] && $opened[1] == $current[1];
+}
+
 sub save_updates {
     my $cfg = shift;
     my $slave = shift;
@@ -149,9 +156,11 @@ sub save_updates {
             make_slavedatadir($file);
             if ( open ($fh, '+>>' , $file) and flock($fh, LOCK_EX) ){
                 my $existing = [];
-                if (! -e $file) { # the reader unlinked it from under us
+                # The pathname may have been replaced while we waited for its lock.
+                if (!same_cache_file($fh, $file)) {
                     flock($fh, LOCK_UN);
                     close $fh;
+                    $i++; # Pathname changes are not I/O failures; keep retrying.
                     next;
                 }
                 seek $fh, 0, 0;
@@ -194,15 +203,20 @@ sub get_slaveupdates {
     my $slave = shift;
     my $file = $name . "." . $slave. ".slave_cache";
     my $empty = [];
-    my $data;
+    my $data = $empty; # returned as is when the lock fails
 
     my $datadir = $cfg->{General}{datadir};
     my $dir = slavedatadir($cfg);
     $file =~ s/^\Q$datadir\E/$dir/;
 
     my $fh;
-    if ( open ($fh, '<', $file) ) {
-        if ( flock $fh, LOCK_SH ){
+    for (1..3) {
+        return $empty unless open ($fh, '<', $file);
+        if ( flock $fh, LOCK_EX ){
+            if (!same_cache_file($fh, $file)) {
+                close $fh;
+                next;
+            }
             eval { $data = fd_retrieve $fh };
             unlink $file;
             flock $fh, LOCK_UN;
