@@ -17,9 +17,7 @@ TESTS = \
     01-load-probes.t \
     02-load-matchers.t \
     03-load-sorters.t \
-    04-config-parse.t \
-    06-web-escaping.t \
-    07-web-input.t
+    04-config-parse.t
 
 # Tests run as executable Perl scripts via their shebang. PERL5LIB points
 # at the in-tree library and at the Carton-installed CPAN deps under
@@ -27,4 +25,7 @@ TESTS = \
 TESTS_ENVIRONMENT = \
     PERL5LIB="$(abs_top_srcdir)/lib:$(abs_top_srcdir)/thirdparty/lib/perl5:$$PERL5LIB"
 
-EXTRA_DIST = $(TESTS) lib/SPTest.pm lib/SPWeb.pm
+EXTRA_DIST = $(TESTS) lib/SPTest.pm
+
+TESTS += 06-web-escaping.t 07-web-input.t
+EXTRA_DIST += lib/SPWeb.pm
